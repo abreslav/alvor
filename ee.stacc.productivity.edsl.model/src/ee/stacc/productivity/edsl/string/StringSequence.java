@@ -19,4 +19,8 @@ public class StringSequence extends AbstractStringCollection implements IAbstrac
 	public String toString() {
 		return getItems().toString();
 	}
+
+	public <R, D> R accept(IAbstractStringVisitor<? extends R,? super D> visitor, D data) {
+		return visitor.visitStringSequence(this, data);
+	};
 }

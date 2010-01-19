@@ -18,4 +18,8 @@ public class StringChoice extends AbstractStringCollection implements IAbstractS
 	public String toString() {
 		return getItems().toString().replace('[', '{').replace(']', '}');
 	}
+
+	public <R, D> R accept(IAbstractStringVisitor<? extends R,? super D> visitor, D data) {
+		return visitor.visitStringChoise(this, data);
+	};
 }

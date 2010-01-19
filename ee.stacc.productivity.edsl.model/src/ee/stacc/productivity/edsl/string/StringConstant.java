@@ -23,4 +23,8 @@ public class StringConstant implements IAbstractString {
 	public String getConstant() {
 		return constant;
 	}
+
+	public <R, D> R accept(IAbstractStringVisitor<? extends R,? super D> visitor, D data) {
+		return visitor.visitStringConstant(this, data);
+	};
 }
