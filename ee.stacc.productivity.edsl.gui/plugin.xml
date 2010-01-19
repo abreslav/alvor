@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <viewerContribution
+            id="ee.stacc.eclipsesql.ShowAbstractValueContribution"
+            targetID="#CompilationUnitEditorContext">
+      	<action
+               class="ee.stacc.eclipsesql.plugin.AbstractStringPrinter"
+               menubarPath="ContextMenu"
+               id="ee.stacc.eclipsesql.ShowAbstractValue"
+               label="Show abstract value">
+         </action>
+      </viewerContribution>
+   </extension>
+   <extension
+         id="sqlerror"
+         name="SQL error marker"
+         point="org.eclipse.core.resources.markers">
+      <super type="org.eclipse.core.resources.problemmarker" />
+      <super type="org.eclipse.core.resources.textmarker" />
+      <persistent value="true"/>
+   </extension>
+
+   <extension
+         id="sqlwarning"
+         name="SQL warning marker"
+         point="org.eclipse.core.resources.markers">
+      <super type="org.eclipse.core.resources.problemmarker" />
+      <super type="org.eclipse.core.resources.textmarker" />
+      <persistent value="true"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.jdt.ui.category.source"
+            defaultHandler="ee.stacc.eclipsesql.plugin.CheckProjectHandler"
+            description="Checks SQL usage in active project"
+            id="ee.stacc.eclipsesql.plugin.CheckProject"
+            name="Check SQL in project">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="popup:org.eclipse.jdt.ui.PackageExplorer?after=additions">
+         <command
+               commandId="ee.stacc.eclipsesql.plugin.CheckProject"
+               label="##### Check SQL in active Project ######"
+               style="push">
+         </command>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.definitions">
+      <definition
+            id="javaFileSelected">
+         <with
+               variable="selection">
+            <instanceof
+                  value="org.eclipse.jdt.core.ICompilationUnit">
+            </instanceof>
+         </with>
+      </definition>
+   </extension>
+
+
+</plugin>

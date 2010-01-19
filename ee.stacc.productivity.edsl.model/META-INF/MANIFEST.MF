@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Model
+Bundle-SymbolicName: ee.stacc.productivity.edsl.model
+Bundle-Version: 1.0.0.qualifier
+Export-Package: ee.stacc.productivity.edsl.message,
+ ee.stacc.productivity.edsl.string
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
