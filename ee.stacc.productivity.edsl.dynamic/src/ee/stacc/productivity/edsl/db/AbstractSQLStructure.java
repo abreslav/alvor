@@ -15,7 +15,7 @@ public class AbstractSQLStructure {
 	
 	public AbstractSQLStructure(IAbstractString aStr, SQLStringAnalyzer analyzer) {
 		
-		List<IAbstractString> strList = aStr.getExpandedStrings();
+		List<IAbstractString> strList = null; //TODO aStr.getExpandedStrings();
 		
 		for (IAbstractString expAStr: strList) {
 			SQLStructure struct = analyzer.analyze(expAStr.toString());

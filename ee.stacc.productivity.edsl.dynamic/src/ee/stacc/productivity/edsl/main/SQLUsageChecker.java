@@ -82,11 +82,14 @@ public class SQLUsageChecker {
 		
 		System.err.println("MARK_ERROR: node: " + node.toString());
 		System.err.println("MARK_ERROR: message: " + message);
-		System.err.println("MARK_ERROR: file: " + AbstractStringEvaluator.getNodeFile(node).toString());
+		//System.err.println("MARK_ERROR: file: " + AbstractStringEvaluator.getNodeFile(node).toString());
 		System.err.println("MARK_ERROR: start: " + node.getStartPosition());
 		
-		createMarker(message, ERROR_MARKER_ID, AbstractStringEvaluator.getNodeFile(node),
-				node.getStartPosition(), node.getStartPosition()+node.getLength());
+		
+		
+		//createMarker(message, ERROR_MARKER_ID, AbstractStringEvaluator.getNodeFile(node),
+		//		node.getStartPosition(), node.getStartPosition()+node.getLength());
+		
 		
 		/*
 		List<AbstractString> aStrList = aStr.getExpandedStrings();

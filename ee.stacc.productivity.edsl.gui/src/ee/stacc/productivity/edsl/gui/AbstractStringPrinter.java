@@ -51,9 +51,6 @@ public class AbstractStringPrinter implements IEditorActionDelegate{
 			// TODO kontrolli et on string tüüpi expression
 			System.out.println("Abstract value is: ");
 			System.out.println(AbstractStringEvaluator.getValOf((Expression)node).toString());
-			
-			System.out.println("Simplified abstract value is: ");
-			System.out.println(AbstractStringEvaluator.getValOf((Expression)node).simplify().toString());
 		} 
 		else {
 			System.out.println("Selection is not expression, but: "

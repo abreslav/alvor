@@ -4,10 +4,10 @@
    <extension
          point="org.eclipse.ui.popupMenus">
       <viewerContribution
-            id="ee.stacc.eclipsesql.ShowAbstractValueContribution"
+            id="ee.stacc.productivity.edsl.gui.ShowAbstractValueContribution"
             targetID="#CompilationUnitEditorContext">
       	<action
-               class="ee.stacc.eclipsesql.plugin.AbstractStringPrinter"
+               class="ee.stacc.productivity.edsl.gui.AbstractStringPrinter"
                menubarPath="ContextMenu"
                id="ee.stacc.eclipsesql.ShowAbstractValue"
                label="Show abstract value">
@@ -35,7 +35,7 @@
          point="org.eclipse.ui.commands">
       <command
             categoryId="org.eclipse.jdt.ui.category.source"
-            defaultHandler="ee.stacc.eclipsesql.plugin.CheckProjectHandler"
+            defaultHandler="ee.stacc.productivity.edsl.gui.CheckProjectHandler"
             description="Checks SQL usage in active project"
             id="ee.stacc.eclipsesql.plugin.CheckProject"
             name="Check SQL in project">

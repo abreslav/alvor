@@ -21,7 +21,7 @@ public class CheckProjectHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		System.out.println("CheckProjectHandler.execute");
 		
-		projectChecker.checkProject(getCurrentProject());
+		//projectChecker.checkProject(getCurrentProject());
 		return null;
 	}
 	

@@ -21,8 +21,8 @@ import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import ee.stacc.productivity.edsl.string.IAbstractString;
-import ee.stacc.productivity.edsl.string.StringCharacterSet;
 import ee.stacc.productivity.edsl.string.StringChoice;
+import ee.stacc.productivity.edsl.string.StringConstant;
 import ee.stacc.productivity.edsl.string.StringSequence;
 
 
@@ -179,15 +179,15 @@ public class AbstractStringEvaluator {
 		*/
 		
 		if (type.getName().equals("int")) {
-			return new StringCharacterSet(node.getStartPosition(), getNodeFile(node));
+			throw new UnsupportedStringOpEx
+				("TODO: int expression");
 		}
 		else if (node instanceof SimpleName) {
 			return getVarValBefore(((SimpleName)node).resolveBinding(),
 				getContainingStmt(node));
 		}
 		else if (node instanceof StringLiteral) {
-			return new StringLiteral(((StringLiteral)node).getLiteralValue(),
-					node.getStartPosition(), getNodeFile(node));
+			return new StringConstant(((StringLiteral)node).getLiteralValue());
 		}
 		else if (node instanceof ParenthesizedExpression) {
 			return getValOf(((ParenthesizedExpression)node).getExpression());

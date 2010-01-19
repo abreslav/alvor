@@ -40,7 +40,7 @@ public class ArgumentFinder extends SearchRequestor {
 	 * @param searchScope eg. project or file 
 	 * @return
 	 */
-	List<Expression> findArgumentNodesFor(String methodName, final int argNo, IJavaElement searchScope) {
+	public List<Expression> findArgumentNodesFor(String methodName, final int argNo, IJavaElement searchScope) {
 		SearchPattern pattern = SearchPattern.createPattern(methodName, 
 				IJavaSearchConstants.METHOD, IJavaSearchConstants.REFERENCES, 
 				SearchPattern.R_EXACT_MATCH);
@@ -93,7 +93,7 @@ public class ArgumentFinder extends SearchRequestor {
 		return result;
 	}
 
-	List<IAbstractString> findArgumentAbstractValues(String methodName, final int argNo, IJavaElement searchScope) {
+	public List<IAbstractString> findArgumentAbstractValues(String methodName, final int argNo, IJavaElement searchScope) {
 		SearchPattern pattern = SearchPattern.createPattern(methodName, 
 				IJavaSearchConstants.METHOD, IJavaSearchConstants.REFERENCES, 
 				SearchPattern.R_EXACT_MATCH);
