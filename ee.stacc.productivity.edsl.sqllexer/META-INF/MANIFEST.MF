@@ -6,4 +6,4 @@ Bundle-Version: 1.0.0.qualifier
 Export-Package: .,
  ee.stacc.productivity.edsl.sqllexer
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: ee.stacc.productivity.edsl.strings;bundle-version="1.0.0"
+Require-Bundle: ee.stacc.productivity.edsl.model;bundle-version="1.0.0"
