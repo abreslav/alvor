@@ -9,7 +9,11 @@ import java.util.Set;
 
 public class AutomataInclusion {
 
-	public static boolean checkInclusion(State initial, State start) {
+	public static final AutomataInclusion INSTANCE = new AutomataInclusion();
+	
+	private AutomataInclusion() {}
+	
+	public boolean checkInclusion(State initial, State start) {
 		return new Checker(initial, start).check();
 	}
 	
