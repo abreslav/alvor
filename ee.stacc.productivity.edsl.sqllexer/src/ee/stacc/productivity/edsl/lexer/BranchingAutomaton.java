@@ -54,40 +54,6 @@ public class BranchingAutomaton {
 	private static int totalTransitions = 0;
 	private static int totalVisitors = 0;
 	
-	private class State {
-		private final String name;
-		private final Collection<Transition> incomingTransitions = new ArrayList<Transition>();
-		private final Collection<Transition> outgoingTransitions = new ArrayList<Transition>();
-
-		public State(String name) {
-			this.name = name;
-			totalStates++;
-		}
-		
-		@Override
-		public String toString() {
-			return "[" + name + "]";
-		}
-	}
-	
-	private class Transition {
-		private final State from;
-		private final State to;
-		private final ICharacterSet set; 
-		
-		public Transition(State from, State to, ICharacterSet set) {
-			this.from = from;
-			this.to = to;
-			this.set = set;
-			totalTransitions++;
-		}
-		
-		@Override
-		public String toString() {
-			return from + " -> " + to;
-		}
-	}
-
 	private final Collection<State> states;
 	private State initialState;
 	private State currentState;
