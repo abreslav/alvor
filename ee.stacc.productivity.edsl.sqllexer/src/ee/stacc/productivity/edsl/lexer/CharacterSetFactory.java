@@ -88,6 +88,10 @@ public class CharacterSetFactory {
 		return new CSet(from, to);
 	}
 	
+	public static ICharacterSet set(Set<Character> set) {
+		return new CSet(set);
+	}
+	
 	public static ICharacterSet any() {
 		if (ANY == null) {
 			ANY = new ICharacterSet() {

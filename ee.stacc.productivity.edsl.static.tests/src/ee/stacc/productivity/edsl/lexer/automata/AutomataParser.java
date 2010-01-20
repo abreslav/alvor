@@ -45,9 +45,12 @@ public class AutomataParser {
 				for (Transition transition : state.getOutgoingTransitions()) {
 					stringBuilder
 						.append(transition.getTo())
-						.append(transition.getSet().toString()
+						.append(transition.getInSet().toString()
 								.replace('[', '{')
 								.replace(']', '}'))
+						.append("/")
+						.append(transition.getOutStr())
+						.append("/")
 						.append(" ");
 				}
 				stringBuilder.append(";\n");
@@ -63,7 +66,7 @@ public class AutomataParser {
 		Map<String, State> map = new HashMap<String, State>();
 		State initialState = null;
 		for (String line : lines) {
-			Pattern pattern = Pattern.compile("(!?[A-Za-z0-9]+)(:([A-Za-z]))?");
+			Pattern pattern = Pattern.compile("(!?[A-Za-z0-9]+)(:([A-Za-z0-9_\"]))?(/([A-Za-z0-9_]?))?");
 			Matcher matcher = pattern.matcher(line);
 			if (!matcher.find()) {
 				continue;
@@ -77,7 +80,8 @@ public class AutomataParser {
 				State to = getState(map, matcher.group(1));
 				char c = matcher.group(3).charAt(0);
 				ICharacterSet range = CharacterSetFactory.range(c, c);
-				Transition transition = new Transition(from, to, range);
+				String outStr = matcher.group(5);
+				Transition transition = new Transition(from, to, range, outStr == null ? "" : outStr);
 				from.getOutgoingTransitions().add(transition);
 				to.getIncomingTransitions().add(transition);
 			}

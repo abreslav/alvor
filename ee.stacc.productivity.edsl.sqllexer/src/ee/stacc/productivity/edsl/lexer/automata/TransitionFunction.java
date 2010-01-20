@@ -18,7 +18,7 @@ public class TransitionFunction {
 		Collection<Transition> transitions = state.getOutgoingTransitions();
 		ICharacterSet allTransitions = CharacterSetFactory.empty();
 		for (Transition transition : transitions) {
-			ICharacterSet set = transition.getSet();
+			ICharacterSet set = transition.getInSet();
 			if (set.intersects(chars)) {
 				result.add(transition.getTo());
 				allTransitions = allTransitions.join(set);
