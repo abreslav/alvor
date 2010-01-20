@@ -1,7 +1,7 @@
 package ee.stacc.productivity.edsl.lexer.automata;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -17,8 +17,8 @@ public class AutomataParser {
 		private final State initialState;
 		
 		public Automaton(
-				Set<ee.stacc.productivity.edsl.lexer.automata.State> states,
-				ee.stacc.productivity.edsl.lexer.automata.State initialState) {
+				Set<State> states,
+				State initialState) {
 			this.states = states;
 			this.initialState = initialState;
 		}
@@ -32,30 +32,7 @@ public class AutomataParser {
 		}
 		
 		public String toString() {
-			StringBuilder stringBuilder = new StringBuilder();
-			for (State state : states) {
-				if (initialState == state) {
-					stringBuilder.append("->");
-				}
-				stringBuilder
-					.append(state);
-				if (!state.getOutgoingTransitions().isEmpty()) {
-					stringBuilder.append(" -> ");
-				}
-				for (Transition transition : state.getOutgoingTransitions()) {
-					stringBuilder
-						.append(transition.getTo())
-						.append(transition.getInSet().toString()
-								.replace('[', '{')
-								.replace(']', '}'))
-						.append("/")
-						.append(transition.getOutStr())
-						.append("/")
-						.append(" ");
-				}
-				stringBuilder.append(";\n");
-			}
-			return stringBuilder.toString();
+			return statesToString(states, initialState);
 		}
 	}
 	
@@ -63,7 +40,7 @@ public class AutomataParser {
 		text = text.replace('-', ' ');
 		String[] lines = text.split(";");
 		
-		Map<String, State> map = new HashMap<String, State>();
+		Map<String, State> map = new LinkedHashMap<String, State>();
 		State initialState = null;
 		for (String line : lines) {
 			Pattern pattern = Pattern.compile("(!?[A-Za-z0-9]+)(:([A-Za-z0-9_\"]))?(/([A-Za-z0-9_]?))?");
@@ -83,10 +60,10 @@ public class AutomataParser {
 				String outStr = matcher.group(5);
 				Transition transition = new Transition(from, to, range, outStr == null ? "" : outStr);
 				from.getOutgoingTransitions().add(transition);
-				to.getIncomingTransitions().add(transition);
+//				to.getIncomingTransitions().add(transition);
 			}
 		}
-		return new Automaton(new HashSet<State>(map.values()), initialState);
+		return new Automaton(new LinkedHashSet<State>(map.values()), initialState);
 	}
 	
 	private static State getState(Map<String, State> map, String name) {
@@ -98,4 +75,34 @@ public class AutomataParser {
 		return state;
 	}	
 	
+	public static String statesToString(Set<State> theStates,
+			State theInitialState) {
+		StringBuilder stringBuilder = new StringBuilder();
+		for (State state : theStates) {
+			if (theInitialState == state) {
+				stringBuilder.append("->");
+			}
+			if (state.isAccepting()) {
+				stringBuilder.append("a:");
+			}
+			stringBuilder
+				.append(state);
+			if (!state.getOutgoingTransitions().isEmpty()) {
+				stringBuilder.append(" -> ");
+			}
+			for (Transition transition : state.getOutgoingTransitions()) {
+				stringBuilder
+					.append(transition.getTo())
+					.append(transition.getInSet().toString()
+							.replace('[', '{')
+							.replace(']', '}'))
+					.append("/")
+					.append(transition.getOutStr())
+					.append("/")
+					.append(" ");
+			}
+			stringBuilder.append(";\n");
+		}
+		return stringBuilder.toString();
+	}
 }

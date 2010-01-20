@@ -9,7 +9,6 @@ import java.util.Collection;
 public class State {
 	private final String name;
 	private final boolean accepting;
-	private final Collection<Transition> incomingTransitions = new ArrayList<Transition>();
 	private final Collection<Transition> outgoingTransitions = new ArrayList<Transition>();
 
 	public State(String name, boolean accepting) {
@@ -19,10 +18,6 @@ public class State {
 
 	public String getName() {
 		return name;
-	}
-
-	public Collection<Transition> getIncomingTransitions() {
-		return incomingTransitions;
 	}
 
 	public Collection<Transition> getOutgoingTransitions() {
@@ -35,6 +30,6 @@ public class State {
 
 	@Override
 	public String toString() {
-		return "[" + name + "]";
+		return name;
 	}
 }

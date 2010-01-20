@@ -148,7 +148,7 @@ public class AutomataInclusion {
 
 	}
 
-	private static <K, V> Set<V> getSet(Map<K, Set<V>> map, K key) {
+	public static <K, V> Set<V> getSet(Map<K, Set<V>> map, K key) {
 		Set<V> set = map.get(key);
 		if (set == null) {
 			set = new HashSet<V>();

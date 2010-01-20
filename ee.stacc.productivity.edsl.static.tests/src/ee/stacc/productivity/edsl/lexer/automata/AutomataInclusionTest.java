@@ -3,12 +3,7 @@ package ee.stacc.productivity.edsl.lexer.automata;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.LinkedHashSet;
 
 import org.junit.Test;
 
@@ -158,6 +153,69 @@ public class AutomataInclusionTest {
 						AutomataParser.parse(automaton2).getInitialState())
 		);
 		
+
+		// aa*
+		automaton1 = 
+			"A1 - !A2:a;" +
+			"!A2 - !A2:a A3:b";
+		// aaa*
+		automaton2 = 
+			"S1 - S2:a;" +
+			"S2 - !S3:a;" +
+			"!S3 - !S3:a;";
+		assertTrue(
+				AutomataInclusion.INSTANCE.checkInclusion(
+						AutomataParser.parse(automaton1).getInitialState(), 
+						AutomataParser.parse(automaton2).getInitialState())
+		);
+		
+		
+		// VV*SS*V | SS*V | V
+		automaton1 = 
+			"C1 - !C13:V C2:S;" +
+			"C2 - C2:S !C3:V;" +
+			"!C13 - !C13:V C6:S;" +
+			"C6 - C6:S !C7:V;";
+		automaton2 = 
+			"A1 - !A3:V A4:S;" +
+			"!A3 - !A3:V A4:S;" +
+			"A4 - A4:S !A5:V;";
+		assertTrue(
+				AutomataInclusion.INSTANCE.checkInclusion(
+						AutomataParser.parse(automaton1).getInitialState(), 
+						AutomataParser.parse(automaton2).getInitialState())
+		);
+		
+		
+		automaton1 = 
+			"C1 - C1:V C2:S !C3:V;" +
+			"C2 - C2:S !C3:V;";
+		automaton2 = 
+			"A1 - A4:S !A5:V A1:V;" +
+			"A4 - A4:S !A5:V;" +
+			"!A5;";
+		assertTrue(
+				AutomataInclusion.INSTANCE.checkInclusion(
+						AutomataDeterminator.determinate(AutomataParser.parse(automaton1).getInitialState()), 
+						AutomataDeterminator.determinate(AutomataParser.parse(automaton2).getInitialState()))
+		);
+		
+		
+		automaton1 = 
+			"C1 - !C13:V C2:S;" +
+			"C2 - C2:S !C3:V;" +
+			"!C13 - !C13:V C6:S;" +
+			"C6 - C6:S !C7:V;";
+		automaton2 = 
+			"A1 - A4:S !A5:V A1:V;" +
+			"A4 - A4:S !A5:V;" +
+			"!A5;";
+		assertTrue(
+				AutomataInclusion.INSTANCE.checkInclusion(
+						AutomataParser.parse(automaton1).getInitialState(), 
+						AutomataDeterminator.determinate(AutomataParser.parse(automaton2).getInitialState()))
+		);
+		
 	}
 	
 	
@@ -208,166 +266,25 @@ public class AutomataInclusionTest {
 		transducer = AutomataParser.parse(transducerStr);
 		check = AutomataParser.parse(checkStr);
 		transduction = AutomataInclusion.INSTANCE.getTrasduction(transducer.getInitialState(), automaton.getInitialState());
-		transduction = eliminateEmptySetTransitions(transduction);
-		System.out.println(transduction.getOutgoingTransitions());
-		assertTrue(AutomataInclusion.INSTANCE.checkInclusion(transduction, check.getInitialState()));
-		assertTrue(AutomataInclusion.INSTANCE.checkInclusion(check.getInitialState(), transduction));
 		
+		transduction = EmptyTransitionEliminator.INSTANCE.eliminateEmptySetTransitions(transduction);
+		transduction = AutomataDeterminator.determinate(transduction);
+		printAutomaton(transduction);
+		
+		State checkInit = AutomataDeterminator.determinate(check.getInitialState());
+		printAutomaton(checkInit);
+		
+		assertTrue(AutomataInclusion.INSTANCE.checkInclusion(transduction, checkInit));
+		assertTrue(AutomataInclusion.INSTANCE.checkInclusion(checkInit, transduction));
+		
+	}
+
+
+	private void printAutomaton(State transduction) {
+		LinkedHashSet<State> states = new LinkedHashSet<State>();
+		EmptyTransitionEliminator.INSTANCE.dfs(transduction, states);
+		System.out.println(AutomataParser.statesToString(states, transduction));
 	}
 	
-	private static final class DisjointSets {
-
-		private final Random random = new Random();
-		private final int[] parents;
-		
-		public DisjointSets(int size) {
-			this.parents = new int[size];
-		}
-
-		public void add(int x) {
-			parents[x] = x;
-		}
-		
-		public int find(int x) {
-			if (parents[x] == x) {
-				return x;
-			} else {
-				int representative = find(parents[x]);
-				parents[x] = representative;
-				return representative;
-			}
-		}
-		
-		public void union(int x, int y) {
-			int xr = find(x);
-			int yr = find(y);
-			if (random.nextBoolean()) {
-				parents[y] = xr;
-			} else {
-				parents[x] = yr;
-			}
-		}
-		
-	}
-	
-	private static final class DisjointSetsOf<E> {
-		private final DisjointSets disjointSets;
-		private final Map<E, Integer> map = new HashMap<E, Integer>();
-		private final Object[] elements;
-		private int index = 0;
-		
-		public DisjointSetsOf(int size) {
-			this.disjointSets = new DisjointSets(size);
-			this.elements = new Object[size];
-		}
-		
-		public boolean add(E e) {
-			if (map.containsKey(e)) {
-				return false;
-			}
-			int ind = index;
-			index++;
-			map.put(e, ind);
-			elements[ind] = e;
-			disjointSets.add(ind);
-			return true;
-		}
-		
-		public E find(E e) {
-			int ind = disjointSets.find(map.get(e));
-			@SuppressWarnings("unchecked")
-			E representative = (E) elements[ind];
-			return representative;
-		}
-		
-		public void union(E e1, E e2) {
-			int ind1 = map.get(e1);
-			int ind2 = map.get(e2);
-			disjointSets.union(ind1, ind2);
-		}
-		
-	}
-	
-	/**
-	 * This \epsilon-closes the automaton
-	 */
-	private State eliminateEmptySetTransitions(State intial) {
-		HashSet<State> states = new HashSet<State>();
-		dfs(intial, states);
-		DisjointSetsOf<State> sets = new DisjointSetsOf<State>(states.size());
-		for (State state : states) {
-			close(state, state, sets);
-		}
-		
-		Set<State> accepting = new HashSet<State>();
-		for (State state : states) {
-			if (state.isAccepting()) {
-				accepting.add(sets.find(state));
-			}
-		}
-		
-		Map<State, State> newStates = new HashMap<State, State>();
-		for (State oldState : states) {
-			
-			
-			State newState = getNewState(newStates, oldState, accepting, sets);
-			
-			for (Transition oldTransition : oldState.getOutgoingTransitions()) {
-				if (!oldTransition.getInSet().isEmpty()) {
-					newState.getOutgoingTransitions().add(
-							new Transition(
-									newState, 
-									getNewState(
-											newStates, 
-											oldTransition.getTo(), 
-											accepting, 
-											sets),
-									oldTransition.getInSet()
-							));
-				}
-			}
-		}
-		
-		return newStates.get(intial);
-	}
-
-
-	private State getNewState(Map<State, State> newStates,
-			State oldState, Set<State> accepting, DisjointSetsOf<State> sets) {
-		State representative = sets.find(oldState);
-		State newState = newStates.get(representative);
-		if (newState == null) {
-			newState = new State(representative.getName() + "'", accepting.contains(representative));
-			newStates.put(representative, newState);
-		}
-		return newState;
-	}
-	
-	private void dfs(State start, Set<State> visited) {
-		if (visited.contains(start)) {
-			return;
-		}
-		
-		visited.add(start);
-		
-		Collection<Transition> outgoingTransitions = start.getOutgoingTransitions();
-		for (Transition transition : outgoingTransitions) {
-			dfs(transition.getTo(), visited);
-		}
-	}
-
-
-	private void close(State state, State rep, DisjointSetsOf<State> sets) {
-		if (!sets.add(state)) {
-			return;
-		}
-		sets.union(state, rep);
-		Collection<Transition> outgoingTransitions = state.getOutgoingTransitions();
-		for (Transition transition : outgoingTransitions) {
-			if (transition.getInSet().isEmpty()) {
-				close(transition.getTo(), rep, sets);
-			}
-		}
-	}
 	
 }

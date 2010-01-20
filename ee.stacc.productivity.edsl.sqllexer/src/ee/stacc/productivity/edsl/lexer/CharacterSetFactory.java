@@ -175,5 +175,9 @@ public class CharacterSetFactory {
 		}
 		return EMPTY;
 	}
+	
+	public static ICharacterSet singleton(char c) {
+		return range(c, c);
+	}
 
 }
