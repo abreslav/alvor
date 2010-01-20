@@ -13,6 +13,9 @@ public class AutomataInclusion {
 	
 	private AutomataInclusion() {}
 	
+	/**
+	 * Check if the first contains the second
+	 */
 	public boolean checkInclusion(State initial, State start) {
 		return new Checker(initial, start).check();
 	}

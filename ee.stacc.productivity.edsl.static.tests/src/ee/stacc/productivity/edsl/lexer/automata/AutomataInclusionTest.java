@@ -121,5 +121,33 @@ public class AutomataInclusionTest {
 						AutomataParser.parse(automaton2).getInitialState())
 		);
 		
+		
+		automaton1 = 
+			"S1 - !S2:a S1:x;" +
+			"!S2 - S3:b;" +
+			"S3 - S2:a";
+		automaton2 = 
+			"A1 - A2:a !A3:a;" +
+			"!A2 - A1:b";
+		assertTrue(
+				AutomataInclusion.INSTANCE.checkInclusion(
+						AutomataParser.parse(automaton1).getInitialState(), 
+						AutomataParser.parse(automaton2).getInitialState())
+		);
+		
+		
+		automaton1 = 
+			"S1 - !S2:a;" +
+			"!S2 - S3:b;" +
+			"S3 - S2:a";
+		automaton2 = 
+			"A1 - A2:a !A3:a A1:x;" +
+			"!A2 - A1:b";
+		assertFalse(
+				AutomataInclusion.INSTANCE.checkInclusion(
+						AutomataParser.parse(automaton1).getInitialState(), 
+						AutomataParser.parse(automaton2).getInitialState())
+		);
+		
 	}
 }
