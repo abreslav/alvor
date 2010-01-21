@@ -265,15 +265,10 @@ public class AutomataInclusionTest {
 		automaton = AutomataParser.parse(automatonStr);
 		transducer = AutomataParser.parse(transducerStr);
 		check = AutomataParser.parse(checkStr);
+		State checkInit = AutomataDeterminator.determinate(check.getInitialState());
 		transduction = AutomataInclusion.INSTANCE.getTrasduction(transducer.getInitialState(), automaton.getInitialState());
-		
 		transduction = EmptyTransitionEliminator.INSTANCE.eliminateEmptySetTransitions(transduction);
 		transduction = AutomataDeterminator.determinate(transduction);
-		printAutomaton(transduction);
-		
-		State checkInit = AutomataDeterminator.determinate(check.getInitialState());
-		printAutomaton(checkInit);
-		
 		assertTrue(AutomataInclusion.INSTANCE.checkInclusion(transduction, checkInit));
 		assertTrue(AutomataInclusion.INSTANCE.checkInclusion(checkInit, transduction));
 		

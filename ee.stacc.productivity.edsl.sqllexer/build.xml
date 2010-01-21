@@ -12,6 +12,14 @@
     		destdir="src"
 			time="on"
     		nobak="on"
+			pack="off"
+		/>
+		<jflex
+			file="lexer/simple.flex"
+    		destdir="src"
+			time="on"
+    		nobak="on"
+			pack="off"
 		/>
 	</target>
 

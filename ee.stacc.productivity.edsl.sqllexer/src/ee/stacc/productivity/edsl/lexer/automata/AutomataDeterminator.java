@@ -17,6 +17,10 @@ public class AutomataDeterminator {
 	private final Map<Set<State>, State> visited = new HashMap<Set<State>, State>();
 	private final Queue<Set<State>> queue = new LinkedList<Set<State>>();
 	
+	/**
+	 * @param initial an \epsilon-free automaton
+	 * @return an initial state of an equivalent deterministic automaton
+	 */
 	public static State determinate(State initial) {
 		return new AutomataDeterminator().doDeterminate(initial);
 	}
