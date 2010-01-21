@@ -31,9 +31,6 @@ public class AutomataConverter {
 					if (isImmediatelyGenerating(toIndex)) {
 						int action = ACTIONS[toIndex];
 					    out = action >= 0 ? "" + (char) action : "";
-					    if (out.length() > 0) {
-					    	System.out.println("out = " + action);
-					    }
 					}
 					Transition transition = new Transition(from, states[toIndex], Integer.valueOf(cc), out);
 					from.getOutgoingTransitions().add(transition);

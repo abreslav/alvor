@@ -12,11 +12,17 @@
 		int maxCharClass = 0;
 		int count = 0;
 		int lineCount = 100;
+		char[] alphabet = new char[Character.MAX_VALUE + 1];
+		int alphCount = 0;
 		for (int i = 0; i < zzCmap.length; i++) {
 			char c = zzCmap[i];
 			if (c > maxCharClass) {
 				maxCharClass = c;
 			} 
+			if (c != 0) {
+				alphabet[alphCount] = (char) i;
+				alphCount++;
+			}
 			switch (c) {
 				case '\n': 
 					System.out.print("'\\n', ");
@@ -35,6 +41,16 @@
 		}
 		System.out.println("};");
 
+		System.out.println("// Alphabet:");
+		System.out.print("// ");
+		for (int i = 0; i < alphCount; i++) {
+			if (alphabet[i] <= 32) {
+				System.out.print(((int) alphabet[i]) + " ");
+			} else {
+				System.out.print(alphabet[i]);
+			}
+		}
+		System.out.println("\n");
 		
 		int[] zzRowmap = ZZ_ROWMAP;
 		System.out.println("/** Number of states (table height) */");
