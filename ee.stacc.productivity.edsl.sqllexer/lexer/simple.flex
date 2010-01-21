@@ -1,4 +1,3 @@
-package ee.stacc.productivity.edsl.sqllexer;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;

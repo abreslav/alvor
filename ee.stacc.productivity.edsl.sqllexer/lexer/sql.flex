@@ -1,5 +1,3 @@
-package ee.stacc.productivity.edsl.sqllexer;
-
 /* this is the scanner example from the JLex website 
    (with small modifications to make it more readable) */
 
@@ -10,10 +8,12 @@ package ee.stacc.productivity.edsl.sqllexer;
 %} 
 
 %class SQLLexer
+%public
 %char
-%state COMMENT
 %unicode
 %ignorecase
+%table
+
 
 %eofval{
   	return (new Yytoken(-1,yytext(),yyline,yychar,yychar+yylength())); 
@@ -33,11 +33,11 @@ Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
 %% 
 
 <YYINITIAL> {
-  "SELECT" { return (new Yytoken(0,yytext(),yyline,yychar,yychar+1)); }
-  "FROM" { return (new Yytoken(0,yytext(),yyline,yychar,yychar+1)); }
-  "AS" { return (new Yytoken(0,yytext(),yyline,yychar,yychar+1)); }
-  "IN" { return (new Yytoken(0,yytext(),yyline,yychar,yychar+1)); }
-  "WHERE" { return (new Yytoken(0,yytext(),yyline,yychar,yychar+1)); }
+  "SELECT" { /*SELECT*/ }
+  "FROM" { /*FROM*/ }
+  "AS" { /*AS*/ }
+  "IN" { /*IN*/ }
+/*  "WHERE" { return (new Yytoken(0,yytext(),yyline,yychar,yychar+1)); }
   "ORDER" { return (new Yytoken(0,yytext(),yyline,yychar,yychar+1)); }
   "BY" { return (new Yytoken(0,yytext(),yyline,yychar,yychar+1)); }
   "GROUP" { return (new Yytoken(0,yytext(),yyline,yychar,yychar+1)); }
@@ -53,13 +53,12 @@ Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
   "-" { return (new Yytoken(11,yytext(),yyline,yychar,yychar+1)); }
   "*" { return (new Yytoken(12,yytext(),yyline,yychar,yychar+1)); }
   "/" { return (new Yytoken(13,yytext(),yyline,yychar,yychar+1)); }
-  "=" { return (new Yytoken(14,yytext(),yyline,yychar,yychar+1)); }
+*/
+  "=" { /*=*/ }
 
-
-  {DIGIT}+{ALPHA}+ {System.out.println("error: " + yytext()); 
-  	return (new Yytoken(-2,"error: " + yytext(),yyline,yychar,yychar+1));
+  {DIGIT}+{ALPHA}+ {/*ERROR_DIGAL*/
   }
-
+/*
   {NONNEWLINE_WHITE_SPACE_CHAR}+ { }
 
   \"{STRING_TEXT}\" {
@@ -73,25 +72,20 @@ Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
     return (new Yytoken(-2,"error (unterm str): " + str,yyline,yychar,yychar + str.length()));
   } 
   
+*/  
   \'{STRING_TEXT}\' {
-    String str =  yytext().substring(1,yylength()-1);
-    return (new Yytoken(40,str,yyline,yychar,yychar+yylength()));
+    /*STRING_SQ*/
   }
   
   \'{STRING_TEXT} {
-    String str =  yytext().substring(1,yytext().length());
-    Utility.error(Utility.E_UNCLOSEDSTR);
-    return (new Yytoken(-2,"error (unterm str): " + str,yyline,yychar,yychar + str.length()));
+    /*STRING_SQ_ERR*/
   } 
   
-  {DIGIT}+ { return (new Yytoken(42,yytext(),yyline,yychar,yychar+yylength())); }  
+  {DIGIT}+ { /*NUMBER*/ }  
 
-  {Ident} { 
-  	System.out.println("id: " + yytext());
-  	return (new Yytoken(43,yytext(),yyline,yychar,yychar+yylength())); 
-  }  
+  {Ident} { /*ID*/ 
+  }
 }
-
 . {
   System.out.println("Illegal character: <" + yytext() + ">");
 	Utility.error(Utility.E_UNMATCHED);

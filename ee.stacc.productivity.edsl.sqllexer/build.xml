@@ -9,18 +9,30 @@
     <target name="depends">  
 		<jflex
 			file="lexer/sql.flex"
-    		destdir="src"
+    		destdir="generated"
 			time="on"
     		nobak="on"
 			pack="off"
 		/>
 		<jflex
 			file="lexer/simple.flex"
-    		destdir="src"
+    		destdir="generated"
 			time="on"
     		nobak="on"
 			pack="off"
 		/>
+    	<java classpath="bin" classname="Generator">
+    		<arg file="generated/"/>
+    		<arg value="SQLLexer"/>
+    		<arg file="generated/"/>
+    		<arg value="SQLLexerGen"/>
+    	</java>
+    	<javac 
+    		srcdir="generated" 
+    		classpath="generated" 
+    		destdir="bin">
+    	</javac>
+    	<java classpath="bin" classname="SQLLexerGen" output="generated/tables"/>
 	</target>
 
 </project>
