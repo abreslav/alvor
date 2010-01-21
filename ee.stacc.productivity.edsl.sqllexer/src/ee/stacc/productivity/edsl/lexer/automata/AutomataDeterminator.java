@@ -8,8 +8,6 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import ee.stacc.productivity.edsl.lexer.CharacterSetFactory;
-
 public class AutomataDeterminator {
 	private final Map<State, Set<State>> singletons = new HashMap<State, Set<State>>();
 	private final Map<Set<State>, Map<Character, Set<State>>> newTransitions = new HashMap<Set<State>, Map<Character,Set<State>>>();
@@ -70,7 +68,7 @@ public class AutomataDeterminator {
 				Transition transition = new Transition(
 						newState, 
 						targetNewState, 
-						CharacterSetFactory.singleton(character));
+						character);
 				newState.getOutgoingTransitions().add(transition);
 			}
 		}
@@ -108,11 +106,10 @@ public class AutomataDeterminator {
 
 	private void encorporateTransition(Map<Character, Set<State>> map,
 			Transition transition) {
-		Set<Character> inSet = transition.getInSet().asJavaSet();
-		if (inSet.size() != 1) {
-			throw new IllegalArgumentException("Only one-element sets are supported");
+		if (transition.isEmpty()) {
+			throw new IllegalArgumentException("Only nonempty transitions suported");
 		}
-		Set<State> stateSet = AutomataInclusion.getSet(map, inSet.iterator().next());
+		Set<State> stateSet = AutomataInclusion.getSet(map, transition.getInChar());
 		stateSet.add(transition.getTo());
 	}
 

@@ -7,9 +7,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import ee.stacc.productivity.edsl.lexer.CharacterSetFactory;
-import ee.stacc.productivity.edsl.lexer.ICharacterSet;
-
 public class AutomataParser {
 
 	public static class Automaton {
@@ -56,9 +53,8 @@ public class AutomataParser {
 			while (matcher.find()) {
 				State to = getState(map, matcher.group(1));
 				char c = matcher.group(3).charAt(0);
-				ICharacterSet range = CharacterSetFactory.range(c, c);
 				String outStr = matcher.group(5);
-				Transition transition = new Transition(from, to, range, outStr == null ? "" : outStr);
+				Transition transition = new Transition(from, to, c, outStr == null ? "" : outStr);
 				from.getOutgoingTransitions().add(transition);
 //				to.getIncomingTransitions().add(transition);
 			}
@@ -93,9 +89,8 @@ public class AutomataParser {
 			for (Transition transition : state.getOutgoingTransitions()) {
 				stringBuilder
 					.append(transition.getTo())
-					.append(transition.getInSet().toString()
-							.replace('[', '{')
-							.replace(']', '}'))
+					.append(":")
+					.append(transition.getInChar())
 					.append("/")
 					.append(transition.getOutStr())
 					.append("/")

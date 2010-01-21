@@ -36,7 +36,7 @@ public class EmptyTransitionEliminator {
 			Set<State> reachableByEmpty = stateSets.get(oldState);
 			for (State state : reachableByEmpty) {
 				for (Transition oldTransition : state.getOutgoingTransitions()) {
-					if (!oldTransition.getInSet().isEmpty()) {
+					if (!oldTransition.isEmpty()) {
 						newState.getOutgoingTransitions().add(
 								new Transition(
 										newState, 
@@ -44,7 +44,7 @@ public class EmptyTransitionEliminator {
 												newStates, 
 												oldTransition.getTo(), 
 												accepting),
-												oldTransition.getInSet()
+												oldTransition.getInChar()
 								));
 					}
 				}
@@ -88,7 +88,7 @@ public class EmptyTransitionEliminator {
 		Collection<Transition> outgoingTransitions = state.getOutgoingTransitions();
 		boolean result = state.isAccepting();
 		for (Transition transition : outgoingTransitions) {
-			if (transition.getInSet().isEmpty()) {
+			if (transition.isEmpty()) {
 				if (close(transition.getTo(), rep, visited)) {
 					result = true;
 				}

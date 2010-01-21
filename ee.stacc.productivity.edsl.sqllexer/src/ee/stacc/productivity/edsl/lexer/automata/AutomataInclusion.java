@@ -7,9 +7,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import ee.stacc.productivity.edsl.lexer.CharacterSetFactory;
-import ee.stacc.productivity.edsl.lexer.ICharacterSet;
-
 public class AutomataInclusion {
 
 	public static final AutomataInclusion INSTANCE = new AutomataInclusion();
@@ -40,18 +37,22 @@ public class AutomataInclusion {
 			Collection<Transition> oldTransitions = oldState.getOutgoingTransitions();
 			for (Transition oldTransition : oldTransitions) {
 				Set<Transition> transducerTransitions = getSet(transitionMap, oldTransition);
-				Set<Character> chars = new HashSet<Character>();
 				for (Transition transducerTransition : transducerTransitions) {
 					String outStr = transducerTransition.getOutStr();
-					if (outStr.length() > 0) {
-						chars.add(outStr.charAt(0));
+					// TODO: support multicharacter strings
+					if (outStr.length() > 1) {
+						throw new IllegalArgumentException("Multichars are not supported: " + transducerTransition);
 					}
+					Character c = null;
+					if (outStr.length() > 0) {
+						c = outStr.charAt(0);
+					}
+					newState.getOutgoingTransitions().add(
+							new Transition(
+									newState, 
+									getNewState(oldToNewStates, oldTransition.getTo()), 
+									c));
 				}
-				newState.getOutgoingTransitions().add(
-						new Transition(
-								newState, 
-								getNewState(oldToNewStates, oldTransition.getTo()), 
-								CharacterSetFactory.set(chars)));
 			}
 		}
 		return oldToNewStates.get(inputInitial);
@@ -120,19 +121,23 @@ public class AutomataInclusion {
 		
 		private Set<State> transitionFunction(State state, State error, Transition underlyingTransition) {
 			Set<State> result = new HashSet<State>();
+			if (underlyingTransition.isEmpty()) {
+				result.add(error);
+				return result;
+			}
+			
 			Collection<Transition> transitions = state.getOutgoingTransitions();
 			Set<Transition> correspondingTransitions = getSet(transitionMap, underlyingTransition);
-			ICharacterSet allTransitions = CharacterSetFactory.empty();
-			ICharacterSet inSet = underlyingTransition.getInSet();
+			char inChar = underlyingTransition.getInChar();
+			boolean anyTransition = false;
 			for (Transition transition : transitions) {
-				ICharacterSet set = transition.getInSet();
-				if (set.intersects(inSet)) {
+				if (transition.getInChar() == inChar) {
 					result.add(transition.getTo());
 					correspondingTransitions.add(transition);
-					allTransitions = allTransitions.join(set);
+					anyTransition = true;
 				}
 			}
-			if (!allTransitions.containsSet(inSet)) {
+			if (!anyTransition) {
 				result.add(error);
 			}
 			return result;
