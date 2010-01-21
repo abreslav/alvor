@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 
 public class AutomataDeterminator {
 	private final Map<State, Set<State>> singletons = new HashMap<State, Set<State>>();
-	private final Map<Set<State>, Map<Character, Set<State>>> newTransitions = new HashMap<Set<State>, Map<Character,Set<State>>>();
+	private final Map<Set<State>, Map<Integer, Set<State>>> newTransitions = new HashMap<Set<State>, Map<Integer,Set<State>>>();
 	// Sets that have been offered to the queue
 	private final Map<Set<State>, State> visited = new HashMap<Set<State>, State>();
 	private final Queue<Set<State>> queue = new LinkedList<Set<State>>();
@@ -46,7 +46,7 @@ public class AutomataDeterminator {
 				continue;
 			}
 			
-			Map<Character, Set<State>> newStateTransitions = new HashMap<Character, Set<State>>();
+			Map<Integer, Set<State>> newStateTransitions = new HashMap<Integer, Set<State>>();
 			for (State oldState : newState) {
 				joinMaps(newStateTransitions, getTransitionMap(oldState));
 			}
@@ -59,36 +59,36 @@ public class AutomataDeterminator {
 		for (Entry<Set<State>, State> entry : visited.entrySet()) {
 			Set<State> oldStates = entry.getKey();
 			State newState = entry.getValue();
-			Map<Character, Set<State>> transitionMap = newTransitions.get(oldStates);
-			for (Entry<Character, Set<State>> trEntry : transitionMap.entrySet()) {
-				Character character = trEntry.getKey();
+			Map<Integer, Set<State>> transitionMap = newTransitions.get(oldStates);
+			for (Entry<Integer, Set<State>> trEntry : transitionMap.entrySet()) {
+				Integer Integer = trEntry.getKey();
 				Set<State> targetOldStates = trEntry.getValue();
 				State targetNewState = visited.get(targetOldStates);
 				
 				Transition transition = new Transition(
 						newState, 
 						targetNewState, 
-						character);
+						(int) Integer);
 				newState.getOutgoingTransitions().add(transition);
 			}
 		}
 	}
 
-	private void joinMaps(Map<Character, Set<State>> newStateTransitions,
-			Map<Character, Set<State>> transitions) {
-		for (Entry<Character, Set<State>> entry : transitions.entrySet()) {
-			Character character = entry.getKey();
+	private void joinMaps(Map<Integer, Set<State>> newStateTransitions,
+			Map<Integer, Set<State>> transitions) {
+		for (Entry<Integer, Set<State>> entry : transitions.entrySet()) {
+			Integer Integer = entry.getKey();
 			Set<State> smallTo = entry.getValue();
-			Set<State> bigTo = AutomataInclusion.getSet(newStateTransitions, character);
+			Set<State> bigTo = AutomataInclusion.getSet(newStateTransitions, Integer);
 			bigTo.addAll(smallTo);
 		}
 	}
 
-	private Map<Character, Set<State>> getTransitionMap(State oldState) {
+	private Map<Integer, Set<State>> getTransitionMap(State oldState) {
 		Set<State> singleton = singleton(oldState);
-		Map<Character, Set<State>> map = newTransitions.get(singleton);
+		Map<Integer, Set<State>> map = newTransitions.get(singleton);
 		if (map == null) {
-			map = new HashMap<Character, Set<State>>();
+			map = new HashMap<Integer, Set<State>>();
 			newTransitions.put(singleton, map);
 			for (Transition transition : oldState.getOutgoingTransitions()) {
 				encorporateTransition(map, transition);
@@ -98,13 +98,13 @@ public class AutomataDeterminator {
 		return map;
 	}
 
-	private void enqueueTargets(Map<Character, Set<State>> map) {
+	private void enqueueTargets(Map<Integer, Set<State>> map) {
 		for (Set<State> newState : map.values()) {
 			enqueue(newState);
 		}
 	}
 
-	private void encorporateTransition(Map<Character, Set<State>> map,
+	private void encorporateTransition(Map<Integer, Set<State>> map,
 			Transition transition) {
 		if (transition.isEmpty()) {
 			throw new IllegalArgumentException("Only nonempty transitions suported");

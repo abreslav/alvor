@@ -17,9 +17,11 @@ public class EmptyTransitionEliminator {
 	 * This \epsilon-closes the transducer
 	 */
 	public State eliminateEmptySetTransitions(State initial) {
+		// Collect reachable states
 		Set<State> states = new LinkedHashSet<State>();
 		dfs(initial, states);
 		
+		// Find what states are reachable from each one by only empty transitions
 		Map<State, Set<State>> stateSets = new HashMap<State, Set<State>>();
 		Set<State> accepting = new HashSet<State>();
 		for (State state : states) {
@@ -30,6 +32,7 @@ public class EmptyTransitionEliminator {
 			stateSets.put(state, reachableByEmpty);
 		}
 		
+		// Create the new transducer
 		Map<State, State> newStates = new HashMap<State, State>();
 		for (State oldState : states) {
 			State newState = getNewState(newStates, oldState, accepting);

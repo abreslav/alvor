@@ -19,12 +19,12 @@ public class AutomataConverterTest {
 //		AutomataUtils.printAutomaton(initial);
 		
 		State current = initial;
-		String input = "aaaabccabcb";
+		String input = "aaaabdexaacdedexabdexxxx";
 		StringBuilder output = new StringBuilder();
-		for (int i = 0; i < input.length(); i++) {
-			char inChar = input.charAt(i);
+		for (int i = 0; i <= input.length(); i++) {
+			int inChar = (i < input.length()) ? input.charAt(i) : -1;
 			System.out.println(inChar);
-			char c = SQLLexerData.CHAR_CLASSES[inChar];
+			int c = inChar < 0 ? inChar : SQLLexerData.CHAR_CLASSES[inChar];
 			if (c == 0) {
 				throw new IllegalArgumentException("Illegal character: '" + inChar + "'");
 			}

@@ -54,7 +54,7 @@ public class AutomataParser {
 				State to = getState(map, matcher.group(1));
 				char c = matcher.group(3).charAt(0);
 				String outStr = matcher.group(5);
-				Transition transition = new Transition(from, to, c, outStr == null ? "" : outStr);
+				Transition transition = new Transition(from, to, (int) c, outStr == null ? "" : outStr);
 				from.getOutgoingTransitions().add(transition);
 //				to.getIncomingTransitions().add(transition);
 			}
@@ -87,11 +87,17 @@ public class AutomataParser {
 				stringBuilder.append(" -> ");
 			}
 			for (Transition transition : state.getOutgoingTransitions()) {
-				char inChar = transition.getInChar();
+				int inChar = transition.getInChar();
+				String inStr;
+				if (inChar == -1) {
+					inStr = "EOF";
+				} else {
+					inStr = inChar == 0 ? "" : ((char) inChar) + "";
+				}
 				stringBuilder
 					.append(transition.getTo())
 					.append(":")
-					.append(inChar == 0 ? "" : inChar + "")
+					.append(inStr)
 					.append("/")
 					.append(transition.getOutStr())
 					.append("/")

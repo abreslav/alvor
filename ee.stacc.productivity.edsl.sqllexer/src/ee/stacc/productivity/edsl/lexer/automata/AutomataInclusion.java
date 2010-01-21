@@ -43,9 +43,9 @@ public class AutomataInclusion {
 					if (outStr.length() > 1) {
 						throw new IllegalArgumentException("Multichars are not supported: " + transducerTransition);
 					}
-					Character c = null;
+					Integer c = null;
 					if (outStr.length() > 0) {
-						c = outStr.charAt(0);
+						c = (int) outStr.charAt(0);
 					}
 					newState.getOutgoingTransitions().add(
 							new Transition(
@@ -128,7 +128,7 @@ public class AutomataInclusion {
 			
 			Collection<Transition> transitions = state.getOutgoingTransitions();
 			Set<Transition> correspondingTransitions = getSet(transitionMap, underlyingTransition);
-			char inChar = underlyingTransition.getInChar();
+			int inChar = underlyingTransition.getInChar();
 			boolean anyTransition = false;
 			for (Transition transition : transitions) {
 				if (transition.getInChar() == inChar) {

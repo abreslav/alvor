@@ -19,4 +19,5 @@ Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
 %% 
 
 a {/*A*/}
-[b-c]+ {/*B*/}
+[b-c](de)+x {/*B*/}
+x+ {/*X*/}
