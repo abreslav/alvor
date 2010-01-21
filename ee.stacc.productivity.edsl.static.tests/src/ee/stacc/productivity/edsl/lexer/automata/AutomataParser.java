@@ -87,10 +87,11 @@ public class AutomataParser {
 				stringBuilder.append(" -> ");
 			}
 			for (Transition transition : state.getOutgoingTransitions()) {
+				char inChar = transition.getInChar();
 				stringBuilder
 					.append(transition.getTo())
 					.append(":")
-					.append(transition.getInChar())
+					.append(inChar == 0 ? "" : inChar + "")
 					.append("/")
 					.append(transition.getOutStr())
 					.append("/")

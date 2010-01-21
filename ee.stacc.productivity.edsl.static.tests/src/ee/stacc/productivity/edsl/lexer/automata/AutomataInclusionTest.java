@@ -3,8 +3,6 @@ package ee.stacc.productivity.edsl.lexer.automata;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.LinkedHashSet;
-
 import org.junit.Test;
 
 import ee.stacc.productivity.edsl.lexer.automata.AutomataParser.Automaton;
@@ -273,13 +271,5 @@ public class AutomataInclusionTest {
 		assertTrue(AutomataInclusion.INSTANCE.checkInclusion(checkInit, transduction));
 		
 	}
-
-
-	private void printAutomaton(State transduction) {
-		LinkedHashSet<State> states = new LinkedHashSet<State>();
-		EmptyTransitionEliminator.INSTANCE.dfs(transduction, states);
-		System.out.println(AutomataParser.statesToString(states, transduction));
-	}
-	
 	
 }

@@ -14,7 +14,7 @@ public class EmptyTransitionEliminator {
 	private EmptyTransitionEliminator() {}
 	
 	/**
-	 * This \epsilon-closes the automaton
+	 * This \epsilon-closes the transducer
 	 */
 	public State eliminateEmptySetTransitions(State initial) {
 		Set<State> states = new LinkedHashSet<State>();
@@ -44,7 +44,8 @@ public class EmptyTransitionEliminator {
 												newStates, 
 												oldTransition.getTo(), 
 												accepting),
-												oldTransition.getInChar()
+												oldTransition.getInChar(),
+												oldTransition.getOutStr()
 								));
 					}
 				}
