@@ -10,7 +10,10 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.IMethodBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.NodeFinder;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
@@ -26,74 +29,17 @@ import ee.stacc.productivity.edsl.string.IAbstractString;
 /**
  * Helper class for using Java SearchEngine
  */
-public class ArgumentFinder extends SearchRequestor {
+public class ArgumentFinder {
 
-	@Override
-	public void acceptSearchMatch(SearchMatch match) throws CoreException {
-		// TODO Auto-generated method stub
-
-	}
-	
-	/**
-	 * @param methodName
-	 * @param argNo
-	 * @param searchScope eg. project or file 
-	 * @return
-	 */
-	public List<Expression> findArgumentNodesFor(String methodName, final int argNo, IJavaElement searchScope) {
-		SearchPattern pattern = SearchPattern.createPattern(methodName, 
-				IJavaSearchConstants.METHOD, IJavaSearchConstants.REFERENCES, 
-				SearchPattern.R_EXACT_MATCH);
-		IJavaElement[] elems = {searchScope};
-		IJavaSearchScope scope = SearchEngine.createJavaSearchScope(elems);
+	static public List<IAbstractString> findArgumentAbstractValuesAtCallSites(
+			final String className, final String methodName, 
+			final int argNo, IJavaElement searchScope, final int level) {
+		System.out.println("ArgumentFinder for " + className + "." + methodName + "(" + argNo + ")");
 		
-		final List<Expression> result = new ArrayList<Expression>();
-		
-		SearchRequestor requestor = new SearchRequestor() {
-			public void acceptSearchMatch(SearchMatch match) {
-				if (match.getElement() instanceof IMethod) {
-					ICompilationUnit cUnit = ((IMethod)match.getElement()).getCompilationUnit(); 
-					// TODO tutorial recommends to hold only one AST at a time
-					ASTParser parser = ASTParser.newParser(AST.JLS3);
-					parser.setKind(ASTParser.K_COMPILATION_UNIT); // TODO maybe it's more efficent to parse only method body
-					parser.setSource(cUnit);
-					parser.setResolveBindings(true);
-					ASTNode ast = parser.createAST(null);
-					ASTNode node = NodeFinder.perform(ast, match.getOffset(), match.getLength());
-					
-					if (node instanceof MethodInvocation) {
-						MethodInvocation invoc = (MethodInvocation)node;
-						/*
-						System.out.println();
-						System.out.println(match.getResource());
-						System.out.println(match.getOffset());
-						System.out.println(match.getLength());
-						System.out.println("----------");
-						*/
-						ASTNode arg = (ASTNode) invoc.arguments().get(argNo-1);
-						if (arg instanceof Expression) {
-							result.add((Expression)arg);
-						}
-					}
-				}
-			}
-		};
-		
-		SearchEngine searchEngine = new SearchEngine();
-		try {
-			searchEngine.search(
-				pattern,
-				new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant()}, 
-				scope,
-				requestor,
-				null);
-		} catch (CoreException e) {
-			e.printStackTrace();
+		if (level > 3) {
+			throw new UnsupportedStringOpEx("argument searching level too deep");
 		}
-		return result;
-	}
-
-	public List<IAbstractString> findArgumentAbstractValues(String methodName, final int argNo, IJavaElement searchScope) {
+		
 		SearchPattern pattern = SearchPattern.createPattern(methodName, 
 				IJavaSearchConstants.METHOD, IJavaSearchConstants.REFERENCES, 
 				SearchPattern.R_EXACT_MATCH);
@@ -102,11 +48,13 @@ public class ArgumentFinder extends SearchRequestor {
 		
 		final List<IAbstractString> result = new ArrayList<IAbstractString>();
 		
-		
 		SearchRequestor requestor = new SearchRequestor() {
-			ICompilationUnit cUnit = null;
-			ASTParser parser = ASTParser.newParser(AST.JLS3);
-			ASTNode ast = null;
+			ICompilationUnit cUnit;
+			ASTParser parser;
+			ASTNode ast;
+			int unsuppCount = 0;
+			int exceptionalCount = 0;
+			
 			
 			public void acceptSearchMatch(SearchMatch match) {
 				if (match.getElement() instanceof IMethod) {
@@ -114,16 +62,14 @@ public class ArgumentFinder extends SearchRequestor {
 					
 					//System.out.println(method);
 					if (! method.getCompilationUnit().equals(cUnit)) { // new unit, need new AST
-						try {
-							System.err.println("_______________________________");
-							System.err.println("#### NEW UNIT: " + method.getUnderlyingResource());
-						} catch (Exception e) {}
 						if (cUnit == null) { // first time
+							parser = ASTParser.newParser(AST.JLS3);
 							parser.setKind(ASTParser.K_COMPILATION_UNIT);
 							parser.setResolveBindings(true);
 						}
 						cUnit = method.getCompilationUnit();
 						parser.setSource(cUnit);
+						parser.setResolveBindings(true);
 						ast = parser.createAST(null);
 						
 					}
@@ -131,23 +77,55 @@ public class ArgumentFinder extends SearchRequestor {
 					
 					if (node instanceof MethodInvocation) {
 						MethodInvocation invoc = (MethodInvocation)node;
+						IMethodBinding methodBinding = invoc.resolveMethodBinding();
+						if (!methodBinding.getDeclaringClass().getQualifiedName().equals(className)
+								&& /* FIXME */ !"prepareStatement".equals(methodName)) {
+							System.err.println("Wrong match, want: " + className + "." + methodName
+									+ ", was: " + methodBinding.getDeclaringClass().getQualifiedName());
+							return;
+						}
+						
+						
 						ASTNode arg = (ASTNode) invoc.arguments().get(argNo-1);
 						if (arg instanceof Expression) {
+							System.out.println("# FOUND : " + getLineNumber(match, arg));
 							// todo: get astr
-							System.err.println("_______________________________");
-							System.err.println("Offset2: " + match.getOffset());
 							try {
-								System.err.println("ARG is: " + arg + ", type: " + arg.getClass());
-								IAbstractString aStr = AbstractStringEvaluator.getValOf((Expression)arg);
-								System.err.println("ASTR: " + aStr);
+								IAbstractString aStr = AbstractStringEvaluator.getValOf((Expression)arg, level);
+//								System.out.println("ASTR   : " + aStr);
 								result.add(aStr);
 							} 
+							catch (UnsupportedStringOpEx e) {
+								System.out.println("_______________________________");
+								try {
+									System.out.println("File   : " + method.getUnderlyingResource());
+								} catch (Exception _e) {_e.printStackTrace();}
+								
+								System.out.println("Arg    : " + arg + ", type: " + arg.getClass());
+								System.out.println("Line   : " + getLineNumber(match, arg));
+								System.out.println("Unsupp : " + e.getMessage());
+								unsuppCount++;
+							}
 							catch (Throwable e) {
-								System.err.println("EXCEPTION: " + e.getMessage());
+								System.err.println("_______________________________");
+								try {
+									System.err.println("File   : " + method.getUnderlyingResource());
+								} catch (Exception _e) {_e.printStackTrace();}
+								
+								System.err.println("Arg    : " + arg + ", type: " + arg.getClass());
+								System.err.println("Offset : " + match.getOffset());
+								System.err.println("Line   : " + getLineNumber(match, arg));
+								System.err.println("ERR    : " + e.getMessage());
+								exceptionalCount++;
 							}
 						}
 					}
 				}
+			}
+			
+			public void endReporting() {
+				System.out.println("UNSUPP count: " + unsuppCount);
+				System.out.println("EXEPTI count: " + exceptionalCount);
 			}
 		};
 		
@@ -163,6 +141,16 @@ public class ArgumentFinder extends SearchRequestor {
 			e.printStackTrace();
 		}
 		return result;
+	}
+	
+	static int getLineNumber(SearchMatch match, ASTNode node) {
+		if (node.getRoot() instanceof CompilationUnit) {
+			return ((CompilationUnit)node.getRoot()).getLineNumber(match.getOffset());
+		}
+		else {
+			return -1;
+		}
+			
 	}
 
 }

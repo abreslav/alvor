@@ -13,9 +13,9 @@ Import-Package: org.eclipse.core.commands,
  org.eclipse.jface.viewers,
  org.eclipse.ui
 Require-Bundle: ee.stacc.productivity.edsl.dynamic;bundle-version="1.0.0",
- ee.stacc.productivity.edsl.model;bundle-version="1.0.0",
  org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.jdt.core;bundle-version="3.5.1",
- org.eclipse.ui.workbench.texteditor;bundle-version="3.5.0",
- org.eclipse.core.expressions;bundle-version="3.4.100"
+ org.eclipse.core.resources;bundle-version="3.5.1",
+ org.eclipse.ui.editors;bundle-version="3.5.0",
+ ee.stacc.productivity.edsl.model;bundle-version="1.0.0"

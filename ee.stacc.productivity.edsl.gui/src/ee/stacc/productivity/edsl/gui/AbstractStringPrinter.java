@@ -50,7 +50,7 @@ public class AbstractStringPrinter implements IEditorActionDelegate{
 			System.out.println("Selection is : " + node.getClass().getName());
 			// TODO kontrolli et on string tüüpi expression
 			System.out.println("Abstract value is: ");
-			System.out.println(AbstractStringEvaluator.getValOf((Expression)node).toString());
+			System.out.println(AbstractStringEvaluator.getValOf((Expression)node, 1).toString());
 		} 
 		else {
 			System.out.println("Selection is not expression, but: "

@@ -1,15 +1,10 @@
 package ee.stacc.productivity.edsl.main;
 
-import java.util.HashMap;
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.ui.texteditor.MarkerUtilities;
 
 import ee.stacc.productivity.edsl.crawler.AbstractStringEvaluator;
 import ee.stacc.productivity.edsl.crawler.ArgumentFinder;
@@ -25,9 +20,6 @@ import ee.stacc.productivity.edsl.string.IAbstractString;
  * 
  */
 public class SQLUsageChecker {
-	public static final String ERROR_MARKER_ID = "EclipseSQLPlugin.sqlerror";
-	public static final String WARNING_MARKER_ID = "EclipseSQLPlugin.sqlwarning";
-	ArgumentFinder argumentFinder = new ArgumentFinder();
 	private SQLStringAnalyzer analyzer = new SQLStringAnalyzer();
 	
 	public void checkProject(IJavaProject project) {
@@ -35,13 +27,13 @@ public class SQLUsageChecker {
 	}
 	
 	public void checkElement(IJavaElement scope) { // scope can be eg. file or project
-		//cleanMarkers(scope);
-		
-		List<IAbstractString> aStrings = argumentFinder.findArgumentAbstractValues
-			("prepareStatement", 1, scope);
+		List<IAbstractString> aStrings = ArgumentFinder.findArgumentAbstractValuesAtCallSites
+			("java.sql.Connection", "prepareStatement", 1, scope, 1);
 	
+		
+		System.out.println("============================================");
 		for (IAbstractString aStr: aStrings) {
-			//System.out.println("ASTR: " + aStr);
+			System.out.println(aStr);
 			//checkParseSQLNode(node);
 		}
 		
@@ -49,19 +41,9 @@ public class SQLUsageChecker {
 	}
 	
 	
-	private void cleanMarkers(IJavaElement scope) {
-		try {
-			scope.getResource().deleteMarkers(ERROR_MARKER_ID, true, IResource.DEPTH_INFINITE);
-			scope.getResource().deleteMarkers(WARNING_MARKER_ID, true, IResource.DEPTH_INFINITE);
-		} 
-		catch (Exception e) {
-			System.err.println(e.getMessage());
-		}
-	}
-	
 	private void checkParseSQLNode(Expression node) {
 		try {
-			IAbstractString aStr = AbstractStringEvaluator.getValOf(node);
+			IAbstractString aStr = AbstractStringEvaluator.getValOf(node, 1);
 			AbstractSQLStructure struct = new AbstractSQLStructure(aStr, analyzer);
 			
 			if (struct.getErrorMsg() != null) {
@@ -99,27 +81,6 @@ public class SQLUsageChecker {
 					tmpAStr.getStartPos(), tmpAStr.getEndPos());
 		}
 		*/
-	}
-	
-	void createMarker(String message, String markerType, IFile file, int charStart, int charEnd) {
-	
-		@SuppressWarnings("unchecked")
-		HashMap<String, Comparable> map = new HashMap<String, Comparable>();
-		MarkerUtilities.setMessage(map, message);
-		map.put(IMarker.LOCATION, file.getFullPath().toString());
-		map.put(IMarker.CHAR_START, charStart);
-		map.put(IMarker.CHAR_END, charEnd);
-	
-		
-		int severity = markerType.equals(WARNING_MARKER_ID) ? 
-				IMarker.SEVERITY_WARNING : IMarker.SEVERITY_ERROR;
-		map.put(IMarker.SEVERITY, new Integer(severity));
-		
-		try {
-			MarkerUtilities.createMarker(file, map, markerType);
-		} catch (Exception e) {
-			System.err.println("Error creating marker: " + e.getMessage());
-		}
 	}
 	
 }
