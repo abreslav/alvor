@@ -30,6 +30,20 @@ public class AutomataConverterTest {
 		output = interpret(initial, input);
 		assertEquals(expected, output.toString().trim());
 
+		
+		input = "'sad\"fsa'   \"sadf a asd f' adsfsdf \"   sdfasd";
+		expected = "STRING_SQ WS STRING_DQ WS ID";
+		
+		output = interpret(initial, input);
+		assertEquals(expected, output.toString().trim());
+		
+		
+		input = "'sad\"fsa'   \"sadf a asd f' adsfsdf    sdfasd";
+		expected = "STRING_SQ WS STRING_DQ_ERR";
+		
+		output = interpret(initial, input);
+		assertEquals(expected, output.toString().trim());
+		
 	}
 
 	private StringBuilder interpret(State initial, String input) {

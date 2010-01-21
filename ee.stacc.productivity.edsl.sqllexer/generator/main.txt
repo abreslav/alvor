@@ -30,6 +30,12 @@
 				case '\r': 
 					System.out.print("'\\r', ");
 					break;
+				case '\"':
+					System.out.print("'\\\"', ");
+					break;
+				case '\'':
+					System.out.print("'\\\'', ");
+					break;
 				default:
 				System.out.format("'\\u%04X', ", ((int) c ));
 			}
