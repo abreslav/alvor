@@ -16,6 +16,14 @@ public class StringCharacterSet implements IAbstractString {
 		this.set = new HashSet<Character>(set);
 	}
 
+	public StringCharacterSet(String set) {
+		HashSet<Character> hashSet = new HashSet<Character>();
+		for (int i = 0; i < set.length(); i++) {
+			hashSet.add(set.charAt(i));
+		}
+		this.set = hashSet;
+	}
+	
 	public boolean contains(Character c) {
 		return set.contains(c);
 	}
@@ -25,7 +33,22 @@ public class StringCharacterSet implements IAbstractString {
 	}
 
 	public String toString() {
-		return set.toString();
+		StringBuilder stringBuilder = new StringBuilder("[");
+		for (Character c : set) {
+			switch (c) {
+			case '\\':
+				stringBuilder.append("\\\\");
+				break;
+			case ']':
+				stringBuilder.append("\\]");
+				break;
+			default:
+				stringBuilder.append(c);
+				break;
+			}
+		}
+		stringBuilder.append(']');
+		return stringBuilder.toString();
 	}
 
 	public <R, D> R accept(IAbstractStringVisitor<? extends R,? super D> visitor, D data) {

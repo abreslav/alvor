@@ -17,7 +17,11 @@ public class StringSequence extends AbstractStringCollection implements IAbstrac
 	}
 
 	public String toString() {
-		return getItems().toString();
+		StringBuilder stringBuilder = new StringBuilder();
+		for (IAbstractString item : getItems()) {
+			stringBuilder.append(item).append(" ");
+		}
+		return stringBuilder.toString();
 	}
 
 	public <R, D> R accept(IAbstractStringVisitor<? extends R,? super D> visitor, D data) {

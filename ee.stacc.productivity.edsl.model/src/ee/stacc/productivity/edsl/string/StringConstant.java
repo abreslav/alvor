@@ -13,10 +13,10 @@ public class StringConstant implements IAbstractString {
 
 	public String toString() {
 		if (constant.length() == 0) {
-			return "{}";
+			return "\"\"";
 		}
 		else {
-			return constant;
+			return "\"" + constant.replaceAll("\\\"", "\\\\\\\"") + "\"";
 		}
 	}
 	

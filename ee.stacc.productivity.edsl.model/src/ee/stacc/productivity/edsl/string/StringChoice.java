@@ -3,6 +3,7 @@
  */
 package ee.stacc.productivity.edsl.string;
 
+import java.util.Iterator;
 import java.util.List;
 
 public class StringChoice extends AbstractStringCollection implements IAbstractString {
@@ -16,7 +17,16 @@ public class StringChoice extends AbstractStringCollection implements IAbstractS
 	}
 
 	public String toString() {
-		return getItems().toString().replace('[', '{').replace(']', '}');
+		StringBuilder stringBuilder = new StringBuilder("{");
+		for (Iterator<IAbstractString> i = getItems().iterator(); i.hasNext();) {
+			IAbstractString option = i.next();
+			stringBuilder.append(option);
+			if (i.hasNext()) {
+				stringBuilder.append(", ");
+			}
+		}
+		stringBuilder.append("}");
+		return stringBuilder.toString();
 	}
 
 	public <R, D> R accept(IAbstractStringVisitor<? extends R,? super D> visitor, D data) {

@@ -14,6 +14,11 @@ public class StringRepetition implements IAbstractString {
 	public IAbstractString getBody() {
 		return body;
 	}
+	
+	@Override
+	public String toString() {
+		return "(" + body + ")*";
+	}
 
 	public <R, D> R accept(IAbstractStringVisitor<? extends R,? super D> visitor, D data) {
 		return visitor.visitStringRepetition(this, data);
