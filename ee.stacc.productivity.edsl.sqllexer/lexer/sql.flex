@@ -56,11 +56,11 @@ Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
 */
   "=" { /*=*/ }
 
+  NONNEWLINE_WHITE_SPACE_CHAR {/*WS*/}
+
   {DIGIT}+{ALPHA}+ {/*ERROR_DIGAL*/
   }
 /*
-  {NONNEWLINE_WHITE_SPACE_CHAR}+ { }
-
   \"{STRING_TEXT}\" {
     String str =  yytext().substring(1,yylength()-1);
     return (new Yytoken(40,str,yyline,yychar,yychar+yylength()));
@@ -85,6 +85,7 @@ Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
 
   {Ident} { /*ID*/ 
   }
+  
 }
 . {
   System.out.println("Illegal character: <" + yytext() + ">");
