@@ -44,6 +44,20 @@ public class AutomataConverterTest {
 		output = interpret(initial, input);
 		assertEquals(expected, output.toString().trim());
 		
+		
+		input = "SELECT cc.ColumnName FROM AD_Column c";
+		expected = "SELECT WS ID . ID WS FROM WS ID WS ID";
+		
+		output = interpret(initial, input);
+		assertEquals(expected, output.toString().trim());
+		
+		
+		input = "INSERT INTO X_Test(Text1, Text2) values(?,?)";
+		expected = "INSERT WS INTO WS ID ( ID , WS ID ) WS VALUES ( ? , ? )";
+		
+		output = interpret(initial, input);
+		assertEquals(expected, output.toString().trim());
+		
 	}
 
 	private StringBuilder interpret(State initial, String input) {

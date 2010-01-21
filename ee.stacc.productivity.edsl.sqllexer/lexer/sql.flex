@@ -21,18 +21,21 @@ Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
 %% 
 
 <YYINITIAL> {
+  "VALUES" {/*VALUES*/}
   "SELECT" { /*SELECT*/ }
-  "FROM" { /*FROM*/ }
-  "AS" { /*AS*/ }
-  "IN" { /*IN*/ }
+  "INSERT" {/*INSERT*/}
   "WHERE" { /*WHERE*/ }
   "ORDER" {/*ORDER*/}
-  "BY" {/*BY*/}
   "GROUP" {/*GROUP*/}
-  "JOIN" {/*JOIN*/}
-  "LEFT" {/*LEFT*/}
   "RIGHT" {/*RIGHT*/}
   "INNER" {/*INNER*/}
+  "FROM" { /*FROM*/ }
+  "JOIN" {/*JOIN*/}
+  "LEFT" {/*LEFT*/}
+  "INTO" {/*INTO*/}
+  "BY" {/*BY*/}
+  "AS" { /*AS*/ }
+  "IN" { /*IN*/ }
   "," {/*,*/}
   "(" {/*(*/}
   ")" {/*)*/}
@@ -42,6 +45,7 @@ Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
   "*" {/***/}
   "/" {/*/*/}
   "=" { /*=*/ }
+  "?" { /*?*/ }
 
   {NONNEWLINE_WHITE_SPACE_CHAR}+ {/*WS*/}
 

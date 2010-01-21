@@ -7,6 +7,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import ee.stacc.productivity.edsl.sqllexer.SQLLexerData;
+
 public class AutomataParser {
 
 	public static class Automaton {
@@ -92,7 +94,7 @@ public class AutomataParser {
 				if (inChar == -1) {
 					inStr = "EOF";
 				} else {
-					inStr = inChar == 0 ? "" : ((char) inChar) + "";
+					inStr = inChar == 0 ? "" : (SQLLexerData.TOKENS[inChar]) + "";
 				}
 				stringBuilder
 					.append(transition.getTo())

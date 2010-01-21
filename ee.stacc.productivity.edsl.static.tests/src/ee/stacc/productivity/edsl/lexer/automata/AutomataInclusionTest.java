@@ -3,9 +3,14 @@ package ee.stacc.productivity.edsl.lexer.automata;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+
 import org.junit.Test;
 
 import ee.stacc.productivity.edsl.lexer.automata.AutomataParser.Automaton;
+import ee.stacc.productivity.edsl.sqllexer.SQLLexerData;
 
 
 public class AutomataInclusionTest {
@@ -270,6 +275,46 @@ public class AutomataInclusionTest {
 		assertTrue(AutomataInclusion.INSTANCE.checkInclusion(transduction, checkInit));
 		assertTrue(AutomataInclusion.INSTANCE.checkInclusion(checkInit, transduction));
 		
+	}
+	
+	@Test
+	public void testSQL() throws Exception {
+		String[] strings = {
+				"IN",
+//				"SELECT cc.ColumnName FROM AD_Column c" ,
+//				"SELECT t.TableName FROM AD_Column c" ,
+//				"SELECT AD_Window_ID, IsReadOnly FROM AD_Menu WHERE AD_Menu_ID=? AND Action='W'", 
+//				"SELECT GRANTOR,GRANTEE,DBADMAUTH FROM SYSCAT.DBAUTH",
+//				"INSERT INTO X_Test(Text1, Text2) values(?,?)",
+//				"SELECT * FROM AD_System",
+//				"INSERT INTO X_Test(Text1, Text2) values(?,?)",
+//				"SELECT c.ColumnName FROM AD_Column c INNER JOIN AD_Table t ON (c.AD_Table_ID=t.AD_Table_ID) ", 
+//				"SELECT AD_Table_ID, TableName FROM AD_Table WHERE IsView='N' ORDER BY 2",
+//				"SELECT COUNT(*) FROM AD_PInstance_Para WHERE AD_PInstance_ID=?",
+		};
+		State automaton = AutomataUtils.toAutomaton(new HashSet<String>(Arrays.asList(strings)));
+//		AutomataUtils.printAutomaton(automaton);
+		State sqlTransducer = AutomataConverter.INSTANCE.convert();
+//		AutomataUtils.printAutomaton(sqlTransducer);
+		
+		State transduction = AutomataInclusion.INSTANCE.getTrasduction(sqlTransducer, automaton);
+		transduction = EmptyTransitionEliminator.INSTANCE.eliminateEmptySetTransitions(transduction);
+		transduction = AutomataDeterminator.determinate(transduction);
+		
+		AutomataUtils.printAutomaton(transduction);
+		
+		System.out.println("gen");
+//		generate(transduction, "");
+	}
+
+	private void generate(State state, String out) {
+//		if (state.isAccepting()) {
+			System.out.println(out);
+//		}
+		Collection<Transition> outgoingTransitions = state.getOutgoingTransitions();
+		for (Transition transition : outgoingTransitions) {
+			generate(transition.getTo(), out + SQLLexerData.TOKENS[transition.getInChar()] + " ");
+		}
 	}
 	
 }

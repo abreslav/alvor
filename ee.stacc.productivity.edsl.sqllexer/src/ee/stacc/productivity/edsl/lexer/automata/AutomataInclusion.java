@@ -27,7 +27,7 @@ public class AutomataInclusion {
 	public State getTrasduction(State transducerInitial, State inputInitial) {
 		Checker checker = new Checker();
 		if (!checker.check(transducerInitial, inputInitial)) {
-			throw new IllegalArgumentException("The given automata does not form a valid input for the given transducer");
+			throw new IllegalArgumentException("The given automaton does not form a valid input for the given transducer");
 		}
 		Map<Transition, Set<Transition>> transitionMap = checker.transitionMap;
 		Map<State, State> oldToNewStates = new HashMap<State, State>();
@@ -39,23 +39,41 @@ public class AutomataInclusion {
 				Set<Transition> transducerTransitions = getSet(transitionMap, oldTransition);
 				for (Transition transducerTransition : transducerTransitions) {
 					String outStr = transducerTransition.getOutStr();
-					// TODO: support multicharacter strings
-					if (outStr.length() > 1) {
-						throw new IllegalArgumentException("Multichars are not supported: " + transducerTransition);
+					State newTo = getNewState(oldToNewStates, oldTransition.getTo());
+					int length = outStr.length();
+					switch (length) {
+					case 0:
+						createTransition(newState, newTo, null);
+						break;
+					case 1:
+						createTransition(newState, newTo, (int) outStr.charAt(0));
+						break;
+					default:
+						State current = newState;
+						for (int i = 0; i < length; i++) {
+							State state;
+							if (i == length) {
+								state = newTo;
+							} else {
+								state = new State("I" + i, false);
+							}
+							createTransition(current, state, (int) outStr.charAt(i));
+							current = state;
+						}
+						break;
 					}
-					Integer c = null;
-					if (outStr.length() > 0) {
-						c = (int) outStr.charAt(0);
-					}
-					newState.getOutgoingTransitions().add(
-							new Transition(
-									newState, 
-									getNewState(oldToNewStates, oldTransition.getTo()), 
-									c));
 				}
 			}
 		}
 		return oldToNewStates.get(inputInitial);
+	}
+
+	private void createTransition(State from, State to, Integer c) {
+		from.getOutgoingTransitions().add(
+				new Transition(
+						from, 
+						to, 
+						c));
 	}
 
 	private State getNewState(Map<State, State> oldToNewStates, State oldState) {
