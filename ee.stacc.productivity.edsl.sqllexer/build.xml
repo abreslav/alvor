@@ -32,7 +32,14 @@
     		classpath="generated" 
     		destdir="bin">
     	</javac>
-    	<java classpath="bin" classname="SQLLexerGen" output="generated/tables"/>
+    	<mkdir dir="generated/ee/stacc/productivity/edsl/sqllexer"/>
+    	<java 
+    		classpath="bin" 
+    		classname="SQLLexerGen" 
+    		output="generated/ee/stacc/productivity/edsl/sqllexer/SQLLexerData.java">
+    		<arg value="ee.stacc.productivity.edsl.sqllexer"/>
+    		<arg value="SQLLexerData"/>
+    	</java>
 	</target>
 
 </project>

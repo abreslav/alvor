@@ -39,14 +39,18 @@ public class Generator {
 		Matcher matcher = pattern.matcher(builder);
 
 		StringBuilder tokens = new StringBuilder();
-		tokens.append("        System.out.println(\"%tokens (action - name)\");\n");
+		tokens.append("        System.out.println(\"/** Tokens (action - name)*/\");\n");
+		tokens.append("        System.out.println(\"public static final String[] TOKENS = new String[ACTIONS.length];\");\n");
+		tokens.append("        System.out.println(\"static {\");\n");
 		int maxToken = 0;  
 		while (matcher.find()) {
 			String index = matcher.group(1);
 			String text = matcher.group(2).replace("\n", "\\n");
-			tokens.append("        System.out.println(" + index + " + \" - \" + \"" + text + "\");\n");
+			tokens.append("        System.out.format(\"    TOKENS[%4d] = \\\"%s\\\";\\n\", " + index + ", \"" + text + "\");\n");
 			maxToken = Math.max(maxToken, Integer.parseInt(index));
 		}
+		tokens.append("        System.out.println(\"}\");\n");
+		tokens.append("        System.out.println(\"}\");\n");
 		
 		
 		InputStream main = Generator.class.getResourceAsStream("main.txt");

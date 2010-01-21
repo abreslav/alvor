@@ -1,53 +1,78 @@
 	public static void main(String[] args) {
-		System.out.println("%charclasses (char - class (char))");
+		String pack = args[0];
+		String className = args[1];
+		
+		System.out.println("package " + pack + ";");
+		System.out.println();
+		System.out.println("public class " + className + "{");
+		
+		System.out.println("/** Char classes (char - class (char)) */");
 		char[] zzCmap = ZZ_CMAP;
+		System.out.println("public static final char[] CHAR_CLASSES = {");
 		int maxCharClass = 0;
+		int count = 0;
+		int lineCount = 100;
 		for (int i = 0; i < zzCmap.length; i++) {
 			char c = zzCmap[i];
 			if (c > maxCharClass) {
 				maxCharClass = c;
 			} 
-			if (c != 0) {
-				System.out.format("%4d - %4d", i, ((int) c ));
-				switch (i) {
-					case '\n':
-						System.out.println(" (\\n)");
-						break;
-					case '\r':
-						System.out.println(" (\\r)");
-						break;
-					default:
-					System.out.println(" (" + ((char) i) + ")");
-				}
+			switch (c) {
+				case '\n': 
+					System.out.print("'\\n', ");
+					break;
+				case '\r': 
+					System.out.print("'\\r', ");
+					break;
+				default:
+				System.out.format("'\\u%04X', ", ((int) c ));
+			}
+			count++;
+			if (count >= lineCount) {
+				System.out.println();
+				count = 0;
 			}
 		}
-		System.out.println();
+		System.out.println("};");
 
-		System.out.println("%transitions (state : state(char class))");
 		
 		int[] zzRowmap = ZZ_ROWMAP;
-		System.out.println(zzRowmap.length + " (states)");
-		System.out.println((maxCharClass + 1) + " (char classes)");
-		
-		for (int zzState = 0; zzState < zzRowmap.length; zzState++) {
-			System.out.format("%4d : ", zzState);
-			for (int charClass = 0; charClass <= maxCharClass; charClass++) {
-				int zzNext = ZZ_TRANS[ZZ_ROWMAP[zzState] + charClass];
-				System.out.format("%4d ", zzNext);
-			}
-			System.out.println();
-		}
-		
-		System.out.println("%attributes (state - attrs (oct))");
-		for (int zzState = 0; zzState < zzRowmap.length; zzState++) {
-			int zzAttributes = ZZ_ATTRIBUTE[zzState];
-			System.out.format("%4d - %3o\n", zzState, zzAttributes);
-		}
-		
-		int[] zzAction = ZZ_ACTION;
-		System.out.println("%actions (state - action)");
-		for (int i = 0; i < zzAction.length; i++) {
-			System.out.format("%4d - %4d\n", i, zzAction[i]);
-		}
+		System.out.println("/** Number of states (table height) */");
+		System.out.println("public static final int STATE_COUNT = " + zzRowmap.length + ";");
+		System.out.println();
+
+		System.out.println("/** Number of character classes (table width) */");
+		System.out.println("public static final int CHAR_CLASS_COUNT = " + (maxCharClass + 1) + ";");
 		System.out.println();
 		
+		System.out.println("/** Transitions (state : state(char class)) */");
+		System.out.println("public static final int[][] TRANSITIONS = {");
+		for (int zzState = 0; zzState < zzRowmap.length; zzState++) {
+			System.out.format("/*%4d : */", zzState);
+			System.out.print("{ ");
+			for (int charClass = 0; charClass <= maxCharClass; charClass++) {
+				int zzNext = ZZ_TRANS[ZZ_ROWMAP[zzState] + charClass];
+				System.out.format("%4d, ", zzNext);
+			}
+			System.out.println("},");
+		}
+		System.out.println("};");
+		System.out.println();
+		
+		System.out.println("/** Attributes (state - attrs (oct)) */");
+		System.out.println("public static final int[] ATTRIBUTES = {");
+		for (int zzState = 0; zzState < zzRowmap.length; zzState++) {
+			int zzAttributes = ZZ_ATTRIBUTE[zzState];
+			System.out.format("/*%4d */ %04o,\n", zzState, zzAttributes);
+		}
+		System.out.println("};");
+		System.out.println();
+		
+		System.out.println("/** Actions (state - action) */");
+		System.out.println("public static final int[] ACTIONS = {");
+		int[] zzAction = ZZ_ACTION;
+		for (int i = 0; i < zzAction.length; i++) {
+			System.out.format("/*%4d*/ %4d,\n", i, zzAction[i]);
+		}
+		System.out.println("};");
+		System.out.println();
