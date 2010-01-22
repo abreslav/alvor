@@ -1,5 +1,6 @@
 package ee.stacc.productivity.edsl.lexer.automata;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -11,6 +12,11 @@ import org.junit.Test;
 
 import ee.stacc.productivity.edsl.lexer.automata.AutomataParser.Automaton;
 import ee.stacc.productivity.edsl.sqllexer.SQLLexerData;
+import ee.stacc.productivity.edsl.string.IAbstractString;
+import ee.stacc.productivity.edsl.string.StringCharacterSet;
+import ee.stacc.productivity.edsl.string.StringConstant;
+import ee.stacc.productivity.edsl.string.StringRepetition;
+import ee.stacc.productivity.edsl.string.StringSequence;
 
 
 public class AutomataInclusionTest {
@@ -309,18 +315,68 @@ public class AutomataInclusionTest {
 		
 		System.out.println("gen");
 		generate(transduction, "");
+		
+		IAbstractString str = 
+			new StringSequence(
+					new StringConstant("SELECT "),
+					new StringRepetition(
+							new StringCharacterSet(".,")
+					),
+					new StringConstant(" FROM")
+				);
+		State init = StringToAutomatonConverter.INSTANCE.convert(
+				str, new IAlphabetConverter() {
+			
+			@Override
+			public int convert(int c) {
+				if (c == -1) {
+					return c;
+				}
+				return SQLLexerData.CHAR_CLASSES[c];
+			}
+		});
+		init = AutomataDeterminator.determinate(init);
+		AutomataUtils.printAutomaton(init);
+		
+		transduction = AutomataInclusion.INSTANCE.getTrasduction(sqlTransducer, init);
+		AutomataUtils.printSQLAutomaton(transduction);
+		transduction = EmptyTransitionEliminator.INSTANCE.eliminateEmptySetTransitions(transduction);
+		transduction = AutomataDeterminator.determinate(transduction);
+		
+		AutomataUtils.printSQLAutomaton(transduction);
+		
+		System.out.println("gen");
+		generate(transduction, "");
+	}
+	
+	@Test
+	public void testLoops() throws Exception {
+		StringSequence loops = new StringSequence(
+				new StringConstant("A"), 
+				new StringRepetition(new StringCharacterSet("1a")), 
+				new StringConstant("B"));
+		State loopsInit = StringToAutomatonConverter.INSTANCE.convert(loops);
+		State sqlTransducer = AutomataConverter.INSTANCE.convert();
+		
 	}
 
 	private Set<String> convertToSQLChars(Set<String> hashSet) {
 		Set<String> result = new HashSet<String>();
 		for (String string : hashSet) {
-			StringBuilder builder = new StringBuilder(string.length());
-			for (int i = 0; i < string.length(); i++) {
-				builder.append(SQLLexerData.CHAR_CLASSES[string.charAt(i)]);
-			}
-			result.add(builder.toString());
+			String res = $(string);
+			result.add(res);
 		}
 		return result;
+	}
+
+
+	private String $(String string) {
+		StringBuilder builder = new StringBuilder(string.length());
+		for (int i = 0; i < string.length(); i++) {
+			builder.append(SQLLexerData.CHAR_CLASSES[string.charAt(i)]);
+		}
+		String res = builder.toString();
+		return res;
 	}
 
 

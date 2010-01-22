@@ -132,13 +132,8 @@ public class AutomataInclusion {
 			
 			Collection<Transition> transitions = current.getOutgoingTransitions();
 			for (Transition transition : transitions) {
-				Set<State> newSet = transitionFunction(
-						setForCurrent, 
-						error, 
-						transition);
-				boolean result = dfs(
-					transition.getTo(), 
-					newSet);
+				Set<State> newSet = transitionFunction(setForCurrent, error, transition);
+				boolean result = dfs(transition.getTo(), newSet);
 				if (!result) {
 					return false;
 				}

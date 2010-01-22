@@ -9,10 +9,6 @@ import ee.stacc.productivity.edsl.sqllexer.SQLLexerData;
 
 public class AutomataUtils {
 
-	public interface ICharacterMapper {
-		String map(int c);
-	}
-
 	public static final ICharacterMapper SQL_TOKEN_MAPPER = new ICharacterMapper() {
 		@Override
 		public String map(int c) {
