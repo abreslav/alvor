@@ -11,7 +11,14 @@ import ee.stacc.productivity.edsl.string.parser.AbstractStringParser;
 public class LexerPerformanceTest {
 
 	@Test
-	public void testPerformance() throws Exception {
+	public void testBig() throws Exception {
+		List<IAbstractString> strings = AbstractStringParser.parseFile("data/big.txt");
+		StringToAutomatonConverter.INSTANCE.convert(strings.get(0), AutomataUtils.SQL_ALPHABET_CONVERTER);
+		
+	}
+	
+	@Test
+	public void testSqls() throws Exception {
 		List<IAbstractString> strings = AbstractStringParser.parseFile("data/sqls.txt");
 		
 		State sqlTransducer = AutomataConverter.INSTANCE.convert();
