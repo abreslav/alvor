@@ -57,8 +57,8 @@ Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
   "=" { /*=*/ }
   "?" { /*?*/ }
 
-  {NONNEWLINE_WHITE_SPACE_CHAR}+ {/**/}
-  {DIGIT}+{ALPHA}+ {/*ERROR_DIGAL*/}
+  {NONNEWLINE_WHITE_SPACE_CHAR}+ {/* */} 
+  {DIGIT}+{ALPHA}({DIGIT}|{ALPHA})* {/*ERROR_DIGAL*/}
   \"{DQ_STRING_TEXT}\" {/*STRING_DQ*/}
   \"{DQ_STRING_TEXT} {/*STRING_DQ_ERR*/} 
   \'{SQ_STRING_TEXT}\' {/*STRING_SQ*/}

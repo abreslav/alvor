@@ -41,7 +41,7 @@ public class AutomataConverter {
 			}
 		}
 
-		initialState.getOutgoingTransitions().add(new Transition(initialState, EOFState, -1, ""));
+		initialState.getOutgoingTransitions().add(new Transition(initialState, EOFState, -1, "" + (char) -1));
 		
 		// Make it circular
 		// Imagine an \eps-transition into initialState from every accepting state

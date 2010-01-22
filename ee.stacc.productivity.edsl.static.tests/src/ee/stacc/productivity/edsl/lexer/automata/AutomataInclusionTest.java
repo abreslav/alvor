@@ -1,6 +1,5 @@
 package ee.stacc.productivity.edsl.lexer.automata;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -315,15 +314,36 @@ public class AutomataInclusionTest {
 		
 		System.out.println("gen");
 		generate(transduction, "");
+	}
+	
+	@Test
+	public void testLoops() throws Exception {
+//		StringSequence loops = new StringSequence(
+//				new StringConstant("A"), 
+//				new StringRepetition(new StringCharacterSet("1a")), 
+//				new StringConstant("B"));
+//		State loopsInit = StringToAutomatonConverter.INSTANCE.convert(loops);
+		State sqlTransducer = AutomataConverter.INSTANCE.convert();
 		
 		IAbstractString str = 
-			new StringSequence(
-					new StringConstant("SELECT "),
-					new StringRepetition(
-							new StringCharacterSet(".,")
-					),
-					new StringConstant(" FROM")
-				);
+//			new StringSequence(
+//					new StringConstant("A"),
+//					new StringRepetition(
+//							new StringCharacterSet("a1")
+//					)
+//		,
+//					new StringConstant("B")
+//				)
+//				;
+		new StringSequence(
+				new StringConstant("SELECT "),
+				new StringRepetition(
+						new StringCharacterSet("a1.")
+				)
+				,
+				new StringConstant(" FROM")
+		)
+		;
 		State init = StringToAutomatonConverter.INSTANCE.convert(
 				str, new IAlphabetConverter() {
 			
@@ -337,27 +357,27 @@ public class AutomataInclusionTest {
 		});
 		init = AutomataDeterminator.determinate(init);
 		AutomataUtils.printAutomaton(init);
+//		AutomataUtils.generate(init, "");
 		
-		transduction = AutomataInclusion.INSTANCE.getTrasduction(sqlTransducer, init);
-		AutomataUtils.printSQLAutomaton(transduction);
+		State transduction = AutomataInclusion.INSTANCE.getTrasduction(sqlTransducer, init);
+		System.out.println("Fresh transduction");
+		AutomataUtils.printSQLInputAutomaton(transduction);
+//		EmptyTransitionEliminator.INSTANCE.deleteEmptyTransitionsPreservingConnectivity(transduction);
 		transduction = EmptyTransitionEliminator.INSTANCE.eliminateEmptySetTransitions(transduction);
 		transduction = AutomataDeterminator.determinate(transduction);
 		
-		AutomataUtils.printSQLAutomaton(transduction);
+		System.out.println("Cleaned transduction");
+		AutomataUtils.printSQLInputAutomaton(transduction);
 		
 		System.out.println("gen");
 		generate(transduction, "");
-	}
-	
-	@Test
-	public void testLoops() throws Exception {
-		StringSequence loops = new StringSequence(
-				new StringConstant("A"), 
-				new StringRepetition(new StringCharacterSet("1a")), 
-				new StringConstant("B"));
-		State loopsInit = StringToAutomatonConverter.INSTANCE.convert(loops);
-		State sqlTransducer = AutomataConverter.INSTANCE.convert();
-		
+/*
+
+->S0 -> S1:ID// S2:ERROR_DIGAL// S1:NUMBER// ;
+a:S1;
+a:S2 -> S2:ERROR_DIGAL// S1:ID// S1:NUMBER// ;
+
+ */
 	}
 
 	private Set<String> convertToSQLChars(Set<String> hashSet) {

@@ -1,7 +1,6 @@
 package ee.stacc.productivity.edsl.lexer.automata;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -108,16 +107,21 @@ public class AutomataInclusion {
 		private final State error = new State("<ERROR>", false);
 		
 		public boolean check(State initial, State start) {
-			return dfs(start, Collections.singleton(initial));
+			getSet(stateMap, start).add(initial);
+			return dfs(start
+//					, Collections.singleton(initial)
+					);
 		}
 		
-		private boolean dfs(State current, Set<State> incoming) {
+		private boolean dfs(State current
+//				, Set<State> incoming
+				) {
 			Set<State> setForCurrent = getSet(stateMap, current);
-			if (setForCurrent.containsAll(incoming)) {
-				return true;
-			}
+//			if (setForCurrent.containsAll(incoming)) {
+//				return true;
+//			}
 			
-			setForCurrent.addAll(incoming);
+//			setForCurrent.addAll(incoming);
 			if (setForCurrent.contains(error)) {
 				return false;
 			}
@@ -132,43 +136,87 @@ public class AutomataInclusion {
 			
 			Collection<Transition> transitions = current.getOutgoingTransitions();
 			for (Transition transition : transitions) {
-				Set<State> newSet = transitionFunction(setForCurrent, error, transition);
-				boolean result = dfs(transition.getTo(), newSet);
-				if (!result) {
+				Change status = transitionFunction(new HashSet<State>(setForCurrent), error, transition);
+//				Set<State> newSet = transitionFunction(setForCurrent, error, transition);
+				switch (status) {
+				case NONE:
+					break;
+				case SOME:
+					boolean result = dfs(transition.getTo()
+//						, newSet
+					);
+					if (!result) {
+						return false;
+					}
+					break;
+				case ERROR:
 					return false;
 				}
 			}
 			return true;
 		}
+	
+		private static enum Change {
+			NONE,
+			SOME,
+			ERROR
+		}
 		
-		private Set<State> transitionFunction(State state, State error, Transition underlyingTransition) {
-			Set<State> result = new HashSet<State>();
+		private 
+//		Set<State>
+		Change
+		transitionFunction(State state, State error, Transition underlyingTransition) {
+			Set<State> correspondingStates = getSet(stateMap, underlyingTransition.getTo());
+//			Set<State> result = new HashSet<State>();
 			if (underlyingTransition.isEmpty()) {
-				result.add(error);
-				return result;
+				correspondingStates.add(error);
+				return Change.ERROR;
+//				result.add(error);
+//				return result;
 			}
 			
+			Change result = Change.NONE;
 			Collection<Transition> transitions = state.getOutgoingTransitions();
 			Set<Transition> correspondingTransitions = getSet(transitionMap, underlyingTransition);
 			int inChar = underlyingTransition.getInChar();
 			boolean anyTransition = false;
 			for (Transition transition : transitions) {
 				if (transition.getInChar() == inChar) {
-					result.add(transition.getTo());
-					correspondingTransitions.add(transition);
+					if (correspondingStates.add(transition.getTo())) {
+						result = Change.SOME;
+					}
+//					result.add(transition.getTo());
+					if (correspondingTransitions.add(transition)) {
+						result = Change.SOME;
+					}
 					anyTransition = true;
 				}
 			}
 			if (!anyTransition) {
-				result.add(error);
+				correspondingStates.add(error);
+				result = Change.ERROR;
+//				result.add(error);
 			}
 			return result;
 		}
 		
-		public Set<State> transitionFunction(Set<State> states, State error, Transition underlyingTransition) {
-			Set<State> result = new HashSet<State>();
+		public 
+//		Set<State>
+		Change
+		transitionFunction(Set<State> states, State error, Transition underlyingTransition) {
+//			Set<State> result = new HashSet<State>();
+			Change result = Change.NONE;
 			for (State state : states) {
-				result.addAll(transitionFunction(state, error, underlyingTransition));
+				Change res = transitionFunction(state, error, underlyingTransition);
+				switch (res) {
+				case SOME:
+					if (result != Change.ERROR) {
+						result = res;
+					}
+					break;
+				case ERROR:
+					result = res;
+				}
 			}	
 			return result;
 		}

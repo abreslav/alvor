@@ -100,5 +100,26 @@ public class EmptyTransitionEliminator {
 		}
 		return result;
 	}
-	
+//
+//	public void deleteEmptyTransitionsPreservingConnectivity(State initial) {
+//		HashSet<State> states = new HashSet<State>();
+//		dfs(initial, states);
+//		Set<Transition> emptyTransitions = new HashSet<Transition>();
+//		for (State state : states) {
+//			emptyTransitions.clear();
+//			Collection<Transition> outgoingTransitions = state.getOutgoingTransitions();
+//			boolean nonEmptyFound = false;
+//			for (Transition transition : outgoingTransitions) {
+//				if (transition.isEmpty()) {
+//					emptyTransitions.add(transition);
+//				} else {
+//					nonEmptyFound = true;
+//				}
+//			}
+//			if (nonEmptyFound) {
+//				outgoingTransitions.removeAll(emptyTransitions);
+//			} else {
+//			}
+//		}
+//	}
 }

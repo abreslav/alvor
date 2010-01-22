@@ -25,35 +25,35 @@ public class AutomataConverterTest {
 
 
 		input = "SELECT t from 1 as = seleCt";
-		expected = "SELECT WS ID WS FROM WS NUMBER WS AS WS = WS SELECT";
+		expected = "SELECT  ID  FROM  NUMBER  AS  =  SELECT";
 		
 		output = interpret(initial, input);
 		assertEquals(expected, output.toString().trim());
 
 		
 		input = "'sad\"fsa'   \"sadf a asd f' adsfsdf \"   sdfasd";
-		expected = "STRING_SQ WS STRING_DQ WS ID";
+		expected = "STRING_SQ  STRING_DQ  ID";
 		
 		output = interpret(initial, input);
 		assertEquals(expected, output.toString().trim());
 		
 		
 		input = "'sad\"fsa'   \"sadf a asd f' adsfsdf    sdfasd";
-		expected = "STRING_SQ WS STRING_DQ_ERR";
+		expected = "STRING_SQ  STRING_DQ_ERR";
 		
 		output = interpret(initial, input);
 		assertEquals(expected, output.toString().trim());
 		
 		
 		input = "SELECT cc.ColumnName FROM AD_Column c";
-		expected = "SELECT WS ID . ID WS FROM WS ID WS ID";
+		expected = "SELECT  ID . ID  FROM  ID  ID";
 		
 		output = interpret(initial, input);
 		assertEquals(expected, output.toString().trim());
 		
 		
 		input = "INSERT INTO X_Test(Text1, Text2) values(?,?)";
-		expected = "INSERT WS INTO WS ID ( ID , WS ID ) WS VALUES ( ? , ? )";
+		expected = "INSERT  INTO  ID ( ID ,  ID )  VALUES ( ? , ? )";
 		
 		output = interpret(initial, input);
 		assertEquals(expected, output.toString().trim());
