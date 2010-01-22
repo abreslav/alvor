@@ -285,9 +285,6 @@ public class AutomataInclusionTest {
 	@Test
 	public void testSQL() throws Exception {
 		String[] strings = {
-//				"A AAA A1 12  A A AA ",
-//				"AAAAA112AAAA ",
-//				"1234A3",
 				"SELECT cc.ColumnName FROM AD_Column c" ,
 				"SELECT t.TableName FROM AD_Column c" ,
 				"SELECT AD_Window_ID, IsReadOnly FROM AD_Menu WHERE AD_Menu_ID=? AND Action='W'", 
@@ -302,7 +299,6 @@ public class AutomataInclusionTest {
 		State automaton = AutomataUtils.toAutomaton(convertToSQLChars(new HashSet<String>(Arrays.asList(strings))));
 		AutomataUtils.printAutomaton(automaton);
 		State sqlTransducer = AutomataConverter.INSTANCE.convert();
-//		sqlTransducer = AutomataDeterminator.determinateWithPriorities(sqlTransducer);
 		AutomataUtils.printSQLAutomaton(sqlTransducer);
 		
 		State transduction = AutomataInclusion.INSTANCE.getTrasduction(sqlTransducer, automaton);
@@ -318,23 +314,9 @@ public class AutomataInclusionTest {
 	
 	@Test
 	public void testLoops() throws Exception {
-//		StringSequence loops = new StringSequence(
-//				new StringConstant("A"), 
-//				new StringRepetition(new StringCharacterSet("1a")), 
-//				new StringConstant("B"));
-//		State loopsInit = StringToAutomatonConverter.INSTANCE.convert(loops);
 		State sqlTransducer = AutomataConverter.INSTANCE.convert();
 		
 		IAbstractString str = 
-//			new StringSequence(
-//					new StringConstant("A"),
-//					new StringRepetition(
-//							new StringCharacterSet("a1")
-//					)
-//		,
-//					new StringConstant("B")
-//				)
-//				;
 		new StringSequence(
 				new StringConstant("SELECT "),
 				new StringRepetition(
@@ -357,12 +339,10 @@ public class AutomataInclusionTest {
 		});
 		init = AutomataDeterminator.determinate(init);
 		AutomataUtils.printAutomaton(init);
-//		AutomataUtils.generate(init, "");
 		
 		State transduction = AutomataInclusion.INSTANCE.getTrasduction(sqlTransducer, init);
 		System.out.println("Fresh transduction");
 		AutomataUtils.printSQLInputAutomaton(transduction);
-//		EmptyTransitionEliminator.INSTANCE.deleteEmptyTransitionsPreservingConnectivity(transduction);
 		transduction = EmptyTransitionEliminator.INSTANCE.eliminateEmptySetTransitions(transduction);
 		transduction = AutomataDeterminator.determinate(transduction);
 		
@@ -371,13 +351,6 @@ public class AutomataInclusionTest {
 		
 		System.out.println("gen");
 		generate(transduction, "");
-/*
-
-->S0 -> S1:ID// S2:ERROR_DIGAL// S1:NUMBER// ;
-a:S1;
-a:S2 -> S2:ERROR_DIGAL// S1:ID// S1:NUMBER// ;
-
- */
 	}
 
 	private Set<String> convertToSQLChars(Set<String> hashSet) {

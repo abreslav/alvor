@@ -18,42 +18,42 @@ public class AutomataConverterTest {
 		StringBuilder output;
 
 		input = "aaaabdexaacdedexabdexxxx";
-		expected = "ID";
+		expected = "ID EOF";
 		
 		output = interpret(initial, input);
 		assertEquals(expected, output.toString().trim());
 
 
 		input = "SELECT t from 1 as = seleCt";
-		expected = "SELECT  ID  FROM  NUMBER  AS  =  SELECT";
+		expected = "SELECT  ID  FROM  NUMBER  AS  =  SELECT EOF";
 		
 		output = interpret(initial, input);
 		assertEquals(expected, output.toString().trim());
 
 		
 		input = "'sad\"fsa'   \"sadf a asd f' adsfsdf \"   sdfasd";
-		expected = "STRING_SQ  STRING_DQ  ID";
+		expected = "STRING_SQ  STRING_DQ  ID EOF";
 		
 		output = interpret(initial, input);
 		assertEquals(expected, output.toString().trim());
 		
 		
 		input = "'sad\"fsa'   \"sadf a asd f' adsfsdf    sdfasd";
-		expected = "STRING_SQ  STRING_DQ_ERR";
+		expected = "STRING_SQ  STRING_DQ_ERR EOF";
 		
 		output = interpret(initial, input);
 		assertEquals(expected, output.toString().trim());
 		
 		
 		input = "SELECT cc.ColumnName FROM AD_Column c";
-		expected = "SELECT  ID . ID  FROM  ID  ID";
+		expected = "SELECT  ID . ID  FROM  ID  ID EOF";
 		
 		output = interpret(initial, input);
 		assertEquals(expected, output.toString().trim());
 		
 		
 		input = "INSERT INTO X_Test(Text1, Text2) values(?,?)";
-		expected = "INSERT  INTO  ID ( ID ,  ID )  VALUES ( ? , ? )";
+		expected = "INSERT  INTO  ID ( ID ,  ID )  VALUES ( ? , ? ) EOF";
 		
 		output = interpret(initial, input);
 		assertEquals(expected, output.toString().trim());
@@ -75,7 +75,12 @@ public class AutomataConverterTest {
 					current = transition.getTo();
 					String outStr = transition.getOutStr();
 					for (int j = 0; j < outStr.length(); j++) {
-						output.append(SQLLexerData.TOKENS[outStr.charAt(j)]);
+						char charAt = outStr.charAt(j);
+						if (charAt == (char) -1) {
+							output.append("EOF");
+						} else {
+							output.append(SQLLexerData.TOKENS[charAt]);
+						}
 						output.append(" ");
 					}
 					worked = true;

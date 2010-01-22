@@ -108,20 +108,11 @@ public class AutomataInclusion {
 		
 		public boolean check(State initial, State start) {
 			getSet(stateMap, start).add(initial);
-			return dfs(start
-//					, Collections.singleton(initial)
-					);
+			return dfs(start);
 		}
 		
-		private boolean dfs(State current
-//				, Set<State> incoming
-				) {
+		private boolean dfs(State current) {
 			Set<State> setForCurrent = getSet(stateMap, current);
-//			if (setForCurrent.containsAll(incoming)) {
-//				return true;
-//			}
-			
-//			setForCurrent.addAll(incoming);
 			if (setForCurrent.contains(error)) {
 				return false;
 			}
@@ -137,14 +128,11 @@ public class AutomataInclusion {
 			Collection<Transition> transitions = current.getOutgoingTransitions();
 			for (Transition transition : transitions) {
 				Change status = transitionFunction(new HashSet<State>(setForCurrent), error, transition);
-//				Set<State> newSet = transitionFunction(setForCurrent, error, transition);
 				switch (status) {
 				case NONE:
 					break;
 				case SOME:
-					boolean result = dfs(transition.getTo()
-//						, newSet
-					);
+					boolean result = dfs(transition.getTo());
 					if (!result) {
 						return false;
 					}
@@ -162,17 +150,11 @@ public class AutomataInclusion {
 			ERROR
 		}
 		
-		private 
-//		Set<State>
-		Change
-		transitionFunction(State state, State error, Transition underlyingTransition) {
+		private	Change transitionFunction(State state, State error, Transition underlyingTransition) {
 			Set<State> correspondingStates = getSet(stateMap, underlyingTransition.getTo());
-//			Set<State> result = new HashSet<State>();
 			if (underlyingTransition.isEmpty()) {
 				correspondingStates.add(error);
 				return Change.ERROR;
-//				result.add(error);
-//				return result;
 			}
 			
 			Change result = Change.NONE;
@@ -185,7 +167,6 @@ public class AutomataInclusion {
 					if (correspondingStates.add(transition.getTo())) {
 						result = Change.SOME;
 					}
-//					result.add(transition.getTo());
 					if (correspondingTransitions.add(transition)) {
 						result = Change.SOME;
 					}
@@ -195,16 +176,11 @@ public class AutomataInclusion {
 			if (!anyTransition) {
 				correspondingStates.add(error);
 				result = Change.ERROR;
-//				result.add(error);
 			}
 			return result;
 		}
 		
-		public 
-//		Set<State>
-		Change
-		transitionFunction(Set<State> states, State error, Transition underlyingTransition) {
-//			Set<State> result = new HashSet<State>();
+		public Change transitionFunction(Set<State> states, State error, Transition underlyingTransition) {
 			Change result = Change.NONE;
 			for (State state : states) {
 				Change res = transitionFunction(state, error, underlyingTransition);
