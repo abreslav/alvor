@@ -7,7 +7,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.dom.Expression;
 
 import ee.stacc.productivity.edsl.crawler.AbstractStringEvaluator;
-import ee.stacc.productivity.edsl.crawler.ArgumentFinder;
+import ee.stacc.productivity.edsl.crawler.Crawler;
 import ee.stacc.productivity.edsl.db.AbstractSQLStructure;
 import ee.stacc.productivity.edsl.db.SQLStringAnalyzer;
 import ee.stacc.productivity.edsl.string.IAbstractString;
@@ -27,7 +27,7 @@ public class SQLUsageChecker {
 	}
 	
 	public void checkElement(IJavaElement scope) { // scope can be eg. file or project
-		List<IAbstractString> aStrings = ArgumentFinder.findArgumentAbstractValuesAtCallSites
+		List<IAbstractString> aStrings = Crawler.findArgumentAbstractValuesAtCallSites
 			("java.sql.Connection", "prepareStatement", 1, scope, 1);
 	
 		

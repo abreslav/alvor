@@ -29,7 +29,7 @@ import ee.stacc.productivity.edsl.string.IAbstractString;
 /**
  * Helper class for using Java SearchEngine
  */
-public class ArgumentFinder {
+public class Crawler {
 
 	static public List<IAbstractString> findArgumentAbstractValuesAtCallSites(
 			final String className, final String methodName, 
