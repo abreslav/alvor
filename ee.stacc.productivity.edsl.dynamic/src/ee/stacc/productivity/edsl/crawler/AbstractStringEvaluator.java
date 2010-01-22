@@ -1,5 +1,6 @@
 package ee.stacc.productivity.edsl.crawler;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -47,8 +48,7 @@ public class AbstractStringEvaluator {
 		*/
 		
 		if (type.getName().equals("int")) {
-			throw new UnsupportedStringOpEx
-				("TODO: int expression");
+			throw new UnsupportedStringOpEx	("TODO: int expression");
 		}
 		else if (node instanceof SimpleName) {
 			IBinding var = ((SimpleName)node).resolveBinding();
@@ -64,9 +64,13 @@ public class AbstractStringEvaluator {
 		else if (node instanceof InfixExpression) {
 			InfixExpression infe = (InfixExpression)node;
 			if (infe.getOperator() == InfixExpression.Operator.PLUS) {
-				return new StringSequence(
-					getValOf(infe.getLeftOperand(), level),
-					getValOf(infe.getRightOperand(), level));
+				List<IAbstractString> ops = new ArrayList<IAbstractString>();
+				ops.add(getValOf(infe.getLeftOperand(), level));
+				ops.add(getValOf(infe.getRightOperand(), level));
+				for (Object operand: infe.extendedOperands()) {
+					ops.add(getValOf((Expression)operand, level));
+				}
+				return new StringSequence(ops);
 			}
 			else {
 				throw new UnsupportedStringOpEx
@@ -75,10 +79,10 @@ public class AbstractStringEvaluator {
 		}
 		else if (node instanceof MethodInvocation) {
 			MethodInvocation inv = (MethodInvocation)node;
-			ITypeBinding binding = ((SimpleName)inv.getExpression()).resolveTypeBinding();
 			if (!(inv.getExpression() instanceof SimpleName)) {
 				throw new UnsupportedStringOpEx("MethodInvocation, expression not SimpleName");
 			}
+			ITypeBinding binding = ((SimpleName)inv.getExpression()).resolveTypeBinding();
 			if (! "toString".equals(inv.getName().getIdentifier())) {
 				throw new UnsupportedStringOpEx("MethodInvocation, method not toString");
 			}
@@ -87,7 +91,6 @@ public class AbstractStringEvaluator {
 				assert inv.getExpression() instanceof SimpleName;
 				IBinding var = ((SimpleName)inv.getExpression()).resolveBinding();
 				return getVarValBefore((IVariableBinding)var, getContainingStmt(node), level);
-//				throw new UnsupportedStringOpEx("TODO: StringBuffer or StringBuilder");
 			}
 			else {
 				throw new UnsupportedStringOpEx("MethodInvocation, neither StringBuffer nor StringBuilder");
@@ -158,29 +161,44 @@ public class AbstractStringEvaluator {
 	
 	private static IAbstractString getVarValAfterVarDec(IVariableBinding var,
 			VariableDeclarationStatement stmt, int level) {
-		assert stmt.fragments().size() == 1; // TODO
-		VariableDeclaration vDec = (VariableDeclaration)stmt.fragments().get(0);
 		
-		if (vDec.getName().resolveBinding().isEqualTo(var)) {
-			if (isStringBuilderOrBuffer(var.getType())) {
-				if (vDec.getInitializer() instanceof ClassInstanceCreation) {
-					ClassInstanceCreation cic = (ClassInstanceCreation)vDec.getInitializer();
-					assert isStringBuilderOrBuffer(cic.getType().resolveBinding());
-					return getValOf((Expression)cic.arguments().get(0), level);
+		// May include declarations for several variables
+		for (int i=stmt.fragments().size()-1; i>=0; i--) {
+			VariableDeclaration vDec = (VariableDeclaration)stmt.fragments().get(i);
+			
+			if (vDec.getName().resolveBinding().isEqualTo(var)) {
+				if (isStringBuilderOrBuffer(var.getType())) {
+					if (vDec.getInitializer() instanceof ClassInstanceCreation) {
+						ClassInstanceCreation cic = (ClassInstanceCreation)vDec.getInitializer();
+						assert isStringBuilderOrBuffer(cic.getType().resolveBinding());
+						if (cic.arguments().size() == 1) {
+							Expression arg = (Expression)cic.arguments().get(0);
+							if (arg.resolveTypeBinding().getName().equals("String")) {
+								return getValOf(arg, level);
+							}
+							else if (arg.resolveTypeBinding().getName().equals("int")) {
+								return new StringConstant("");
+							}
+							else { // CharSequence
+								throw new UnsupportedStringOpEx("Unknown StringBuilder/Buffer constructor: " 
+										+ arg.resolveTypeBinding().getName());
+							}
+						} else {
+							return new StringConstant("");
+						}
+					}
+					else {
+						throw new UnsupportedStringOpEx("getVarValAfterVarDec: initializer is "
+								+ vDec.getInitializer().getClass());
+					}
 				}
 				else {
-					throw new UnsupportedStringOpEx("getVarValAfterVarDec: initializer is "
-							+ vDec.getInitializer().getClass());
+					assert var.getType().getName().equals("String");
+					return getValOf(vDec.getInitializer(), level);
 				}
 			}
-			else {
-				assert var.getType().getName().equals("String");
-				return getValOf(vDec.getInitializer(), level);
-			}
 		}
-		else {
-			return getVarValBefore(var, stmt, level);
-		}
+		return getVarValBefore(var, stmt, level);
 	}
 	
 	private static IAbstractString getVarValAfterAss(IVariableBinding var, 
@@ -335,7 +353,8 @@ public class AbstractStringEvaluator {
 	private static String getMethodClassName(MethodDeclaration method) {
 		assert (method.getParent() instanceof TypeDeclaration);
 		TypeDeclaration typeDecl = (TypeDeclaration)method.getParent();
-		return typeDecl.resolveBinding().getDeclaringClass().getQualifiedName();
+		ITypeBinding classBinding = typeDecl.resolveBinding();
+		return classBinding.getQualifiedName();
 	}
 	
 	private static boolean isStringBuilderOrBuffer(ITypeBinding typeBinding) {

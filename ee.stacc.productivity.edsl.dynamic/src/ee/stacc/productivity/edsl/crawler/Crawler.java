@@ -1,6 +1,7 @@
 package ee.stacc.productivity.edsl.crawler;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
@@ -30,11 +31,27 @@ import ee.stacc.productivity.edsl.string.IAbstractString;
  * Helper class for using Java SearchEngine
  */
 public class Crawler {
-
+	private static Hashtable<String, List<IAbstractString>> cache = new Hashtable<String, List<IAbstractString>>();
+	
 	static public List<IAbstractString> findArgumentAbstractValuesAtCallSites(
-			final String className, final String methodName, 
+			final String typeName, final String methodName, 
 			final int argNo, IJavaElement searchScope, final int level) {
-		System.out.println("ArgumentFinder for " + className + "." + methodName + "(" + argNo + ")");
+		
+		String argDescriptor = getArgDescriptor(typeName, methodName, argNo); 
+		System.out.println("ArgumentFinder for " + argDescriptor);
+		
+		final List<IAbstractString> cacheResult = cache.get(argDescriptor);
+		if (cacheResult != null) {
+			return cacheResult;
+		}
+		
+		
+		// FIXME temporary, to speed up a bit
+		if (methodName.equals("get")) {
+			return new ArrayList<IAbstractString>();
+		}
+		
+		final List<IAbstractString> result = new ArrayList<IAbstractString>();
 		
 		if (level > 3) {
 			throw new UnsupportedStringOpEx("argument searching level too deep");
@@ -46,7 +63,6 @@ public class Crawler {
 		IJavaElement[] elems = {searchScope};
 		IJavaSearchScope scope = SearchEngine.createJavaSearchScope(elems);
 		
-		final List<IAbstractString> result = new ArrayList<IAbstractString>();
 		
 		SearchRequestor requestor = new SearchRequestor() {
 			ICompilationUnit cUnit;
@@ -57,69 +73,93 @@ public class Crawler {
 			
 			
 			public void acceptSearchMatch(SearchMatch match) {
-				if (match.getElement() instanceof IMethod) {
-					IMethod method = (IMethod)match.getElement();
-					
-					//System.out.println(method);
-					if (! method.getCompilationUnit().equals(cUnit)) { // new unit, need new AST
-						if (cUnit == null) { // first time
-							parser = ASTParser.newParser(AST.JLS3);
-							parser.setKind(ASTParser.K_COMPILATION_UNIT);
-							parser.setResolveBindings(true);
-						}
-						cUnit = method.getCompilationUnit();
-						parser.setSource(cUnit);
+				if (! (match.getElement() instanceof IMethod)) {
+					return;
+				}
+				IMethod method = (IMethod)match.getElement();
+				
+				//System.out.println(method);
+				if (! method.getCompilationUnit().equals(cUnit)) { // new unit, need new AST
+					if (cUnit == null) { // first time
+						parser = ASTParser.newParser(AST.JLS3);
+						parser.setKind(ASTParser.K_COMPILATION_UNIT);
 						parser.setResolveBindings(true);
-						ast = parser.createAST(null);
-						
 					}
-					ASTNode node = NodeFinder.perform(ast, match.getOffset(), match.getLength());
+					cUnit = method.getCompilationUnit();
+					parser.setSource(cUnit);
+					parser.setResolveBindings(true);
+					ast = parser.createAST(null);
 					
-					if (node instanceof MethodInvocation) {
-						MethodInvocation invoc = (MethodInvocation)node;
-						IMethodBinding methodBinding = invoc.resolveMethodBinding();
-						if (!methodBinding.getDeclaringClass().getQualifiedName().equals(className)
-								&& /* FIXME */ !"prepareStatement".equals(methodName)) {
-							System.err.println("Wrong match, want: " + className + "." + methodName
-									+ ", was: " + methodBinding.getDeclaringClass().getQualifiedName());
-							return;
-						}
-						
-						
-						ASTNode arg = (ASTNode) invoc.arguments().get(argNo-1);
-						if (arg instanceof Expression) {
-							System.out.println("# FOUND : " + getLineNumber(match, arg));
-							// todo: get astr
-							try {
-								IAbstractString aStr = AbstractStringEvaluator.getValOf((Expression)arg, level);
+				}
+				ASTNode node = NodeFinder.perform(ast, match.getOffset(), match.getLength());
+				
+				if (! (node instanceof MethodInvocation)) {
+					System.err.println("Crawler: not MethodInvocation, but: " + node.getClass());
+					return;
+				}
+				
+				assert node instanceof MethodInvocation;
+				
+				MethodInvocation invoc = (MethodInvocation)node;
+				IMethodBinding methodBinding = invoc.resolveMethodBinding();
+				
+				// TODO: check that object has that type
+				
+				if (!methodBinding.getDeclaringClass().getQualifiedName().equals(typeName)
+						&& /* FIXME */ !"prepareStatement".equals(methodName)) {
+					System.out.println("Wrong match, want: " + typeName + "." + methodName
+							+ ", was: " + methodBinding.getDeclaringClass().getQualifiedName()
+							+ "." + methodBinding.getName());
+					return;
+				}
+				else {
+					System.out.println("Good match: " 
+							+ methodBinding.getDeclaringClass().getQualifiedName()
+							+ "." + methodBinding.getName());
+				}
+				
+				// TODO overloading may complicate things
+				if (invoc.arguments().size() < argNo) {
+					throw new UnsupportedStringOpEx("can't find required argument (" + argNo + "), method="
+							+ methodBinding.getDeclaringClass().getQualifiedName()
+							+ "." + methodBinding.getName());
+				}
+				
+				ASTNode arg = (ASTNode) invoc.arguments().get(argNo-1);
+				if (arg instanceof Expression) {
+					System.out.println("# FOUND : " + getLineNumber(match, arg));
+					// todo: get astr
+					try {
+						IAbstractString aStr = AbstractStringEvaluator.getValOf((Expression)arg, level);
 //								System.out.println("ASTR   : " + aStr);
-								result.add(aStr);
-							} 
-							catch (UnsupportedStringOpEx e) {
-								System.out.println("_______________________________");
-								try {
-									System.out.println("File   : " + method.getUnderlyingResource());
-								} catch (Exception _e) {_e.printStackTrace();}
-								
-								System.out.println("Arg    : " + arg + ", type: " + arg.getClass());
-								System.out.println("Line   : " + getLineNumber(match, arg));
-								System.out.println("Unsupp : " + e.getMessage());
-								unsuppCount++;
-							}
-							catch (Throwable e) {
-								System.err.println("_______________________________");
-								try {
-									System.err.println("File   : " + method.getUnderlyingResource());
-								} catch (Exception _e) {_e.printStackTrace();}
-								
-								System.err.println("Arg    : " + arg + ", type: " + arg.getClass());
-								System.err.println("Offset : " + match.getOffset());
-								System.err.println("Line   : " + getLineNumber(match, arg));
-								System.err.println("ERR    : " + e.getMessage());
-								exceptionalCount++;
-							}
-						}
+						result.add(aStr);
+					} 
+					catch (UnsupportedStringOpEx e) {
+						System.out.println("_______________________________");
+						try {
+							System.out.println("File   : " + method.getUnderlyingResource());
+						} catch (Exception _e) {_e.printStackTrace();}
+						
+						System.out.println("Arg    : " + arg + ", type: " + arg.getClass());
+						System.out.println("Line   : " + getLineNumber(match, arg));
+						System.out.println("Unsupp : " + e.getMessage());
+						unsuppCount++;
 					}
+					/*
+					catch (Throwable e) {
+						System.err.println("_______________________________");
+						try {
+							System.err.println("File   : " + method.getUnderlyingResource());
+						} catch (Exception _e) {_e.printStackTrace();}
+						
+						System.err.println("Arg    : " + arg + ", type: " + arg.getClass());
+						System.err.println("Offset : " + match.getOffset());
+						System.err.println("Line   : " + getLineNumber(match, arg));
+						System.err.println("ERRClass: " + e.getClass());
+						System.err.println("ERR    : " + e.getMessage());
+						exceptionalCount++;
+					}
+					*/
 				}
 			}
 			
@@ -140,6 +180,8 @@ public class Crawler {
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
+		
+		cache.put(argDescriptor, result);
 		return result;
 	}
 	
@@ -152,5 +194,8 @@ public class Crawler {
 		}
 			
 	}
-
+	
+	private static String getArgDescriptor(String typeName, String methodName, int argNo) {
+		return typeName + "." + methodName + ":" + argNo; 
+	}
 }
