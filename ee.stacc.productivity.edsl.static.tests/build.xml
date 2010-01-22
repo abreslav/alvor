@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="project" default="default">
+	<taskdef classname="JFlex.anttask.JFlexTask" name="jflex" classpath="../../jflex/lib/JFlex.jar"/>
+	
+    <target name="default" depends="depends" description="description">
+        
+    </target>
+
+    <target name="depends">  
+		<!-- Simple lexer : used for experimentation -->
+    	<jflex
+			file="lexer/astr.flex"
+    		destdir="generated"
+			time="on"
+    		nobak="on"
+		/>
+	</target>
+
+</project>

@@ -17,7 +17,7 @@ public class StringRepetition implements IAbstractString {
 	
 	@Override
 	public String toString() {
-		return "(" + body + ")*";
+		return "(" + body + ")+";
 	}
 
 	public <R, D> R accept(IAbstractStringVisitor<? extends R,? super D> visitor, D data) {

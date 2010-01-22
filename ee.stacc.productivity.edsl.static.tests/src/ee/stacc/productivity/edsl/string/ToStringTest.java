@@ -16,6 +16,6 @@ public class ToStringTest {
 					new StringRepetition(new StringConstant(""))
 			)
 		).toString();
-		assertEquals("\"\\\"asdas\" {[fdsa\\][], (\"\")*} ", string);
+		assertEquals("\"\\\"asdas\" {[fdsa\\][], (\"\")+} ", string);
 	}
 }
