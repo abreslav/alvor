@@ -4,7 +4,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -326,13 +325,8 @@ public class AutomataInclusionTest {
 
 
 	private void generate(State state, String out) {
-		if (state.isAccepting()) {
-			System.out.println(out);
-		}
-		Collection<Transition> outgoingTransitions = state.getOutgoingTransitions();
-		for (Transition transition : outgoingTransitions) {
-			generate(transition.getTo(), out + SQLLexerData.TOKENS[transition.getInChar()] + " ");
-		}
+		AutomataUtils.generate(state, out, AutomataUtils.SQL_TOKEN_MAPPER);
 	}
+	
 	
 }

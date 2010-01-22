@@ -1,5 +1,6 @@
 package ee.stacc.productivity.edsl.string;
 
+
 public interface IAbstractStringVisitor<R, D> {
 
 	R visitStringCharacterSet(StringCharacterSet characterSet, D data);

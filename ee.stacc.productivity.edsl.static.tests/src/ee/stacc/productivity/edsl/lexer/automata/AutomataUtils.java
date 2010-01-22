@@ -1,5 +1,7 @@
 package ee.stacc.productivity.edsl.lexer.automata;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -127,4 +129,31 @@ public class AutomataUtils {
 		}
 		return result.toString();
 	}
+	
+	public static void generate(State state, String out, ICharacterMapper outputMapper) {
+		HashMap<State, Integer> visitCounts = new HashMap<State, Integer>();
+		int maxVisits = 2;
+		doGenerate(state, out, outputMapper, visitCounts, maxVisits);
+	}
+
+	private static void doGenerate(State state, String out,
+			ICharacterMapper outputMapper, HashMap<State, Integer> visitCounts,
+			int maxVisits) {
+		Integer count = visitCounts.get(state);
+		if (count == null) {
+			count = 0;
+		}
+		if (count >= maxVisits) {
+			return;
+		}
+		visitCounts.put(state, count + 1);
+		if (state.isAccepting()) {
+			System.out.println(out);
+		}
+		Collection<Transition> outgoingTransitions = state.getOutgoingTransitions();
+		for (Transition transition : outgoingTransitions) {
+			doGenerate(transition.getTo(), out + outputMapper.map(transition.getInChar()) + " ", outputMapper,
+					visitCounts, maxVisits);
+		}
+	}	
 }

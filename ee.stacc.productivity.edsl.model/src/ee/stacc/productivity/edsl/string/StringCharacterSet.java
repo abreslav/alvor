@@ -4,6 +4,7 @@
 package ee.stacc.productivity.edsl.string;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,6 +31,10 @@ public class StringCharacterSet implements IAbstractString {
 	
 	public boolean containsAll(Collection<Character> c) {
 		return set.containsAll(c);
+	}
+	
+	public Set<Character> getContents() {
+		return Collections.unmodifiableSet(set);
 	}
 
 	public String toString() {
