@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,13 +34,19 @@ public class AutomataInclusion {
 		Map<State, State> oldToNewStates = new HashMap<State, State>();
 		Set<State> oldStates = checker.stateMap.keySet();
 		for (State oldState : oldStates) {
+			println("oldState: " + oldState + System.identityHashCode(oldState));
 			State newState = getNewState(oldToNewStates, oldState);
+			println("newState: " + newState + System.identityHashCode(newState));
 			Collection<Transition> oldTransitions = oldState.getOutgoingTransitions();
 			for (Transition oldTransition : oldTransitions) {
+				println("  oldTransition: " + oldTransition);
 				Set<Transition> transducerTransitions = getSet(transitionMap, oldTransition);
 				for (Transition transducerTransition : transducerTransitions) {
+					println("  transducerTransition: " + transducerTransition);
 					String outStr = transducerTransition.getOutStr();
 					State newTo = getNewState(oldToNewStates, oldTransition.getTo());
+					println("  newTo: " + newTo + System.identityHashCode(newTo));
+					
 					int length = outStr.length();
 					switch (length) {
 					case 0:
@@ -52,7 +59,7 @@ public class AutomataInclusion {
 						State current = newState;
 						for (int i = 0; i < length; i++) {
 							State state;
-							if (i == length) {
+							if (i == length - 1) {
 								state = newTo;
 							} else {
 								state = new State("I" + i, false);
@@ -68,12 +75,14 @@ public class AutomataInclusion {
 		return oldToNewStates.get(inputInitial);
 	}
 
+	private void println(String string) {
+//		System.out.println(string);
+	}
+
 	private void createTransition(State from, State to, Integer c) {
-		from.getOutgoingTransitions().add(
-				new Transition(
-						from, 
-						to, 
-						c));
+		Transition transition = new Transition(from, to, c);
+		println("    newTransition: " + transition);
+		from.getOutgoingTransitions().add(transition);
 	}
 
 	private State getNewState(Map<State, State> oldToNewStates, State oldState) {
@@ -90,11 +99,11 @@ public class AutomataInclusion {
 		/**
 		 * Maps a state of the included automaton to a set of states of including automaton  
 		 */
-		private final Map<State, Set<State>> stateMap = new HashMap<State, Set<State>>();
+		private final Map<State, Set<State>> stateMap = new LinkedHashMap<State, Set<State>>();
 		/**
 		 * Maps a transition of the included automaton to a set of transitions of including automaton  
 		 */
-		private final Map<Transition, Set<Transition>> transitionMap = new HashMap<Transition, Set<Transition>>();
+		private final Map<Transition, Set<Transition>> transitionMap = new LinkedHashMap<Transition, Set<Transition>>();
 
 		private final State error = new State("<ERROR>", false);
 		

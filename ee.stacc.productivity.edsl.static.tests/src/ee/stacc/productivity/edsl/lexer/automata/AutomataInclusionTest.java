@@ -281,7 +281,9 @@ public class AutomataInclusionTest {
 	@Test
 	public void testSQL() throws Exception {
 		String[] strings = {
-				"AA AA AAAAA",
+				"A AAA A1 12  A A AA ",
+				"AAAAA112AAAA ",
+				"1234A3",
 //				"SELECT cc.ColumnName FROM AD_Column c" ,
 //				"SELECT t.TableName FROM AD_Column c" ,
 //				"SELECT AD_Window_ID, IsReadOnly FROM AD_Menu WHERE AD_Menu_ID=? AND Action='W'", 
@@ -300,6 +302,7 @@ public class AutomataInclusionTest {
 		AutomataUtils.printSQLAutomaton(sqlTransducer);
 		
 		State transduction = AutomataInclusion.INSTANCE.getTrasduction(sqlTransducer, automaton);
+		AutomataUtils.printSQLAutomaton(transduction);
 		transduction = EmptyTransitionEliminator.INSTANCE.eliminateEmptySetTransitions(transduction);
 		transduction = AutomataDeterminator.determinate(transduction);
 		
@@ -323,9 +326,9 @@ public class AutomataInclusionTest {
 
 
 	private void generate(State state, String out) {
-//		if (state.isAccepting()) {
+		if (state.isAccepting()) {
 			System.out.println(out);
-//		}
+		}
 		Collection<Transition> outgoingTransitions = state.getOutgoingTransitions();
 		for (Transition transition : outgoingTransitions) {
 			generate(transition.getTo(), out + SQLLexerData.TOKENS[transition.getInChar()] + " ");

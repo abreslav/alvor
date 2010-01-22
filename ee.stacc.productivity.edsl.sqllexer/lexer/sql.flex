@@ -23,7 +23,8 @@ Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
 <YYINITIAL> {
  "A" {/*K1*/}
  "AA" {/*K2*/}
- A+ { /*ID*/}
+ A[A0-9]+ { /*ID*/}
+ [0-9]+ {/*INT*/}
  \  { /*WS*/}
 //  "VALUES" {/*VALUES*/}
 //  "SELECT" { /*SELECT*/ }
