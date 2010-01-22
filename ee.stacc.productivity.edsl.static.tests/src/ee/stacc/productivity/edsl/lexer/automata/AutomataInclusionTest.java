@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.junit.Test;
 
@@ -280,7 +281,7 @@ public class AutomataInclusionTest {
 	@Test
 	public void testSQL() throws Exception {
 		String[] strings = {
-				"IN",
+				"AA AA AAAAA",
 //				"SELECT cc.ColumnName FROM AD_Column c" ,
 //				"SELECT t.TableName FROM AD_Column c" ,
 //				"SELECT AD_Window_ID, IsReadOnly FROM AD_Menu WHERE AD_Menu_ID=? AND Action='W'", 
@@ -292,20 +293,34 @@ public class AutomataInclusionTest {
 //				"SELECT AD_Table_ID, TableName FROM AD_Table WHERE IsView='N' ORDER BY 2",
 //				"SELECT COUNT(*) FROM AD_PInstance_Para WHERE AD_PInstance_ID=?",
 		};
-		State automaton = AutomataUtils.toAutomaton(new HashSet<String>(Arrays.asList(strings)));
-//		AutomataUtils.printAutomaton(automaton);
+		State automaton = AutomataUtils.toAutomaton(convertToSQLChars(new HashSet<String>(Arrays.asList(strings))));
+		AutomataUtils.printAutomaton(automaton);
 		State sqlTransducer = AutomataConverter.INSTANCE.convert();
-//		AutomataUtils.printAutomaton(sqlTransducer);
+//		sqlTransducer = AutomataDeterminator.determinateWithPriorities(sqlTransducer);
+		AutomataUtils.printSQLAutomaton(sqlTransducer);
 		
 		State transduction = AutomataInclusion.INSTANCE.getTrasduction(sqlTransducer, automaton);
 		transduction = EmptyTransitionEliminator.INSTANCE.eliminateEmptySetTransitions(transduction);
 		transduction = AutomataDeterminator.determinate(transduction);
 		
-		AutomataUtils.printAutomaton(transduction);
+		AutomataUtils.printSQLAutomaton(transduction);
 		
 		System.out.println("gen");
 		generate(transduction, "");
 	}
+
+	private Set<String> convertToSQLChars(Set<String> hashSet) {
+		Set<String> result = new HashSet<String>();
+		for (String string : hashSet) {
+			StringBuilder builder = new StringBuilder(string.length());
+			for (int i = 0; i < string.length(); i++) {
+				builder.append(SQLLexerData.CHAR_CLASSES[string.charAt(i)]);
+			}
+			result.add(builder.toString());
+		}
+		return result;
+	}
+
 
 	private void generate(State state, String out) {
 //		if (state.isAccepting()) {

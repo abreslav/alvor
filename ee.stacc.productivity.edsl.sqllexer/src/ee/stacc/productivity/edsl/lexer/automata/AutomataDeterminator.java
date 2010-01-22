@@ -2,6 +2,8 @@ package ee.stacc.productivity.edsl.lexer.automata;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
@@ -141,6 +143,29 @@ public class AutomataDeterminator {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * This operation changes the passed automaton
+	 */
+	public static State determinateWithPriorities(State initial) {
+		Set<State> states = new HashSet<State>();
+		EmptyTransitionEliminator.INSTANCE.dfs(initial, states);
+		Set<Integer> usedIns = new HashSet<Integer>();
+		for (State state : states) {
+			usedIns.clear();
+			Iterator<Transition> iterator = state.getOutgoingTransitions().iterator();
+			while (iterator.hasNext()) {
+				Transition transition = iterator.next();
+				int inChar = transition.getInChar();
+				if (usedIns.contains(inChar)) {
+					iterator.remove();
+				} else {
+					usedIns.add(inChar);
+				}
+			}
+		}
+		return initial;
 	}
 	
 }

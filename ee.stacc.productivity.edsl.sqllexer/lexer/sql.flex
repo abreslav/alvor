@@ -21,46 +21,43 @@ Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
 %% 
 
 <YYINITIAL> {
-  "VALUES" {/*VALUES*/}
-  "SELECT" { /*SELECT*/ }
-  "INSERT" {/*INSERT*/}
-  "WHERE" { /*WHERE*/ }
-  "ORDER" {/*ORDER*/}
-  "GROUP" {/*GROUP*/}
-  "RIGHT" {/*RIGHT*/}
-  "INNER" {/*INNER*/}
-  "FROM" { /*FROM*/ }
-  "JOIN" {/*JOIN*/}
-  "LEFT" {/*LEFT*/}
-  "INTO" {/*INTO*/}
-  "BY" {/*BY*/}
-  "AS" { /*AS*/ }
-  "IN" { /*IN*/ }
-  "," {/*,*/}
-  "(" {/*(*/}
-  ")" {/*)*/}
-  "." {/*.*/}
-  "+" {/*+*/}
-  "-" {/*-*/}
-  "*" {/***/}
-  "/" {/*/*/}
-  "=" { /*=*/ }
-  "?" { /*?*/ }
+ "A" {/*K1*/}
+ "AA" {/*K2*/}
+ A+ { /*ID*/}
+ \  { /*WS*/}
+//  "VALUES" {/*VALUES*/}
+//  "SELECT" { /*SELECT*/ }
+//  "INSERT" {/*INSERT*/}
+//  "WHERE" { /*WHERE*/ }
+//  "ORDER" {/*ORDER*/}
+//  "GROUP" {/*GROUP*/}
+//  "RIGHT" {/*RIGHT*/}
+//  "INNER" {/*INNER*/}
+//  "FROM" { /*FROM*/ }
+//  "JOIN" {/*JOIN*/}
+//  "LEFT" {/*LEFT*/}
+//  "INTO" {/*INTO*/}
+//  "BY" {/*BY*/}
+//  "AS" { /*AS*/ }
+//  "IN" { /*IN*/ }
+//  "," {/*,*/}
+//  "(" {/*(*/}
+//  ")" {/*)*/}
+//  "." {/*.*/}
+//  "+" {/*+*/}
+//  "-" {/*-*/}
+//  "*" {/***/}
+//  "/" {/*/*/}
+//  "=" { /*=*/ }
+//  "?" { /*?*/ }
 
-  {NONNEWLINE_WHITE_SPACE_CHAR}+ {/*WS*/}
-
-  {DIGIT}+{ALPHA}+ {/*ERROR_DIGAL*/}
-
-  \"{DQ_STRING_TEXT}\" {/*STRING_DQ*/}
-  
-  \"{DQ_STRING_TEXT} {/*STRING_DQ_ERR*/} 
-  
-  \'{SQ_STRING_TEXT}\' {/*STRING_SQ*/}
-  
-  \'{SQ_STRING_TEXT} {/*STRING_SQ_ERR*/} 
-  
-  {DIGIT}+ { /*NUMBER*/ }  
-
-  {Ident} { /*ID*/ }
+//  {NONNEWLINE_WHITE_SPACE_CHAR}+ {/*WS*/}
+//  {DIGIT}+{ALPHA}+ {/*ERROR_DIGAL*/}
+//  \"{DQ_STRING_TEXT}\" {/*STRING_DQ*/}
+//  \"{DQ_STRING_TEXT} {/*STRING_DQ_ERR*/} 
+//  \'{SQ_STRING_TEXT}\' {/*STRING_SQ*/}
+//  \'{SQ_STRING_TEXT} {/*STRING_SQ_ERR*/} 
+//  {DIGIT}+ { /*NUMBER*/ }  
+//  {Ident} { /*ID*/ }
   
 }

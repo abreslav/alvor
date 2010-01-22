@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import ee.stacc.productivity.edsl.sqllexer.SQLLexerData;
 
 public class AutomataParser {
 
@@ -30,9 +29,6 @@ public class AutomataParser {
 			return initialState;
 		}
 		
-		public String toString() {
-			return statesToString(states, initialState);
-		}
 	}
 	
 	public static Automaton parse(String text) {
@@ -71,42 +67,5 @@ public class AutomataParser {
 			map.put(name, state);
 		}
 		return state;
-	}	
-	
-	public static String statesToString(Set<State> theStates,
-			State theInitialState) {
-		StringBuilder stringBuilder = new StringBuilder();
-		for (State state : theStates) {
-			if (theInitialState == state) {
-				stringBuilder.append("->");
-			}
-			if (state.isAccepting()) {
-				stringBuilder.append("a:");
-			}
-			stringBuilder
-				.append(state);
-			if (!state.getOutgoingTransitions().isEmpty()) {
-				stringBuilder.append(" -> ");
-			}
-			for (Transition transition : state.getOutgoingTransitions()) {
-				int inChar = transition.getInChar();
-				String inStr;
-				if (inChar == -1) {
-					inStr = "EOF";
-				} else {
-					inStr = inChar == 0 ? "" : (SQLLexerData.TOKENS[inChar]) + "";
-				}
-				stringBuilder
-					.append(transition.getTo())
-					.append(":")
-					.append(inStr)
-					.append("/")
-					.append(transition.getOutStr())
-					.append("/")
-					.append(" ");
-			}
-			stringBuilder.append(";\n");
-		}
-		return stringBuilder.toString();
 	}
 }

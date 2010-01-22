@@ -14,7 +14,7 @@ public class AutomataConverter {
 		// Create states
 		State[] states = new State[STATE_COUNT + 1];
 		for (int i = 0; i < STATE_COUNT; i++) {
-			states[i] = new State("S" + i, isAccepting(i));
+			states[i] = new State("S" + i, false);
 		}
 		State initialState = states[0];
 		State EOFState = new State("EOF", true);
@@ -64,7 +64,7 @@ public class AutomataConverter {
 			}
 		}
 		
-		return initialState;
+		return AutomataDeterminator.determinateWithPriorities(initialState);
 	}
 	
 	private boolean isAccepting(int state) {
