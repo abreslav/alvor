@@ -281,19 +281,19 @@ public class AutomataInclusionTest {
 	@Test
 	public void testSQL() throws Exception {
 		String[] strings = {
-				"A AAA A1 12  A A AA ",
-				"AAAAA112AAAA ",
-				"1234A3",
-//				"SELECT cc.ColumnName FROM AD_Column c" ,
-//				"SELECT t.TableName FROM AD_Column c" ,
-//				"SELECT AD_Window_ID, IsReadOnly FROM AD_Menu WHERE AD_Menu_ID=? AND Action='W'", 
-//				"SELECT GRANTOR,GRANTEE,DBADMAUTH FROM SYSCAT.DBAUTH",
-//				"INSERT INTO X_Test(Text1, Text2) values(?,?)",
-//				"SELECT * FROM AD_System",
-//				"INSERT INTO X_Test(Text1, Text2) values(?,?)",
-//				"SELECT c.ColumnName FROM AD_Column c INNER JOIN AD_Table t ON (c.AD_Table_ID=t.AD_Table_ID) ", 
-//				"SELECT AD_Table_ID, TableName FROM AD_Table WHERE IsView='N' ORDER BY 2",
-//				"SELECT COUNT(*) FROM AD_PInstance_Para WHERE AD_PInstance_ID=?",
+//				"A AAA A1 12  A A AA ",
+//				"AAAAA112AAAA ",
+//				"1234A3",
+				"SELECT cc.ColumnName FROM AD_Column c" ,
+				"SELECT t.TableName FROM AD_Column c" ,
+				"SELECT AD_Window_ID, IsReadOnly FROM AD_Menu WHERE AD_Menu_ID=? AND Action='W'", 
+				"SELECT GRANTOR,GRANTEE,DBADMAUTH FROM SYSCAT.DBAUTH",
+				"INSERT INTO X_Test(Text1, Text2) values(?,?)",
+				"SELECT * FROM AD_System",
+				"INSERT INTO X_Test(Text1, Text2) values(?,?)",
+				"SELECT c.ColumnName FROM AD_Column c INNER JOIN AD_Table t ON (c.AD_Table_ID=t.AD_Table_ID) ", 
+				"SELECT AD_Table_ID, TableName FROM AD_Table WHERE IsView='N' ORDER BY 2",
+				"SELECT COUNT(*) FROM AD_PInstance_Para WHERE AD_PInstance_ID=?",
 		};
 		State automaton = AutomataUtils.toAutomaton(convertToSQLChars(new HashSet<String>(Arrays.asList(strings))));
 		AutomataUtils.printAutomaton(automaton);
