@@ -304,7 +304,7 @@ public class AutomataInclusionTest {
 		AutomataUtils.printAutomaton(transduction);
 		
 		System.out.println("gen");
-//		generate(transduction, "");
+		generate(transduction, "");
 	}
 
 	private void generate(State state, String out) {

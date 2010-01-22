@@ -7,8 +7,55 @@
 		System.out.println("public class " + className + "{");
 		
 		System.out.println("/** Char classes (char - class (char)) */");
+		System.out.println("private static final String CHAR_CLASSES_PACKED = ");
+		{
+			int stored = 0;
+			int cmpLen = ZZ_CMAP_PACKED.length();
+			while (stored < cmpLen) {
+				int rightBnd = Math.min(stored + 30, cmpLen);
+				System.out.print("\"");
+				for (int i = stored; i < rightBnd; i++) {
+					char c = ZZ_CMAP_PACKED.charAt(i);
+					if (c < 256) {
+						System.out.format("\\%o", (int) c);
+					} else {
+						System.out.format("\\u%4x", (int) c);
+					}
+				}
+				System.out.println("\" + ");
+				stored = rightBnd;
+			}
+			System.out.println("\"\";");
+		}
+			
+		System.out.println();
+		System.out.println("public static final char[] CHAR_CLASSES = unpackCharClasses(CHAR_CLASSES_PACKED);");
+		System.out.println();
+		System.out.println("  /** ");
+		System.out.println("   * Copied from JFlex code");
+		System.out.println("   * Unpacks the compressed character translation table.");
+		System.out.println("   *");
+		System.out.println("   * @param packed   the packed character translation table");
+		System.out.println("   * @return         the unpacked character translation table");
+		System.out.println("   */");
+		System.out.println("  private static char [] unpackCharClasses(String packed) {");
+		System.out.println("    char [] map = new char[0x10000];");
+		System.out.println("    int i = 0;  /* index in packed string  */");
+		System.out.println("    int j = 0;  /* index in unpacked array */");
+		System.out.println("    int length = packed.length();");
+		System.out.println("    while (i < length) {");
+		System.out.println("      int  count = packed.charAt(i++);");
+		System.out.println("      char value = packed.charAt(i++);");
+		System.out.println("      do map[j++] = value; while (--count > 0);");
+		System.out.println("    }");
+		System.out.println("    return map;");
+		System.out.println("  }");
+		System.out.println();
+		
+
+		
 		char[] zzCmap = ZZ_CMAP;
-		System.out.println("public static final char[] CHAR_CLASSES = {");
+//		System.out.println("public static final char[] CHAR_CLASSES = {");
 		int maxCharClass = 0;
 		int count = 0;
 		int lineCount = 100;
@@ -25,27 +72,27 @@
 			}
 			switch (c) {
 				case '\n': 
-					System.out.print("'\\n', ");
+//					System.out.print("'\\n', ");
 					break;
 				case '\r': 
-					System.out.print("'\\r', ");
+//					System.out.print("'\\r', ");
 					break;
 				case '\"':
-					System.out.print("'\\\"', ");
+//					System.out.print("'\\\"', ");
 					break;
 				case '\'':
-					System.out.print("'\\\'', ");
+//					System.out.print("'\\\'', ");
 					break;
 				default:
-				System.out.format("'\\u%04X', ", ((int) c ));
+//					System.out.format("'\\u%04X', ", ((int) c ));
 			}
 			count++;
 			if (count >= lineCount) {
-				System.out.println();
+//				System.out.println();
 				count = 0;
 			}
 		}
-		System.out.println("};");
+//		System.out.println("};");
 
 		System.out.println("// Alphabet:");
 		System.out.print("// ");
