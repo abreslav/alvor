@@ -68,4 +68,6 @@ Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
   {DIGIT}+ { /*NUMBER*/ }  
   {Ident} { /*ID*/ }
   
+  . {/*UNKNOWN_CHARACTER*/}
+  
 }
