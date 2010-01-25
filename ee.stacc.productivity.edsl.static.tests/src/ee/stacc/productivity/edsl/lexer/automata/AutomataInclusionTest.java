@@ -174,7 +174,6 @@ public class AutomataInclusionTest {
 		transduction = AutomataInclusion.INSTANCE.getTrasduction(transducer, automaton);
 		transduction = EmptyTransitionEliminator.INSTANCE.eliminateEmptySetTransitions(transduction);
 		transduction = AutomataDeterminator.determinate(transduction);
-		AutomataUtils.printAutomaton(transduction);
 		assertTrue(AutomataInclusion.INSTANCE.checkInclusion(check, transduction));
 		assertTrue(AutomataInclusion.INSTANCE.checkInclusion(transduction, check));
 	}
