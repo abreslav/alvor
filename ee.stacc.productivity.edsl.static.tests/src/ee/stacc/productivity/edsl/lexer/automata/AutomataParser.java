@@ -1,37 +1,14 @@
 package ee.stacc.productivity.edsl.lexer.automata;
 
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
 public class AutomataParser {
 
-	public static class Automaton {
-		private final Set<State> states;
-		private final State initialState;
-		
-		public Automaton(
-				Set<State> states,
-				State initialState) {
-			this.states = states;
-			this.initialState = initialState;
-		}
-
-		public Set<State> getStates() {
-			return states;
-		}
-
-		public State getInitialState() {
-			return initialState;
-		}
-		
-	}
-	
-	public static Automaton parse(String text) {
+	public static State parse(String text) {
 		text = text.replace('-', ' ');
 		String[] lines = text.split(";");
 		
@@ -57,7 +34,7 @@ public class AutomataParser {
 //				to.getIncomingTransitions().add(transition);
 			}
 		}
-		return new Automaton(new LinkedHashSet<State>(map.values()), initialState);
+		return initialState;
 	}
 	
 	private static State getState(Map<String, State> map, String name) {

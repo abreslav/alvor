@@ -176,33 +176,49 @@ public class AutomataUtils {
 		}
 		return result.toString();
 	}
+
 	
 	public static void generate(State state, String out) {
-		generate(state, out, ID_MAPPER);
+		generate(state, out, ID_MAPPER, STANDARD_OUTPUT);
 	}
 	
-	public static void generate(State state, String out, ICharacterMapper outputMapper) {
+	public interface IOutput {
+		void putString(String str);
+	}
+	
+	public static final IOutput STANDARD_OUTPUT = new IOutput() {
+
+		@Override
+		public void putString(String str) {
+			System.out.println(str);
+		}
+		
+	};
+	
+	public static void generate(State state, String out, ICharacterMapper outputMapper, IOutput output) {
 		Set<Transition> visitedTransitions = new HashSet<Transition>();
 //		HashMap<State, Integer> visitCounts = new HashMap<State, Integer>();
 //		int maxVisits = 2;
 //		doGenerate(state, out, outputMapper, visitCounts, maxVisits, visitedTransitions);
 		Collection<Transition> outgoingTransitions = state.getOutgoingTransitions();
 		for (Transition transition : outgoingTransitions) {
-			doGenerate(transition, out, outputMapper, visitedTransitions);
+			doGenerate(transition, out, outputMapper, visitedTransitions, output);
 		}
 	}
 
-	private static void doGenerate(Transition tr, String out, ICharacterMapper outputMapper, Set<Transition> visitedTransitions) {
+	private static void doGenerate(Transition tr, String out, 
+			ICharacterMapper outputMapper, Set<Transition> visitedTransitions, 
+			IOutput output) {
 		if (!visitedTransitions.add(tr)) {
 			return;
 		}
 		State to = tr.getTo();
 		out += outputMapper.map(tr.getInChar()) + " ";
 		if (to.isAccepting()) {
-			System.out.println(out);
+			output.putString(out);
 		}
 		for (Transition transition : to.getOutgoingTransitions()) {
-			doGenerate(transition, out, outputMapper, visitedTransitions);
+			doGenerate(transition, out, outputMapper, visitedTransitions, output);
 		}
 		visitedTransitions.remove(tr);
 	}

@@ -3,6 +3,8 @@ package ee.stacc.productivity.edsl.string.parser;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +18,26 @@ import ee.stacc.productivity.edsl.string.StringSequence;
 public class AbstractStringParser {
 
 	private final AbstractStringLexer lexer;
+
+	public static List<IAbstractString> parseFile(String fileName) throws FileNotFoundException {
+		return parseReader(new FileReader(fileName));
+	}
+
+	public static List<IAbstractString> parseString(String data) {
+		return parseReader(new StringReader(data));
+	}
+	
+	public static IAbstractString parseOneFromString(String data) {
+		AbstractStringLexer lexer = new AbstractStringLexer(new StringReader(data));
+		AbstractStringParser parser = new AbstractStringParser(lexer);
+		return parser.abstractString();
+	}
+	
+	public static List<IAbstractString> parseReader(Reader in) {
+		AbstractStringLexer lexer = new AbstractStringLexer(in);
+		AbstractStringParser parser = new AbstractStringParser(lexer);
+		return parser.strings();
+	}
 
 	public AbstractStringParser(AbstractStringLexer lexer) {
 		this.lexer = lexer;
@@ -123,11 +145,5 @@ public class AbstractStringParser {
 		if (next() != expected) {
 			throw new ParseException("Missing token: " + expected);
 		}
-	}
-
-	public static List<IAbstractString> parseFile(String fileName) throws FileNotFoundException {
-		AbstractStringLexer lexer = new AbstractStringLexer(new FileReader(fileName));
-		AbstractStringParser parser = new AbstractStringParser(lexer);
-		return parser.strings();
 	}
 }

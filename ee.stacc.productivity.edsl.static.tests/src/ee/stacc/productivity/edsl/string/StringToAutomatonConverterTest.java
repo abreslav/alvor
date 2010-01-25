@@ -2,9 +2,9 @@ package ee.stacc.productivity.edsl.string;
 
 import org.junit.Test;
 
-import ee.stacc.productivity.edsl.lexer.automata.AutomataUtils;
 import ee.stacc.productivity.edsl.lexer.automata.State;
 import ee.stacc.productivity.edsl.lexer.automata.StringToAutomatonConverter;
+import ee.stacc.productivity.edsl.tests.util.TestUtil;
 
 
 public class StringToAutomatonConverterTest {
@@ -27,28 +27,38 @@ public class StringToAutomatonConverterTest {
 		State initial;
 		
 		initial = StringToAutomatonConverter.INSTANCE.convert(stringConstant);
-		AutomataUtils.printAutomaton(initial);
+		TestUtil.checkGeneratedcharacterStrings(initial, "\"asdas");
 
 		initial = StringToAutomatonConverter.INSTANCE.convert(stringCharacterSet);
-		AutomataUtils.printAutomaton(initial);
+		TestUtil.checkGeneratedcharacterStrings(initial, "s", "a", "d", "f", "]", "[");
 		
 		initial = StringToAutomatonConverter.INSTANCE.convert(stringRepetition);
-		AutomataUtils.printAutomaton(initial);
+		TestUtil.checkGeneratedcharacterStrings(initial, "sa");
 		
 		initial = StringToAutomatonConverter.INSTANCE.convert(stringChoice);
-		AutomataUtils.printAutomaton(initial);
-		AutomataUtils.generate(initial, "", AutomataUtils.ID_MAPPER);
+		TestUtil.checkGeneratedcharacterStrings(initial, "sa", "s", "a", "d", "f", "]", "[");
 		
 		initial = StringToAutomatonConverter.INSTANCE.convert(stringSequence);
-		AutomataUtils.printAutomaton(initial);
-		AutomataUtils.generate(initial, "", AutomataUtils.ID_MAPPER);
-		
-		initial = StringToAutomatonConverter.INSTANCE.convert(stringRepetition);
-		AutomataUtils.printAutomaton(initial);
-		AutomataUtils.generate(initial, "", AutomataUtils.ID_MAPPER);
+		TestUtil.checkGeneratedcharacterStrings(initial, 
+				"\"asdassa", 
+				"\"asdass", 
+				"\"asdasa", 
+				"\"asdasd", 
+				"\"asdasf", 
+				"\"asdas]", 
+				"\"asdas[");
 		
 		initial = StringToAutomatonConverter.INSTANCE.convert(new StringRepetition(new StringCharacterSet("a1")));
-		AutomataUtils.printAutomaton(initial);
-		AutomataUtils.generate(initial, "", AutomataUtils.ID_MAPPER);
+		TestUtil.checkGeneratedcharacterStrings(initial, 
+				"1 1 a  ",
+				"1 1  ",
+				"1 a 1  ",
+				"1 a  ",
+				"1  ",
+				"a 1 a  ",
+				"a 1  ",
+				"a a 1  ",
+				"a a  ",
+				"a  ");
 	}
 }
