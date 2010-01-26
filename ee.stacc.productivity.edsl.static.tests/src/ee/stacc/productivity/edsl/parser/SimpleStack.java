@@ -49,4 +49,29 @@ public final class SimpleStack implements IAbstractStack {
 	public String toString() {
 		return stack.toString();
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((stack == null) ? 0 : stack.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SimpleStack other = (SimpleStack) obj;
+		if (stack == null) {
+			if (other.stack != null)
+				return false;
+		} else if (!stack.equals(other.stack))
+			return false;
+		return true;
+	}
 }

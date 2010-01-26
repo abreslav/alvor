@@ -5,7 +5,9 @@ import static org.junit.Assert.*;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 import org.junit.Test;
@@ -27,11 +29,11 @@ public class FixpointParsingTest {
 		final LRParser parser = LRParser.build("../ee.stacc.productivity.edsl.sqlparser/generated/sql.xml");
 		State initial;
 		
-		initial = AutomataParser.parse("A - B:S; B - C:I; C - D:F; D - E:I; E - X:X; X - !X1:X");
+		initial = AutomataParser.parse("A - B:S; B - C:I; C - D:F; D - E:I; E - !X:X");
 		AutomataUtils.generate(initial, "");
 		assertTrue(doParse(parser, initial));
 		
-		initial = AutomataParser.parse("A - B:S; B - C:S; C - D:F; D - E:I; E - X:X; X - !X1:X");
+		initial = AutomataParser.parse("A - B:S; B - C:S; C - D:F; D - E:I; E - !X:X");
 		assertFalse(doParse(parser, initial));
 		
 	}
@@ -62,7 +64,7 @@ public class FixpointParsingTest {
 			public IAbstractStackSet newAbstractStackSet() {
 				return new StackSet();
 			}
-		}).parse(initial);
+		}, parser.getNamesToTokenNumbers().get("$end")).parse(initial);
 		return parse;
 	}
 	
@@ -128,13 +130,16 @@ public class FixpointParsingTest {
 		private final IAlphabetConverter alphabetConverter;
 		private final LRParser parser;
 		private final IAbstractStackSetFactory factory;
+		private final int eofTokenIndex;
 		
 		public FixpointParser(LRParser parser,
 				IAlphabetConverter alphabetConverter,
-				IAbstractStackSetFactory factory) {
+				IAbstractStackSetFactory factory,
+				int eofTokenIndex) {
 			this.parser = parser;
 			this.alphabetConverter = alphabetConverter;
 			this.factory = factory;
+			this.eofTokenIndex = eofTokenIndex;
 		}
 		
 		private IAbstractStackSet getSet(State state) {
@@ -156,7 +161,7 @@ public class FixpointParsingTest {
 			IAbstractStackSet setForCurrent = getSet(current);
 			
 			if (current.isAccepting()) {
-				if (!setForCurrent.allAccepting()) {
+				if (!closeWithEof(setForCurrent)) {
 					return false;
 				}
 			}
@@ -164,16 +169,7 @@ public class FixpointParsingTest {
 			for (Transition transition : current.getOutgoingTransitions()) {
 				int tokenIndex = alphabetConverter.convert(transition.getInChar());
 				IAbstractStackSet setForTo = getSet(transition.getTo());
-				Collection<IAbstractStack> hashSet = setForCurrent.asJavaSet();
-				boolean changes = false;
-				for (IAbstractStack stack : hashSet) {
-					Set<IAbstractStack> newStacks = parser.processToken(tokenIndex, stack);
-					for (IAbstractStack newStack : newStacks) {
-						if (setForTo.add(newStack)) {
-							changes = true;
-						}
-					}
-				}
+				boolean changes = transformSet(setForCurrent, tokenIndex, setForTo);
 				if (changes) {
 					if (setForCurrent.hasError()) {
 						return false;
@@ -184,6 +180,40 @@ public class FixpointParsingTest {
 				}
 			}
 			
+			return true;
+		}
+
+		private boolean transformSet(IAbstractStackSet setForCurrent,
+				int tokenIndex, IAbstractStackSet setForTo) {
+			Collection<IAbstractStack> hashSet = setForCurrent.asJavaSet();
+ 			boolean changes = false;
+			for (IAbstractStack stack : hashSet) {
+				Set<IAbstractStack> newStacks = parser.processToken(tokenIndex, stack);
+				for (IAbstractStack newStack : newStacks) {
+					if (setForTo.add(newStack)) {
+						changes = true;
+					}
+				}
+			}
+			return changes;
+		}
+
+		private boolean closeWithEof(IAbstractStackSet setForCurrent) {
+			Queue<IAbstractStack> queue = new LinkedList<IAbstractStack>(setForCurrent.asJavaSet());
+			while (!queue.isEmpty()) {
+				IAbstractStack stack = queue.poll();
+				
+				Set<IAbstractStack> newStacks = parser.processToken(eofTokenIndex, stack);
+				for (IAbstractStack newStack : newStacks) {
+					IParserState top = newStack.top();
+					if (top == IParserState.ERROR) {
+						return false;
+					}
+					if (top != IParserState.ACCEPT) {
+						queue.offer(newStack);
+					}
+				}
+			}
 			return true;
 		}
 	}
