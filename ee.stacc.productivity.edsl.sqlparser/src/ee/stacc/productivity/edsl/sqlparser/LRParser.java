@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import org.jdom.JDOMException;
 
@@ -176,7 +175,7 @@ public class LRParser {
 			Set<IAbstractStack> results = new HashSet<IAbstractStack>();
 			for (IAbstractStack s : popped) {
 				IAction action = s.top().getAction(byRule.getLhsSymbol());
-				results.addAll(action.process(-1, stack));
+				results.addAll(action.process(-1, s));
 			}
 			return results;
 		}
@@ -211,7 +210,7 @@ public class LRParser {
 			@Override
 			public void addRule(int number, String lhs, int rhsLength, String text) {
 				Integer lhsNumber = namesToSymbolNumbers.get(lhs);
-				addTo(rules, number, new Rule(lhsNumber, rhsLength, text));
+				addTo(rules, number, new Rule(lhsNumber, rhsLength, "(" + number + ") " + text));
 			}
 			
 			@Override
@@ -247,24 +246,24 @@ public class LRParser {
 				state.addAction(symbolNumber, new GotoAction(states.get(toState)));
 			}
 		});
-		
-		int max = 0;
-		String[] names = new String[namesToSymbolNumbers.size() + 1];
-		for (Entry<String, Integer> entry : namesToSymbolNumbers.entrySet()) {
-//			System.out.println(entry);
-			Integer value = entry.getValue();
-			if (max < value) {
-				max = value;
-			}
-			names[value + 1] = entry.getKey();
-		}
-		
-		for (State state : states) {
-			System.out.println(state);
-			for (int i = 0; i <= max; i++) {
-				System.out.println(names[i + 1] + " " + state.getAction(i));				
-			}
-		}
+//		
+//		int max = 0;
+//		String[] names = new String[namesToSymbolNumbers.size() + 1];
+//		for (Entry<String, Integer> entry : namesToSymbolNumbers.entrySet()) {
+////			System.out.println(entry);
+//			Integer value = entry.getValue();
+//			if (max < value) {
+//				max = value;
+//			}
+//			names[value + 1] = entry.getKey();
+//		}
+//		
+//		for (State state : states) {
+//			System.out.println(state);
+//			for (int i = 0; i <= max; i++) {
+//				System.out.println(names[i + 1] + " " + state.getAction(i));				
+//			}
+//		}
 		
 		return new LRParser(states.get(0), symbolByToken, namesToTokenNumbers);
 	}
@@ -301,8 +300,7 @@ public class LRParser {
 				continue;
 			}
 			IAction action = currentState.getAction(symbolNumber);
-			System.out.println(action);
-			Set<IAbstractStack> newStacks = action.process(symbolNumber, stack);
+			Set<IAbstractStack> newStacks = action.process(symbolNumber, currenStack);
 			if (action.consumes()) {
 				result.addAll(newStacks);
 			} else {

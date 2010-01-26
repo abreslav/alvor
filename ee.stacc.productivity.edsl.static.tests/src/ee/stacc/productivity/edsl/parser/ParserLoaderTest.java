@@ -19,29 +19,36 @@ public class ParserLoaderTest {
 
 	@Test
 	public void test() throws Exception {
-		LRParser parser = LRParser.build("../ee.stacc.productivity.edsl.sqlparser/generated/sql.xml");
+		LRParser parser = LRParser.build("../ee.stacc.productivity.edsl.sqlparser/generated/arith.xml");
 		Map<String, Integer> namesToTokenNumbers = parser.getNamesToTokenNumbers();
-		System.out.println(namesToTokenNumbers.keySet());
 		
-		String input = "'1'";
-		input += " $end $end";
-		String[] split = input.split(" ");
-		IAbstractStack stack = new SimpleStack(parser.getInitialState());
-		for (String token : split) {
-			Integer tokenNumber = namesToTokenNumbers.get(token.trim());
-			if (tokenNumber == null) {
-				throw new IllegalArgumentException("Unknown token: " + token);
+		String[] correctInputs = {
+				"'1'",
+				"'0'",
+				"'1' '*' '0'",
+				"'0' '+' '1'",
+				"'1' '*' '0' '+' '1' '*' '0'",
+				"'1' '+' '0' '+' '1' '*' '0'",
+		};
+		for (String input : correctInputs) {
+			input += " $end $end";
+			String[] split = input.split(" ");
+			IAbstractStack stack = new SimpleStack(parser.getInitialState());
+			for (String token : split) {
+				Integer tokenNumber = namesToTokenNumbers.get(token.trim());
+				if (tokenNumber == null) {
+					throw new IllegalArgumentException("Unknown token: " + token);
+				}
+				
+				Set<IAbstractStack> stacks = parser.processToken(tokenNumber, stack);
+				if (stacks.size() > 1) {
+					throw new IllegalStateException("Only simple stacks are supported");
+				}
+				stack = stacks.iterator().next();
 			}
-			
-			Set<IAbstractStack> stacks = parser.processToken(tokenNumber, stack);
-			if (stacks.size() > 1) {
-				throw new IllegalStateException("Only simple stacks are supported");
-			}
-			stack = stacks.iterator().next();
-			System.out.println(stack.top());
+			IParserState top = stack.top();
+			assertSame(IParserState.ACCEPT, top);
 		}
-		IParserState top = stack.top();
-		assertSame(IParserState.ACCEPT, top);
 	}
 	
 	private static final class SimpleStack implements IAbstractStack {
