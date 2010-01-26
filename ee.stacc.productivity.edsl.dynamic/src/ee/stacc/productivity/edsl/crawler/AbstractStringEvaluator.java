@@ -6,6 +6,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -18,6 +19,7 @@ import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+import org.eclipse.jdt.core.dom.ThisExpression;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
@@ -62,43 +64,32 @@ public class AbstractStringEvaluator {
 			return getValOf(((ParenthesizedExpression)node).getExpression(), level);
 		}
 		else if (node instanceof InfixExpression) {
-			InfixExpression infe = (InfixExpression)node;
-			if (infe.getOperator() == InfixExpression.Operator.PLUS) {
-				List<IAbstractString> ops = new ArrayList<IAbstractString>();
-				ops.add(getValOf(infe.getLeftOperand(), level));
-				ops.add(getValOf(infe.getRightOperand(), level));
-				for (Object operand: infe.extendedOperands()) {
-					ops.add(getValOf((Expression)operand, level));
-				}
-				return new StringSequence(ops);
-			}
-			else {
-				throw new UnsupportedStringOpEx
-					("TODO: getValOf( infix op = " + infe.getOperator() + ")");
-			}
+			return getValOfInfixExpression((InfixExpression)node, level);
 		}
 		else if (node instanceof MethodInvocation) {
 			MethodInvocation inv = (MethodInvocation)node;
-			if (!(inv.getExpression() instanceof SimpleName)) {
-				throw new UnsupportedStringOpEx("MethodInvocation, expression not SimpleName");
-			}
-			ITypeBinding binding = ((SimpleName)inv.getExpression()).resolveTypeBinding();
-			if (! "toString".equals(inv.getName().getIdentifier())) {
-				throw new UnsupportedStringOpEx("MethodInvocation, method not toString");
-			}
-			// StringBuilder.toString()
-			if (isStringBuilderOrBuffer(binding)) {
-				assert inv.getExpression() instanceof SimpleName;
-				IBinding var = ((SimpleName)inv.getExpression()).resolveBinding();
-				return getVarValBefore((IVariableBinding)var, getContainingStmt(node), level);
-			}
-			else {
-				throw new UnsupportedStringOpEx("MethodInvocation, neither StringBuffer nor StringBuilder");
-			}			
+				return getValOfMethodInvocation(inv, level);
 		}
 		else {
 			throw new UnsupportedStringOpEx
 				("TODO: getValOf(" + node.getClass().getName() + ")");
+		}
+	}
+
+	private static IAbstractString getValOfInfixExpression(InfixExpression expr,
+			int level) {
+		if (expr.getOperator() == InfixExpression.Operator.PLUS) {
+			List<IAbstractString> ops = new ArrayList<IAbstractString>();
+			ops.add(getValOf(expr.getLeftOperand(), level));
+			ops.add(getValOf(expr.getRightOperand(), level));
+			for (Object operand: expr.extendedOperands()) {
+				ops.add(getValOf((Expression)operand, level));
+			}
+			return new StringSequence(ops);
+		}
+		else {
+			throw new UnsupportedStringOpEx
+				("TODO: getValOf( infix op = " + expr.getOperator() + ")");
 		}
 	}
 	
@@ -287,8 +278,62 @@ public class AbstractStringEvaluator {
 			return getVarValBefore(var, stmt, level);
 		}
 	}
+	
+	private static IAbstractString getValOfMethodInvocation(MethodInvocation inv, int level) {
+		ITypeBinding binding = inv.getExpression().resolveTypeBinding();
 
-
+		if (isStringBuilderOrBuffer(binding)) {
+			if (!(inv.getExpression() instanceof SimpleName)) {
+				throw new UnsupportedStringOpEx("MethodInvocation, expression not SimpleName");
+			}
+			if (! "toString".equals(inv.getName().getIdentifier())) {
+				throw new UnsupportedStringOpEx("MethodInvocation, StringBuilder/Buffer, method not toString");
+			}
+			IBinding var = ((SimpleName)inv.getExpression()).resolveBinding();
+			return getVarValBefore((IVariableBinding)var, getContainingStmt(inv), level);
+		}
+		else if (inv.getExpression() == null || inv.getExpression() instanceof ThisExpression) {
+			MethodDeclaration decl = getMethodDeclaration(getContainingTypeDeclaration(inv), 
+					inv.getName().getIdentifier()); 
+			return getMethodReturnValueForInvocation(decl, inv, level);
+		}
+		else {
+			//throw new UnsupportedStringOpEx("too complex method invocation");
+			List<MethodDeclaration> decls = Crawler.findMethodDeclarations(inv);
+			List<IAbstractString> choices = new ArrayList<IAbstractString>();
+			for (MethodDeclaration decl: decls) {
+				choices.add(getMethodReturnValueForInvocation(decl, inv, level));
+			}
+			return new StringChoice(choices);
+		}			
+	}
+	
+	private static IAbstractString getMethodReturnValueForInvocation(MethodDeclaration decl, 
+			MethodInvocation inv, int level) {
+		assert inv.resolveTypeBinding().getName().equals("String");
+		assert decl != null;
+		
+		// find all return statements
+		final List<ReturnStatement> returnStmts = new ArrayList<ReturnStatement>();
+		ASTVisitor visitor = new ASTVisitor() {
+			@Override
+			public boolean visit(ReturnStatement node) {
+				returnStmts.add(node);
+				return true;
+			}
+		};
+		decl.accept(visitor);
+		
+		// get choice out of different return expressions
+		// TODO for evaluating arguments it should use only given invocation, not all of them
+		
+		List<IAbstractString> options = new ArrayList<IAbstractString>();
+		for (ReturnStatement ret: returnStmts) {
+			options.add(getValOf(ret.getExpression(), level));
+		}
+		return new StringChoice(options);
+	}
+	
 	private static Statement getLastStmt(Block block) {
 		return (Statement)block.statements().get(block.statements().size()-1);
 	}
@@ -301,18 +346,19 @@ public class AbstractStringEvaluator {
 		if (prevStmt == null) {
 			// no prev statement, must be beginning of method declaration
 			// and value should come from parameter
-			//System.out.println("%%%%%%%%%% " + stmt.getParent().getClass());
 			
-			System.out.println("Going after method arguments");
+			// TODO: can be also object field
 			
-			MethodDeclaration method = getMethodDeclaration(stmt);
+			MethodDeclaration method = getContainingMethodDeclaration(stmt);
 			int argIndex = getParamIndex(method, var);
+			/*
 			List<IAbstractString> choices = Crawler.findArgumentAbstractValuesAtCallSites
 				(getMethodClassName(method) , method.getName().toString(), 
 						argIndex, getNodeProject(stmt), level+1);
 			return new StringChoice(choices);
-//			throw new UnsupportedStringOpEx("######### TODO: analyze argument '" + var.getName() 
-//					+ "'(" +argIndex+ ") at all call sites of method '" + method.getName() + "'");
+			*/
+			throw new UnsupportedStringOpEx("######### TODO: analyze argument '" + var.getName() 
+					+ "'(" +argIndex+ ") at all call sites of method '" + method.getName() + "'");
 		}
 		else {
 			return getVarValAfter(var, prevStmt, level);
@@ -330,7 +376,7 @@ public class AbstractStringEvaluator {
 		return cUnit.getJavaElement().getJavaProject();
 	}
 	
-	private static MethodDeclaration getMethodDeclaration(ASTNode node) {
+	private static MethodDeclaration getContainingMethodDeclaration(ASTNode node) {
 		ASTNode result = node;
 		while (result != null && ! (result instanceof MethodDeclaration)) {
 			result = result.getParent();
@@ -360,5 +406,23 @@ public class AbstractStringEvaluator {
 	private static boolean isStringBuilderOrBuffer(ITypeBinding typeBinding) {
 		return typeBinding.getQualifiedName().equals("java.lang.StringBuffer")
 		|| typeBinding.getQualifiedName().equals("java.lang.StringBuilder");
+	}
+	
+	private static TypeDeclaration getContainingTypeDeclaration(ASTNode node) {
+		ASTNode result = node;
+		while (result != null && ! (result instanceof TypeDeclaration)) {
+			result = result.getParent();
+		}
+		return (TypeDeclaration)result;
+	}
+	
+	private static MethodDeclaration getMethodDeclaration(TypeDeclaration typeDecl,
+			String methodName) {
+		for (MethodDeclaration method: typeDecl.getMethods()) {
+			if (method.getName().getIdentifier().equals(methodName)) {
+				return method;
+			}
+		}
+		throw new IllegalArgumentException("Method '" + methodName + "' not found");
 	}
 }

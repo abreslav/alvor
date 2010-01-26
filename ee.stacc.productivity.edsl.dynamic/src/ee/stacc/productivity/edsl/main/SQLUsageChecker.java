@@ -27,6 +27,7 @@ public class SQLUsageChecker {
 	}
 	
 	public void checkElement(IJavaElement scope) { // scope can be eg. file or project
+		Crawler.clearCache();
 		List<IAbstractString> aStrings = Crawler.findArgumentAbstractValuesAtCallSites
 			("java.sql.Connection", "prepareStatement", 1, scope, 1);
 	
@@ -58,8 +59,6 @@ public class SQLUsageChecker {
 	}
 	
 	public void markSQLError(Expression node, IAbstractString aStr, String message) {
-		// TODO abs-stringi loomisel jäta meelde, kuhu näidata punane kriips
-		// SQL-i komponendid näidata ära ainult siis, kui kõik on ühes meetodis koos
 		//System.err.println(struct.getErrorMsg());
 		
 		System.err.println("MARK_ERROR: node: " + node.toString());
