@@ -1,6 +1,7 @@
 package ee.stacc.productivity.edsl.sqlparser;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -46,7 +47,7 @@ public class LRParser {
 	private static final class State implements IParserState {
 
 		private final int index;
-		private IAction defaultAction = null;
+		private IAction defaultAction = ERROR_ACTION;
 		private List<IAction> actions = null;
 		
 		public State(int index) {
@@ -59,11 +60,11 @@ public class LRParser {
 				return defaultAction;
 			}
 			if (symbolNumber >= actions.size()) {
-				return ERROR_ACTION;
+				return defaultAction;
 			}
 			IAction action = actions.get(symbolNumber);
 			if (action == null) {
-				return ERROR_ACTION;
+				return defaultAction;
 			}
 			return action;
 		}
@@ -278,6 +279,7 @@ public class LRParser {
 	private final Integer[] symbolByToken;
 	private final State initialState;
 	private final Map<String, Integer> namesToTokenNumbers;
+	private PrintStream trace;
 	
 	private LRParser(State initialState, List<Integer> symbolByToken, Map<String, Integer> namesToTokenNumbers) {
 		this.initialState = initialState;
@@ -286,6 +288,10 @@ public class LRParser {
 		symbolByToken.toArray(this.symbolByToken);
 	}
 
+	public void setTrace(PrintStream trace) {
+		this.trace = trace;
+	}
+	
 	// Proceeds until ERROR, ACCEPT or a consumption of a given token 
 	public Set<IAbstractStack> processToken(int tokenIndex, IAbstractStack stack) {
 		Integer symbolNumber = symbolByToken[tokenIndex];
@@ -294,13 +300,16 @@ public class LRParser {
 		Set<IAbstractStack> result = new HashSet<IAbstractStack>();
 		while (!queue.isEmpty()) {
 			IAbstractStack currenStack = queue.poll();
+			println(currenStack);
 			IParserState currentState = currenStack.top();
 			if (currentState.isTerminating()) {
 				result.add(currenStack);
 				continue;
 			}
 			IAction action = currentState.getAction(symbolNumber);
+			println(action);
 			Set<IAbstractStack> newStacks = action.process(symbolNumber, currenStack);
+			println("new stacks: " + newStacks);
 			if (action.consumes()) {
 				result.addAll(newStacks);
 			} else {
@@ -310,6 +319,12 @@ public class LRParser {
 			}
 		}
 		return result;
+	}
+
+	private void println(Object o) {
+		if (trace != null) {
+			trace.println(o.toString());
+		}
 	}
 	
 	public State getInitialState() {

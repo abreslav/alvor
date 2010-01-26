@@ -10,7 +10,7 @@
 			<arg value="--xml=generated/sql.xml"/>
 			<arg value="--report=lookahead,itemset"/>
 			<arg value="--report-file=generated/sql.report"/>
-			<arg value="--output=generated/Parser.java"/>
+			<arg value="--output=generated/SQLParser.java"/>
 			<arg value="--language=Java"/>
 			<arg value="--debug"/>
 			<arg value="grammar/sql.bg"/>
@@ -19,7 +19,7 @@
 			<arg value="--xml=generated/arith.xml"/>
 			<arg value="--report=lookahead,itemset"/>
 			<arg value="--report-file=generated/arith.report"/>
-			<arg value="--output=generated/Parser.java"/>
+			<arg value="--output=generated/ArithParser.java"/>
 			<arg value="--language=Java"/>
 			<arg value="--debug"/>
 			<arg value="grammar/arith.bg"/>
