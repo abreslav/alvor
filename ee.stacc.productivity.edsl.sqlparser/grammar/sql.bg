@@ -32,7 +32,7 @@ import java.io.IOException;
 	}
 }
 %define parser_class_name "SQLParser"
-%token SELECT FROM ID VAR
+%token SELECT FROM ID
 %%
 
 select : SELECT idList FROM idList ;

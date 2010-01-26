@@ -153,8 +153,9 @@ public class AutomataInclusion {
 		private	Change transitionFunction(State state, State error, Transition underlyingTransition) {
 			Set<State> correspondingStates = getSet(stateMap, underlyingTransition.getTo());
 			if (underlyingTransition.isEmpty()) {
-				correspondingStates.add(error);
-				return Change.ERROR;
+				throw new UnsupportedOperationException("Empty transitions are not supported");
+//				correspondingStates.add(error);
+//				return Change.ERROR;
 			}
 			
 			Change result = Change.NONE;
