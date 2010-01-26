@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="project" default="default">
+
+	<target name="default" depends="depends" description="description">
+        
+    </target>
+
+    <target name="depends">
+		<exec executable="bison" dir="${basedir}">
+			<arg value="--xml=generated/sql.xml"/>
+			<arg value="--report=lookahead,itemset"/>
+			<arg value="--report-file=generated/report"/>
+			<arg value="--output=/dev/null"/>
+			<arg value="grammar/sql.bg"/>
+		</exec>	
+	</target>
+
+</project>

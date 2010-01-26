@@ -1,0 +1,9 @@
+%token SELECT FROM ID VAR
+%%
+
+//select : SELECT idList FROM idList ;
+//idList : ID | ID ',' idList | ID '+';
+
+E : E '*' B | E '+' B | B;
+B : '0';
+B : '1';
