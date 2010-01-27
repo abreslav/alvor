@@ -295,8 +295,12 @@ public class LRParser {
 	// Proceeds until ERROR, ACCEPT or a consumption of a given token 
 	public Set<IAbstractStack> processToken(int tokenIndex, IAbstractStack stack) {
 		Integer symbolNumber = symbolByToken[tokenIndex];
+
 		Queue<IAbstractStack> queue = new LinkedList<IAbstractStack>();
+		Set<IAbstractStack> visited = new HashSet<IAbstractStack>();
 		queue.offer(stack);
+		visited.add(stack);
+		
 		Set<IAbstractStack> result = new HashSet<IAbstractStack>();
 		while (!queue.isEmpty()) {
 			IAbstractStack currenStack = queue.poll();
@@ -314,7 +318,9 @@ public class LRParser {
 				result.addAll(newStacks);
 			} else {
 				for (IAbstractStack newStack : newStacks) {
-					queue.offer(newStack);
+					if (visited.add(newStack)) {
+						queue.offer(newStack);
+					}
 				}
 			}
 		}

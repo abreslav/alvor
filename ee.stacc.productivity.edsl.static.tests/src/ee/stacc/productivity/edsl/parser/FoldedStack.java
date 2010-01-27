@@ -10,6 +10,14 @@ import ee.stacc.productivity.edsl.sqlparser.IParserState;
 
 public class FoldedStack implements IAbstractStack {
 
+	public static final IStackFactory FACTORY = new  IStackFactory() {
+		
+		@Override
+		public IAbstractStack newStack(IParserState state) {
+			return new FoldedStack(state);
+		}
+	};
+
 	static int counter = 0;
 	
 	private final Map<IParserState, Set<IParserState>> graph; 
@@ -86,5 +94,44 @@ public class FoldedStack implements IAbstractStack {
 		}
 		return set;
 	}
+
 	
+	@Override
+	public int hashCode() {
+		return 0;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (false == obj instanceof FoldedStack) {
+			return false;
+		}
+		FoldedStack other = (FoldedStack) obj;
+		Set<IParserState> myAll = new HashSet<IParserState>();
+		gatherAllStates(top, myAll);
+		Set<IParserState> hisAll = new HashSet<IParserState>();
+		gatherAllStates(other.top, hisAll);
+		if (!myAll.equals(hisAll)) {
+			return false;
+		}
+		for (IParserState state : hisAll) {
+			Set<IParserState> mySet = getSet(state);
+			Set<IParserState> hisSet = other.getSet(state);
+			if (!mySet.equals(hisSet)) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	private void gatherAllStates(IParserState current, Set<IParserState> visited) {
+		if (!visited.add(current)) {
+			return;
+		}
+		
+		Set<IParserState> set = getSet(current);
+		for (IParserState next : set) {
+			gatherAllStates(next, visited);
+		}
+	}
 }

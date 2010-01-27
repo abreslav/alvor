@@ -2,6 +2,7 @@ package ee.stacc.productivity.edsl.parser;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,7 +12,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import ee.stacc.productivity.edsl.lexer.automata.AutomataConverter;
@@ -42,27 +42,13 @@ public class FixpointParsingTest {
 		}
 	};
 
-	interface IStackFactory {
-		IAbstractStack newStack(IParserState state);
-	}
+	private static IStackFactory STACK_FACTORY = SimpleFoldedStack.FACTORY;
 	
-	private static IStackFactory STACK_FACTORY = new  IStackFactory() {
-		
-		@Override
-		public IAbstractStack newStack(IParserState state) {
-			return new FoldedStack(state);
-		}
-	};
+	private static LRParser parser = Parsers.SQL_PARSER;
 	
-	private static LRParser parser;
-	
-	@BeforeClass
-	public static void beforeAll() throws Exception {
-		parser = LRParser.build("../ee.stacc.productivity.edsl.sqlparser/generated/sql.xml");
-	}
-
 	@Test
 	public void testSimple() throws Exception {
+//		fail();
 		State initial;
 		
 		initial = AutomataParser.parse("A - B:S; B - C:I; C - D:F; D - E:I; E - !X:X");
@@ -71,7 +57,6 @@ public class FixpointParsingTest {
 		
 		initial = AutomataParser.parse("A - B:S; B - C:S; C - D:F; D - E:I; E - !X:X");
 		assertFalse(doParse(parser, initial));
-		
 	}
 
 	private boolean doParse(final LRParser parser, State initial) {
@@ -100,13 +85,22 @@ public class FixpointParsingTest {
 	
 	@Test
 	public void testSQL() throws Exception {
+//		fail();
 		String abstractString;
 
-		abstractString = "\"SELECT asd FROM asd\"";
+		abstractString = "\"SELECT sd, asd FROM asd\"";
+		assertTrue(parseAbstractString(abstractString));
+		
+		
+		abstractString = "\"SELECT asd FROM asd, dsd\"";
 		assertTrue(parseAbstractString(abstractString));
 
 		
 		abstractString = "\"SELECT asd, dsd FROM asd, sdf\"";
+		assertTrue(parseAbstractString(abstractString));
+		
+		
+		abstractString = "\"SELECT asd FROM asd\"";
 		assertTrue(parseAbstractString(abstractString));
 		
 		
@@ -141,11 +135,14 @@ public class FixpointParsingTest {
 
 	@Test
 	public void testLoops() throws Exception {
-		
 		String abstractString;
+
 		abstractString = "\"SELECT asd\" (\", dsd \")+ \"FROM asd, sdf\"";
-//		fail("Loops are not supported yet");
-//		assertTrue(parseAbstractString(abstractString));
+		assertTrue(parseAbstractString(abstractString));
+		
+		
+		abstractString = "\"SELECT asd\" (\", dsd \")+ \"sd FROM asd, sdf\"";
+		assertFalse(parseAbstractString(abstractString));
 		
 	}
 	
@@ -226,6 +223,8 @@ public class FixpointParsingTest {
 
 		@Override
 		public boolean add(IAbstractStack stack) {
+//			System.out.println("Set #" + System.identityHashCode(this));
+//			System.out.println(stack);
 			return stacks.add(stack);
 		}
 		

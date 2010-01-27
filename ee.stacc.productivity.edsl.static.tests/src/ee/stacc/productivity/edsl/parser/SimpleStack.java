@@ -13,6 +13,14 @@ import ee.stacc.productivity.edsl.sqlparser.IParserState;
 
 public final class SimpleStack implements IAbstractStack {
 
+	public static final IStackFactory FACTORY = new  IStackFactory() {
+		
+		@Override
+		public IAbstractStack newStack(IParserState state) {
+			return new SimpleStack(state);
+		}
+	};
+
 	private final List<IParserState> stack;
 	
 	private SimpleStack(List<IParserState> stack) {
@@ -30,6 +38,7 @@ public final class SimpleStack implements IAbstractStack {
 	
 	@Override
 	public Set<IAbstractStack> pop(int count) {
+		System.out.println(">>> pop " + count + " from " + this);
 		return Collections.<IAbstractStack>singleton(
 				new SimpleStack(
 						new ArrayList<IParserState>(stack.subList(0, stack.size() - count))));
@@ -37,6 +46,7 @@ public final class SimpleStack implements IAbstractStack {
 
 	@Override
 	public IAbstractStack push(IParserState state) {
+		System.out.println(">>> push " + state + " into " + this);
 		ArrayList<IParserState> newStack = new ArrayList<IParserState>(stack);
 		newStack.add(state);
 		return new SimpleStack(newStack);
