@@ -44,8 +44,8 @@ whatToSelect
 	;
 expression
 	: ID '(' expressionList ')'
-	| '*'
 	| ID '(' ')'
+	| '*'
 	;
 expressionList
 	: expression

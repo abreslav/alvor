@@ -44,6 +44,18 @@ public class LRParsingTest {
 		interpret(parser, SimpleFoldedStack.FACTORY, 
 				"SELECT FROM ID ',' ID ',' ID", 
 				false);
+		
+		interpret(parser, SimpleFoldedStack.FACTORY, 
+				"SELECT ID '(' ')' FROM ID ',' ID ',' ID", 
+				true);
+		
+		interpret(parser, SimpleFoldedStack.FACTORY, 
+				"SELECT ID '(' '*' ')' FROM ID ',' ID ',' ID", 
+				true);
+		
+		interpret(parser, SimpleFoldedStack.FACTORY, 
+				"SELECT ID '(' ID '(' ')' ')' FROM ID ',' ID ',' ID", 
+				true);
 	}
 
 	public static boolean interpret(LRParser parser, IStackFactory factory, String input,

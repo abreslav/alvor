@@ -292,7 +292,7 @@ public class LRParser {
 		this.trace = trace;
 	}
 	
-	// Proceeds until ERROR, ACCEPT or a consumption of a given token 
+	// Proceeds until ERROR, ACCEPT or consumption of a given token 
 	public Set<IAbstractStack> processToken(int tokenIndex, IAbstractStack stack) {
 		Integer symbolNumber = symbolByToken[tokenIndex];
 
