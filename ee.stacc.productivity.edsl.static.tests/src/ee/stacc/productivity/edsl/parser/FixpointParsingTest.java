@@ -75,7 +75,6 @@ public class FixpointParsingTest {
 		 */
 		boolean add(IAbstractStack stack);
 		
-		boolean allAccepting();
 		boolean hasError();
 		/**
 		 * @return a java.util.Set of all IAbstractStack objects, which is 
@@ -88,16 +87,6 @@ public class FixpointParsingTest {
 
 		private final Set<IAbstractStack> stacks = new HashSet<IAbstractStack>();
 		
-		@Override
-		public boolean allAccepting() {
-			for (IAbstractStack stack : stacks) {
-				if (stack.top() != IParserState.ACCEPT) {
-					return false;
-				}
-			}
-			return true;
-		}
-
 		@Override
 		public boolean hasError() {
 			for (IAbstractStack stack : stacks) {
