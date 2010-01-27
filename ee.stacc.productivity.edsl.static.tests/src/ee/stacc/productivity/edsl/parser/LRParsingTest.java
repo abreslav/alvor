@@ -32,6 +32,11 @@ public class LRParsingTest {
 				"SELECT ID ',' ID ',' ID ',' ID ',' ID FROM ID ',' ID ',' ID", 
 				true);
 		
+		
+		interpret(parser, SimpleFoldedStack.FACTORY, 
+				"SELECT ID '.' ID ',' ID ',' ID ',' ID ',' ID FROM ID ',' ID ',' ID", 
+				true);
+		
 		interpret(parser, SimpleFoldedStack.FACTORY, 
 				"SELECT ID ID ',' ID ',' ID ',' ID FROM ID ',' ID ',' ID", 
 				false);

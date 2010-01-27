@@ -2,7 +2,6 @@ package ee.stacc.productivity.edsl.parser;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -48,11 +47,9 @@ public class FixpointParsingTest {
 	
 	@Test
 	public void testSimple() throws Exception {
-//		fail();
 		State initial;
 		
 		initial = AutomataParser.parse("A - B:S; B - C:I; C - D:F; D - E:I; E - !X:X");
-		AutomataUtils.generate(initial, "");
 		assertTrue(doParse(parser, initial));
 		
 		initial = AutomataParser.parse("A - B:S; B - C:S; C - D:F; D - E:I; E - !X:X");
@@ -85,9 +82,12 @@ public class FixpointParsingTest {
 	
 	@Test
 	public void testSQL() throws Exception {
-//		fail();
 		String abstractString;
 
+		abstractString = "\"SELECT sd.x, asd FROM asd\"";
+		assertTrue(parseAbstractString(abstractString));
+		
+		
 		abstractString = "\"SELECT sd, asd FROM asd\"";
 		assertTrue(parseAbstractString(abstractString));
 		
@@ -148,12 +148,10 @@ public class FixpointParsingTest {
 	
 	private boolean parseAbstractString(String abstractString) {
 		State sqlTransducer = AutomataConverter.INSTANCE.convert();
-//		AutomataUtils.printSQLAutomaton(sqlTransducer);
 		
 		IAbstractString as = AbstractStringParser.parseOneFromString(abstractString);
 		State asAut = StringToAutomatonConverter.INSTANCE.convert(as, AutomataUtils.SQL_ALPHABET_CONVERTER);
 		asAut = AutomataDeterminator.determinate(asAut);
-//		AutomataUtils.printAutomaton(asAut, AutomataUtils.SQL_IN_MAPPER, AutomataUtils.ID_MAPPER);
 		
 		State transduction = AutomataInclusion.INSTANCE.getTrasduction(sqlTransducer, asAut);
 		transduction = EmptyTransitionEliminator.INSTANCE.eliminateEmptySetTransitions(transduction, new IEmptinessExpert() {
@@ -164,7 +162,6 @@ public class FixpointParsingTest {
 			}
 		});
 		transduction = AutomataDeterminator.determinate(transduction);
-//		AutomataUtils.printAutomaton(transduction, AutomataUtils.SQL_TOKEN_MAPPER, AutomataUtils.ID_MAPPER);
 		
 		final Integer eofTokenIndex = parser.getNamesToTokenNumbers().get("$end");
 		IAlphabetConverter converter = new IAlphabetConverter() {
@@ -175,7 +172,6 @@ public class FixpointParsingTest {
 					return eofTokenIndex;
 				}
 				String tokenName = SQLLexerData.TOKENS[c];
-//				System.out.println(c);
 				if (Character.isLetter(tokenName.charAt(0))) {
 					return parser.getNamesToTokenNumbers().get(tokenName);
 				}

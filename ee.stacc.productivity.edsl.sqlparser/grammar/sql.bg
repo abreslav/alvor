@@ -36,4 +36,5 @@ import java.io.IOException;
 %%
 
 select : SELECT idList FROM idList ;
-idList : ID | ID ',' idList ;
+idList : ident | ident ',' idList ;
+ident : ID | ID '.' ID ;
