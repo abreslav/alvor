@@ -1,6 +1,8 @@
 package ee.stacc.productivity.edsl.parser;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,23 +12,46 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import ee.stacc.productivity.edsl.lexer.automata.AutomataConverter;
+import ee.stacc.productivity.edsl.lexer.automata.AutomataDeterminator;
+import ee.stacc.productivity.edsl.lexer.automata.AutomataInclusion;
 import ee.stacc.productivity.edsl.lexer.automata.AutomataParser;
 import ee.stacc.productivity.edsl.lexer.automata.AutomataUtils;
+import ee.stacc.productivity.edsl.lexer.automata.EmptyTransitionEliminator;
 import ee.stacc.productivity.edsl.lexer.automata.IAlphabetConverter;
 import ee.stacc.productivity.edsl.lexer.automata.State;
+import ee.stacc.productivity.edsl.lexer.automata.StringToAutomatonConverter;
 import ee.stacc.productivity.edsl.lexer.automata.Transition;
+import ee.stacc.productivity.edsl.lexer.automata.EmptyTransitionEliminator.IEmptinessExpert;
+import ee.stacc.productivity.edsl.sqllexer.SQLLexerData;
 import ee.stacc.productivity.edsl.sqlparser.IAbstractStack;
 import ee.stacc.productivity.edsl.sqlparser.IParserState;
 import ee.stacc.productivity.edsl.sqlparser.LRParser;
+import ee.stacc.productivity.edsl.string.IAbstractString;
+import ee.stacc.productivity.edsl.string.parser.AbstractStringParser;
 
 
 public class FixpointParsingTest {
+	private static final IAbstractStackSetFactory FACTORY = new IAbstractStackSetFactory() {
+		
+		@Override
+		public IAbstractStackSet newAbstractStackSet() {
+			return new StackSet();
+		}
+	};
+
+	private static LRParser parser;
+	
+	@BeforeClass
+	public static void beforeAll() throws Exception {
+		parser = LRParser.build("../ee.stacc.productivity.edsl.sqlparser/generated/sql.xml");
+	}
 
 	@Test
-	public void test() throws Exception {
-		final LRParser parser = LRParser.build("../ee.stacc.productivity.edsl.sqlparser/generated/sql.xml");
+	public void testSimple() throws Exception {
 		State initial;
 		
 		initial = AutomataParser.parse("A - B:S; B - C:I; C - D:F; D - E:I; E - !X:X");
@@ -58,14 +83,100 @@ public class FixpointParsingTest {
 				}
 				throw new IllegalStateException("Unknown token: " + c);
 			}
-		}, new IAbstractStackSetFactory() {
+		}, FACTORY, parser.getNamesToTokenNumbers().get("$end")).parse(initial);
+		return parse;
+	}
+	
+	@Test
+	public void testSQL() throws Exception {
+		String abstractString;
+
+		abstractString = "\"SELECT asd FROM asd\"";
+		assertTrue(parseAbstractString(abstractString));
+
+		
+		abstractString = "\"SELECT asd, dsd FROM asd, sdf\"";
+		assertTrue(parseAbstractString(abstractString));
+		
+		
+		abstractString = "\"SELECT asd asd FROM asd\"";
+		assertFalse(parseAbstractString(abstractString));
+		
+		
+		abstractString = "\"asd FROM asd\"";
+		assertFalse(parseAbstractString(abstractString));
+		
+		
+		abstractString = "\"SELECT asd FROM asd,\"";
+		assertFalse(parseAbstractString(abstractString));
+		
+		
+		abstractString = "\"SELECT asd FROM ,\"";
+		assertFalse(parseAbstractString(abstractString));
+		
+		
+		abstractString = "\"SELECT asd\" (\", dsd\")+ \"FROM asd, sdf\"";
+		assertFalse(parseAbstractString(abstractString));
+		
+		
+		abstractString = "\"SELECT asd\" {\", dsd\", \"\"} \" FROM asd, sdf\"";
+		assertTrue(parseAbstractString(abstractString));
+		
+		
+		abstractString = "\"SELECT asd\" {\", dsd\", \"\", \", a, s, v\"} \" FROM asd, sdf\"";
+		assertTrue(parseAbstractString(abstractString));
+		
+	}
+
+	@Test
+	public void testLoops() throws Exception {
+		
+		String abstractString;
+		abstractString = "\"SELECT asd\" (\", dsd \")+ \"FROM asd, sdf\"";
+//		fail("Loops are not supported yet");
+//		assertTrue(parseAbstractString(abstractString));
+		
+	}
+	
+	private boolean parseAbstractString(String abstractString) {
+		State sqlTransducer = AutomataConverter.INSTANCE.convert();
+//		AutomataUtils.printSQLAutomaton(sqlTransducer);
+		
+		IAbstractString as = AbstractStringParser.parseOneFromString(abstractString);
+		State asAut = StringToAutomatonConverter.INSTANCE.convert(as, AutomataUtils.SQL_ALPHABET_CONVERTER);
+		asAut = AutomataDeterminator.determinate(asAut);
+//		AutomataUtils.printAutomaton(asAut, AutomataUtils.SQL_IN_MAPPER, AutomataUtils.ID_MAPPER);
+		
+		State transduction = AutomataInclusion.INSTANCE.getTrasduction(sqlTransducer, asAut);
+		transduction = EmptyTransitionEliminator.INSTANCE.eliminateEmptySetTransitions(transduction, new IEmptinessExpert() {
 			
 			@Override
-			public IAbstractStackSet newAbstractStackSet() {
-				return new StackSet();
+			public boolean isEmpty(Transition transition) {
+				return transition.isEmpty() || AutomataUtils.SQL_TOKEN_MAPPER.map(transition.getInChar()).length() == 0;
 			}
-		}, parser.getNamesToTokenNumbers().get("$end")).parse(initial);
-		return parse;
+		});
+		transduction = AutomataDeterminator.determinate(transduction);
+//		AutomataUtils.printAutomaton(transduction, AutomataUtils.SQL_TOKEN_MAPPER, AutomataUtils.ID_MAPPER);
+		
+		final Integer eofTokenIndex = parser.getNamesToTokenNumbers().get("$end");
+		IAlphabetConverter converter = new IAlphabetConverter() {
+			
+			@Override
+			public int convert(int c) {
+				if (c == (char) -1) {
+					return eofTokenIndex;
+				}
+				String tokenName = SQLLexerData.TOKENS[c];
+//				System.out.println(c);
+				if (Character.isLetter(tokenName.charAt(0))) {
+					return parser.getNamesToTokenNumbers().get(tokenName);
+				}
+				return parser.getNamesToTokenNumbers().get("'" + tokenName + "'");
+			}
+		};
+		FixpointParser fixpointParser = new FixpointParser(parser, converter , FACTORY, eofTokenIndex);
+		boolean parseResult = fixpointParser.parse(transduction);
+		return parseResult;
 	}
 	
 	public interface IAbstractStackSet {
@@ -156,6 +267,9 @@ public class FixpointParsingTest {
 			}
 			
 			for (Transition transition : current.getOutgoingTransitions()) {
+				if (transition.isEmpty()) {
+					throw new IllegalArgumentException("Empty transitions are not supported");
+				}
 				int tokenIndex = alphabetConverter.convert(transition.getInChar());
 				IAbstractStackSet setForTo = getSet(transition.getTo());
 				boolean changes = transformSet(setForCurrent, tokenIndex, setForTo);

@@ -24,6 +24,9 @@ public class AutomataUtils {
 	public static final ICharacterMapper SQL_IN_MAPPER = new ICharacterMapper() {
 		@Override
 		public String map(int c) {
+			if (c == (char) -1) {
+				return "EOF";
+			}
 			char[] cc = SQLLexerData.CHAR_CLASSES;
 			for (int i = 0; i < cc.length; i++) {
 				if (cc[i] == c) {
@@ -36,7 +39,7 @@ public class AutomataUtils {
 					}
 				}
 			}
-			throw new IllegalStateException("Impossible state");
+			throw new IllegalStateException("Impossible state: '" + ((int) c) + "'");
 		}
 	};
 
@@ -148,12 +151,16 @@ public class AutomataUtils {
 				stringBuilder.append(" -> ");
 			}
 			for (Transition transition : state.getOutgoingTransitions()) {
-				int inChar = transition.getInChar();
 				String inStr;
-				if (inChar == -1) {
-					inStr = "EOF";
+				if (!transition.isEmpty()) {
+					int inChar = transition.getInChar();
+					if (inChar == -1) {
+						inStr = "EOF";
+					} else {
+						inStr = inChar == 0 ? "" : inMapper.map(inChar) + "";
+					}
 				} else {
-					inStr = inChar == 0 ? "" : inMapper.map(inChar) + "";
+					inStr = "\\eps";
 				}
 				stringBuilder
 					.append(renderer.render(transition.getTo()))

@@ -9,14 +9,31 @@ import java.util.Set;
 
 public class EmptyTransitionEliminator {
 
+	public interface IEmptinessExpert {
+		IEmptinessExpert DEFAULT = new IEmptinessExpert() {
+			
+			@Override
+			public boolean isEmpty(Transition transition) {
+				return transition.isEmpty();
+			}
+		};
+		
+		boolean isEmpty(Transition transition);
+	}
+	
+	
 	public static final EmptyTransitionEliminator INSTANCE = new EmptyTransitionEliminator();
 	
 	private EmptyTransitionEliminator() {}
 	
+	public State eliminateEmptySetTransitions(State initial) {
+		return eliminateEmptySetTransitions(initial, IEmptinessExpert.DEFAULT);
+	}
+	
 	/**
 	 * This \epsilon-closes the transducer
 	 */
-	public State eliminateEmptySetTransitions(State initial) {
+	public State eliminateEmptySetTransitions(State initial, IEmptinessExpert emptinessExpert) {
 		// Collect reachable states
 		Set<State> states = new LinkedHashSet<State>();
 		dfs(initial, states);
@@ -26,7 +43,7 @@ public class EmptyTransitionEliminator {
 		Set<State> accepting = new HashSet<State>();
 		for (State state : states) {
 			Set<State> reachableByEmpty = new HashSet<State>();
-			if (close(state, state, reachableByEmpty)) {
+			if (close(state, state, reachableByEmpty, emptinessExpert)) {
 				accepting.add(state);
 			}
 			stateSets.put(state, reachableByEmpty);
@@ -39,7 +56,7 @@ public class EmptyTransitionEliminator {
 			Set<State> reachableByEmpty = stateSets.get(oldState);
 			for (State state : reachableByEmpty) {
 				for (Transition oldTransition : state.getOutgoingTransitions()) {
-					if (!oldTransition.isEmpty()) {
+					if (!emptinessExpert.isEmpty(oldTransition)) {
 						newState.getOutgoingTransitions().add(
 								new Transition(
 										newState, 
@@ -84,7 +101,7 @@ public class EmptyTransitionEliminator {
 	}
 
 
-	private boolean close(State state, State rep, Set<State> visited) {
+	private boolean close(State state, State rep, Set<State> visited, IEmptinessExpert emptinessExpert) {
 		if (visited.contains(state)) {
 			return state.isAccepting();
 		}
@@ -92,8 +109,8 @@ public class EmptyTransitionEliminator {
 		Collection<Transition> outgoingTransitions = state.getOutgoingTransitions();
 		boolean result = state.isAccepting();
 		for (Transition transition : outgoingTransitions) {
-			if (transition.isEmpty()) {
-				if (close(transition.getTo(), rep, visited)) {
+			if (emptinessExpert.isEmpty(transition)) {
+				if (close(transition.getTo(), rep, visited, emptinessExpert)) {
 					result = true;
 				}
 			}
