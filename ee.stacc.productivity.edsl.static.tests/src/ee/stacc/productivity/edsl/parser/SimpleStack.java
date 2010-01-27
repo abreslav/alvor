@@ -19,9 +19,13 @@ public final class SimpleStack implements IAbstractStack {
 		this.stack = stack;
 	}
 
-	SimpleStack(IParserState state) {
+	/*package*/ SimpleStack(IParserState state) {
 		this.stack = new ArrayList<IParserState>();
 		stack.add(state);
+	}
+	
+	/*package*/ SimpleStack() {
+		this.stack = new ArrayList<IParserState>();
 	}
 	
 	@Override
@@ -32,12 +36,10 @@ public final class SimpleStack implements IAbstractStack {
 	}
 
 	@Override
-	public Set<IAbstractStack> push(IParserState state) {
+	public IAbstractStack push(IParserState state) {
 		ArrayList<IParserState> newStack = new ArrayList<IParserState>(stack);
 		newStack.add(state);
-		return Collections.<IAbstractStack>singleton(
-				new SimpleStack(
-						newStack));
+		return new SimpleStack(newStack);
 	}
 
 	@Override

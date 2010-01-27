@@ -101,7 +101,7 @@ public class LRParser {
 	private static final class ErrorAction extends AbstractAction {
 		@Override
 		public Set<IAbstractStack> process(int symbolNumber, IAbstractStack stack) {
-			return stack.push(IParserState.ERROR);
+			return Collections.singleton(stack.push(IParserState.ERROR));
 		}
 		
 		@Override
@@ -113,7 +113,7 @@ public class LRParser {
 	private static final class AcceptAction extends AbstractAction {
 		@Override
 		public Set<IAbstractStack> process(int symbolNumber, IAbstractStack stack) {
-			return stack.push(IParserState.ACCEPT);
+			return Collections.singleton(stack.push(IParserState.ACCEPT));
 		}
 		
 		@Override
@@ -131,7 +131,7 @@ public class LRParser {
 
 		@Override
 		public Set<IAbstractStack> process(int symbolNumber, IAbstractStack stack) {
-			return stack.push(toState);
+			return Collections.singleton(stack.push(toState));
 		}
 		
 		@Override
@@ -149,7 +149,7 @@ public class LRParser {
 
 		@Override
 		public Set<IAbstractStack> process(int symbolNumber, IAbstractStack stack) {
-			return stack.push(toState);
+			return Collections.singleton(stack.push(toState));
 		}
 
 		@Override
@@ -327,7 +327,7 @@ public class LRParser {
 		}
 	}
 	
-	public State getInitialState() {
+	public IParserState getInitialState() {
 		return initialState;
 	}
 	

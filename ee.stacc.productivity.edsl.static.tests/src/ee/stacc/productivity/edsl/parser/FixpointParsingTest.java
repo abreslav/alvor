@@ -1,6 +1,5 @@
 package ee.stacc.productivity.edsl.parser;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -43,6 +42,18 @@ public class FixpointParsingTest {
 		}
 	};
 
+	interface IStackFactory {
+		IAbstractStack newStack(IParserState state);
+	}
+	
+	private static IStackFactory STACK_FACTORY = new  IStackFactory() {
+		
+		@Override
+		public IAbstractStack newStack(IParserState state) {
+			return new FoldedStack(state);
+		}
+	};
+	
 	private static LRParser parser;
 	
 	@BeforeClass
@@ -251,8 +262,8 @@ public class FixpointParsingTest {
 			return set;
 		}
 
-		public boolean parse (State initial) {
-			IAbstractStack initialStack = new SimpleStack(parser.getInitialState());
+		public boolean parse(State initial) {
+			IAbstractStack initialStack = STACK_FACTORY.newStack(parser.getInitialState());
 			getSet(initial).add(initialStack);
 			return dfs(initial);
 		}
