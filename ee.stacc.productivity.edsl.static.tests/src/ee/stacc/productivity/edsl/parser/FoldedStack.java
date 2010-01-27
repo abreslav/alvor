@@ -34,7 +34,7 @@ public class FoldedStack implements IAbstractStack {
 		this.bottom = bottom;
 		this.parent = parent;
 		this.graph = Collections.unmodifiableMap(graph);
-		System.out.println(++counter);
+//		System.out.println(++counter);
 	}
 	
 	@Override

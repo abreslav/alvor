@@ -38,7 +38,7 @@ public final class SimpleStack implements IAbstractStack {
 	
 	@Override
 	public Set<IAbstractStack> pop(int count) {
-		System.out.println(">>> pop " + count + " from " + this);
+//		System.out.println(">>> pop " + count + " from " + this);
 		return Collections.<IAbstractStack>singleton(
 				new SimpleStack(
 						new ArrayList<IParserState>(stack.subList(0, stack.size() - count))));
@@ -46,7 +46,7 @@ public final class SimpleStack implements IAbstractStack {
 
 	@Override
 	public IAbstractStack push(IParserState state) {
-		System.out.println(">>> push " + state + " into " + this);
+//		System.out.println(">>> push " + state + " into " + this);
 		ArrayList<IParserState> newStack = new ArrayList<IParserState>(stack);
 		newStack.add(state);
 		return new SimpleStack(newStack);

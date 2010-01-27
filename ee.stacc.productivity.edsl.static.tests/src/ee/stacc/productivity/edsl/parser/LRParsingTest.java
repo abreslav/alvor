@@ -50,27 +50,26 @@ public class LRParsingTest {
 			boolean expected) {
 		input += " $end $end"; 
 		Map<String, Integer> namesToTokenNumbers = parser.getNamesToTokenNumbers();
-		PrintStream trace = System.out;
-//		parser.setTrace(trace);
-		trace.print("Parsing: " + input + "\n");
+		String trace = "Parsing: " + input + "\n";
 		String[] split = input.split(" ");
-		trace.append("Input tokens: ");
+		trace += "Input tokens: ";
 		for (String token : split) {
 			Integer tokenNumber = namesToTokenNumbers.get(token.trim());
-			trace.print(tokenNumber + ",");
+			trace += tokenNumber + ",";
 		}
-		trace.append("\n");
+		trace += "\n";
 		
-		boolean r = followParsingTrace(parser, factory.newStack(parser.getInitialState()), Arrays.asList(split), "", expected);
+		PrintStream out = System.out;//new PrintStream(new ByteArrayOutputStream());
+		boolean r = followParsingTrace(parser, factory.newStack(parser.getInitialState()), Arrays.asList(split), trace, expected, out);
 		assertEquals(expected, r);
 		return r;
 	}
 
-	private static boolean followParsingTrace(LRParser parser, IAbstractStack stack, List<String> tokens, String trace, boolean expected) {
+	private static boolean followParsingTrace(LRParser parser, IAbstractStack stack, List<String> tokens, String trace, boolean expected, PrintStream out) {
 		trace += stack;
 		if (tokens.isEmpty()) {
 			if ((stack.top() == IParserState.ERROR) == expected) {
-				System.out.println(trace);
+				out.println(trace);
 				return !expected;
 			}
 			return expected;
@@ -82,7 +81,7 @@ public class LRParsingTest {
 		Integer tokenNumber = parser.getNamesToTokenNumbers().get(token.trim());
 		Set<IAbstractStack> stacks = parser.processToken(tokenNumber, stack);
 		for (IAbstractStack newStack : stacks) {
-			boolean r = followParsingTrace(parser, newStack, tokens.subList(1, tokens.size()), trace + "\n===\n", expected);
+			boolean r = followParsingTrace(parser, newStack, tokens.subList(1, tokens.size()), trace + "\n===\n", expected, out);
 			if (r != expected) {
 				return r;
 			}

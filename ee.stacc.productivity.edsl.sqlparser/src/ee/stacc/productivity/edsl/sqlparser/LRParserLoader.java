@@ -113,7 +113,7 @@ public class LRParserLoader {
 	}
 
 	private static void use(Object value) {
-		System.out.println("Unused value: " + value);
+//		System.out.println("Unused value: " + value);
 	}
 
 }

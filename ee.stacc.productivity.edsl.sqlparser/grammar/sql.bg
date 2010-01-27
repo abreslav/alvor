@@ -35,6 +35,28 @@ import java.io.IOException;
 %token SELECT FROM ID
 %%
 
-select : SELECT idList FROM idList ;
-idList : ident | ident ',' idList ;
-ident : ID | ID '.' ID ;
+select 
+	: SELECT whatToSelect FROM idList 
+	;
+whatToSelect
+	: idList
+	| expression
+	;
+expression
+	: ID '(' expressionList ')'
+	| '*'
+	| ID '(' ')'
+	;
+expressionList
+	: expression
+	| expression ',' expressionList
+	;
+idList 
+	: ident 
+	| ident ',' idList 
+	;
+ident 
+	: ID 
+	| ID '.' ID
+//	| ID ID 
+	;
