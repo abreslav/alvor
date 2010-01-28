@@ -3,7 +3,8 @@ package ee.stacc.productivity.edsl.crawler;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -37,27 +38,16 @@ import ee.stacc.productivity.edsl.string.StringConstant;
 import ee.stacc.productivity.edsl.string.StringSequence;
 
 
-public class AbstractStringEvaluator {
-	private int level;
-	private MethodInvocation invocationContext;
-	private IJavaProject scope;
+public class OldAbstractStringEvaluator {
 	
-	public static IAbstractString evaluateExpression(Expression node) {
-		AbstractStringEvaluator evaluator = 
-			new AbstractStringEvaluator(0, null, getNodeProject(node));
-		return evaluator.eval(node);
-	}
-	
-	private AbstractStringEvaluator(int level, MethodInvocation invocationContext,
-			IJavaProject scope) {
-		this.level = level;
-		this.invocationContext = invocationContext;
-		this.scope = scope;
-	}
-	
-	private IAbstractString eval(Expression node) {
+	public static IAbstractString getValOf(Expression node, int level) {
 		ITypeBinding type = node.resolveTypeBinding();
 		assert type != null;
+		/*
+		System.out.println("getValOf: class=" + node.getClass().getSimpleName()
+				+ ", toString=" + node.toString()
+				+ ", binding=" + type.getName());
+		*/
 		
 		if (type.getName().equals("int")) {
 			throw new UnsupportedStringOpEx	("TODO: int expression");
@@ -65,20 +55,20 @@ public class AbstractStringEvaluator {
 		else if (node instanceof SimpleName) {
 			IBinding var = ((SimpleName)node).resolveBinding();
 			assert var instanceof IVariableBinding;
-			return evalVarBefore((IVariableBinding)var, getContainingStmt(node));
+			return getVarValBefore((IVariableBinding)var, getContainingStmt(node), level);
 		}
 		else if (node instanceof StringLiteral) {
 			return new StringConstant(((StringLiteral)node).getLiteralValue());
 		}
 		else if (node instanceof ParenthesizedExpression) {
-			return eval(((ParenthesizedExpression)node).getExpression());
+			return getValOf(((ParenthesizedExpression)node).getExpression(), level);
 		}
 		else if (node instanceof InfixExpression) {
-			return evalInfix((InfixExpression)node);
+			return getValOfInfixExpression((InfixExpression)node, level);
 		}
 		else if (node instanceof MethodInvocation) {
 			MethodInvocation inv = (MethodInvocation)node;
-				return evalInvocation(inv);
+				return getValOfMethodInvocation(inv, level);
 		}
 		else {
 			throw new UnsupportedStringOpEx
@@ -86,13 +76,14 @@ public class AbstractStringEvaluator {
 		}
 	}
 
-	private IAbstractString evalInfix(InfixExpression expr) {
+	private static IAbstractString getValOfInfixExpression(InfixExpression expr,
+			int level) {
 		if (expr.getOperator() == InfixExpression.Operator.PLUS) {
 			List<IAbstractString> ops = new ArrayList<IAbstractString>();
-			ops.add(eval(expr.getLeftOperand()));
-			ops.add(eval(expr.getRightOperand()));
+			ops.add(getValOf(expr.getLeftOperand(), level));
+			ops.add(getValOf(expr.getRightOperand(), level));
 			for (Object operand: expr.extendedOperands()) {
-				ops.add(eval((Expression)operand));
+				ops.add(getValOf((Expression)operand, level));
 			}
 			return new StringSequence(ops);
 		}
@@ -142,14 +133,14 @@ public class AbstractStringEvaluator {
 		}
 	}
 	
-	private IAbstractString evalVarAfterIf(IVariableBinding var, IfStatement stmt) {
-		IAbstractString ifVal = evalVarAfter(var, stmt.getThenStatement());
+	private static IAbstractString getVarValAfterIf(IVariableBinding var, IfStatement stmt, int level) {
+		IAbstractString ifVal = getVarValAfter(var, stmt.getThenStatement(), level);
 		IAbstractString elseVal = null;
 		
 		if (stmt.getElseStatement() != null) {
-			elseVal = evalVarAfter(var, stmt.getElseStatement());
+			elseVal = getVarValAfter(var, stmt.getElseStatement(), level);
 		} else {
-			elseVal = evalVarBefore(var, stmt);
+			elseVal = getVarValBefore(var, stmt, level);
 		}
 		
 		if (ifVal.equals(elseVal)) {
@@ -159,8 +150,8 @@ public class AbstractStringEvaluator {
 		}
 	}
 	
-	private IAbstractString evalVarAfterDecl(IVariableBinding var,
-			VariableDeclarationStatement stmt) {
+	private static IAbstractString getVarValAfterVarDec(IVariableBinding var,
+			VariableDeclarationStatement stmt, int level) {
 		
 		// May include declarations for several variables
 		for (int i=stmt.fragments().size()-1; i>=0; i--) {
@@ -174,7 +165,7 @@ public class AbstractStringEvaluator {
 						if (cic.arguments().size() == 1) {
 							Expression arg = (Expression)cic.arguments().get(0);
 							if (arg.resolveTypeBinding().getName().equals("String")) {
-								return eval(arg);
+								return getValOf(arg, level);
 							}
 							else if (arg.resolveTypeBinding().getName().equals("int")) {
 								return new StringConstant("");
@@ -194,15 +185,15 @@ public class AbstractStringEvaluator {
 				}
 				else {
 					assert var.getType().getName().equals("String");
-					return eval(vDec.getInitializer());
+					return getValOf(vDec.getInitializer(), level);
 				}
 			}
 		}
-		return evalVarBefore(var, stmt);
+		return getVarValBefore(var, stmt, level);
 	}
 	
-	private IAbstractString evalVarAfterAss(IVariableBinding var, 
-			ExpressionStatement stmt) {
+	private static IAbstractString getVarValAfterAss(IVariableBinding var, 
+			ExpressionStatement stmt, int level) {
 		assert stmt.getExpression() instanceof Assignment;
 		
 		// TODO StringBuilder variable can be assigned also
@@ -212,34 +203,34 @@ public class AbstractStringEvaluator {
 		if (ass.getLeftHandSide() instanceof SimpleName
 			&& ((SimpleName)ass.getLeftHandSide()).resolveBinding().isEqualTo(var)) {
 			
-			IAbstractString rhs = eval(ass.getRightHandSide());
+			IAbstractString rhs = getValOf(ass.getRightHandSide(), level);
 			
 			if (ass.getOperator() == Assignment.Operator.ASSIGN) {
 				return rhs;
 			}
 			else if (ass.getOperator() == Assignment.Operator.PLUS_ASSIGN) {
-				return new StringSequence(evalVarBefore(var, stmt), rhs);
+				return new StringSequence(getVarValBefore(var, stmt, level), rhs);
 			}
 			else {
 				throw new UnsupportedStringOpEx("getVarValAfterAss: unknown operator");
 			}
 		}
 		else { // wrong assignment, this statement doesn't change var (hopefully :)
-			return evalVarBefore(var, stmt);
+			return getVarValBefore(var, stmt, level);
 		}
 	}
 	
-	private IAbstractString evalVarAfter(IVariableBinding var, Statement stmt) {
+	private static IAbstractString getVarValAfter(IVariableBinding var, Statement stmt, int level) {
 		//System.out.println("getVarValAfter: var=" + var.getName()
 		//		+ ", stmt="+ stmt.getClass().getName());
 		
 		if (stmt instanceof ExpressionStatement) {
 			Expression expr = ((ExpressionStatement)stmt).getExpression(); 
 			if (expr instanceof Assignment) {
-				return evalVarAfterAss(var, (ExpressionStatement)stmt);
+				return getVarValAfterAss(var, (ExpressionStatement)stmt, level);
 			}
 			else if (expr instanceof MethodInvocation) {
-				return evalVarAfterMethodInvStmt(var, (ExpressionStatement)stmt);
+				return getVarValAfterMethodInvStmt(var, (ExpressionStatement)stmt, level);
 			}
 			else {
 				throw new UnsupportedStringOpEx
@@ -247,24 +238,24 @@ public class AbstractStringEvaluator {
 			}
 		}
 		else if (stmt instanceof VariableDeclarationStatement) {
-			return evalVarAfterDecl(var, (VariableDeclarationStatement)stmt);
+			return getVarValAfterVarDec(var, (VariableDeclarationStatement)stmt, level);
 		}
 		else if (stmt instanceof IfStatement) {
-			return evalVarAfterIf(var, (IfStatement)stmt);
+			return getVarValAfterIf(var, (IfStatement)stmt, level);
 		}
 		else if (stmt instanceof Block) {
-			return evalVarAfter(var, getLastStmt((Block)stmt));
+			return getVarValAfter(var, getLastStmt((Block)stmt), level);
 		}
 		else if (stmt instanceof ReturnStatement) {
-			return evalVarBefore(var, stmt);
+			return getVarValBefore(var, stmt, level);
 		}
 		else { // other kind of statement
 			throw new UnsupportedStringOpEx("TODO: getVarValAfter(_, " + stmt.getClass().getName() + ")");
 		} 
 	}
 	
-	private IAbstractString evalVarAfterMethodInvStmt(IVariableBinding var,
-			ExpressionStatement stmt) {
+	private static IAbstractString getVarValAfterMethodInvStmt(IVariableBinding var,
+			ExpressionStatement stmt, int level) {
 		MethodInvocation inv = (MethodInvocation)stmt.getExpression();
 		Expression expr = inv.getExpression();
 		
@@ -273,8 +264,8 @@ public class AbstractStringEvaluator {
 			
 			if (inv.getName().getIdentifier().equals("append")) {
 				return new StringSequence(
-						evalVarBefore(var, stmt),
-						eval((Expression)inv.arguments().get(0)));
+						getVarValBefore(var, stmt, level),
+						getValOf((Expression)inv.arguments().get(0), level));
 			}
 			else {
 				throw new UnsupportedStringOpEx("getVarValAfterMethodInvStmt(StringBuilder/Buffer."
@@ -284,12 +275,17 @@ public class AbstractStringEvaluator {
 		else {
 			// TODO at the moment just assuming that if i don't understand
 			//  the construction then it doesn't modify var
-			return evalVarBefore(var, stmt);
+			return getVarValBefore(var, stmt, level);
 		}
 	}
 	
-	private IAbstractString evalInvocation(MethodInvocation inv) {
-		if (isStringBuilderOrBuffer(inv.getExpression().resolveTypeBinding())) {
+	private static IAbstractString getValOfMethodInvocation(MethodInvocation inv, int level) {
+		if (inv.getExpression() == null || inv.getExpression() instanceof ThisExpression) {
+			MethodDeclaration decl = getMethodDeclarationByName(Crawler.getContainingTypeDeclaration(inv), 
+					inv.getName().getIdentifier()); 
+			return getMethodReturnValueForInvocation(decl, inv, level+1);
+		}
+		else if (isStringBuilderOrBuffer(inv.getExpression().resolveTypeBinding())) {
 			if (!(inv.getExpression() instanceof SimpleName)) {
 				throw new UnsupportedStringOpEx("MethodInvocation, SB, expression not SimpleName");
 			}
@@ -297,33 +293,26 @@ public class AbstractStringEvaluator {
 				throw new UnsupportedStringOpEx("MethodInvocation, StringBuilder/Buffer, method not toString");
 			}
 			IBinding var = ((SimpleName)inv.getExpression()).resolveBinding();
-			return evalVarBefore((IVariableBinding)var, getContainingStmt(inv));
+			return getVarValBefore((IVariableBinding)var, getContainingStmt(inv), level);
 		}
 		else if (!(inv.getExpression() instanceof SimpleName)) {
 			throw new UnsupportedStringOpEx("MethodInvocation, expression not SimpleName");
 		} 
-		else  {
-			AbstractStringEvaluator evaluatorWithNewContext = 
-				new AbstractStringEvaluator(level, inv, scope);
-			
-			if (inv.getExpression() == null || inv.getExpression() instanceof ThisExpression) {
-				MethodDeclaration decl = getMethodDeclarationByName(NodeSearchEngine.getContainingTypeDeclaration(inv), 
-						inv.getName().getIdentifier());
-				return evaluatorWithNewContext.getMethodReturnValue(decl);
+		else {
+			//throw new UnsupportedStringOpEx("too complex method invocation");
+			List<MethodDeclaration> decls = Crawler.findMethodDeclarations(inv);
+			List<IAbstractString> choices = new ArrayList<IAbstractString>();
+			for (MethodDeclaration decl: decls) {
+				choices.add(getMethodReturnValueForInvocation(decl, inv, level));
 			}
-			else {
-				List<MethodDeclaration> decls = NodeSearchEngine.findMethodDeclarations(inv);
-				List<IAbstractString> choices = new ArrayList<IAbstractString>();
-				for (MethodDeclaration decl: decls) {
-					choices.add(evaluatorWithNewContext.getMethodReturnValue(decl));
-				}
-				return new StringChoice(choices);
-			}
+			return new StringChoice(choices);
 		}			
 	}
 	
-	private IAbstractString getMethodReturnValue(MethodDeclaration decl) {
+	private static IAbstractString getMethodReturnValueForInvocation(MethodDeclaration decl, 
+			MethodInvocation inv, int level) {
 		
+		assert inv.resolveTypeBinding().getName().equals("String");
 		assert decl != null;
 		
 		// find all return statements
@@ -338,10 +327,11 @@ public class AbstractStringEvaluator {
 		decl.accept(visitor);
 		
 		// get choice out of different return expressions
+		// TODO for evaluating arguments it should use only given invocation, not all of them
 		
 		List<IAbstractString> options = new ArrayList<IAbstractString>();
 		for (ReturnStatement ret: returnStmts) {
-			options.add(eval(ret.getExpression()));
+			options.add(getValOf(ret.getExpression(), level));
 		}
 		return new StringChoice(options);
 	}
@@ -350,54 +340,41 @@ public class AbstractStringEvaluator {
 		return (Statement)block.statements().get(block.statements().size()-1);
 	}
 	
-	private IAbstractString getMethodArgumentValue
-		(String className, String methodName, int paramIndex) {
+	private static IAbstractString getVarValBefore(IVariableBinding var, Statement stmt, int level) {
+		//System.out.println("getVarValBefore: var=" + var.getName()
+		//		+ ", stmt="+ stmt.getClass().getName());
 		
-		AbstractStringEvaluator nextLevelEvaluator = 
-			new AbstractStringEvaluator(level+1, null, scope);
-		
-		if (this.invocationContext != null) {
-			// TODO: check that invocation context matches
-			return nextLevelEvaluator.eval
-				((Expression)this.invocationContext.arguments().get(paramIndex));
-		}
-		else {
-			// find value from all call-sites
-			List<Expression> argumentNodes = NodeSearchEngine.findArgumentNodes
-				(className, methodName, paramIndex, this.scope);
-			
-			List<IAbstractString> choices = new ArrayList<IAbstractString>();
-			for (Expression arg: argumentNodes) {
-				choices.add(nextLevelEvaluator.eval(arg));
-			}
-			return new StringChoice(choices);
-		}
-	}
-	
-	private IAbstractString evalVarBefore(IVariableBinding var, Statement stmt) {
 		Statement prevStmt = getPrevStmt(stmt);
 		if (prevStmt == null) {
-			// no previous statement, must be beginning of method declaration
+			// no prev statement, must be beginning of method declaration
 			if (var.isField()) {
 				throw new UnsupportedStringOpEx("getVarValBefore field");
 			}
 			else if (var.isParameter()) {
 				MethodDeclaration method = getContainingMethodDeclaration(stmt);
-				int paramIndex = getParamIndex(method, var);
-				return getMethodArgumentValue(getMethodClassName(method), 
-						method.getName().toString(), paramIndex);
+				int argIndex = getParamIndex(method, var);
+				List<IAbstractString> choices = Crawler.findArgumentAbstractValuesAtCallSites
+				(getMethodClassName(method) , method.getName().toString(), 
+						argIndex, getNodeProject(stmt), level+1);
+				return new StringChoice(choices);
+//				throw new UnsupportedStringOpEx("######### TODO: analyze argument '" + var.getName() 
+//						+ "'(" +argIndex+ ") at all call sites of method '" + method.getName() + "'");
 			}
 			else {
-				throw new UnsupportedStringOpEx
-					("getVarValBefore: not param, not field, kind=" + var.getKind());
+				throw new UnsupportedStringOpEx("getVarValBefore: not param, not field, kind=" + var.getKind());
 			}
 		}
 		else {
-			return evalVarAfter(var, prevStmt);
+			return getVarValAfter(var, prevStmt, level);
 		}
 	}
 	
-	private static IJavaProject getNodeProject(ASTNode node) {
+	private static IFile getNodeFile(ASTNode node) {
+		CompilationUnit unit = (CompilationUnit)node.getRoot();
+		return (IFile)unit.getTypeRoot().getResource();
+	}
+	
+	private static IJavaElement getNodeProject(ASTNode node) {
 		assert node.getRoot() instanceof CompilationUnit;
 		CompilationUnit cUnit = (CompilationUnit)node.getRoot();
 		return cUnit.getJavaElement().getJavaProject();

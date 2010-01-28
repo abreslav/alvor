@@ -12,7 +12,6 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -28,43 +27,27 @@ import org.eclipse.jdt.core.search.SearchParticipant;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
 
-import ee.stacc.productivity.edsl.string.IAbstractString;
-
-public class Crawler {
-	private static Hashtable<String, List<IAbstractString>> argStringCache = 
-		new Hashtable<String, List<IAbstractString>>();
+public class NodeSearchEngine {
 	private static Hashtable<ICompilationUnit, ASTNode> astCache = 
 		new Hashtable<ICompilationUnit, ASTNode>();
 	private static IJavaElement[] scopeElems = {null};
 	
 	public static void clearCache() {
-		argStringCache.clear();
 		//astCache.clear();
 	}
 	
-	static public List<IAbstractString> findArgumentAbstractValuesAtCallSites(
+	static public List<Expression> findArgumentNodes(
 			final String typeName, final String methodName, 
-			final int argNo, IJavaElement searchScope, final int level) {
+			final int argNo, IJavaElement searchScope) {
 		
 		System.out.println("FIND ARGUMENT VAL: " + methodName);
 		
-		final String argDescriptor = getArgDescriptor(typeName, methodName, argNo); 
-		
-		final List<IAbstractString> cacheResult = argStringCache.get(argDescriptor);
-		if (cacheResult != null) {
-			return cacheResult;
-		}
-		
-		final List<IAbstractString> result = new ArrayList<IAbstractString>();
+		final List<Expression> result = new ArrayList<Expression>();
 		
 		// FIXME temporary, to speed up a bit
 		if (methodName.equals("get")) {
-			return new ArrayList<IAbstractString>();
+			return new ArrayList<Expression>();
 		}
-		if (level > 3) {
-			throw new UnsupportedStringOpEx("argument searching level too deep");
-		}
-		
 		
 		SearchPattern pattern = SearchPattern.createPattern(methodName, 
 				IJavaSearchConstants.METHOD, IJavaSearchConstants.REFERENCES, 
@@ -113,28 +96,12 @@ public class Crawler {
 				
 				ASTNode arg = (ASTNode) invoc.arguments().get(argNo-1);
 				if (arg instanceof Expression) {
-					try {
-						IAbstractString aStr = OldAbstractStringEvaluator.getValOf((Expression)arg, level);
-						result.add(aStr);
-					} 
-					catch (UnsupportedStringOpEx e) {
-						System.out.println("_______________________________");
-						System.out.println("ArgumentFinder for: " + argDescriptor);
-						System.out.println("Level  : " + level);
-						System.out.println("Unsupp : " + e.getMessage());
-						System.out.println("Arg    : " + arg + ", type: " + arg.getClass());
-						System.out.println("File   : " + match.getResource());
-						System.out.println("Line   : " + getLineNumber(match, arg));
-					}
-					catch (Throwable e) {
-						System.err.println("THROWABLE: " + e.getMessage());
-					}
+					result.add((Expression)arg);
 				}
 			}
 		};
 		
 		executeSearch(pattern, requestor, scope);
-		argStringCache.put(argDescriptor, result);
 		return result;
 	}
 	
@@ -148,19 +115,6 @@ public class Crawler {
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	private static int getLineNumber(SearchMatch match, ASTNode node) {
-		if (node.getRoot() instanceof CompilationUnit) {
-			return ((CompilationUnit)node.getRoot()).getLineNumber(match.getOffset());
-		}
-		else {
-			return -1;
-		}
-	}
-	
-	private static String getArgDescriptor(String typeName, String methodName, int argNo) {
-		return typeName + "." + methodName + ":" + argNo; 
 	}
 	
 	public static List<MethodDeclaration> findMethodDeclarations(final MethodInvocation inv) {

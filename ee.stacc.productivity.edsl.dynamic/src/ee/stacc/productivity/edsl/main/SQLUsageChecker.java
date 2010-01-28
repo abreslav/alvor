@@ -1,15 +1,17 @@
 package ee.stacc.productivity.edsl.main;
 
+import java.util.Hashtable;
 import java.util.List;
 
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.dom.Expression;
 
-import ee.stacc.productivity.edsl.crawler.AbstractStringEvaluator;
+import ee.stacc.productivity.edsl.crawler.OldAbstractStringEvaluator;
 import ee.stacc.productivity.edsl.crawler.Crawler;
 import ee.stacc.productivity.edsl.db.AbstractSQLStructure;
 import ee.stacc.productivity.edsl.db.SQLStringAnalyzer;
+import ee.stacc.productivity.edsl.samplegen.SampleGenerator;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 
 /**
@@ -31,20 +33,31 @@ public class SQLUsageChecker {
 		List<IAbstractString> aStrings = Crawler.findArgumentAbstractValuesAtCallSites
 			("java.sql.Connection", "prepareStatement", 1, scope, 1);
 	
+		int totalConcrete = 0;
+		Hashtable<String, Integer> concretes = new Hashtable<String, Integer>();
 		
 		System.out.println("============================================");
 		for (IAbstractString aStr: aStrings) {
-			System.out.println(aStr);
+			List<String> conc = SampleGenerator.getConcreteStrings(aStr);
+			System.out.println(conc.size() + ":" + aStr);
+			totalConcrete += conc.size();
+			
+			for (String s: conc) {
+				Integer soFar = concretes.get(s);
+				concretes.put(s, (soFar == null) ? 1 : soFar+1);
+			}
 			//checkParseSQLNode(node);
 		}
 		
-		System.out.println("TOTAL COUNT: " + aStrings.size());
+		System.out.println("TOTAL ABSTRACT COUNT: " + aStrings.size());
+		System.out.println("TOTAL CONCRETE COUNT: " + totalConcrete);
+		System.out.println("DIFFERENT CONCRETE COUNT: " + concretes.size());
 	}
 	
 	
 	private void checkParseSQLNode(Expression node) {
 		try {
-			IAbstractString aStr = AbstractStringEvaluator.getValOf(node, 1);
+			IAbstractString aStr = OldAbstractStringEvaluator.getValOf(node, 1);
 			AbstractSQLStructure struct = new AbstractSQLStructure(aStr, analyzer);
 			
 			if (struct.getErrorMsg() != null) {

@@ -80,5 +80,4 @@ public class CheckProjectHandler extends AbstractHandler {
 			System.err.println("Error creating marker: " + e.getMessage());
 		}
 	}
-	
 }
