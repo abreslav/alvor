@@ -27,6 +27,11 @@ import org.eclipse.jdt.core.search.SearchParticipant;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
 
+/**
+ * Implements some Java searches + Node searches required by AbstractStringEvaluator
+ * @author Aivar
+ *
+ */
 public class NodeSearchEngine {
 	private static Hashtable<ICompilationUnit, ASTNode> astCache = 
 		new Hashtable<ICompilationUnit, ASTNode>();
@@ -165,6 +170,7 @@ public class NodeSearchEngine {
 		assert cUnit != null;
 		
 		ASTNode ast = astCache.get(cUnit);
+		// TODO check if AST is still good (or file has been edited after creating AST)
 		if (ast == null) {
 			ASTParser parser = ASTParser.newParser(AST.JLS3);
 			parser.setKind(ASTParser.K_COMPILATION_UNIT);

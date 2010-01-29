@@ -289,7 +289,8 @@ public class AbstractStringEvaluator {
 	}
 	
 	private IAbstractString evalInvocation(MethodInvocation inv) {
-		if (isStringBuilderOrBuffer(inv.getExpression().resolveTypeBinding())) {
+		if (inv.getExpression() != null
+				&& isStringBuilderOrBuffer(inv.getExpression().resolveTypeBinding())) {
 			if (!(inv.getExpression() instanceof SimpleName)) {
 				throw new UnsupportedStringOpEx("MethodInvocation, SB, expression not SimpleName");
 			}
@@ -299,9 +300,6 @@ public class AbstractStringEvaluator {
 			IBinding var = ((SimpleName)inv.getExpression()).resolveBinding();
 			return evalVarBefore((IVariableBinding)var, getContainingStmt(inv));
 		}
-		else if (!(inv.getExpression() instanceof SimpleName)) {
-			throw new UnsupportedStringOpEx("MethodInvocation, expression not SimpleName");
-		} 
 		else  {
 			AbstractStringEvaluator evaluatorWithNewContext = 
 				new AbstractStringEvaluator(level, inv, scope);
@@ -311,6 +309,9 @@ public class AbstractStringEvaluator {
 						inv.getName().getIdentifier());
 				return evaluatorWithNewContext.getMethodReturnValue(decl);
 			}
+			else if (!(inv.getExpression() instanceof SimpleName)) {
+				throw new UnsupportedStringOpEx("MethodInvocation, expression not SimpleName");
+			} 
 			else {
 				List<MethodDeclaration> decls = NodeSearchEngine.findMethodDeclarations(inv);
 				List<IAbstractString> choices = new ArrayList<IAbstractString>();
@@ -350,28 +351,22 @@ public class AbstractStringEvaluator {
 		return (Statement)block.statements().get(block.statements().size()-1);
 	}
 	
-	private IAbstractString getMethodArgumentValue
-		(String className, String methodName, int paramIndex) {
+	public static List<IAbstractString> evaluateMethodArgumentAtCallSites
+			(String className, String methodName, int paramIndex,
+					IJavaProject scope, int level) {
 		
-		AbstractStringEvaluator nextLevelEvaluator = 
-			new AbstractStringEvaluator(level+1, null, scope);
+		AbstractStringEvaluator evaluator = 
+			new AbstractStringEvaluator(level, null, scope);
 		
-		if (this.invocationContext != null) {
-			// TODO: check that invocation context matches
-			return nextLevelEvaluator.eval
-				((Expression)this.invocationContext.arguments().get(paramIndex));
+		// find value from all call-sites
+		List<Expression> argumentNodes = NodeSearchEngine.findArgumentNodes
+			(className, methodName, paramIndex, scope);
+		
+		List<IAbstractString> result = new ArrayList<IAbstractString>();
+		for (Expression arg: argumentNodes) {
+			result.add(evaluator.eval(arg));
 		}
-		else {
-			// find value from all call-sites
-			List<Expression> argumentNodes = NodeSearchEngine.findArgumentNodes
-				(className, methodName, paramIndex, this.scope);
-			
-			List<IAbstractString> choices = new ArrayList<IAbstractString>();
-			for (Expression arg: argumentNodes) {
-				choices.add(nextLevelEvaluator.eval(arg));
-			}
-			return new StringChoice(choices);
-		}
+		return result;
 	}
 	
 	private IAbstractString evalVarBefore(IVariableBinding var, Statement stmt) {
@@ -384,8 +379,22 @@ public class AbstractStringEvaluator {
 			else if (var.isParameter()) {
 				MethodDeclaration method = getContainingMethodDeclaration(stmt);
 				int paramIndex = getParamIndex(method, var);
-				return getMethodArgumentValue(getMethodClassName(method), 
-						method.getName().toString(), paramIndex);
+				
+				if (this.invocationContext != null) {
+					// TODO: check that invocation context matches
+					AbstractStringEvaluator nextLevelEvaluator = 
+						new AbstractStringEvaluator(level+1, null, scope);
+					
+					return nextLevelEvaluator.eval
+						((Expression)this.invocationContext.arguments().get(paramIndex));
+				}
+				else {
+					return new StringChoice(
+						AbstractStringEvaluator.evaluateMethodArgumentAtCallSites
+							(getMethodClassName(method), method.getName().toString(), 
+							paramIndex,	this.scope, this.level+1)
+					);
+				}
 			}
 			else {
 				throw new UnsupportedStringOpEx
