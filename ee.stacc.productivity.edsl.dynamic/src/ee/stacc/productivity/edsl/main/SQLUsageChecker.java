@@ -13,7 +13,7 @@ import ee.stacc.productivity.edsl.db.SQLStringAnalyzer;
 import ee.stacc.productivity.edsl.samplegen.SampleGenerator;
 
 /**
- * This is main class in a sense.
+ * This is main class
  * - finds "prepareStatement"-s
  * - creates abstract strings
  * - creates abstract SQL structures (containing either error msg or resultset metadata)
