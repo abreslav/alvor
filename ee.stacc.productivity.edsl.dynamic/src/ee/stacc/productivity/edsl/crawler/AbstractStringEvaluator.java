@@ -39,8 +39,8 @@ import ee.stacc.productivity.edsl.string.StringSequence;
 
 public class AbstractStringEvaluator {
 	private int maxLevel = 1;
-	private boolean supportParameters = false;
-	private boolean supportInvocations = false;
+	private boolean supportParameters = true;
+	private boolean supportInvocations = true;
 	
 	private int level;
 	private MethodInvocation invocationContext;

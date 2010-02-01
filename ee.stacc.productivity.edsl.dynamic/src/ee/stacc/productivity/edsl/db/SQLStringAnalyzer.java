@@ -7,14 +7,16 @@ import java.sql.SQLException;
 
 /**
  * Responsible for parsing and validating given SQL string
+ * 
+ * Some DB drivers won't actually parse query at "parseStatement"
  */
 public class SQLStringAnalyzer {
 	Connection conn;
 	boolean needExecute = false;
 	
 	public SQLStringAnalyzer() {
-		// connect to database
-		connectToMySQL();
+		//connectToMySQL();
+		connectToOracle();
 	}
 	
 	
@@ -23,7 +25,7 @@ public class SQLStringAnalyzer {
 		try {
 			Class.forName ("oracle.jdbc.OracleDriver");
 			conn = DriverManager.getConnection(url, "compiere", "password");
-			this.needExecute = true;
+			this.needExecute = false;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

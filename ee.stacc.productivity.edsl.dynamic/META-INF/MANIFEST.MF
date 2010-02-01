@@ -11,6 +11,6 @@ Require-Bundle: ee.stacc.productivity.edsl.model;bundle-version="1.0.0",
 Export-Package: ee.stacc.productivity.edsl.crawler,
  ee.stacc.productivity.edsl.db,
  ee.stacc.productivity.edsl.main
-Bundle-ClassPath: lib/mysql-connector-java-5.1.10-bin.jar,
- .,
- lib/ojdbc14_g.jar
+Bundle-ClassPath: .,
+ lib/mysql-connector-java-5.1.10-bin.jar,
+ lib/ojdbc6.jar
