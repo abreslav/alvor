@@ -1,5 +1,6 @@
 package ee.stacc.productivity.edsl.gui;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -18,10 +19,11 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
+import ee.stacc.productivity.edsl.main.ISQLErrorHandler;
 import ee.stacc.productivity.edsl.main.SQLUsageChecker;
 
 
-public class CheckProjectHandler extends AbstractHandler {
+public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHandler {
 	public static final String ERROR_MARKER_ID = "EclipseSQLPlugin.sqlerror";
 	public static final String WARNING_MARKER_ID = "EclipseSQLPlugin.sqlwarning";
 	SQLUsageChecker projectChecker = new SQLUsageChecker();
@@ -79,5 +81,11 @@ public class CheckProjectHandler extends AbstractHandler {
 		} catch (Exception e) {
 			System.err.println("Error creating marker: " + e.getMessage());
 		}
+	}
+
+	@Override
+	public void handleSQLError(SQLException e, IFile file, int startPosition,
+			int length) {
+		createMarker(e.getMessage(), ERROR_MARKER_ID, file, startPosition, length);		
 	}
 }

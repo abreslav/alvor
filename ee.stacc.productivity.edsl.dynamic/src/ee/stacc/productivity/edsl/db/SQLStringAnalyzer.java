@@ -2,7 +2,6 @@ package ee.stacc.productivity.edsl.db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
@@ -22,16 +21,23 @@ public class SQLStringAnalyzer {
 		}
 	}
 	
-	public SQLStructure analyze(String sql) {
+	public void validate(String sql) throws SQLException {
+		conn.prepareStatement(sql);
+	}
+	
+	/*
+	public SQLStructure analyzeAndReturn(String sql) {
 		try {
 			PreparedStatement stmt = conn.prepareStatement(sql);
 //			System.out.println("CHECKED: " + sql);
 			return new SQLStructure(stmt.getMetaData(), stmt.getParameterMetaData());
-		} catch (SQLException e) {
+		}
+		catch (SQLException e) {
 			System.err.println("ERR SQL: " + sql);
 			String errorMsg = e.getMessage().replace("\n", "; ");
 			System.err.println("SQL ERR: " + errorMsg);
 			return new SQLStructure(e);
 		}
 	}
+	*/
 }

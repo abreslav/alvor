@@ -1,13 +1,9 @@
 package ee.stacc.productivity.edsl.db;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import ee.stacc.productivity.edsl.string.IAbstractString;
 
 public class AbstractSQLStructure {
-    // test test
+    /*
+	
 	private ArrayList<String> colNames = new ArrayList<String>();
 	private int maxColumnCount = 0;
 	private String errorMsg = null;
@@ -18,7 +14,7 @@ public class AbstractSQLStructure {
 		List<IAbstractString> strList = null; //TODO aStr.getExpandedStrings();
 		
 		for (IAbstractString expAStr: strList) {
-			SQLStructure struct = analyzer.analyze(expAStr.toString());
+			SQLStructure struct = analyzer.validate(expAStr.toString());
 			
 			if (struct.errorMsg != null) {
 				this.errorMsg = struct.errorMsg;
@@ -57,4 +53,5 @@ public class AbstractSQLStructure {
 	public IAbstractString getErrorAStr() {
 		return errorAStr;
 	}
+	*/
 }

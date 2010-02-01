@@ -1,5 +1,6 @@
 package ee.stacc.productivity.edsl.main;
 
+import java.sql.SQLException;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -7,9 +8,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.dom.Expression;
 
-import ee.stacc.productivity.edsl.crawler.OldAbstractStringEvaluator;
 import ee.stacc.productivity.edsl.crawler.Crawler;
-import ee.stacc.productivity.edsl.db.AbstractSQLStructure;
 import ee.stacc.productivity.edsl.db.SQLStringAnalyzer;
 import ee.stacc.productivity.edsl.samplegen.SampleGenerator;
 import ee.stacc.productivity.edsl.string.IAbstractString;
@@ -23,6 +22,7 @@ import ee.stacc.productivity.edsl.string.IAbstractString;
  */
 public class SQLUsageChecker {
 	private SQLStringAnalyzer analyzer = new SQLStringAnalyzer();
+	
 	
 	public void checkProject(IJavaProject project) {
 		checkElement(project);
@@ -44,7 +44,17 @@ public class SQLUsageChecker {
 			
 			for (String s: conc) {
 				Integer soFar = concretes.get(s);
-				concretes.put(s, (soFar == null) ? 1 : soFar+1);
+				if (soFar == null) {
+					try {
+						analyzer.validate(s);
+					} catch (SQLException e) {
+						
+					}
+					concretes.put(s, 1);
+				}
+				else {
+					concretes.put(s, (soFar == null) ? 1 : soFar+1);
+				}
 			}
 			//checkParseSQLNode(node);
 		}
@@ -54,7 +64,7 @@ public class SQLUsageChecker {
 		System.out.println("DIFFERENT CONCRETE COUNT: " + concretes.size());
 	}
 	
-	
+	/*
 	private void checkParseSQLNode(Expression node) {
 		try {
 			IAbstractString aStr = OldAbstractStringEvaluator.getValOf(node, 1);
@@ -70,6 +80,7 @@ public class SQLUsageChecker {
 			System.err.println(e.getMessage());
 		}
 	}
+	*/
 	
 	public void markSQLError(Expression node, IAbstractString aStr, String message) {
 		//System.err.println(struct.getErrorMsg());

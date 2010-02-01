@@ -14,7 +14,6 @@ import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorPart;
 
 import ee.stacc.productivity.edsl.crawler.AbstractStringEvaluator;
-import ee.stacc.productivity.edsl.crawler.OldAbstractStringEvaluator;
 
 public class AbstractStringPrinter implements IEditorActionDelegate{
 	private ISelection selection;
