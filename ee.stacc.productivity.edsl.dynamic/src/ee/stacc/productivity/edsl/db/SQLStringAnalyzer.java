@@ -2,6 +2,7 @@ package ee.stacc.productivity.edsl.db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
@@ -22,7 +23,8 @@ public class SQLStringAnalyzer {
 	}
 	
 	public void validate(String sql) throws SQLException {
-		conn.prepareStatement(sql);
+		PreparedStatement stmt = conn.prepareStatement(sql);
+		stmt.getMetaData();
 	}
 	
 	/*

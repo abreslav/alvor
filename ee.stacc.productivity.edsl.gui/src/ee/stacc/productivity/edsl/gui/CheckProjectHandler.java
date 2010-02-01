@@ -24,14 +24,15 @@ import ee.stacc.productivity.edsl.main.SQLUsageChecker;
 
 
 public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHandler {
-	public static final String ERROR_MARKER_ID = "EclipseSQLPlugin.sqlerror";
-	public static final String WARNING_MARKER_ID = "EclipseSQLPlugin.sqlwarning";
+	public static final String ERROR_MARKER_ID = "ee.stacc.productivity.edsl.gui.sqlerror";
+	public static final String WARNING_MARKER_ID = "ee.stacc.productivity.edsl.gui.sqlwarning";
 	SQLUsageChecker projectChecker = new SQLUsageChecker();
 	
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		System.out.println("CheckProjectHandler.execute");
-		projectChecker.checkProject(getCurrentProject());
+		cleanMarkers(getCurrentProject());
+		projectChecker.checkProject(getCurrentProject(), this);
 		return null;
 	}
 	
@@ -63,6 +64,8 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 	}
 	
 	void createMarker(String message, String markerType, IFile file, int charStart, int charEnd) {
+		System.out.println("creating marker: " + message + ", file=" + file
+				+ ", charStart=" + charStart + ", charEnd=" + charEnd);
 		
 		@SuppressWarnings("unchecked")
 		HashMap<String, Comparable> map = new HashMap<String, Comparable>();
@@ -86,6 +89,8 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 	@Override
 	public void handleSQLError(SQLException e, IFile file, int startPosition,
 			int length) {
-		createMarker(e.getMessage(), ERROR_MARKER_ID, file, startPosition, length);		
+		//System.err.println(e.getMessage());
+		createMarker(e.getMessage(), ERROR_MARKER_ID, file, startPosition, 
+				startPosition + length);		
 	}
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
@@ -12,6 +13,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -38,21 +40,21 @@ public class NodeSearchEngine {
 	private static IJavaElement[] scopeElems = {null};
 	
 	public static void clearCache() {
-		//astCache.clear();
+		astCache.clear();
 	}
 	
-	static public List<Expression> findArgumentNodes(
+	static public List<NodeDescriptor> findArgumentNodes(
 			final String typeName, final String methodName, 
 			final int argNo, IJavaElement searchScope) {
 		
-		System.out.println("FIND ARGUMENT VAL: " + methodName);
-		
-		final List<Expression> result = new ArrayList<Expression>();
+		final List<NodeDescriptor> result = new ArrayList<NodeDescriptor>();
 		
 		// FIXME temporary, to speed up a bit
+		/*
 		if (methodName.equals("get")) {
-			return new ArrayList<Expression>();
+			return new ArrayList<NodeSearchResult>();
 		}
+		*/
 		
 		SearchPattern pattern = SearchPattern.createPattern(methodName, 
 				IJavaSearchConstants.METHOD, IJavaSearchConstants.REFERENCES, 
@@ -86,9 +88,11 @@ public class NodeSearchEngine {
 				
 				if (!methodBinding.getDeclaringClass().getQualifiedName().equals(typeName)
 						&& /* FIXME */ !"prepareStatement".equals(methodName)) {
+					/*
 					System.out.println("Wrong match, want: " + typeName + "." + methodName
 							+ ", was: " + methodBinding.getDeclaringClass().getQualifiedName()
 							+ "." + methodBinding.getName());
+					*/
 					return;
 				}
 				
@@ -101,7 +105,11 @@ public class NodeSearchEngine {
 				
 				ASTNode arg = (ASTNode) invoc.arguments().get(argNo-1);
 				if (arg instanceof Expression) {
-					result.add((Expression)arg);
+					result.add(new NodeDescriptor((Expression)arg, 
+							(IFile)match.getResource(), 
+							getNodeLineNumber(match, arg),
+							match.getOffset(),
+							match.getLength()));
 				}
 			}
 		};
@@ -124,7 +132,7 @@ public class NodeSearchEngine {
 	
 	public static List<MethodDeclaration> findMethodDeclarations(final MethodInvocation inv) {
 		System.out.println("FIND METHOD DECL: " + inv);
-		ITypeBinding objectType = inv.getExpression().resolveTypeBinding();
+//		ITypeBinding objectType = inv.getExpression().resolveTypeBinding();
 		final List<MethodDeclaration> result = new ArrayList<MethodDeclaration>();
 		
 		SearchPattern pattern = SearchPattern.createPattern(
@@ -205,4 +213,11 @@ public class NodeSearchEngine {
 		return (TypeDeclaration)result;
 	}
 	
-}
+	private static int getNodeLineNumber(SearchMatch match, ASTNode node) {
+		if (node.getRoot() instanceof CompilationUnit) {
+			return ((CompilationUnit)node.getRoot()).getLineNumber(match.getOffset());
+		}
+		else {
+			return -1;
+		}
+	}}

@@ -38,6 +38,10 @@ import ee.stacc.productivity.edsl.string.StringSequence;
 
 
 public class AbstractStringEvaluator {
+	private int maxLevel = 1;
+	private boolean supportParameters = false;
+	private boolean supportInvocations = false;
+	
 	private int level;
 	private MethodInvocation invocationContext;
 	private IJavaProject scope;
@@ -50,6 +54,11 @@ public class AbstractStringEvaluator {
 	
 	private AbstractStringEvaluator(int level, MethodInvocation invocationContext,
 			IJavaProject scope) {
+		
+		if (level > maxLevel) {
+			throw new UnsupportedStringOpEx("Analysis level (" + level + ") too deep");
+		}
+		
 		this.level = level;
 		this.invocationContext = invocationContext;
 		this.scope = scope;
@@ -301,9 +310,12 @@ public class AbstractStringEvaluator {
 			return evalVarBefore((IVariableBinding)var, getContainingStmt(inv));
 		}
 		else  {
+			if (! supportInvocations) {
+				throw new UnsupportedStringOpEx("Method call");
+			}
 			AbstractStringEvaluator evaluatorWithNewContext = 
 				new AbstractStringEvaluator(level, inv, scope);
-			
+
 			if (inv.getExpression() == null || inv.getExpression() instanceof ThisExpression) {
 				MethodDeclaration decl = getMethodDeclarationByName(NodeSearchEngine.getContainingTypeDeclaration(inv), 
 						inv.getName().getIdentifier());
@@ -351,20 +363,43 @@ public class AbstractStringEvaluator {
 		return (Statement)block.statements().get(block.statements().size()-1);
 	}
 	
-	public static List<IAbstractString> evaluateMethodArgumentAtCallSites
+	public static List<StringNodeDescriptor> evaluateMethodArgumentAtCallSites
 			(String className, String methodName, int paramIndex,
 					IJavaProject scope, int level) {
+		String levelPrefix = "";
+		for (int i = 0; i < level; i++) {
+			levelPrefix += "    ";
+		}
+
 		
 		AbstractStringEvaluator evaluator = 
 			new AbstractStringEvaluator(level, null, scope);
 		
+		System.out.println(levelPrefix + "###########################################");
+		System.out.println(levelPrefix + "searching: " + className + "." + methodName
+				+ "(" + paramIndex + ")");	
+		
 		// find value from all call-sites
-		List<Expression> argumentNodes = NodeSearchEngine.findArgumentNodes
+		List<NodeDescriptor> argumentNodes = NodeSearchEngine.findArgumentNodes
 			(className, methodName, paramIndex, scope);
 		
-		List<IAbstractString> result = new ArrayList<IAbstractString>();
-		for (Expression arg: argumentNodes) {
-			result.add(evaluator.eval(arg));
+		List<StringNodeDescriptor> result = new ArrayList<StringNodeDescriptor>();
+		for (NodeDescriptor sr: argumentNodes) {
+			Expression arg = (Expression)sr.getNode();
+			StringNodeDescriptor desc = new StringNodeDescriptor(arg, sr.getFile(),
+					sr.getLineNumber(), sr.getCharStart(), sr.getCharLength(), null);
+			try {
+				desc.setAbstractValue(evaluator.eval(arg));
+				result.add(desc);
+			} catch (UnsupportedStringOpEx e) {
+				System.out.println(levelPrefix + "UNSUPPORTED: " + e.getMessage());
+				System.out.println(levelPrefix + "    file: " + sr.getFile() + ", line: " 
+						+ sr.getLineNumber());	
+			} catch (Throwable t) {
+				System.out.println(levelPrefix + "PROGRAM ERROR: " + t.getMessage());
+				System.out.println(levelPrefix + "    file: " + sr.getFile() + ", line: " 
+						+ sr.getLineNumber());	
+			}
 		}
 		return result;
 	}
@@ -377,6 +412,9 @@ public class AbstractStringEvaluator {
 				throw new UnsupportedStringOpEx("getVarValBefore field");
 			}
 			else if (var.isParameter()) {
+				if (! supportParameters) {
+					throw new UnsupportedStringOpEx("eval Parameter");
+				}
 				MethodDeclaration method = getContainingMethodDeclaration(stmt);
 				int paramIndex = getParamIndex(method, var);
 				
@@ -389,11 +427,16 @@ public class AbstractStringEvaluator {
 						((Expression)this.invocationContext.arguments().get(paramIndex));
 				}
 				else {
-					return new StringChoice(
+					List<StringNodeDescriptor> descList = 
 						AbstractStringEvaluator.evaluateMethodArgumentAtCallSites
-							(getMethodClassName(method), method.getName().toString(), 
-							paramIndex,	this.scope, this.level+1)
-					);
+						(getMethodClassName(method), method.getName().toString(), 
+						paramIndex,	this.scope, this.level+1);
+					
+					List<IAbstractString> choices = new ArrayList<IAbstractString>();
+					for (StringNodeDescriptor choiceDesc: descList) {
+						choices.add(choiceDesc.getAbstractValue());
+					}
+					return new StringChoice(choices);
 				}
 			}
 			else {
@@ -411,6 +454,14 @@ public class AbstractStringEvaluator {
 		CompilationUnit cUnit = (CompilationUnit)node.getRoot();
 		return cUnit.getJavaElement().getJavaProject();
 	}
+	
+	/*
+	private static IFile getNodeFile(ASTNode node) {
+		assert node.getRoot() instanceof CompilationUnit;
+		CompilationUnit cUnit = (CompilationUnit)node.getRoot();
+		return (IFile)cUnit.getTypeRoot().getResource();
+	}
+	*/
 	
 	private static MethodDeclaration getContainingMethodDeclaration(ASTNode node) {
 		ASTNode result = node;
