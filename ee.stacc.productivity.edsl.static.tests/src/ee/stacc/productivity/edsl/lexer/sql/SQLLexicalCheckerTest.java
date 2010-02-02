@@ -16,7 +16,7 @@ public class SQLLexicalCheckerTest {
 
 	@Test
 	public void test() throws Exception {
-		SQLLexicalChecker checker = new SQLLexicalChecker();
+		SQLLexicalChecker checker = SQLLexicalChecker.INSTANCE;
 		IAbstractString string = AbstractStringParser.parseOneFromString("\"12a &\"");
 		List<String> result = checker.check(string);
 		assertEquals(
