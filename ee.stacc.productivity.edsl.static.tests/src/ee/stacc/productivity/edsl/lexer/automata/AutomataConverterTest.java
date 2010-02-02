@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import ee.stacc.productivity.edsl.lexer.sql.SQLLexer;
 import ee.stacc.productivity.edsl.sqllexer.SQLLexerData;
 
 
@@ -11,7 +12,7 @@ public class AutomataConverterTest {
 
 	@Test
 	public void test() throws Exception {
-		State initial = AutomataConverter.INSTANCE.convert();
+		State initial = SQLLexer.SQL_TRANSDUCER;
 		
 		String input;
 		String expected;

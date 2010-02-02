@@ -36,10 +36,11 @@ public class StringToAutomatonConverterTest {
 		TestUtil.checkGeneratedcharacterStrings(initial, "sa");
 		
 		initial = StringToAutomatonConverter.INSTANCE.convert(stringChoice);
-		TestUtil.checkGeneratedcharacterStrings(initial, "sa", "s", "a", "d", "f", "]", "[");
+		TestUtil.checkGeneratedcharacterStrings(initial, "sasa", "sa", "s", "a", "d", "f", "]", "[");
 		
 		initial = StringToAutomatonConverter.INSTANCE.convert(stringSequence);
 		TestUtil.checkGeneratedcharacterStrings(initial, 
+				"\"asdassasa", 
 				"\"asdassa", 
 				"\"asdass", 
 				"\"asdasa", 

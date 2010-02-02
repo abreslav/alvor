@@ -3,6 +3,7 @@ package ee.stacc.productivity.edsl.parser;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,8 +13,10 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
-import ee.stacc.productivity.edsl.lexer.automata.AutomataConverter;
 import ee.stacc.productivity.edsl.lexer.automata.AutomataDeterminator;
 import ee.stacc.productivity.edsl.lexer.automata.AutomataInclusion;
 import ee.stacc.productivity.edsl.lexer.automata.AutomataParser;
@@ -24,6 +27,7 @@ import ee.stacc.productivity.edsl.lexer.automata.State;
 import ee.stacc.productivity.edsl.lexer.automata.StringToAutomatonConverter;
 import ee.stacc.productivity.edsl.lexer.automata.Transition;
 import ee.stacc.productivity.edsl.lexer.automata.EmptyTransitionEliminator.IEmptinessExpert;
+import ee.stacc.productivity.edsl.lexer.sql.SQLLexer;
 import ee.stacc.productivity.edsl.sqllexer.SQLLexerData;
 import ee.stacc.productivity.edsl.sqlparser.IAbstractStack;
 import ee.stacc.productivity.edsl.sqlparser.IParserState;
@@ -31,8 +35,23 @@ import ee.stacc.productivity.edsl.sqlparser.LRParser;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.parser.AbstractStringParser;
 
-
+@RunWith(Parameterized.class)
 public class FixpointParsingTest {
+	
+	@Parameters
+	public static Collection<Object[]> parameters() {
+		return Arrays.asList(new Object[][] {
+				{SimpleStack.FACTORY},
+				{SimpleFoldedStack.FACTORY},
+		});
+	}
+
+	private final IStackFactory stackFactory;
+	
+	public FixpointParsingTest(IStackFactory stackFactory) {
+		this.stackFactory = stackFactory;
+	}
+	
 	private static final IAbstractStackSetFactory FACTORY = new IAbstractStackSetFactory() {
 		
 		@Override
@@ -41,8 +60,6 @@ public class FixpointParsingTest {
 		}
 	};
 
-	private static IStackFactory STACK_FACTORY = SimpleFoldedStack.FACTORY;
-	
 	private static LRParser parser = Parsers.SQL_PARSER;
 	
 	@Test
@@ -130,19 +147,26 @@ public class FixpointParsingTest {
 		
 		abstractString = "\"SELECT asd\" {\", dsd\", \"\", \", a, s, v\"} \" FROM asd, sdf\"";
 		assertTrue(parseAbstractString(abstractString));
-		
+	}
+
+	@Test
+	public void testNestedParentheses() throws Exception {
+		String abstractString;
 		
 		abstractString = "\"SELECT a(*, a()) FROM asd, sdf\"";
 		assertTrue(parseAbstractString(abstractString));
 		
-//		
-//		abstractString = "\"SELECT a(a(*), a(b, c(d(e)))) FROM asd, sdf\"";
-//		assertTrue(parseAbstractString(abstractString));
-//		
+		
+		abstractString = "\"SELECT a(a(*), a(b, c(d(e)))) FROM asd, sdf\"";
+		assertTrue(parseAbstractString(abstractString));
 	}
-
+	
 	@Test
 	public void testLoops() throws Exception {
+		if (stackFactory == SimpleStack.FACTORY) {
+			return;
+		}
+		
 		String abstractString;
 
 		abstractString = "\"SELECT asd\" (\", dsd \")+ \"FROM asd, sdf\"";
@@ -155,10 +179,10 @@ public class FixpointParsingTest {
 	}
 	
 	private boolean parseAbstractString(String abstractString) {
-		State sqlTransducer = AutomataConverter.INSTANCE.convert();
+		State sqlTransducer = SQLLexer.SQL_TRANSDUCER;
 		
 		IAbstractString as = AbstractStringParser.parseOneFromString(abstractString);
-		State asAut = StringToAutomatonConverter.INSTANCE.convert(as, AutomataUtils.SQL_ALPHABET_CONVERTER);
+		State asAut = StringToAutomatonConverter.INSTANCE.convert(as, SQLLexer.SQL_ALPHABET_CONVERTER);
 		asAut = AutomataDeterminator.determinate(asAut);
 		
 		State transduction = AutomataInclusion.INSTANCE.getTrasduction(sqlTransducer, asAut);
@@ -186,7 +210,7 @@ public class FixpointParsingTest {
 				return parser.getNamesToTokenNumbers().get("'" + tokenName + "'");
 			}
 		};
-		FixpointParser fixpointParser = new FixpointParser(parser, converter , FACTORY, eofTokenIndex);
+		FixpointParser fixpointParser = new FixpointParser(parser, converter, FACTORY, eofTokenIndex);
 		boolean parseResult = fixpointParser.parse(transduction);
 		return parseResult;
 	}
@@ -238,7 +262,7 @@ public class FixpointParsingTest {
 		IAbstractStackSet newAbstractStackSet();
 	}
 	
-	private static final class FixpointParser {
+	private final class FixpointParser {
 	
 		private final Map<State, IAbstractStackSet> abstractStackSets = new HashMap<State, IAbstractStackSet>();
 		private final IAlphabetConverter alphabetConverter;
@@ -266,7 +290,7 @@ public class FixpointParsingTest {
 		}
 
 		public boolean parse(State initial) {
-			IAbstractStack initialStack = STACK_FACTORY.newStack(parser.getInitialState());
+			IAbstractStack initialStack = stackFactory.newStack(parser.getInitialState());
 			getSet(initial).add(initialStack);
 			return dfs(initial);
 		}

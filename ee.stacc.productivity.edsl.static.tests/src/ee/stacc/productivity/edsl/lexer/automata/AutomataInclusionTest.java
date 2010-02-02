@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import ee.stacc.productivity.edsl.lexer.sql.SQLLexer;
 import ee.stacc.productivity.edsl.sqllexer.SQLLexerData;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.parser.AbstractStringParser;
@@ -219,7 +220,7 @@ public class AutomataInclusionTest {
 		expected = new String[] {
 				"SELECT ID FROM",	
 				"SELECT NUMBER FROM",	
-				"SELECT ERROR_DIGAL FROM",	
+				"SELECT DIGAL_ERR FROM",	
 		};
 		checkAbstractStringTransduction(AbstractStringParser.parseOneFromString(abstractString), expected);
 
@@ -266,14 +267,14 @@ public class AutomataInclusionTest {
 	private void checkAbstractStringTransduction(IAbstractString str,
 			String[] expected) {
 		State init = StringToAutomatonConverter.INSTANCE.convert(str,
-				AutomataUtils.SQL_ALPHABET_CONVERTER);
+				SQLLexer.SQL_ALPHABET_CONVERTER);
 		init = AutomataDeterminator.determinate(init);
 
 		checkAutomatonTransduction(expected, init);
 	}
 
 	private void checkAutomatonTransduction(String[] expected, State init) {
-		State sqlTransducer = AutomataConverter.INSTANCE.convert();
+		State sqlTransducer = SQLLexer.SQL_TRANSDUCER;
 		State transduction = AutomataInclusion.INSTANCE.getTrasduction(
 				sqlTransducer, init);
 		transduction = EmptyTransitionEliminator.INSTANCE

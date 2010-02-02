@@ -60,7 +60,7 @@ public class TestUtil {
 		for (String expectedStr : expected) {
 			assertTrue("Not found: " + expectedStr, actual.contains(expectedStr.replaceAll(" ", "") + "EOF"));
 		}
-		assertEquals(new HashSet<String>(Arrays.asList(expected)).size(), actual.size());
+		assertEquals(actual.toString(), new HashSet<String>(Arrays.asList(expected)).size(), actual.size());
 	}
 
 }

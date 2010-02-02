@@ -4,58 +4,84 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.PrintStream;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 import ee.stacc.productivity.edsl.sqlparser.IAbstractStack;
 import ee.stacc.productivity.edsl.sqlparser.IParserState;
 import ee.stacc.productivity.edsl.sqlparser.LRParser;
 
+@RunWith(Parameterized.class)
 public class LRParsingTest {
 
+	@Parameters
+	public static Collection<Object[]> parameters() {
+		return Arrays.asList(new Object[][] {
+				{SimpleStack.FACTORY},
+				{SimpleFoldedStack.FACTORY},
+		});
+	}
+
+	private final IStackFactory stackFactory;
+	
+	public LRParsingTest(IStackFactory stackFactory) {
+		this.stackFactory = stackFactory;
+	}
+
 	@Test
-	public void test() throws Exception {
+	public void testBasics() throws Exception {
 		LRParser parser = Parsers.SQL_PARSER;
 
-		interpret(parser, SimpleFoldedStack.FACTORY, 
+		interpret(parser, stackFactory, 
 				"SELECT ID FROM ID", 
 				true);
 		
-		interpret(parser, SimpleFoldedStack.FACTORY, 
+		interpret(parser, stackFactory, 
 				"SELECT ID ',' ID ',' ID ',' ID ',' ID FROM ID", 
 				true);
 		
-		interpret(parser, SimpleFoldedStack.FACTORY, 
+		interpret(parser, stackFactory, 
 				"SELECT ID ',' ID ',' ID ',' ID ',' ID FROM ID ',' ID ',' ID", 
 				true);
 		
 		
-		interpret(parser, SimpleFoldedStack.FACTORY, 
+		interpret(parser, stackFactory, 
 				"SELECT ID '.' ID ',' ID ',' ID ',' ID ',' ID FROM ID ',' ID ',' ID", 
 				true);
 		
-		interpret(parser, SimpleFoldedStack.FACTORY, 
+		interpret(parser, stackFactory, 
 				"SELECT ID ID ',' ID ',' ID ',' ID FROM ID ',' ID ',' ID", 
 				false);
 		
-		interpret(parser, SimpleFoldedStack.FACTORY, 
+		interpret(parser, stackFactory, 
 				"SELECT FROM ID ',' ID ',' ID", 
 				false);
 		
-		interpret(parser, SimpleFoldedStack.FACTORY, 
+		interpret(parser, stackFactory, 
 				"SELECT ID '(' ')' FROM ID ',' ID ',' ID", 
 				true);
 		
-		interpret(parser, SimpleFoldedStack.FACTORY, 
+		interpret(parser, stackFactory, 
 				"SELECT ID '(' '*' ')' FROM ID ',' ID ',' ID", 
 				true);
 		
-		interpret(parser, SimpleFoldedStack.FACTORY, 
+	}
+	
+	@Test
+	public void testNestedParentheses() throws Exception {
+		LRParser parser = Parsers.SQL_PARSER;
+
+		interpret(parser, stackFactory, 
 				"SELECT ID '(' ID '(' ')' ')' FROM ID ',' ID ',' ID", 
 				true);
+
 	}
 
 	public static boolean interpret(LRParser parser, IStackFactory factory, String input,

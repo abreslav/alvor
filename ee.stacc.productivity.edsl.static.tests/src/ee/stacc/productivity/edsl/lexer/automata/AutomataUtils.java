@@ -123,17 +123,6 @@ public class AutomataUtils {
 		}
 	};
 
-	public static final IAlphabetConverter SQL_ALPHABET_CONVERTER = new IAlphabetConverter() {
-			@Override
-			public int convert(int c) {
-				if (c == -1) {
-					return c;
-				}
-				return SQLLexerData.CHAR_CLASSES[c];
-			}
-		};
-;
-	
 	public static String statesToString(Set<State> theStates, State theInitialState, 
 			ICharacterMapper inMapper, ICharacterMapper outMapper,
 			IStateRenderer renderer) {
