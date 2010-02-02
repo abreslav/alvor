@@ -18,6 +18,12 @@ public class SQLSyntaxCheckerTest {
 		assertTrue(check("\"SELECT a FROM b\""));
 	}
 
+	@Test(expected = IllegalArgumentException.class)
+	public void testLoopChecker() throws Exception {
+		check("(\"a\")+");
+		fail();
+	}
+	
 	private boolean check(String astr) {
 		return SQLSyntaxChecker.INSTANCE.check(AbstractStringParser.parseOneFromString(astr)).isEmpty();
 	}
