@@ -12,7 +12,7 @@ public class StringChoice extends AbstractStringCollection implements IAbstractS
 		super(options);
 	}
 
-	public StringChoice(List<IAbstractString> options) {
+	public StringChoice(List<? extends IAbstractString> options) {
 		super(options);
 	}
 

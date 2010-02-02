@@ -9,7 +9,7 @@ public class AbstractStringCollection {
 
 	private final List<IAbstractString> items;
 
-	public AbstractStringCollection(List<IAbstractString> options) {
+	public AbstractStringCollection(List<? extends IAbstractString> options) {
 		this.items = new ArrayList<IAbstractString>(options);
 	}
 
