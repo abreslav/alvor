@@ -21,11 +21,6 @@ Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
 %% 
 
 <YYINITIAL> {
-// "A" {/*K1*/}
-// "AA" {/*K2*/}
-// A[A0-9]+ { /*ID*/}
-// [0-9]+ {/*INT*/}
-// \  { /*WS*/}
   "VALUES" {/*VALUES*/}
   "SELECT" { /*SELECT*/ }
   "INSERT" {/*INSERT*/}
@@ -60,7 +55,7 @@ Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
   "?" { /*?*/ }
 
   {NONNEWLINE_WHITE_SPACE_CHAR}+ {/**/} 
-  {DIGIT}+{ALPHA}({DIGIT}|{ALPHA})* {/*ERROR_DIGAL*/}
+  {DIGIT}+{ALPHA}({DIGIT}|{ALPHA})* {/*DIGAL_ERR*/}
   \"{DQ_STRING_TEXT}\" {/*STRING_DQ*/}
   \"{DQ_STRING_TEXT} {/*STRING_DQ_ERR*/} 
   \'{SQ_STRING_TEXT}\' {/*STRING_SQ*/}
@@ -68,6 +63,6 @@ Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
   {DIGIT}+ { /*NUMBER*/ }  
   {Ident} { /*ID*/ }
   
-  . {/*UNKNOWN_CHARACTER*/}
+  . {/*UNKNOWN_CHARACTER_ERR*/}
   
 }
