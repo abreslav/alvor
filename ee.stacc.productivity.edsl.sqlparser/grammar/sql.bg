@@ -34,17 +34,16 @@ import java.io.IOException;
 %define parser_class_name "SQLParser"
 %token SELECT FROM ID
 %%
-
 select 
 	: SELECT whatToSelect FROM idList 
 	;
 whatToSelect
-	: idList
-	| expression
+	: expressionList
 	;
 expression
-	: ID '(' expressionList ')'
+	: ident
 	| ID '(' ')'
+	| ID '(' expressionList ')'
 	| '*'
 	;
 expressionList
