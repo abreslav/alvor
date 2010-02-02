@@ -42,6 +42,9 @@ public class SQLStringAnalyzer {
 	}
 	
 	public void validate(String sql) throws SQLException {
+		if (conn == null) {
+			return;
+		}
 		if (this.needExecute) {
 			PreparedStatement stmt = conn.prepareStatement(sql.replaceAll("where", "where 1=0 and"));
 			stmt.getMetaData();

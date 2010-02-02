@@ -1,7 +1,7 @@
 package ee.stacc.productivity.edsl.gui;
 
-import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -19,6 +19,10 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
+import ee.stacc.productivity.edsl.crawler.StringNodeDescriptor;
+import ee.stacc.productivity.edsl.lexer.sql.SQLLexicalChecker;
+import ee.stacc.productivity.edsl.main.DynamicSQLChecker;
+import ee.stacc.productivity.edsl.main.IAbstractStringChecker;
 import ee.stacc.productivity.edsl.main.ISQLErrorHandler;
 import ee.stacc.productivity.edsl.main.SQLUsageChecker;
 
@@ -32,7 +36,23 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		System.out.println("CheckProjectHandler.execute");
 		cleanMarkers(getCurrentProject());
-		projectChecker.checkProject(getCurrentProject(), this);
+		projectChecker.checkProject(getCurrentProject(), DynamicSQLChecker.INSTANCE, this);
+		projectChecker.checkProject(getCurrentProject(), new IAbstractStringChecker() {
+			
+			@Override
+			public void checkAbstractStrings(List<StringNodeDescriptor> descriptors,
+					ISQLErrorHandler errorHandler) {
+				for (StringNodeDescriptor descriptor : descriptors) {
+					List<String> errors = SQLLexicalChecker.INSTANCE.check(descriptor.getAbstractValue());
+					for (String errorMessage : errors) {
+						errorHandler.handleSQLError(errorMessage, 
+								descriptor.getFile(), 
+								descriptor.getCharStart(), 
+								descriptor.getCharLength());
+					}
+				}
+			}
+		}, this);
 		return null;
 	}
 	
@@ -87,10 +107,10 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 	}
 
 	@Override
-	public void handleSQLError(SQLException e, IFile file, int startPosition,
+	public void handleSQLError(String message, IFile file, int startPosition,
 			int length) {
 		//System.err.println(e.getMessage());
-		createMarker(e.getMessage(), ERROR_MARKER_ID, file, startPosition, 
+		createMarker(message, ERROR_MARKER_ID, file, startPosition, 
 				startPosition + length);		
 	}
 }
