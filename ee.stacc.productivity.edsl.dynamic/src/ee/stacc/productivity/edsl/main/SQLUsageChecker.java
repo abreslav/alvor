@@ -17,11 +17,13 @@ import ee.stacc.productivity.edsl.crawler.StringNodeDescriptor;
  */
 public class SQLUsageChecker {
 	
-	public void checkProject(IJavaProject project, IAbstractStringChecker checker, ISQLErrorHandler errorHandler) {
+	public void checkProject(IJavaProject project, ISQLErrorHandler errorHandler, IAbstractStringChecker... checkers) {
 		NodeSearchEngine.clearCache();
 		List<StringNodeDescriptor> descriptors = AbstractStringEvaluator.evaluateMethodArgumentAtCallSites
 			("java.sql.Connection", "prepareStatement", 1, project, 0);
 	
-		checker.checkAbstractStrings(descriptors, errorHandler);
+		for (IAbstractStringChecker checker : checkers) {
+			checker.checkAbstractStrings(descriptors, errorHandler);
+		}
 	}
 }

@@ -30,6 +30,13 @@ public class SQLLexer {
 
 	public static final State SQL_TRANSDUCER = new AutomataConverter().convert();
 
+	public static String getTokenName(int c) {
+		if (c == (char) -1) {
+			return "EOF";
+		}
+		return SQLLexerData.TOKENS[c];		
+	}
+	
 	private static class AutomataConverter {
 
 		public State convert() {

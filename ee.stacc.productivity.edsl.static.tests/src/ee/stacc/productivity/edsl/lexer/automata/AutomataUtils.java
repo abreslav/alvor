@@ -7,6 +7,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import ee.stacc.productivity.edsl.lexer.sql.SQLLexer;
 import ee.stacc.productivity.edsl.sqllexer.SQLLexerData;
 
 public class AutomataUtils {
@@ -14,10 +15,7 @@ public class AutomataUtils {
 	public static final ICharacterMapper SQL_TOKEN_MAPPER = new ICharacterMapper() {
 		@Override
 		public String map(int c) {
-			if (c == (char) -1) {
-				return "EOF";
-			}
-			return SQLLexerData.TOKENS[c];
+			return SQLLexer.getTokenName(c);
 		}
 	};
 	

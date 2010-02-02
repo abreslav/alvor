@@ -1,15 +1,13 @@
 /**
  * 
  */
-package ee.stacc.productivity.edsl.parser;
+package ee.stacc.productivity.edsl.sqlparser;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import ee.stacc.productivity.edsl.sqlparser.IAbstractStack;
-import ee.stacc.productivity.edsl.sqlparser.IParserState;
 
 public final class SimpleStack implements IAbstractStack {
 

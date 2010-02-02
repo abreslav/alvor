@@ -16,7 +16,10 @@ import org.junit.runners.Parameterized.Parameters;
 
 import ee.stacc.productivity.edsl.sqlparser.IAbstractStack;
 import ee.stacc.productivity.edsl.sqlparser.IParserState;
+import ee.stacc.productivity.edsl.sqlparser.IStackFactory;
 import ee.stacc.productivity.edsl.sqlparser.LRParser;
+import ee.stacc.productivity.edsl.sqlparser.Parsers;
+import ee.stacc.productivity.edsl.sqlparser.SimpleStack;
 
 @RunWith(Parameterized.class)
 public class LRParsingTest {

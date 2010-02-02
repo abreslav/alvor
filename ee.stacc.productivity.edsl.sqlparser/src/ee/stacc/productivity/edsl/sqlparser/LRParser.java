@@ -2,6 +2,7 @@ package ee.stacc.productivity.edsl.sqlparser;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -187,7 +188,7 @@ public class LRParser {
 		}
 	}
 
-	public static LRParser build(String xmlFile) throws JDOMException, IOException {
+	public static LRParser build(URL xmlFile) throws JDOMException, IOException {
 		final List<State> states = new ArrayList<State>();
 		final List<Rule> rules = new ArrayList<Rule>();
 		final List<Integer> symbolByToken = new ArrayList<Integer>();

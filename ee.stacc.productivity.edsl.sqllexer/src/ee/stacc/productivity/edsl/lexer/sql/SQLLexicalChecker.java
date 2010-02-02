@@ -24,8 +24,6 @@ public class SQLLexicalChecker {
 		State automaton = StringToAutomatonConverter.INSTANCE.convert(str, SQLLexer.SQL_ALPHABET_CONVERTER);
 
 		State transduction = AutomataInclusion.INSTANCE.getTrasduction(sqlTransducer, automaton);
-//		transduction = EmptyTransitionEliminator.INSTANCE.eliminateEmptySetTransitions(transduction);
-//		transduction = AutomataDeterminator.determinate(transduction);
 		
 		Collection<String> errorTokens = new ArrayList<String>();
 		findErrorTokens(transduction, new HashSet<Transition>(), errorTokens);

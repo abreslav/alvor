@@ -1,6 +1,7 @@
 package ee.stacc.productivity.edsl.sqlparser;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 
@@ -12,7 +13,7 @@ import org.jdom.input.SAXBuilder;
 public class LRParserLoader {
 
 	@SuppressWarnings("unchecked")
-	public static void load(String fileName, ILRParserBuilder builder) throws JDOMException, IOException {
+	public static void load(URL fileName, ILRParserBuilder builder) throws JDOMException, IOException {
 		Document document = new SAXBuilder().build(fileName);
 		Element root = document.getRootElement();
 		Element grammar = root.getChild("grammar");

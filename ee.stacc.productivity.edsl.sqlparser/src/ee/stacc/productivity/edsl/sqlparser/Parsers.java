@@ -1,10 +1,9 @@
-package ee.stacc.productivity.edsl.parser;
+package ee.stacc.productivity.edsl.sqlparser;
 
 import java.io.IOException;
 
 import org.jdom.JDOMException;
 
-import ee.stacc.productivity.edsl.sqlparser.LRParser;
 
 public class Parsers {
 
@@ -13,8 +12,8 @@ public class Parsers {
 	
 	static {
 		try {
-			ARITH_PARSER = LRParser.build("../ee.stacc.productivity.edsl.sqlparser/generated/arith.xml");
-			SQL_PARSER = LRParser.build("../ee.stacc.productivity.edsl.sqlparser/generated/sql.xml");
+			ARITH_PARSER = LRParser.build(Parsers.class.getClassLoader().getResource("arith.xml"));
+			SQL_PARSER = LRParser.build(Parsers.class.getClassLoader().getResource("sql.xml"));
 		} catch (JDOMException e) {
 			throw new IllegalStateException(e);
 		} catch (IOException e) {

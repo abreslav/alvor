@@ -32,7 +32,36 @@ import java.io.IOException;
 	}
 }
 %define parser_class_name "SQLParser"
-%token SELECT FROM ID
+
+%token VALUES
+%token SELECT
+%token INSERT
+%token WHERE
+%token ORDER
+%token GROUP
+%token RIGHT
+%token INNER
+%token FROM
+%token JOIN
+%token LEFT
+%token INTO
+%token AND
+%token XOR
+%token NOT
+%token OR
+%token ON
+%token BY
+%token AS
+%token IN
+%token DIGAL_ERR
+%token STRING_DQ
+%token STRING_DQ_ERR 
+%token STRING_SQ
+%token STRING_SQ_ERR 
+%token NUMBER  
+%token ID
+%token UNKNOWN_CHARACTER_ERR
+
 %%
 select 
 	: SELECT whatToSelect FROM idList 

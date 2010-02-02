@@ -1,7 +1,6 @@
 package ee.stacc.productivity.edsl.gui;
 
 import java.util.HashMap;
-import java.util.List;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -19,10 +18,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
-import ee.stacc.productivity.edsl.crawler.StringNodeDescriptor;
-import ee.stacc.productivity.edsl.lexer.sql.SQLLexicalChecker;
 import ee.stacc.productivity.edsl.main.DynamicSQLChecker;
-import ee.stacc.productivity.edsl.main.IAbstractStringChecker;
 import ee.stacc.productivity.edsl.main.ISQLErrorHandler;
 import ee.stacc.productivity.edsl.main.SQLUsageChecker;
 
@@ -36,23 +32,15 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		System.out.println("CheckProjectHandler.execute");
 		cleanMarkers(getCurrentProject());
-		projectChecker.checkProject(getCurrentProject(), new IAbstractStringChecker() {
-			
-			@Override
-			public void checkAbstractStrings(List<StringNodeDescriptor> descriptors,
-					ISQLErrorHandler errorHandler) {
-				for (StringNodeDescriptor descriptor : descriptors) {
-					List<String> errors = SQLLexicalChecker.INSTANCE.check(descriptor.getAbstractValue());
-					for (String errorMessage : errors) {
-						errorHandler.handleSQLError(errorMessage, 
-								descriptor.getFile(), 
-								descriptor.getCharStart(), 
-								descriptor.getCharLength());
-					}
-				}
-			}
-		}, this);
-		projectChecker.checkProject(getCurrentProject(), DynamicSQLChecker.INSTANCE, this);
+		try {
+			projectChecker.checkProject(getCurrentProject(), this, 
+				StaticSQLChecker.SQL_LEXICAL_CHECKER,
+				StaticSQLChecker.SQL_SYNTAX_CHECKER, 
+				DynamicSQLChecker.INSTANCE);
+		} catch (Throwable e) {
+			e.printStackTrace();
+			throw new ExecutionException("Error during checking: " + e.getMessage(), e);
+		}
 		return null;
 	}
 	
