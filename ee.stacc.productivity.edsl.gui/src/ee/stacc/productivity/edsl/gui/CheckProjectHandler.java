@@ -36,7 +36,6 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		System.out.println("CheckProjectHandler.execute");
 		cleanMarkers(getCurrentProject());
-		projectChecker.checkProject(getCurrentProject(), DynamicSQLChecker.INSTANCE, this);
 		projectChecker.checkProject(getCurrentProject(), new IAbstractStringChecker() {
 			
 			@Override
@@ -53,6 +52,7 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 				}
 			}
 		}, this);
+		projectChecker.checkProject(getCurrentProject(), DynamicSQLChecker.INSTANCE, this);
 		return null;
 	}
 	
