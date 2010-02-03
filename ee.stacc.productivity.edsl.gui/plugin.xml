@@ -64,6 +64,46 @@
          </with>
       </definition>
    </extension>
+   
+   <extension
+         id="sqlhotspot"
+         name="SQL hot spot marker"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+      <persistent value="true"/>
+    </extension>
+    
+	<extension 
+         point="org.eclipse.ui.editors.annotationTypes">
+         <type
+             name="sqlhotspot"
+             super="org.eclipse.ui.workbench.texteditor.info"
+             markerType="ee.stacc.productivity.edsl.gui.sqlhotspot">
+         </type>
+   </extension>
 
+   <extension
+         point="org.eclipse.ui.editors.markerAnnotationSpecification">
+         <specification
+             annotationType="sqlhotspot"
+             verticalRulerPreferenceKey="highlight.rulers.vertical"
+             textPreferenceKey="highlight.text"
+            colorPreferenceKey="highlight.color"
+            highlightPreferenceKey="highlight.background"
+            textPreferenceValue="true"
+            textStylePreferenceValue="BOX"
+            overviewRulerPreferenceKey="highlight.rulers.overview"
+            presentationLayer="4"
+            highlightPreferenceValue="true"
+            label="sqlhotspot"
+            symbolicIcon="warning"
+            colorPreferenceValue="128,255,0"
+            verticalRulerPreferenceValue="true"
+            overviewRulerPreferenceValue="true"
+            textStylePreferenceKey="highlight.text.style" >
+        </specification >
+    </extension>
 
 </plugin>

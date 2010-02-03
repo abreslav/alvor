@@ -1,8 +1,11 @@
 package ee.stacc.productivity.edsl.crawler;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -35,30 +38,46 @@ import org.eclipse.jdt.core.search.SearchRequestor;
  *
  */
 public class NodeSearchEngine {
-	private static Hashtable<ICompilationUnit, ASTNode> astCache = 
-		new Hashtable<ICompilationUnit, ASTNode>();
+	
+	private static Map<ICompilationUnit, ASTNode> astCache = 
+		new HashMap<ICompilationUnit, ASTNode>();
 	private static IJavaElement[] scopeElems = {null};
 	
 	public static void clearCache() {
 		astCache.clear();
 	}
 	
-	static public List<NodeDescriptor> findArgumentNodes(
-			final String typeName, final String methodName, 
-			final int argNo, IJavaElement searchScope) {
+	public static List<NodeDescriptor> findArgumentNodes(IJavaElement searchScope, final Collection<NodeRequest> requests) {
+		// No requests -- no results
+		if (requests.isEmpty()) {
+			return Collections.emptyList();
+		}
 		
 		final List<NodeDescriptor> result = new ArrayList<NodeDescriptor>();
-		
-		// FIXME temporary, to speed up a bit
+
+		// FIXME temporary, to speed up a bit -- must not be a problem any more
 		/*
 		if (methodName.equals("get")) {
 			return new ArrayList<NodeSearchResult>();
 		}
 		*/
 		
-		SearchPattern pattern = SearchPattern.createPattern(methodName, 
-				IJavaSearchConstants.METHOD, IJavaSearchConstants.REFERENCES, 
-				SearchPattern.R_EXACT_MATCH);
+		// Create one big pattern from all the requests
+		// NB: This is likely to be faster than searching for each request separately,
+		//     but we have to confirm this by and experiment
+		SearchPattern pattern = null;
+		for (NodeRequest nodeRequest : requests) {
+			SearchPattern subPattern = SearchPattern.createPattern(nodeRequest.getPatternString(), 
+					IJavaSearchConstants.METHOD, IJavaSearchConstants.REFERENCES, 
+					SearchPattern.R_ERASURE_MATCH | SearchPattern.R_CASE_SENSITIVE);
+			if (pattern == null) {
+				pattern = subPattern;
+			} else {
+				pattern = SearchPattern.createOrPattern(pattern, subPattern);
+			}
+		}
+		System.out.println(pattern);
+		
 		scopeElems[0] = searchScope;
 		IJavaElement[] elems = {searchScope};
 		IJavaSearchScope scope = SearchEngine.createJavaSearchScope(elems);
@@ -66,9 +85,11 @@ public class NodeSearchEngine {
 		
 		SearchRequestor requestor = new SearchRequestor() {
 			public void acceptSearchMatch(SearchMatch match) {
+				// TODO: Should not be needed -- we look only for methods
 				if (! (match.getElement() instanceof IMethod)) {
 					return;
 				}
+				
 				ASTNode node = getASTNode(match);
 				
 				if (! (node instanceof MethodInvocation)) {
@@ -79,37 +100,57 @@ public class NodeSearchEngine {
 				MethodInvocation invoc = (MethodInvocation)node;
 				IMethodBinding methodBinding = invoc.resolveMethodBinding();
 				
-				// TODO: check that object has that type
+				// TODO: check that object has that type -- not needed, the type is in the patterns
 				
 				if (methodBinding == null || methodBinding.getDeclaringClass() == null) {
 					System.err.println("TODO: crawler methodBinding.getDeclaringClass() == null");
 					return;
 				}
 				
-				if (!methodBinding.getDeclaringClass().getQualifiedName().equals(typeName)
-						&& /* FIXME */ !"prepareStatement".equals(methodName)) {
+				// Find a request corresponding to the current match
+				// TODO: Bad assumption: only one argument for each method
+				int requestedArgumentIndex = -1;
+				for (NodeRequest request : requests) {
+						String signature =
+							methodBinding.getDeclaringClass().getQualifiedName()
+							+ "." + 
+							methodBinding.getMethodDeclaration().getName();
+						if (request.signatureMatches(signature)) {
+							requestedArgumentIndex = request.getArgumentIndex();
+							break;
+						}
+				}
+				
+				if (requestedArgumentIndex < 0) {
+					System.err.println("No matching request found for method: " + methodBinding);
+					return;
+				}
+				
+// This code should not be needed: everything is encoded in the pattern				
+//				if (!methodBinding.getDeclaringClass().getQualifiedName().equals(typeName)
+//						&& /* FIXME */ !"prepareStatement".equals(methodName)) {
 					/*
 					System.out.println("Wrong match, want: " + typeName + "." + methodName
 							+ ", was: " + methodBinding.getDeclaringClass().getQualifiedName()
 							+ "." + methodBinding.getName());
 					*/
-					return;
-				}
+//					return;
+//				}
 				
-				// TODO overloading may complicate things
-				if (invoc.arguments().size() < argNo) {
-					throw new UnsupportedStringOpEx("can't find required argument (" + argNo + "), method="
+				// TODO overloading may complicate things -- no, patterns support complete signatures
+				if (invoc.arguments().size() < requestedArgumentIndex) {
+					throw new UnsupportedStringOpEx("can't find required argument (" + requestedArgumentIndex + "), method="
 							+ methodBinding.getDeclaringClass().getQualifiedName()
 							+ "." + methodBinding.getName());
 				}
 				
-				ASTNode arg = (ASTNode) invoc.arguments().get(argNo-1);
+				ASTNode arg = (ASTNode) invoc.arguments().get(requestedArgumentIndex - 1);
 				if (arg instanceof Expression) {
 					result.add(new NodeDescriptor((Expression)arg, 
 							(IFile)match.getResource(), 
 							getNodeLineNumber(match, arg),
-							match.getOffset(),
-							match.getLength()));
+							arg.getStartPosition(),
+							arg.getLength()));
 				}
 			}
 		};
@@ -175,6 +216,10 @@ public class NodeSearchEngine {
 	
 	private static ASTNode getASTNode(SearchMatch match) {
 		ICompilationUnit cUnit = getCompilationUnit(match);
+		
+		if (cUnit == null) {
+			System.err.println("Compilation unit is null for the match: " + match.getElement());
+		}
 		assert cUnit != null;
 		
 		ASTNode ast = astCache.get(cUnit);

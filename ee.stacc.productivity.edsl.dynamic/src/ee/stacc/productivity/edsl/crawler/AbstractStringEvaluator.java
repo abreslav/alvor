@@ -1,8 +1,11 @@
 package ee.stacc.productivity.edsl.crawler;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -16,17 +19,17 @@ import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.ReturnStatement;
-import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
-import org.eclipse.jdt.core.dom.ThisExpression;
-import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
+import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
+import org.eclipse.jdt.core.dom.ThisExpression;
+import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
@@ -44,7 +47,7 @@ public class AbstractStringEvaluator {
 	
 	private int level;
 	private MethodInvocation invocationContext;
-	private IJavaProject scope;
+	private IJavaElement scope;
 	
 	public static IAbstractString evaluateExpression(Expression node) {
 		AbstractStringEvaluator evaluator = 
@@ -53,7 +56,7 @@ public class AbstractStringEvaluator {
 	}
 	
 	private AbstractStringEvaluator(int level, MethodInvocation invocationContext,
-			IJavaProject scope) {
+			IJavaElement scope) {
 		
 		if (level > maxLevel) {
 			throw new UnsupportedStringOpEx("Analysis level (" + level + ") too deep");
@@ -364,8 +367,8 @@ public class AbstractStringEvaluator {
 	}
 	
 	public static List<StringNodeDescriptor> evaluateMethodArgumentAtCallSites
-			(String className, String methodName, int paramIndex,
-					IJavaProject scope, int level) {
+			(Collection<NodeRequest> requests,
+					IJavaElement scope, int level) {
 		String levelPrefix = "";
 		for (int i = 0; i < level; i++) {
 			levelPrefix += "    ";
@@ -376,12 +379,14 @@ public class AbstractStringEvaluator {
 			new AbstractStringEvaluator(level, null, scope);
 		
 		System.out.println(levelPrefix + "###########################################");
-		System.out.println(levelPrefix + "searching: " + className + "." + methodName
-				+ "(" + paramIndex + ")");	
+		System.out.println(levelPrefix + "searching: ");
+		for (NodeRequest nodeRequest : requests) {
+			System.out.println(nodeRequest);
+		}
 		
 		// find value from all call-sites
 		List<NodeDescriptor> argumentNodes = NodeSearchEngine.findArgumentNodes
-			(className, methodName, paramIndex, scope);
+			(scope, requests);
 		
 		List<StringNodeDescriptor> result = new ArrayList<StringNodeDescriptor>();
 		for (NodeDescriptor sr: argumentNodes) {
@@ -428,9 +433,13 @@ public class AbstractStringEvaluator {
 				}
 				else {
 					List<StringNodeDescriptor> descList = 
-						AbstractStringEvaluator.evaluateMethodArgumentAtCallSites
-						(getMethodClassName(method), method.getName().toString(), 
-						paramIndex,	this.scope, this.level+1);
+						AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(
+								Collections.singleton(
+										new NodeRequest(
+												getMethodClassName(method), 
+												method.getName().toString(),
+												paramIndex)), 
+							this.scope, this.level + 1);
 					
 					List<IAbstractString> choices = new ArrayList<IAbstractString>();
 					for (StringNodeDescriptor choiceDesc: descList) {
