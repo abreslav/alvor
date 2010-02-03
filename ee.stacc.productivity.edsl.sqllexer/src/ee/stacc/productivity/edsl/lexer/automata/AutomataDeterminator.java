@@ -11,22 +11,45 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 public class AutomataDeterminator {
-	private final Map<State, Set<State>> singletons = new HashMap<State, Set<State>>();
-	private final Map<Set<State>, Map<Integer, Set<State>>> newTransitions = new HashMap<Set<State>, Map<Integer,Set<State>>>();
-	// Sets that have been offered to the queue
-	private final Map<Set<State>, State> visited = new HashMap<Set<State>, State>();
-	private final Queue<Set<State>> queue = new LinkedList<Set<State>>();
+	
+	public interface IStateSetPredicate {
+		boolean accept(Set<State> states);
+	}
+	
+	public static final IStateSetPredicate NONE = new IStateSetPredicate() {
+		@Override
+		public boolean accept(Set<State> states) {
+			return false;
+		}
+	};
 	
 	/**
 	 * @param initial an \epsilon-free automaton
 	 * @return an initial state of an equivalent deterministic automaton
 	 */
 	public static State determinate(State initial) {
-		return new AutomataDeterminator().doDeterminate(initial);
+		return new AutomataDeterminator(NONE, null).doDeterminate(initial);
+	}
+
+	public static State determinate(State initial, IStateSetPredicate predicate, Set<State> result) {
+		return new AutomataDeterminator(predicate, result).doDeterminate(initial);
 	}
 	
-	private AutomataDeterminator() {}
+	private final Map<State, Set<State>> singletons = new HashMap<State, Set<State>>();
+	private final Map<Set<State>, Map<Integer, Set<State>>> newTransitions = new HashMap<Set<State>, Map<Integer,Set<State>>>();
+	// Sets that have been offered to the queue
+	private final Map<Set<State>, State> visited = new HashMap<Set<State>, State>();
+	private final Queue<Set<State>> queue = new LinkedList<Set<State>>();
 	
+	private final IStateSetPredicate predicate;
+	private final Set<State> selectedByPredicate;
+	
+	public AutomataDeterminator(IStateSetPredicate predicate,
+			Set<State> selectedByPredicate) {
+		this.predicate = predicate;
+		this.selectedByPredicate = selectedByPredicate;
+	}
+
 	private State doDeterminate(State initial) {
 		
 		Set<State> newInitial = Collections.singleton(initial);
@@ -132,7 +155,11 @@ public class AutomataDeterminator {
 		if (visited.containsKey(newState)) {
 			return;
 		}
-		visited.put(newState, new State(newState.toString(), accepting(newState)));
+		State newStateObject = new State(newState.toString(), accepting(newState));
+		visited.put(newState, newStateObject);
+		if (predicate.accept(newState)) {
+			selectedByPredicate.add(newStateObject);
+		}
 		queue.offer(newState);
 	}
 
@@ -148,7 +175,7 @@ public class AutomataDeterminator {
 	/**
 	 * This operation changes the passed automaton
 	 */
-	public static State determinateWithPriorities(State initial) {
+	public static void determinateWithPriorities(State initial) {
 		Set<State> states = new HashSet<State>();
 		EmptyTransitionEliminator.INSTANCE.dfs(initial, states);
 		Set<Integer> usedIns = new HashSet<Integer>();
@@ -165,7 +192,6 @@ public class AutomataDeterminator {
 				}
 			}
 		}
-		return initial;
 	}
 	
 }

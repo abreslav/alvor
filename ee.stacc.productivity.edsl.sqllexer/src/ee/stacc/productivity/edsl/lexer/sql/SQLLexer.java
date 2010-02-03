@@ -93,7 +93,8 @@ public class SQLLexer {
 				}
 			}
 			
-			return AutomataDeterminator.determinateWithPriorities(initialState);
+			AutomataDeterminator.determinateWithPriorities(initialState);
+			return initialState;
 		}
 		
 		private boolean isAccepting(int state) {
