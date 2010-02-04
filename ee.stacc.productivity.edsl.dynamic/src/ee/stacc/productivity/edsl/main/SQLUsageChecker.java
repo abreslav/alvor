@@ -43,6 +43,8 @@ public class SQLUsageChecker {
 				new NodeRequest("org.springframework.jdbc.core.simple.SimpleJdbcTemplate", "query", 1)
 				,
 				new NodeRequest("java.sql.Connection", "prepareStatement", 1)
+				,
+				new NodeRequest("org.araneaframework.backend.list.helper.ListSqlHelper", "setSqlQuery", 1)
 			), scope, 0);
 		return descriptors;
 	}
