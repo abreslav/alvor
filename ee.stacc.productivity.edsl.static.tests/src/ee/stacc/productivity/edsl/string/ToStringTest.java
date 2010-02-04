@@ -17,5 +17,7 @@ public class ToStringTest {
 			)
 		).toString();
 		assertEquals("\"\\\"asdas\" {[fdsa\\][], (\"\")+} ", string);
+		
+		assertEquals("\"\\\" \\n \\r\"", new StringConstant("\" \n \r").toString());
 	}
 }
