@@ -14,7 +14,13 @@ public class StringConstant implements IAbstractString {
 		if (constant.length() == 0) {
 			return "\"\"";
 		} else {
-			return "\"" + constant.replaceAll("\\\"", "\\\\\\\"") + "\"";
+			return "\"" + 
+				constant
+					.replaceAll("\\\\", "\\\\\\\\") // \ -> \\
+					.replaceAll("\\\"", "\\\\\\\"") // " -> \"
+					.replaceAll("\n", "\\\\n") // NL -> \n
+					.replaceAll("\r", "\\\\r") // CR -> \n
+				+ "\"";
 		}
 	}
 
