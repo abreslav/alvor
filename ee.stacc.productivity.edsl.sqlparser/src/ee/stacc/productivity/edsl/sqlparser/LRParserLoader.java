@@ -106,9 +106,9 @@ public class LRParserLoader {
 				throw new UnsupportedOperationException("Errors are not supported");
 			}
 			
-			if (state.getChild("solved-conflicts").getChildren().size() > 0) {
-				throw new UnsupportedOperationException("Conflicts are not supported");
-			}
+//			if (state.getChild("solved-conflicts").getChildren().size() > 0) {
+//				throw new UnsupportedOperationException("Conflicts are not supported");
+//			}
 		}
 		
 	}

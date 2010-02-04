@@ -38,14 +38,23 @@ import java.io.IOException;
 %token INSERT
 %token WHERE
 %token ORDER
+%token OUTER
 %token GROUP
 %token RIGHT
 %token INNER
 %token FROM
 %token JOIN
 %token LEFT
+%token WHEN
+%token THEN
+%token ELSE
+%token CASE
 %token INTO
+%token FULL
+%token DESC
+%token ASC
 %token AND
+%token END
 %token XOR
 %token NOT
 %token OR
@@ -53,6 +62,8 @@ import java.io.IOException;
 %token BY
 %token AS
 %token IN
+%token IS
+%token NULL
 %token DIGAL_ERR
 %token STRING_DQ
 %token STRING_DQ_ERR 
@@ -60,31 +71,151 @@ import java.io.IOException;
 %token STRING_SQ_ERR 
 %token NUMBER  
 %token ID
+%token DISTINCT
 %token UNKNOWN_CHARACTER_ERR
+%token NE
+%token LE
+%token GE
+%token CONCAT
+%token TABLE
+
+%left OR
+%left AND
+%right NOT
+%left '=' NE LE GE '>' '<'
+%left '-' '+'
+%left '/' '*' CONCAT
 
 %%
 select 
-	: SELECT whatToSelect FROM idList 
+	: basicSelect where orderBy
+	;
+basicSelect
+	: SELECT optDist whatToSelect FROM tableList
+	;
+where
+	: WHERE whereCond
+	| /*empty*/
+	;
+orderBy
+	: ORDER BY directionList 
+	| /*empty*/
+	;
+directionList
+	: direction
+	| direction ',' directionList
+	;
+direction
+	: simpleExpr orderDirection
+	;
+orderDirection
+	: ASC
+	| DESC
+	| /*empty*/
+	;
+optDist
+	: DISTINCT
+	| /*empty*/
 	;
 whatToSelect
-	: expressionList
+	: selectExpressionList
+	;
+selectExpression
+	: expression
+	| expression AS ID
 	;
 expression
+	: condition
+	| simpleExpr
+	;
+selectExpressionList
+	: selectExpression
+	| selectExpression ',' selectExpressionList
+	;
+tableList 
+	: table
+	| table ',' tableList 
+	;
+table
+	: alias
+	| table join alias ON condition
+	;
+join
+	: /*empty*/ JOIN
+	| outerType OUTER JOIN
+	| INNER JOIN
+	;
+outerType
+	: LEFT
+	| RIGHT
+	| FULL
+	;
+alias
+	: tableExpr
+	| tableExpr ID
+	; 
+tableExpr
 	: ident
-	| ID '(' ')'
-	| ID '(' expressionList ')'
-	| '*'
-	;
-expressionList
-	: expression
-	| expression ',' expressionList
-	;
-idList 
-	: ident 
-	| ident ',' idList 
+	| TABLE '(' simpleExpr ')'
+	| '(' select ')'
 	;
 ident 
 	: ID 
 	| ID '.' ID
-//	| ID ID 
+	;
+whereCond
+	: condition;
+condition
+	: condition AND condition
+	| condition OR condition
+	| NOT condition
+	| '(' condition ')'
+	| simpleExpr comparisonOperation simpleExpr
+	| simpleExpr inExpr '(' simExList ')'
+	| simpleExpr inExpr '(' select ')'
+	| simpleExpr IS optNot NULL
+	;
+inExpr
+	: optNot IN
+	;
+optNot
+	: NOT
+	| /*empty*/
+	;
+comparisonOperation 
+	: '=' | '>' | '<' | LE | NE | GE 
+    ;
+simpleExpr
+	: NUMBER
+	| CASE whenList else END
+	| STRING_SQ
+	| ident identRest
+	| '(' simpleExpr ')'
+	| simpleExpr '+' simpleExpr
+	| simpleExpr '-' simpleExpr
+	| simpleExpr '*' simpleExpr
+	| simpleExpr '/' simpleExpr
+	| simpleExpr CONCAT simpleExpr
+	| '(' select ')'
+	| '*'
+	| '?'
+	;	
+whenList
+	: when
+	| when whenList
+	;
+when
+	: WHEN condition THEN simpleExpr
+	;
+else
+	: ELSE simpleExpr
+	| /*empty*/
+	;
+identRest
+	: '(' simExList ')'
+	| /*empty*/
+	;
+simExList
+	: simpleExpr
+	| simpleExpr ',' simExList
 	;

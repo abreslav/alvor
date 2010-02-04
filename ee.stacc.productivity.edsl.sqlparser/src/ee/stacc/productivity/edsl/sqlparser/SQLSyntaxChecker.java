@@ -73,7 +73,11 @@ public class SQLSyntaxChecker {
 				if (Character.isLetter(tokenName.charAt(0))) {
 					return parser.getNamesToTokenNumbers().get(tokenName);
 				}
-				return parser.getNamesToTokenNumbers().get("'" + tokenName + "'");
+				Integer tokenNumber = parser.getNamesToTokenNumbers().get("'" + tokenName + "'");
+				if (tokenNumber == null) {
+					throw new IllegalArgumentException("Unknown token: " + tokenName);
+				}
+				return tokenNumber;
 			}
 		};
 		FixpointParser fixpointParser = new FixpointParser(parser, converter, SimpleStackSet.FACTORY, stackFactory, eofTokenIndex);
