@@ -32,15 +32,15 @@ public class AutomataConverterTest {
 		assertEquals(expected, output.toString().trim());
 
 		
-		input = "'sad\"fsa'   \"sadf a asd f' adsfsdf \"   sdfasd";
-		expected = "STRING_SQ  STRING_DQ  ID EOF";
+		input = "'sad\"fsa' ''  'sadf a asd f'' adsfsdf'   sdfasd";
+		expected = "STRING_SQ  STRING_SQ  STRING_SQ  ID EOF";
 		
 		output = interpret(initial, input);
 		assertEquals(expected, output.toString().trim());
 		
 		
 		input = "'sad\"fsa'   \"sadf a asd f' adsfsdf    sdfasd";
-		expected = "STRING_SQ  STRING_DQ_ERR EOF";
+		expected = "STRING_SQ  UNKNOWN_CHARACTER_ERR ID  ID  ID  ID STRING_SQ_ERR EOF";
 		
 		output = interpret(initial, input);
 		assertEquals(expected, output.toString().trim());
@@ -67,9 +67,9 @@ public class AutomataConverterTest {
 		for (int i = 0; i <= input.length(); i++) {
 			int inChar = (i < input.length()) ? input.charAt(i) : -1;
 			int c = inChar < 0 ? inChar : SQLLexerData.CHAR_CLASSES[inChar];
-			if (c == 0) {
-				throw new IllegalArgumentException("Illegal character: '" + ((char) inChar) + "'");
-			}
+//			if (c == 0) {
+//				throw new IllegalArgumentException("Illegal character: '" + ((char) inChar) + "'");
+//			}
 			boolean worked = false;
 			for (Transition transition : current.getOutgoingTransitions()) {
 				if (!transition.isEmpty() && transition.getInChar() == c) {
