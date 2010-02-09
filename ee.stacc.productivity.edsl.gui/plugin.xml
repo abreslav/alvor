@@ -98,7 +98,6 @@
             presentationLayer="4"
             highlightPreferenceValue="true"
             label="sqlhotspot"
-            symbolicIcon="warning"
             colorPreferenceValue="128,255,0"
             verticalRulerPreferenceValue="true"
             overviewRulerPreferenceValue="true"

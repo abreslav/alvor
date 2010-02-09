@@ -86,7 +86,7 @@ public class SQLSyntaxChecker {
 		});
 		boolean parseResult = fixpointParser.parse(transduction);
 		if (!parseResult && errors.isEmpty()) {
-			errors.add("SQL syntax error");
+			errors.add("SQL syntax error. Most likely unfinished query");
 		}
 		return errors;
 	}

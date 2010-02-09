@@ -4,3 +4,4 @@
 "select ref_invoice, failed_attempts from " {} " where " 
 "select id, cost_objective, cost_objective_dimension_code, cost_objective_dimension_name, ref_invoice_item, order_id " "from journal_entry where " 
 "select id, ref_invoice_sum_group, ref_invoice_item, add_code, add_content, add_rate, " "add_sum, invoice from addition where " 
+"select code, name from dimension_data where code in " {} 
