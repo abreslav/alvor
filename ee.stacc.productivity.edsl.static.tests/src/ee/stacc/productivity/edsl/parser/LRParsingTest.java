@@ -15,7 +15,6 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import ee.stacc.productivity.edsl.sqlparser.IAbstractStack;
-import ee.stacc.productivity.edsl.sqlparser.IParserState;
 import ee.stacc.productivity.edsl.sqlparser.IStackFactory;
 import ee.stacc.productivity.edsl.sqlparser.LRParser;
 import ee.stacc.productivity.edsl.sqlparser.Parsers;
@@ -61,7 +60,7 @@ public class LRParsingTest {
 		
 		interpret(parser, stackFactory, 
 				"SELECT ID ID ',' ID ',' ID ',' ID FROM ID ',' ID ',' ID", 
-				false);
+				true);
 		
 		interpret(parser, stackFactory, 
 				"SELECT FROM ID ',' ID ',' ID", 
@@ -109,7 +108,7 @@ public class LRParsingTest {
 	private static boolean followParsingTrace(LRParser parser, IAbstractStack stack, List<String> tokens, String trace, boolean expected, PrintStream out) {
 		trace += stack;
 		if (tokens.isEmpty()) {
-			if ((stack.top() == IParserState.ERROR) == expected) {
+			if ((stack.top().isError()) == expected) {
 				out.println(trace);
 				return !expected;
 			}

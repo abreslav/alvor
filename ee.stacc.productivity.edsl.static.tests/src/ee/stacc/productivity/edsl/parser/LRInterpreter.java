@@ -5,6 +5,7 @@ import java.io.PrintStream;
 import java.util.Map;
 import java.util.Set;
 
+import ee.stacc.productivity.edsl.sqlparser.ErrorState;
 import ee.stacc.productivity.edsl.sqlparser.IAbstractStack;
 import ee.stacc.productivity.edsl.sqlparser.IParserState;
 import ee.stacc.productivity.edsl.sqlparser.IStackFactory;
@@ -13,7 +14,7 @@ import ee.stacc.productivity.edsl.sqlparser.LRParser;
 public class LRInterpreter {
 
 	public static IParserState interpret(LRParser parser, IStackFactory factory, String input,
-			IParserState expectedState) {
+			boolean expectingAccept) {
 		Map<String, Integer> namesToTokenNumbers = parser.getNamesToTokenNumbers();
 		ByteArrayOutputStream traceData = new ByteArrayOutputStream();
 		PrintStream trace = new PrintStream(traceData);
@@ -43,8 +44,10 @@ public class LRInterpreter {
 			trace.println();
 		}
 		IParserState top = stack.top();
-		if (top != expectedState) {
+		if (expectingAccept && top.isError()) {
+			int unexpectedSymbol = ((ErrorState) top).getUnexpectedSymbol();
 			System.out.println(traceData.toString());
+			System.out.println(parser.getSymbolNumbersToNames().get(unexpectedSymbol));
 		}
 		return top;
 	}

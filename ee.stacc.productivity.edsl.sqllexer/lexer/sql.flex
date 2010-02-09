@@ -23,21 +23,23 @@ Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
 <YYINITIAL> {
   "DISTINCT" {/*DISTINCT*/}
   "VALUES" {/*VALUES*/}
-  "SELECT" { /*SELECT*/ }
+  "SELECT" {/*SELECT*/}
   "INSERT" {/*INSERT*/}
-  "WHERE" { /*WHERE*/ }
-  "TABLE" { /*TABLE*/ }
+  "ESCAPE" {/*ESCAPE*/}
+  "WHERE" {/*WHERE*/}
+  "TABLE" {/*TABLE*/}
   "ORDER" {/*ORDER*/}
   "GROUP" {/*GROUP*/}
   "RIGHT" {/*RIGHT*/}
   "INNER" {/*INNER*/}
   "OUTER" {/*OUTER*/}
-  "FROM" { /*FROM*/ }
-  "WHEN" { /*WHEN*/ }
-  "THEN" { /*THEN*/ }
-  "CASE" { /*CASE*/ }
-  "ELSE" { /*ELSE*/ }
-  "DESC" { /*DESC*/ }
+  "FROM" {/*FROM*/}
+  "WHEN" {/*WHEN*/}
+  "THEN" {/*THEN*/}
+  "CASE" {/*CASE*/}
+  "ELSE" {/*ELSE*/}
+  "DESC" {/*DESC*/}
+  "LIKE" {/*LIKE*/}
   "JOIN" {/*JOIN*/}
   "LEFT" {/*LEFT*/}
   "NULL" {/*NULL*/}
@@ -51,12 +53,12 @@ Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
   "OR" {/*OR*/}
   "ON" {/*ON*/}
   "BY" {/*BY*/}
-  "AS" { /*AS*/ }
-  "IN" { /*IN*/ }
-  "IS" { /*IS*/ }
+  "AS" {/*AS*/}
+  "IN" {/*IN*/}
+  "IS" {/*IS*/}
   "<>" {/*NE*/}
-  "<=" { /*LE*/ }
-  ">=" { /*GE*/ }
+  "<=" {/*LE*/}
+  ">=" {/*GE*/}
   "!=" {/*NE*/}
   "||" {/*CONCAT*/}
   "," {/*,*/}
@@ -67,10 +69,10 @@ Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
   "-" {/*-*/}
   "*" {/***/}
   "/" {/*/*/}
-  "=" { /*=*/ }
-  "<" { /*<*/ }
-  ">" { /*>*/ }
-  "?" { /*?*/ }
+  "=" {/*=*/}
+  "<" {/*<*/}
+  ">" {/*>*/}
+  "?" {/*?*/}
 
   {NONNEWLINE_WHITE_SPACE_CHAR}+ {/**/} 
   {DIGIT}+{ALPHA}({DIGIT}|{ALPHA})* {/*DIGAL_ERR*/}

@@ -101,7 +101,7 @@ public class FixpointParsingTest {
 		
 		
 		abstractString = "\"SELECT asd asd FROM asd\"";
-		assertFalse(parseAbstractString(abstractString));
+		assertTrue(parseAbstractString(abstractString));
 		
 		
 		abstractString = "\"asd FROM asd\"";
@@ -152,7 +152,7 @@ public class FixpointParsingTest {
 		assertTrue(parseAbstractString(abstractString));
 		
 		
-		abstractString = "\"SELECT asd\" (\", dsd \")+ \"sd FROM asd, sdf\"";
+		abstractString = "\"SELECT asd\" (\", dsd \")+ \"IN FROM asd, sdf\"";
 		assertFalse(parseAbstractString(abstractString));
 		
 	}

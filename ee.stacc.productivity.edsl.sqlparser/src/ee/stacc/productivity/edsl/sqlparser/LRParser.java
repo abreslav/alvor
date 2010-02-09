@@ -12,12 +12,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import org.jdom.JDOMException;
 
 public class LRParser {
 
-	private static final IAction ERROR_ACTION = new ErrorAction();
 	private static final IAction ACCEPT_ACTION = new AcceptAction();
 	
 	private static final class Rule {
@@ -45,10 +46,10 @@ public class LRParser {
 		}
 	}
 	
-	private static final class State implements IParserState {
+	static final class State implements IParserState {
 
 		private final int index;
-		private IAction defaultAction = ERROR_ACTION;
+		private IAction defaultAction = new ErrorAction(this);
 		private List<IAction> actions = null;
 		
 		public State(int index) {
@@ -87,27 +88,32 @@ public class LRParser {
 		}
 		
 		@Override
+		public boolean isError() {
+			return false;
+		}
+		
+		@Override
 		public String toString() {
 			return "S" + index;
 		}
 	}
 
-	private static abstract class AbstractAction implements IAction {
-		@Override
-		public boolean consumes() {
-			return false;
-		}
-	}
-	
 	private static final class ErrorAction extends AbstractAction {
+		
+		private final State state;
+		
+		public ErrorAction(State state) {
+			this.state = state;
+		}
+
 		@Override
 		public Set<IAbstractStack> process(int symbolNumber, IAbstractStack stack) {
-			return Collections.singleton(stack.push(IParserState.ERROR));
+			return Collections.singleton(stack.push(new ErrorState(state, symbolNumber)));
 		}
 		
 		@Override
 		public String toString() {
-			return "ERROR";
+			return "ERROR after state " + state;
 		}
 	}
 	
@@ -156,6 +162,11 @@ public class LRParser {
 		@Override
 		public boolean consumes() {
 			return true;
+		}
+		
+		@Override
+		public boolean isError() {
+			return false;
 		}
 		
 		@Override
@@ -280,13 +291,21 @@ public class LRParser {
 	private final Integer[] symbolByToken;
 	private final State initialState;
 	private final Map<String, Integer> namesToTokenNumbers;
+	private final Map<Integer, String> symbolNumbersToNames;
 	private PrintStream trace;
 	
 	private LRParser(State initialState, List<Integer> symbolByToken, Map<String, Integer> namesToTokenNumbers) {
 		this.initialState = initialState;
-		this.namesToTokenNumbers = Collections.unmodifiableMap(new HashMap<String, Integer>(namesToTokenNumbers));
 		this.symbolByToken = new Integer[symbolByToken.size()];
 		symbolByToken.toArray(this.symbolByToken);
+
+		this.namesToTokenNumbers = Collections.unmodifiableMap(new TreeMap<String, Integer>(namesToTokenNumbers));
+		Map<Integer, String> map = new HashMap<Integer, String>();
+		for (Entry<String, Integer> entry : this.namesToTokenNumbers.entrySet()) {
+			map.put(this.symbolByToken[entry.getValue()], entry.getKey());
+		}
+		this.symbolNumbersToNames = Collections.unmodifiableMap(map);
+		
 	}
 
 	public void setTrace(PrintStream trace) {
@@ -340,5 +359,9 @@ public class LRParser {
 	
 	public Map<String, Integer> getNamesToTokenNumbers() {
 		return namesToTokenNumbers;
+	}
+	
+	public Map<Integer, String> getSymbolNumbersToNames() {
+		return symbolNumbersToNames;
 	}
 }

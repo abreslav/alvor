@@ -23,9 +23,10 @@ public class SQLSyntaxCheckerTest {
 	@Parameters
 	public static Collection<Object[]> parameters() throws FileNotFoundException {
 		List<Object[]> result = new ArrayList<Object[]>();
-
-//		addFromFile("data/earved_sqls.txt", true, result);
-//		addFromFile("data/earved_escape.txt", true, result);
+/*
+*/		
+		addFromFile("data/earved_sqls.txt", true, result);
+		addFromFile("data/earved_escape.txt", true, result);
 		addFromFile("data/earved_basic.txt", true, result);
 		addFromFile("data/earved_bugs.txt", false, result);
 		return result;

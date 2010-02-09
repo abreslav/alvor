@@ -34,6 +34,7 @@ import java.io.IOException;
 %define parser_class_name "SQLParser"
 
 %token VALUES
+%token ESCAPE
 %token SELECT
 %token INSERT
 %token WHERE
@@ -78,12 +79,14 @@ import java.io.IOException;
 %token GE
 %token CONCAT
 %token TABLE
+%token LIKE
 
-%left OR
+//%left AS
+%left OR XOR
 %left AND
 %right NOT
 %left '=' NE LE GE '>' '<'
-%left '-' '+'
+%left '-' '+'  
 %left '/' '*' CONCAT
 
 %%
@@ -122,8 +125,10 @@ whatToSelect
 	;
 selectExpression
 	: expression
-	| expression AS ID
+	| selectExpression AS id
+	| selectExpression id
 	;
+id : ID;
 expression
 	: condition
 	| simpleExpr
@@ -141,7 +146,8 @@ table
 	| table join alias ON condition
 	;
 join
-	: /*empty*/ JOIN
+	: JOIN
+	| LEFT JOIN
 	| outerType OUTER JOIN
 	| INNER JOIN
 	;
@@ -168,12 +174,26 @@ whereCond
 condition
 	: condition AND condition
 	| condition OR condition
+	| condition XOR condition
 	| NOT condition
 	| '(' condition ')'
-	| simpleExpr comparisonOperation simpleExpr
+	| comparison
 	| simpleExpr inExpr '(' simExList ')'
 	| simpleExpr inExpr '(' select ')'
 	| simpleExpr IS optNot NULL
+	| simpleExpr LIKE simpleExpr escape 
+	;
+comparison 
+	: simpleExpr '=' simpleExpr 
+	| simpleExpr '>' simpleExpr 
+	| simpleExpr '<' simpleExpr 
+	| simpleExpr LE simpleExpr 
+	| simpleExpr NE simpleExpr 
+	| simpleExpr GE simpleExpr 
+    ;
+escape
+	: ESCAPE STRING_SQ
+	| /*empty*/
 	;
 inExpr
 	: optNot IN
@@ -182,23 +202,21 @@ optNot
 	: NOT
 	| /*empty*/
 	;
-comparisonOperation 
-	: '=' | '>' | '<' | LE | NE | GE 
-    ;
 simpleExpr
 	: NUMBER
 	| CASE whenList else END
 	| STRING_SQ
 	| ident identRest
 	| '(' simpleExpr ')'
-	| simpleExpr '+' simpleExpr
 	| simpleExpr '-' simpleExpr
+	| simpleExpr '+' simpleExpr
 	| simpleExpr '*' simpleExpr
 	| simpleExpr '/' simpleExpr
 	| simpleExpr CONCAT simpleExpr
 	| '(' select ')'
 	| '*'
 	| '?'
+	| NULL
 	;	
 whenList
 	: when

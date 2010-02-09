@@ -1,6 +1,6 @@
 package ee.stacc.productivity.edsl.parser;
 
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
@@ -14,6 +14,10 @@ public class ParserLoaderTest {
 
 	@Test
 	public void test() throws Exception {
+		testParser(Parsers.BIN_EXP_PARSER, new String[] {
+				"SELECT NUMBER '-' NUMBER FROM ID",
+		}, true);
+
 		testParser(Parsers.ARITH_PARSER, new String[] {
 				"'1'",
 				"'0'",
@@ -21,8 +25,8 @@ public class ParserLoaderTest {
 				"'0' '+' '1'",
 				"'1' '*' '0' '+' '1' '*' '0'",
 				"'1' '+' '0' '+' '1' '*' '0'",
-		}, IParserState.ACCEPT);
-
+		}, true);
+		
 		testParser(Parsers.ARITH_PARSER, new String[] {
 				"'*'",
 				"'+'",
@@ -30,7 +34,7 @@ public class ParserLoaderTest {
 				"'+' '1'",
 				"'1' '*' '0' '1' '*' '0'",
 				"'1' '+' '+' '1' '*' '0'",
-		}, IParserState.ERROR);
+		}, false);
 		
 		testParser(Parsers.SQL_PARSER, new String[] {
 				"SELECT ID FROM ID",
@@ -38,7 +42,8 @@ public class ParserLoaderTest {
 				"SELECT ID ',' ID FROM ID ',' ID",
 				"SELECT ID FROM ID ',' ID",
 				"SELECT ID ',' ID FROM ID ID",
-		}, IParserState.ACCEPT);
+				"SELECT ID ID FROM ID",
+		}, true);
 		
 		testParser(Parsers.SQL_PARSER, new String[] {
 				"SELECT",
@@ -46,19 +51,18 @@ public class ParserLoaderTest {
 				"SELECT FROM",
 				"SELECT FROM ID",
 				"SELECT ID FROM",
-				"SELECT ID ID FROM ID",
 				"SELECT ',' ID FROM ID",
 				"SELECT ID ',' FROM ID",
 				"SELECT ID FROM ',' ID",
 				"SELECT ID FROM ','",
-		}, IParserState.ERROR);
+		}, false);
 	}
 
-	private void testParser(LRParser parser, String[] correctInputs, IParserState expectedState) {
+	private void testParser(LRParser parser, String[] correctInputs, boolean expectingAccept) {
 		for (String input : correctInputs) {
 			input += " $end $end";
-			IParserState top = LRInterpreter.interpret(parser, SimpleStack.FACTORY, input, expectedState);
-			assertSame(expectedState, top);
+			IParserState top = LRInterpreter.interpret(parser, SimpleStack.FACTORY, input, expectingAccept);
+			assertEquals(top.toString(), expectingAccept, !top.isError());
 		}
 	}
 }

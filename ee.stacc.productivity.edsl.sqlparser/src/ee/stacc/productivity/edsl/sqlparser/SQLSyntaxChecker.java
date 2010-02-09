@@ -126,7 +126,10 @@ public class SQLSyntaxChecker {
 		@Override
 		public boolean hasError() {
 			for (IAbstractStack stack : stacks) {
-				if (stack.top() == IParserState.ERROR) {
+				if (stack.top().isError()) {
+					System.out.println(stack.top());
+					int unexpectedSymbol = ((ErrorState) stack.top()).getUnexpectedSymbol();
+					System.out.println(Parsers.SQL_PARSER.getSymbolNumbersToNames().get(unexpectedSymbol));
 					return true;
 				}
 			}
@@ -237,7 +240,7 @@ public class SQLSyntaxChecker {
 				Set<IAbstractStack> newStacks = parser.processToken(eofTokenIndex, stack);
 				for (IAbstractStack newStack : newStacks) {
 					IParserState top = newStack.top();
-					if (top == IParserState.ERROR) {
+					if (top.isError()) {
 						return false;
 					}
 					if (top != IParserState.ACCEPT) {

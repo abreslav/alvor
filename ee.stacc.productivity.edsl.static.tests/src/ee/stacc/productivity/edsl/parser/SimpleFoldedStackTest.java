@@ -154,6 +154,11 @@ public class SimpleFoldedStackTest {
 		public String toString() {
 			return text;
 		}
+
+		@Override
+		public boolean isError() {
+			return false;
+		}
 		
 	}
 }
