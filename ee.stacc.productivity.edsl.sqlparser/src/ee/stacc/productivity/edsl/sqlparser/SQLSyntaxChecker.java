@@ -39,10 +39,6 @@ public class SQLSyntaxChecker {
 		}
 		
 		return checkAbstractString(str, SimpleStack.FACTORY);
-		
-//		return result 
-//			? Collections.<String>emptyList()
-//			: Collections.singletonList("SQL syntax error");
 	}
 
 	public List<String> checkAbstractString(IAbstractString as, IStackFactory stackFactory) {
