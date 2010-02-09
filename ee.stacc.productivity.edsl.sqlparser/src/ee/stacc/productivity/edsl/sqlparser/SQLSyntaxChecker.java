@@ -1,7 +1,7 @@
 package ee.stacc.productivity.edsl.sqlparser;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -38,14 +38,14 @@ public class SQLSyntaxChecker {
 			throw new IllegalArgumentException("The current version does not support loops in abstract strings");
 		}
 		
-		boolean result = checkAbstractString(str, SimpleStack.FACTORY);
+		return checkAbstractString(str, SimpleStack.FACTORY);
 		
-		return result 
-			? Collections.<String>emptyList()
-			: Collections.singletonList("SQL syntax error");
+//		return result 
+//			? Collections.<String>emptyList()
+//			: Collections.singletonList("SQL syntax error");
 	}
 
-	public boolean checkAbstractString(IAbstractString as, IStackFactory stackFactory) {
+	public List<String> checkAbstractString(IAbstractString as, IStackFactory stackFactory) {
 		State asAut = StringToAutomatonConverter.INSTANCE.convert(as, SQLLexer.SQL_ALPHABET_CONVERTER);
 		
 		State sqlTransducer = SQLLexer.SQL_TRANSDUCER;
@@ -80,9 +80,19 @@ public class SQLSyntaxChecker {
 				return tokenNumber;
 			}
 		};
-		FixpointParser fixpointParser = new FixpointParser(parser, converter, SimpleStackSet.FACTORY, stackFactory, eofTokenIndex);
+		final List<String> errors = new ArrayList<String>();
+		FixpointParser fixpointParser = new FixpointParser(parser, converter, SimpleStackSet.FACTORY, stackFactory, eofTokenIndex, new IParseErrorHandler() {
+			
+			@Override
+			public void handleError(String message) {
+				errors.add(message);
+			}
+		});
 		boolean parseResult = fixpointParser.parse(transduction);
-		return parseResult;
+		if (!parseResult && errors.isEmpty()) {
+			errors.add("SQL syntax error");
+		}
+		return errors;
 	}
 	
 	public boolean parseAutomaton(State initial, IAlphabetConverter alphabetConverter, IStackFactory stackFactory) {
@@ -91,13 +101,14 @@ public class SQLSyntaxChecker {
 				alphabetConverter, 
 				SimpleStackSet.FACTORY, 
 				stackFactory, 
-				Parsers.SQL_PARSER.getNamesToTokenNumbers().get("$end"))
+				Parsers.SQL_PARSER.getNamesToTokenNumbers().get("$end"),
+				IParseErrorHandler.NONE)
 			.parse(initial);
 	}
 	
 	private interface IAbstractStackSet {
 
-		boolean hasError();
+		IParserState hasError();
 		
 		/**
 		 * @return true if there was an actual change 
@@ -124,16 +135,14 @@ public class SQLSyntaxChecker {
 		private final Set<IAbstractStack> stacks = new HashSet<IAbstractStack>();
 		
 		@Override
-		public boolean hasError() {
+		public IParserState hasError() {
 			for (IAbstractStack stack : stacks) {
-				if (stack.top().isError()) {
-					System.out.println(stack.top());
-					int unexpectedSymbol = ((ErrorState) stack.top()).getUnexpectedSymbol();
-					System.out.println(Parsers.SQL_PARSER.getSymbolNumbersToNames().get(unexpectedSymbol));
-					return true;
+				IParserState top = stack.top();
+				if (top.isError()) {
+					return top;
 				}
 			}
-			return false;
+			return null;
 		}
 
 		@Override
@@ -152,6 +161,30 @@ public class SQLSyntaxChecker {
 		IAbstractStackSet newAbstractStackSet();
 	}
 	
+	public interface IParseErrorHandler {
+		IParseErrorHandler NONE = new IParseErrorHandler() {
+			@Override
+			public void handleError(String message) {
+			}
+		}; 
+		
+		IParseErrorHandler SYSTEM_OUT = new IParseErrorHandler() {
+			@Override
+			public void handleError(String message) {
+				System.out.println(message);
+			}
+		}; 
+		
+		IParseErrorHandler EXCEPTION = new IParseErrorHandler() {
+			@Override
+			public void handleError(String message) {
+				throw new IllegalArgumentException(message);
+			}
+		}; 
+		
+		void handleError(String message);
+	}
+	
 	private static final class FixpointParser {
 	
 		private final Map<State, IAbstractStackSet> abstractStackSets = new HashMap<State, IAbstractStackSet>();
@@ -160,17 +193,20 @@ public class SQLSyntaxChecker {
 		private final IAbstractStackSetFactory factory;
 		private final IStackFactory stackFactory;
 		private final int eofTokenIndex;
+		private final IParseErrorHandler errorHandler; 
 		
 		public FixpointParser(LRParser parser,
 				IAlphabetConverter alphabetConverter,
 				IAbstractStackSetFactory factory,
 				IStackFactory stackFactory,
-				int eofTokenIndex) {
+				int eofTokenIndex,
+				IParseErrorHandler parseErrorHandler) {
 			this.parser = parser;
 			this.alphabetConverter = alphabetConverter;
 			this.factory = factory;
 			this.stackFactory = stackFactory;
 			this.eofTokenIndex = eofTokenIndex;
+			this.errorHandler = parseErrorHandler;
 		}
 		
 		private IAbstractStackSet getSet(State state) {
@@ -205,7 +241,10 @@ public class SQLSyntaxChecker {
 				IAbstractStackSet setForTo = getSet(transition.getTo());
 				boolean changes = transformSet(setForCurrent, tokenIndex, setForTo);
 				if (changes) {
-					if (setForCurrent.hasError()) {
+					IParserState errorState = setForCurrent.hasError();
+					if (errorState != null) {
+						int unexpectedSymbol = ((ErrorState) errorState).getUnexpectedSymbol();
+						errorHandler.handleError("Unexpected token: " + Parsers.SQL_PARSER.getSymbolNumbersToNames().get(unexpectedSymbol));
 						return false;
 					}
 					if (!dfs(transition.getTo())) {

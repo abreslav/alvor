@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
@@ -81,11 +82,11 @@ public class FixpointParsingTest {
 		String abstractString;
 
 		abstractString = "\"SELECT sd.x, asd FROM asd\"";
-		assertTrue(parseAbstractString(abstractString));
+		assertParses(abstractString);
 		
 		
 		abstractString = "\"SELECT sd, asd FROM asd\"";
-		assertTrue(parseAbstractString(abstractString));
+		assertParses(abstractString);
 		
 		
 		abstractString = "\"SELECT asd FROM asd, dsd\"";
@@ -157,8 +158,14 @@ public class FixpointParsingTest {
 		
 	}
 	
+	private void assertParses(String abstractString) {
+		IAbstractString as = AbstractStringParser.parseOneFromString(abstractString);
+		List<String> errors = SQLSyntaxChecker.INSTANCE.checkAbstractString(as, stackFactory);
+		assertTrue(errors.toString(), errors.isEmpty());
+	}
+
 	private boolean parseAbstractString(String abstractString) {
 		IAbstractString as = AbstractStringParser.parseOneFromString(abstractString);
-		return SQLSyntaxChecker.INSTANCE.checkAbstractString(as, stackFactory);
+		return SQLSyntaxChecker.INSTANCE.checkAbstractString(as, stackFactory).isEmpty();
 	}
 }
