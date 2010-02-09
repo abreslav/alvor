@@ -37,6 +37,7 @@ public class ParserLoaderTest {
 				"SELECT ID ',' ID FROM ID",
 				"SELECT ID ',' ID FROM ID ',' ID",
 				"SELECT ID FROM ID ',' ID",
+				"SELECT ID ',' ID FROM ID ID",
 		}, IParserState.ACCEPT);
 		
 		testParser(Parsers.SQL_PARSER, new String[] {
@@ -48,7 +49,6 @@ public class ParserLoaderTest {
 				"SELECT ID ID FROM ID",
 				"SELECT ',' ID FROM ID",
 				"SELECT ID ',' FROM ID",
-				"SELECT ID ',' ID FROM ID ID",
 				"SELECT ID FROM ',' ID",
 				"SELECT ID FROM ','",
 		}, IParserState.ERROR);

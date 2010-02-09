@@ -68,7 +68,7 @@ public class LRParsingTest {
 				false);
 		
 		interpret(parser, stackFactory, 
-				"SELECT ID '(' ')' FROM ID ',' ID ',' ID", 
+				"SELECT ID '(' NUMBER ')' FROM ID ',' ID ',' ID", 
 				true);
 		
 		interpret(parser, stackFactory, 
@@ -82,7 +82,7 @@ public class LRParsingTest {
 		LRParser parser = Parsers.SQL_PARSER;
 
 		interpret(parser, stackFactory, 
-				"SELECT ID '(' ID '(' ')' ')' FROM ID ',' ID ',' ID", 
+				"SELECT ID '(' ID '(' ID ')' ')' FROM ID ',' ID ',' ID", 
 				true);
 
 	}

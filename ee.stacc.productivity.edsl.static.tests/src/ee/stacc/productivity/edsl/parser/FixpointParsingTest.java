@@ -132,7 +132,7 @@ public class FixpointParsingTest {
 	public void testNestedParentheses() throws Exception {
 		String abstractString;
 		
-		abstractString = "\"SELECT a(*, a()) FROM asd, sdf\"";
+		abstractString = "\"SELECT a(*, a(x)) FROM asd, sdf\"";
 		assertTrue(parseAbstractString(abstractString));
 		
 		

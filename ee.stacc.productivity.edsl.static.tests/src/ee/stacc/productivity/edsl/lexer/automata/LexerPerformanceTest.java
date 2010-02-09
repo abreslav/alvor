@@ -46,7 +46,7 @@ public class LexerPerformanceTest {
 //			fileWriter.write(string + "\n");
 //		}
 //		fileWriter.close();
-//		
+
 		FileReader fileReader = new FileReader("data/sqls.expected");
 		StringBuilder stringBuilder = new StringBuilder();
 		int c;
@@ -55,14 +55,29 @@ public class LexerPerformanceTest {
 		}
 		fileReader.close();
 		String[] split = stringBuilder.toString().split("\n");
+		String[] expected = split.clone();
+		Arrays.sort(expected);
 		
-		assertEquals(new HashSet<String>(Arrays.asList(split)), generated);
+		String[] genarr = generated.toArray(new String[generated.size()]);
+		Arrays.sort(genarr);
+	
+		assertEquals(expected.length, genarr.length);
+		
+		for (int i = 0; i < genarr.length; i++) {
+			if (!expected[i].equals(genarr[i])) {
+				System.out.println(expected[i]);
+				System.out.println(genarr[i]);
+				System.out.println();
+			}
+		}
+		
+		assertEquals(new HashSet<String>(Arrays.asList(expected)), generated);
 	}
 
 	@Test
 	public void testBig() throws Exception {
 		final List<IAbstractString> strings = AbstractStringParser.parseFile("data/big.txt");
-		IAbstractString str = strings.get(0);
+//		IAbstractString str = strings.get(0);
 //		System.out.println("Parsed. Size: " + size(str));
 //		IAbstractString opt = optimize(str);
 //		System.out.println("Optimized size: " + size(opt));
