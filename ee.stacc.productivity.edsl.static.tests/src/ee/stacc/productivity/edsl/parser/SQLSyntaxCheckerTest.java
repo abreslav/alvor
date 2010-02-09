@@ -22,25 +22,36 @@ public class SQLSyntaxCheckerTest {
 
 	@Parameters
 	public static Collection<Object[]> parameters() throws FileNotFoundException {
-		List<IAbstractString> abstractStrings = AbstractStringParser.parseFile("data/earved_sqls.txt");
-		
 		List<Object[]> result = new ArrayList<Object[]>();
-		for (IAbstractString str : abstractStrings) {
-			result.add(new Object[] {str});
-		}
+
+//		addFromFile("data/earved_sqls.txt", true, result);
+//		addFromFile("data/earved_escape.txt", true, result);
+		addFromFile("data/earved_basic.txt", true, result);
+		addFromFile("data/earved_bugs.txt", false, result);
 		return result;
+	}
+
+	private static void addFromFile(String fileName, boolean expected,
+			List<Object[]> result) throws FileNotFoundException {
+		List<IAbstractString> abstractStrings = AbstractStringParser.parseFile(fileName);
+		
+		for (IAbstractString str : abstractStrings) {
+			result.add(new Object[] {str, expected});
+		}
 	}
 	
 	private final IAbstractString abstractString;
+	private final boolean expected;
 	
-	public SQLSyntaxCheckerTest(IAbstractString abstractString) {
+	public SQLSyntaxCheckerTest(IAbstractString abstractString, boolean expected) {
 		this.abstractString = abstractString;
+		this.expected = expected;
 	}
 
 	@Test
 	public void testSQL() throws Exception {
 		List<String> errors = SQLSyntaxChecker.INSTANCE.check(abstractString);
-		assertTrue(errors + "   " + abstractString.toString(), errors.isEmpty());
+		assertEquals(errors + "   " + abstractString.toString(), expected, errors.isEmpty());
 	}
 	
 //	@Test
@@ -57,7 +68,7 @@ public class SQLSyntaxCheckerTest {
 //		fail();
 //	}
 //	
-	private boolean check(String astr) {
-		return SQLSyntaxChecker.INSTANCE.check(AbstractStringParser.parseOneFromString(astr)).isEmpty();
-	}
+//	private boolean check(String astr) {
+//		return SQLSyntaxChecker.INSTANCE.check(AbstractStringParser.parseOneFromString(astr)).isEmpty();
+//	}
 }
