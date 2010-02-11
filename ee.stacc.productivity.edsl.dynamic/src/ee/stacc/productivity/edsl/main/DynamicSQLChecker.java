@@ -3,6 +3,7 @@ package ee.stacc.productivity.edsl.main;
 import java.sql.SQLException;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Properties;
 
 import ee.stacc.productivity.edsl.crawler.StringNodeDescriptor;
 import ee.stacc.productivity.edsl.db.SQLStringAnalyzer;
@@ -10,11 +11,13 @@ import ee.stacc.productivity.edsl.samplegen.SampleGenerator;
 
 public class DynamicSQLChecker implements IAbstractStringChecker {
 
-	public static final DynamicSQLChecker INSTANCE = new DynamicSQLChecker();
+	public static final DynamicSQLChecker INSTANCE = new DynamicSQLChecker(null);
 	
 	private SQLStringAnalyzer analyzer = new SQLStringAnalyzer();
 
-	private DynamicSQLChecker() {}
+	private DynamicSQLChecker(Properties props) {
+		//analyzer = new SQLs
+	}
 	
 	@Override
 	public void checkAbstractStrings(List<StringNodeDescriptor> descriptors,

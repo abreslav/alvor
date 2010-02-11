@@ -15,10 +15,10 @@ public class SQLStringAnalyzer {
 	boolean needExecute = false;
 	
 	public SQLStringAnalyzer() {
+		
 		//connectToMySQL();
 		connectToOracle();
 	}
-	
 	
 	private void connectToOracle() {
 		String url = "jdbc:oracle:thin:@localhost:1521:xe";
