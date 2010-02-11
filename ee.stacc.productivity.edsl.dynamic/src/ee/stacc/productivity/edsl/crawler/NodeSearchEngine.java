@@ -53,6 +53,8 @@ public class NodeSearchEngine {
 			return Collections.emptyList();
 		}
 		
+		//System.out.println("SEARCH SCOPE: " + searchScope);
+		
 		final List<NodeDescriptor> result = new ArrayList<NodeDescriptor>();
 
 		// FIXME temporary, to speed up a bit -- must not be a problem any more
@@ -80,7 +82,7 @@ public class NodeSearchEngine {
 		
 		scopeElems[0] = searchScope;
 		IJavaElement[] elems = {searchScope};
-		IJavaSearchScope scope = SearchEngine.createJavaSearchScope(elems);
+		IJavaSearchScope scope = SearchEngine.createJavaSearchScope(elems, IJavaSearchScope.SOURCES);
 		
 		
 		SearchRequestor requestor = new SearchRequestor() {

@@ -12,30 +12,13 @@ import java.sql.SQLException;
  */
 public class SQLStringAnalyzer {
 	Connection conn;
-	boolean needExecute = false;
 	
-	public SQLStringAnalyzer() {
+	public SQLStringAnalyzer(String driverName, String url, String username,
+			String password) {
 		
-		//connectToMySQL();
-		connectToOracle();
-	}
-	
-	private void connectToOracle() {
-		String url = "jdbc:oracle:thin:@localhost:1521:xe";
 		try {
-			Class.forName ("oracle.jdbc.OracleDriver");
-			conn = DriverManager.getConnection(url, "compiere", "password");
-			this.needExecute = false;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private void connectToMySQL() {
-		String url = "jdbc:mysql://localhost:3306/openbravopos";
-		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			conn = DriverManager.getConnection(url, "openbravopos", "openbravopos");
+			Class.forName (driverName);
+			conn = DriverManager.getConnection(url, username, password);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -45,34 +28,7 @@ public class SQLStringAnalyzer {
 		if (conn == null) {
 			return;
 		}
-		if (this.needExecute) {
-			PreparedStatement stmt = conn.prepareStatement(sql.replaceAll("where", "where 1=0 and"));
-			stmt.getMetaData();
-		} 
-		else {
-			PreparedStatement stmt = conn.prepareStatement(sql);
-			stmt.getMetaData();
-		}
+		PreparedStatement stmt = conn.prepareStatement(sql);
+		stmt.getMetaData();
 	}
-	
-	private String simplifySQL(String sql) {
-		String prefix = sql.substring(0, sql.toLowerCase().indexOf("where"));
-		return prefix + " where 1=0";
-	}
-	
-	/*
-	public SQLStructure analyzeAndReturn(String sql) {
-		try {
-			PreparedStatement stmt = conn.prepareStatement(sql);
-//			System.out.println("CHECKED: " + sql);
-			return new SQLStructure(stmt.getMetaData(), stmt.getParameterMetaData());
-		}
-		catch (SQLException e) {
-			System.err.println("ERR SQL: " + sql);
-			String errorMsg = e.getMessage().replace("\n", "; ");
-			System.err.println("SQL ERR: " + errorMsg);
-			return new SQLStructure(e);
-		}
-	}
-	*/
 }

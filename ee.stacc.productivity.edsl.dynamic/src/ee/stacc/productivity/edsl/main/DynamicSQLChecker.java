@@ -11,12 +11,16 @@ import ee.stacc.productivity.edsl.samplegen.SampleGenerator;
 
 public class DynamicSQLChecker implements IAbstractStringChecker {
 
-	public static final DynamicSQLChecker INSTANCE = new DynamicSQLChecker(null);
+	//public static final DynamicSQLChecker INSTANCE = new DynamicSQLChecker(null);
 	
-	private SQLStringAnalyzer analyzer = new SQLStringAnalyzer();
+	private SQLStringAnalyzer analyzer;
 
-	private DynamicSQLChecker(Properties props) {
-		//analyzer = new SQLs
+	public DynamicSQLChecker(Properties props) {
+		analyzer = new SQLStringAnalyzer(
+				props.getProperty("DBDriverName"),
+				props.getProperty("DBUrl"),
+				props.getProperty("DBUsername"),
+				props.getProperty("DBPassword"));
 	}
 	
 	@Override
