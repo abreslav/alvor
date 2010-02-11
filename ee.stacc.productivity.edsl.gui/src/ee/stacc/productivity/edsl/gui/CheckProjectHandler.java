@@ -1,8 +1,13 @@
 package ee.stacc.productivity.edsl.gui;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -12,6 +17,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.PlatformUI;
@@ -38,15 +44,28 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 		try {
 			List<StringNodeDescriptor> hotspots = projectChecker.findHotspots(selectedJavaElement);
 			markHotspots(hotspots);
+			
 			projectChecker.checkJavaElement(hotspots, this, 
-				StaticSQLChecker.SQL_LEXICAL_CHECKER,
-				StaticSQLChecker.SQL_SYNTAX_CHECKER, 
-				DynamicSQLChecker.INSTANCE);
+				//StaticSQLChecker.SQL_LEXICAL_CHECKER,
+				//StaticSQLChecker.SQL_SYNTAX_CHECKER,  
+				new DynamicSQLChecker(getElementSqlCheckerProperties(selectedJavaElement)));
 		} catch (Throwable e) {
 			e.printStackTrace();
 			throw new ExecutionException("Error during checking: " + e.getMessage(), e);
 		}
 		return null; // Must be null
+	}
+	
+	private Properties getElementSqlCheckerProperties(IJavaElement element)
+			throws FileNotFoundException, IOException {
+		IJavaProject project = element.getJavaProject();
+		File propsFile = project.getResource().getLocation()
+			.append("/sqlchecker.properites").toFile();
+		System.out.println("PROPS_FILE: " + propsFile);
+		FileInputStream in = new FileInputStream(propsFile);
+		Properties props = new Properties();
+		props.load(in);
+		return props;
 	}
 
 	/*
