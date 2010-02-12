@@ -31,6 +31,7 @@ public class EDSLApplication implements IApplication {
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		IJavaModel javaModel = JavaCore.create(root);
 		IJavaProject[] projects = javaModel.getJavaProjects();
+		
 		for (IJavaProject javaProject : projects) {
 			System.out.println(javaProject.getElementName());
 			IJavaElement[] children = javaProject.getChildren();
@@ -40,22 +41,26 @@ public class EDSLApplication implements IApplication {
 					if (!sf.isExternal() && !sf.isArchive()) {
 						System.out.println(sf.getElementName());
 						SQLUsageChecker projectChecker = new SQLUsageChecker();
+						
+						long time = System.currentTimeMillis();
 						List<StringNodeDescriptor> hotspots = projectChecker.findHotspots(sf);
+						time = System.currentTimeMillis() - time;
+						System.out.format("%d\n", time);
 						for (StringNodeDescriptor stringNodeDescriptor : hotspots) {
 							System.out.println(stringNodeDescriptor.getAbstractValue());
 						}
-						projectChecker.checkJavaElement(hotspots, 
-								new ISQLErrorHandler() {
-									
-									@Override
-									public void handleSQLError(String errorMessage, IFile file,
-											int startPosition, int length) {
-										System.out.println(errorMessage);
-									}
-								}, 
-								StaticSQLChecker.SQL_LEXICAL_CHECKER,
-								StaticSQLChecker.SQL_SYNTAX_CHECKER, 
-								DynamicSQLChecker.INSTANCE);
+//						projectChecker.checkJavaElement(hotspots, 
+//								new ISQLErrorHandler() {
+//									
+//									@Override
+//									public void handleSQLError(String errorMessage, IFile file,
+//											int startPosition, int length) {
+//										System.out.println(errorMessage);
+//									}
+//								}, 
+//								StaticSQLChecker.SQL_LEXICAL_CHECKER,
+//								StaticSQLChecker.SQL_SYNTAX_CHECKER, 
+//								DynamicSQLChecker.INSTANCE);
 					}
 				}
 			}

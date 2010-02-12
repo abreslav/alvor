@@ -9,5 +9,6 @@ Require-Bundle: org.eclipse.core.runtime,
  ee.stacc.productivity.edsl.dynamic;bundle-version="1.0.0",
  ee.stacc.productivity.edsl.model;bundle-version="1.0.0",
  ee.stacc.productivity.edsl.sqllexer;bundle-version="1.0.0",
- ee.stacc.productivity.edsl.sqlparser;bundle-version="1.0.0"
+ ee.stacc.productivity.edsl.sqlparser;bundle-version="1.0.0",
+ org.apache.commons.logging;bundle-version="1.0.4"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
