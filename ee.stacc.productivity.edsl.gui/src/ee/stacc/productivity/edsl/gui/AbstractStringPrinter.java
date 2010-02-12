@@ -13,7 +13,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorPart;
 
-import ee.stacc.productivity.edsl.crawler.AbstractStringEvaluator;
+//import ee.stacc.productivity.edsl.crawler.AbstractStringEvaluator;
 
 public class AbstractStringPrinter implements IEditorActionDelegate{
 	private ISelection selection;
@@ -50,8 +50,8 @@ public class AbstractStringPrinter implements IEditorActionDelegate{
 			System.out.println("Selection is : " + node.getClass().getName());
 			// TODO kontrolli et on string tüüpi expression
 			System.out.println("Abstract value is: ");
-			System.out.println(AbstractStringEvaluator.evaluateExpression
-					((Expression)node).toString());
+//			System.out.println(AbstractStringEvaluator.evaluateExpression
+//					((Expression)node).toString());
 		} 
 		else {
 			System.out.println("Selection is not expression, but: "

@@ -14,6 +14,8 @@ public class AbstractStringCheckerManager {
 	
 	private List<IAbstractStringChecker> checkers = null;
 	
+	private AbstractStringCheckerManager() {}
+	
 	public List<IAbstractStringChecker> getCheckers() {
 		if (checkers == null) {
 			checkers = new ArrayList<IAbstractStringChecker>();			

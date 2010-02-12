@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="project" default="default">
-	<taskdef classname="JFlex.anttask.JFlexTask" name="jflex" classpath="../../jflex/lib/JFlex.jar"/>
+	<taskdef classname="JFlex.anttask.JFlexTask" name="jflex" classpath="../ee.stacc.productivity.edsl.sqllexer/lib/JFlex.jar"/>
 	
     <target name="default" depends="depends" description="description">
         

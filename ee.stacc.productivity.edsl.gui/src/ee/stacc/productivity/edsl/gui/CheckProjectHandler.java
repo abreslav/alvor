@@ -26,7 +26,7 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
 import ee.stacc.productivity.edsl.checkers.AbstractStringCheckerManager;
 import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
-import ee.stacc.productivity.edsl.main.SQLUsageChecker;
+import ee.stacc.productivity.edsl.main.JavaElementChecker;
 
 
 public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHandler {
@@ -34,22 +34,22 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 	public static final String WARNING_MARKER_ID = "ee.stacc.productivity.edsl.gui.sqlwarning";
 	public static final String HOTSPOT_MARKER_ID = "ee.stacc.productivity.edsl.gui.sqlhotspot";
 	
-	private SQLUsageChecker projectChecker = new SQLUsageChecker();
+	private JavaElementChecker projectChecker = new JavaElementChecker();
 	
 	@Override
+	@SuppressWarnings("unchecked")
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		System.out.println("CheckProjectHandler.execute");
 		IJavaElement selectedJavaElement = getSelectedJavaElement();
 		cleanMarkers(selectedJavaElement);
 		try {
-			List<IStringNodeDescriptor> hotspots = projectChecker.findHotspots(selectedJavaElement);
+			Map options = getElementSqlCheckerProperties(selectedJavaElement);
+			List<IStringNodeDescriptor> hotspots = projectChecker.findHotspots(selectedJavaElement, options);
 			markHotspots(hotspots);
 			
-			projectChecker.checkJavaElement(hotspots, this,
-					AbstractStringCheckerManager.INSTANCE.getCheckers()
-				//StaticSQLChecker.SQL_LEXICAL_CHECKER,
-				//StaticSQLChecker.SQL_SYNTAX_CHECKER,  
-//				new DynamicSQLChecker(getElementSqlCheckerProperties(selectedJavaElement))
+			projectChecker.checkHotspots(hotspots, this,
+					AbstractStringCheckerManager.INSTANCE.getCheckers(),
+					options
 			);
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -133,10 +133,9 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 	}
 
 	@Override
-	public void handleSQLError(String message, IFile file, int startPosition,
-			int length) {
+	public void handleSQLError(String message, IStringNodeDescriptor descriptor) {
 		//System.err.println(e.getMessage());
-		createMarker(message, ERROR_MARKER_ID, file, startPosition, 
-				startPosition + length);		
+		createMarker(message, ERROR_MARKER_ID, descriptor.getFile(), descriptor.getCharStart(), 
+				descriptor.getCharStart() + descriptor.getCharLength());		
 	}
 }

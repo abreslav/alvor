@@ -1,8 +1,9 @@
 package ee.stacc.productivity.edsl.cmdline;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.equinox.app.IApplication;
@@ -16,7 +17,7 @@ import org.eclipse.jdt.core.JavaCore;
 import ee.stacc.productivity.edsl.checkers.AbstractStringCheckerManager;
 import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
-import ee.stacc.productivity.edsl.main.SQLUsageChecker;
+import ee.stacc.productivity.edsl.main.JavaElementChecker;
 
 /**
  * This class controls all aspects of the application's execution
@@ -40,26 +41,30 @@ public class EDSLApplication implements IApplication {
 					IPackageFragmentRoot sf = (IPackageFragmentRoot) iJavaElement;
 					if (!sf.isExternal() && !sf.isArchive()) {
 						System.out.println(sf.getElementName());
-						SQLUsageChecker projectChecker = new SQLUsageChecker();
+						JavaElementChecker projectChecker = new JavaElementChecker();
 						
 						long time = System.currentTimeMillis();
-						List<IStringNodeDescriptor> hotspots = projectChecker.findHotspots(sf);
+						Map<String, Object> options = Collections.<String, Object>emptyMap();
+						List<IStringNodeDescriptor> hotspots = projectChecker.findHotspots(sf, options);
 						time = System.currentTimeMillis() - time;
 						System.out.format("%d\n", time);
 						for (IStringNodeDescriptor stringNodeDescriptor : hotspots) {
 							System.out.println(stringNodeDescriptor.getAbstractValue());
 						}
-						projectChecker.checkJavaElement(hotspots, 
+						projectChecker.checkHotspots(hotspots, 
 								new ISQLErrorHandler() {
-									
+
 									@Override
-									public void handleSQLError(String errorMessage, IFile file,
-											int startPosition, int length) {
+									public void handleSQLError(
+											String errorMessage,
+											IStringNodeDescriptor descriptor) {
 										System.err.println(errorMessage);
 										System.err.flush();
 									}
 								}, 
-								AbstractStringCheckerManager.INSTANCE.getCheckers());
+								AbstractStringCheckerManager.INSTANCE.getCheckers(),
+								options
+							);
 					}
 				}
 			}
