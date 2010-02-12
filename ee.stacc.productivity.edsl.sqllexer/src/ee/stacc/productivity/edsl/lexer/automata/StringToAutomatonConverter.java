@@ -31,7 +31,8 @@ public class StringToAutomatonConverter {
 		for (State state : finalStates) {
 			createTransition(state, eof, -1, inputConverter);
 		}
-		return AutomataDeterminator.determinate(initial);
+		return initial;
+//		return AutomataDeterminator.determinate(initial);
 	}
 	
 	private static final class StringToAutomatonConverterVisitor implements

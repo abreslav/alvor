@@ -3,7 +3,9 @@ package ee.stacc.productivity.edsl.crawler;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.dom.ASTNode;
 
-public class NodeDescriptor {
+import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
+
+public class NodeDescriptor implements INodeDescriptor {
 	private ASTNode node;
 	private IFile file;
 	private int lineNumber;

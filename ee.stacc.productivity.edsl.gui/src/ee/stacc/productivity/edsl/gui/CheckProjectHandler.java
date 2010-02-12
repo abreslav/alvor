@@ -23,9 +23,9 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
-import ee.stacc.productivity.edsl.crawler.StringNodeDescriptor;
-import ee.stacc.productivity.edsl.main.DynamicSQLChecker;
-import ee.stacc.productivity.edsl.main.ISQLErrorHandler;
+import ee.stacc.productivity.edsl.checkers.AbstractStringCheckerManager;
+import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
+import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.main.SQLUsageChecker;
 
 
@@ -42,13 +42,15 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 		IJavaElement selectedJavaElement = getSelectedJavaElement();
 		cleanMarkers(selectedJavaElement);
 		try {
-			List<StringNodeDescriptor> hotspots = projectChecker.findHotspots(selectedJavaElement);
+			List<IStringNodeDescriptor> hotspots = projectChecker.findHotspots(selectedJavaElement);
 			markHotspots(hotspots);
 			
-			projectChecker.checkJavaElement(hotspots, this, 
+			projectChecker.checkJavaElement(hotspots, this,
+					AbstractStringCheckerManager.INSTANCE.getCheckers()
 				//StaticSQLChecker.SQL_LEXICAL_CHECKER,
 				//StaticSQLChecker.SQL_SYNTAX_CHECKER,  
-				new DynamicSQLChecker(getElementSqlCheckerProperties(selectedJavaElement)));
+//				new DynamicSQLChecker(getElementSqlCheckerProperties(selectedJavaElement))
+			);
 		} catch (Throwable e) {
 			e.printStackTrace();
 			throw new ExecutionException("Error during checking: " + e.getMessage(), e);
@@ -121,8 +123,8 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 		}
 	}
 
-	private void markHotspots(List<StringNodeDescriptor> hotspots) {
-		for (StringNodeDescriptor hotspot : hotspots) {
+	private void markHotspots(List<IStringNodeDescriptor> hotspots) {
+		for (IStringNodeDescriptor hotspot : hotspots) {
 			createMarker("Hotspot: " + hotspot.getAbstractValue(), HOTSPOT_MARKER_ID, 
 					hotspot.getFile(), 
 					hotspot.getCharStart(), 

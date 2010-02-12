@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Sqlstatic
+Bundle-SymbolicName: ee.stacc.productivity.edsl.checkers.sqlstatic;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: ee.stacc.productivity.edsl.sqllexer;bundle-version="1.0.0",
+ ee.stacc.productivity.edsl.sqlparser;bundle-version="1.0.0",
+ ee.stacc.productivity.edsl.checkers;bundle-version="1.0.0",
+ ee.stacc.productivity.edsl.model;bundle-version="1.0.0",
+ org.eclipse.core.resources;bundle-version="3.5.1"
+Export-Package: ee.stacc.productivity.edsl.checkers.sqlstatic

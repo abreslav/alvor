@@ -5,7 +5,9 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 
-import ee.stacc.productivity.edsl.crawler.StringNodeDescriptor;
+import ee.stacc.productivity.edsl.checkers.IAbstractStringChecker;
+import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
+import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.db.SQLStringAnalyzer;
 import ee.stacc.productivity.edsl.samplegen.SampleGenerator;
 
@@ -24,14 +26,14 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 	}
 	
 	@Override
-	public void checkAbstractStrings(List<StringNodeDescriptor> descriptors,
+	public void checkAbstractStrings(List<IStringNodeDescriptor> descriptors,
 			ISQLErrorHandler errorHandler) {
 		int totalConcrete = 0;
 		Hashtable<String, Integer> concretes = new Hashtable<String, Integer>();
 		
 		System.out.println("============================================");
 		
-		for (StringNodeDescriptor desc: descriptors) {
+		for (IStringNodeDescriptor desc: descriptors) {
 			System.out.println("ABS: " + desc.getAbstractValue());
 			List<String> concreteStr = SampleGenerator.getConcreteStrings(desc.getAbstractValue());
 //			System.out.println(conc);

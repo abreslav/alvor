@@ -2,6 +2,7 @@ package ee.stacc.productivity.edsl.cmdline;
 
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.equinox.app.IApplication;
@@ -12,7 +13,9 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 
-import ee.stacc.productivity.edsl.crawler.StringNodeDescriptor;
+import ee.stacc.productivity.edsl.checkers.AbstractStringCheckerManager;
+import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
+import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.main.SQLUsageChecker;
 
 /**
@@ -40,24 +43,23 @@ public class EDSLApplication implements IApplication {
 						SQLUsageChecker projectChecker = new SQLUsageChecker();
 						
 						long time = System.currentTimeMillis();
-						List<StringNodeDescriptor> hotspots = projectChecker.findHotspots(sf);
+						List<IStringNodeDescriptor> hotspots = projectChecker.findHotspots(sf);
 						time = System.currentTimeMillis() - time;
 						System.out.format("%d\n", time);
-						for (StringNodeDescriptor stringNodeDescriptor : hotspots) {
+						for (IStringNodeDescriptor stringNodeDescriptor : hotspots) {
 							System.out.println(stringNodeDescriptor.getAbstractValue());
 						}
-//						projectChecker.checkJavaElement(hotspots, 
-//								new ISQLErrorHandler() {
-//									
-//									@Override
-//									public void handleSQLError(String errorMessage, IFile file,
-//											int startPosition, int length) {
-//										System.out.println(errorMessage);
-//									}
-//								}, 
-//								StaticSQLChecker.SQL_LEXICAL_CHECKER,
-//								StaticSQLChecker.SQL_SYNTAX_CHECKER, 
-//								DynamicSQLChecker.INSTANCE);
+						projectChecker.checkJavaElement(hotspots, 
+								new ISQLErrorHandler() {
+									
+									@Override
+									public void handleSQLError(String errorMessage, IFile file,
+											int startPosition, int length) {
+										System.err.println(errorMessage);
+										System.err.flush();
+									}
+								}, 
+								AbstractStringCheckerManager.INSTANCE.getCheckers());
 					}
 				}
 			}

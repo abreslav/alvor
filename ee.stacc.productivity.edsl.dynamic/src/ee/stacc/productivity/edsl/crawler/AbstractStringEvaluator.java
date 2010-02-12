@@ -34,6 +34,8 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
+import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
+import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.StringChoice;
 import ee.stacc.productivity.edsl.string.StringConstant;
@@ -366,7 +368,7 @@ public class AbstractStringEvaluator {
 		return (Statement)block.statements().get(block.statements().size()-1);
 	}
 	
-	public static List<StringNodeDescriptor> evaluateMethodArgumentAtCallSites
+	public static List<IStringNodeDescriptor> evaluateMethodArgumentAtCallSites
 			(Collection<NodeRequest> requests,
 					IJavaElement scope, int level) {
 		String levelPrefix = "";
@@ -388,8 +390,8 @@ public class AbstractStringEvaluator {
 		List<NodeDescriptor> argumentNodes = NodeSearchEngine.findArgumentNodes
 			(scope, requests);
 		
-		List<StringNodeDescriptor> result = new ArrayList<StringNodeDescriptor>();
-		for (NodeDescriptor sr: argumentNodes) {
+		List<IStringNodeDescriptor> result = new ArrayList<IStringNodeDescriptor>();
+		for (INodeDescriptor sr: argumentNodes) {
 			Expression arg = (Expression)sr.getNode();
 			StringNodeDescriptor desc = new StringNodeDescriptor(arg, sr.getFile(),
 					sr.getLineNumber(), sr.getCharStart(), sr.getCharLength(), null);
@@ -432,7 +434,7 @@ public class AbstractStringEvaluator {
 						((Expression)this.invocationContext.arguments().get(paramIndex));
 				}
 				else {
-					List<StringNodeDescriptor> descList = 
+					List<IStringNodeDescriptor> descList = 
 						AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(
 								Collections.singleton(
 										new NodeRequest(
@@ -442,7 +444,7 @@ public class AbstractStringEvaluator {
 							this.scope, this.level + 1);
 					
 					List<IAbstractString> choices = new ArrayList<IAbstractString>();
-					for (StringNodeDescriptor choiceDesc: descList) {
+					for (IStringNodeDescriptor choiceDesc: descList) {
 						choices.add(choiceDesc.getAbstractValue());
 					}
 					return new StringChoice(choices);

@@ -5,10 +5,12 @@ import java.util.List;
 
 import org.eclipse.jdt.core.IJavaElement;
 
+import ee.stacc.productivity.edsl.checkers.IAbstractStringChecker;
+import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
+import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.crawler.AbstractStringEvaluator;
 import ee.stacc.productivity.edsl.crawler.NodeRequest;
 import ee.stacc.productivity.edsl.crawler.NodeSearchEngine;
-import ee.stacc.productivity.edsl.crawler.StringNodeDescriptor;
 
 /**
  * This is main class
@@ -19,9 +21,9 @@ import ee.stacc.productivity.edsl.crawler.StringNodeDescriptor;
  */
 public class SQLUsageChecker {
 	
-	public void checkJavaElement(List<StringNodeDescriptor> hotspots, ISQLErrorHandler errorHandler, IAbstractStringChecker... checkers) {
+	public void checkJavaElement(List<IStringNodeDescriptor> hotspots, ISQLErrorHandler errorHandler, List<IAbstractStringChecker> checkers) {
 	
-		for (StringNodeDescriptor stringNodeDescriptor : hotspots) {
+		for (IStringNodeDescriptor stringNodeDescriptor : hotspots) {
 			System.out.println(stringNodeDescriptor.getAbstractValue());
 		}
 		
@@ -31,14 +33,14 @@ public class SQLUsageChecker {
 		}
 	}
 
-	public List<StringNodeDescriptor> findHotspots(IJavaElement scope) {
+	public List<IStringNodeDescriptor> findHotspots(IJavaElement scope) {
 		NodeSearchEngine.clearCache();
-		List<StringNodeDescriptor> descriptors = AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(Arrays.asList(
-				//new NodeRequest("org.springframework.jdbc.core.simple.SimpleJdbcTemplate", "queryForInt", 1),
-				//new NodeRequest("org.springframework.jdbc.core.simple.SimpleJdbcTemplate", "queryForObject", 1),
-				//new NodeRequest("org.springframework.jdbc.core.simple.SimpleJdbcTemplate", "queryForLong", 1),
-				//new NodeRequest("org.springframework.jdbc.core.simple.SimpleJdbcTemplate", "query", 1),
-				//new NodeRequest("org.araneaframework.backend.list.helper.ListSqlHelper", "setSqlQuery", 1),
+		List<IStringNodeDescriptor> descriptors = AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(Arrays.asList(
+				new NodeRequest("org.springframework.jdbc.core.simple.SimpleJdbcTemplate", "queryForInt", 1),
+				new NodeRequest("org.springframework.jdbc.core.simple.SimpleJdbcTemplate", "queryForObject", 1),
+				new NodeRequest("org.springframework.jdbc.core.simple.SimpleJdbcTemplate", "queryForLong", 1),
+				new NodeRequest("org.springframework.jdbc.core.simple.SimpleJdbcTemplate", "query", 1),
+				new NodeRequest("org.araneaframework.backend.list.helper.ListSqlHelper", "setSqlQuery", 1),
 				new NodeRequest("java.sql.Connection", "prepareStatement", 1)
 			), scope, 0);
 		return descriptors;

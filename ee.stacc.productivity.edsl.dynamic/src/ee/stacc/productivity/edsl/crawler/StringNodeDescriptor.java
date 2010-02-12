@@ -3,9 +3,10 @@ package ee.stacc.productivity.edsl.crawler;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.dom.ASTNode;
 
+import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 
-public class StringNodeDescriptor extends NodeDescriptor {
+public class StringNodeDescriptor extends NodeDescriptor implements IStringNodeDescriptor {
 
 	private IAbstractString abstractValue;
 

@@ -268,7 +268,7 @@ public class AutomataInclusionTest {
 			String[] expected) {
 		State init = StringToAutomatonConverter.INSTANCE.convert(str,
 				SQLLexer.SQL_ALPHABET_CONVERTER);
-		init = AutomataDeterminator.determinate(init);
+//		init = AutomataDeterminator.determinate(init);
 
 		checkAutomatonTransduction(expected, init);
 	}

@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.main;
+package ee.stacc.productivity.edsl.checkers;
 
 import org.eclipse.core.resources.IFile;
 
