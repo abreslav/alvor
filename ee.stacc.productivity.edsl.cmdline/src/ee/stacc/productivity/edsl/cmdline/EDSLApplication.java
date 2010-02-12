@@ -2,7 +2,6 @@ package ee.stacc.productivity.edsl.cmdline;
 
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.equinox.app.IApplication;
@@ -14,8 +13,6 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 
 import ee.stacc.productivity.edsl.crawler.StringNodeDescriptor;
-import ee.stacc.productivity.edsl.main.DynamicSQLChecker;
-import ee.stacc.productivity.edsl.main.ISQLErrorHandler;
 import ee.stacc.productivity.edsl.main.SQLUsageChecker;
 
 /**
