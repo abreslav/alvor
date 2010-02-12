@@ -1,13 +1,8 @@
 package ee.stacc.productivity.edsl.gui;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -17,7 +12,6 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.PlatformUI;
@@ -27,6 +21,7 @@ import ee.stacc.productivity.edsl.checkers.AbstractStringCheckerManager;
 import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.main.JavaElementChecker;
+import ee.stacc.productivity.edsl.main.OptionLoader;
 
 
 public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHandler {
@@ -37,13 +32,12 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 	private JavaElementChecker projectChecker = new JavaElementChecker();
 	
 	@Override
-	@SuppressWarnings("unchecked")
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		System.out.println("CheckProjectHandler.execute");
 		IJavaElement selectedJavaElement = getSelectedJavaElement();
 		cleanMarkers(selectedJavaElement);
 		try {
-			Map options = getElementSqlCheckerProperties(selectedJavaElement);
+			Map<String, Object> options = OptionLoader.getElementSqlCheckerProperties(selectedJavaElement);
 			List<IStringNodeDescriptor> hotspots = projectChecker.findHotspots(selectedJavaElement, options);
 			markHotspots(hotspots);
 			
@@ -58,18 +52,6 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 		return null; // Must be null
 	}
 	
-	private Properties getElementSqlCheckerProperties(IJavaElement element)
-			throws FileNotFoundException, IOException {
-		IJavaProject project = element.getJavaProject();
-		File propsFile = project.getResource().getLocation()
-			.append("/sqlchecker.properites").toFile();
-		System.out.println("PROPS_FILE: " + propsFile);
-		FileInputStream in = new FileInputStream(propsFile);
-		Properties props = new Properties();
-		props.load(in);
-		return props;
-	}
-
 	/*
 	 * @return an IJavaElement currently selected in the workbench
 	 */

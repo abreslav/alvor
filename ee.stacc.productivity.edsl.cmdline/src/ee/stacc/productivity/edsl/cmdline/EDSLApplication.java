@@ -1,5 +1,6 @@
 package ee.stacc.productivity.edsl.cmdline;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import ee.stacc.productivity.edsl.checkers.AbstractStringCheckerManager;
 import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.main.JavaElementChecker;
+import ee.stacc.productivity.edsl.main.OptionLoader;
 
 /**
  * This class controls all aspects of the application's execution
@@ -34,6 +36,10 @@ public class EDSLApplication implements IApplication {
 		IJavaProject[] projects = javaModel.getJavaProjects();
 		
 		for (IJavaProject javaProject : projects) {
+			File propertiesFile = OptionLoader.getElementSqlCheckerPropertiesFile(javaProject);
+			if (!propertiesFile.exists()) {
+				continue;
+			}
 			System.out.println(javaProject.getElementName());
 			IJavaElement[] children = javaProject.getChildren();
 			for (IJavaElement iJavaElement : children) {
@@ -44,7 +50,7 @@ public class EDSLApplication implements IApplication {
 						JavaElementChecker projectChecker = new JavaElementChecker();
 						
 						long time = System.currentTimeMillis();
-						Map<String, Object> options = Collections.<String, Object>emptyMap();
+						Map<String, Object> options = OptionLoader.getElementSqlCheckerProperties(iJavaElement);
 						List<IStringNodeDescriptor> hotspots = projectChecker.findHotspots(sf, options);
 						time = System.currentTimeMillis() - time;
 						System.out.format("%d\n", time);
