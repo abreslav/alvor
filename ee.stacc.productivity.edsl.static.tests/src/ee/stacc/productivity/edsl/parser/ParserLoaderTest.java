@@ -7,7 +7,7 @@ import org.junit.Test;
 import ee.stacc.productivity.edsl.sqlparser.IParserState;
 import ee.stacc.productivity.edsl.sqlparser.LRParser;
 import ee.stacc.productivity.edsl.sqlparser.Parsers;
-import ee.stacc.productivity.edsl.sqlparser.SimpleStack;
+import ee.stacc.productivity.edsl.sqlparser.SimpleLinkedStack;
 
 
 public class ParserLoaderTest {
@@ -61,7 +61,7 @@ public class ParserLoaderTest {
 	private void testParser(LRParser parser, String[] correctInputs, boolean expectingAccept) {
 		for (String input : correctInputs) {
 			input += " $end $end";
-			IParserState top = LRInterpreter.interpret(parser, SimpleStack.FACTORY, input, expectingAccept);
+			IParserState top = LRInterpreter.interpret(parser, SimpleLinkedStack.FACTORY, input, expectingAccept);
 			assertEquals(top.toString(), expectingAccept, !top.isError());
 		}
 	}

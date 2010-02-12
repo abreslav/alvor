@@ -38,7 +38,7 @@ public class SQLSyntaxChecker {
 			throw new IllegalArgumentException("The current version does not support loops in abstract strings");
 		}
 		
-		return checkAbstractString(str, SimpleStack.FACTORY);
+		return checkAbstractString(str, SimpleLinkedStack.FACTORY);
 	}
 
 	public List<String> checkAbstractString(IAbstractString as, IStackFactory stackFactory) {

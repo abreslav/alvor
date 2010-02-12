@@ -18,6 +18,7 @@ import ee.stacc.productivity.edsl.sqlparser.IAbstractStack;
 import ee.stacc.productivity.edsl.sqlparser.IStackFactory;
 import ee.stacc.productivity.edsl.sqlparser.LRParser;
 import ee.stacc.productivity.edsl.sqlparser.Parsers;
+import ee.stacc.productivity.edsl.sqlparser.SimpleLinkedStack;
 import ee.stacc.productivity.edsl.sqlparser.SimpleStack;
 
 @RunWith(Parameterized.class)
@@ -27,6 +28,7 @@ public class LRParsingTest {
 	public static Collection<Object[]> parameters() {
 		return Arrays.asList(new Object[][] {
 				{SimpleStack.FACTORY},
+				{SimpleLinkedStack.FACTORY},
 				{SimpleFoldedStack.FACTORY},
 		});
 	}

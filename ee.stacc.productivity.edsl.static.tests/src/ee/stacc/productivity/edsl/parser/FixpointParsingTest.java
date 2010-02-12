@@ -20,6 +20,7 @@ import ee.stacc.productivity.edsl.sqlparser.IStackFactory;
 import ee.stacc.productivity.edsl.sqlparser.LRParser;
 import ee.stacc.productivity.edsl.sqlparser.Parsers;
 import ee.stacc.productivity.edsl.sqlparser.SQLSyntaxChecker;
+import ee.stacc.productivity.edsl.sqlparser.SimpleLinkedStack;
 import ee.stacc.productivity.edsl.sqlparser.SimpleStack;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.parser.AbstractStringParser;
@@ -31,6 +32,7 @@ public class FixpointParsingTest {
 	public static Collection<Object[]> parameters() {
 		return Arrays.asList(new Object[][] {
 				{SimpleStack.FACTORY},
+				{SimpleLinkedStack.FACTORY},
 				{SimpleFoldedStack.FACTORY},
 		});
 	}
