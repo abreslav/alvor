@@ -14,6 +14,24 @@
 			time="on"
     		nobak="on"
 		/>
+		<exec executable="bison" dir="${basedir}">
+			<arg value="--xml=data/arith.xml"/>
+			<arg value="--report=state,lookahead,itemset"/>
+			<arg value="--report-file=generated/arith.report"/>
+			<arg value="--output=generated/ArithParser.java"/>
+			<arg value="--language=Java"/>
+			<arg value="--debug"/>
+			<arg value="grammar/arith.bg"/>
+		</exec>	
+		<exec executable="bison" dir="${basedir}">
+			<arg value="--xml=data/binexp.xml"/>
+			<arg value="--report=state,lookahead,itemset"/>
+			<arg value="--report-file=generated/binexp.report"/>
+			<arg value="--output=generated/BinExpParser.java"/>
+			<arg value="--language=Java"/>
+			<arg value="--debug"/>
+			<arg value="grammar/binexp.bg"/>
+		</exec>	
 	</target>
 
 </project>

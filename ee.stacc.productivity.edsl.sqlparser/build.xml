@@ -7,31 +7,13 @@
 
     <target name="depends">
 		<exec executable="bison" dir="${basedir}">
-			<arg value="--xml=generated/sql.xml"/>
+			<arg value="--xml=src/ee/stacc/productivity/edsl/sqlparser/sql.xml"/>
 			<arg value="--report=state,lookahead,itemset"/>
 			<arg value="--report-file=generated/sql.report"/>
 			<arg value="--output=generated/SQLParser.java"/>
 			<arg value="--language=Java"/>
 			<arg value="--debug"/>
 			<arg value="grammar/sql.bg"/>
-		</exec>	
-		<exec executable="bison" dir="${basedir}">
-			<arg value="--xml=generated/arith.xml"/>
-			<arg value="--report=state,lookahead,itemset"/>
-			<arg value="--report-file=generated/arith.report"/>
-			<arg value="--output=generated/ArithParser.java"/>
-			<arg value="--language=Java"/>
-			<arg value="--debug"/>
-			<arg value="grammar/arith.bg"/>
-		</exec>	
-		<exec executable="bison" dir="${basedir}">
-			<arg value="--xml=generated/binexp.xml"/>
-			<arg value="--report=state,lookahead,itemset"/>
-			<arg value="--report-file=generated/binexp.report"/>
-			<arg value="--output=generated/BinExpParser.java"/>
-			<arg value="--language=Java"/>
-			<arg value="--debug"/>
-			<arg value="grammar/binexp.bg"/>
 		</exec>	
 	</target>
 

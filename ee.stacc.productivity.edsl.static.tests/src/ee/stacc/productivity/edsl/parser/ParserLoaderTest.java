@@ -14,11 +14,11 @@ public class ParserLoaderTest {
 
 	@Test
 	public void test() throws Exception {
-		testParser(Parsers.BIN_EXP_PARSER, new String[] {
+		testParser(TestParsers.BIN_EXP_PARSER, new String[] {
 				"SELECT NUMBER '-' NUMBER FROM ID",
 		}, true);
 
-		testParser(Parsers.ARITH_PARSER, new String[] {
+		testParser(TestParsers.ARITH_PARSER, new String[] {
 				"'1'",
 				"'0'",
 				"'1' '*' '0'",
@@ -27,7 +27,7 @@ public class ParserLoaderTest {
 				"'1' '+' '0' '+' '1' '*' '0'",
 		}, true);
 		
-		testParser(Parsers.ARITH_PARSER, new String[] {
+		testParser(TestParsers.ARITH_PARSER, new String[] {
 				"'*'",
 				"'+'",
 				"'1' '*'",
