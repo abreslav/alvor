@@ -20,7 +20,8 @@ public final class SimpleLinkedStack implements IAbstractStack {
 	private final static class StackEntry {
 		private final StackEntry nextEntry;
 		private final IParserState state;
-
+		private Integer hashCode = null;
+		
 		public StackEntry(StackEntry nextEntry, IParserState state) {
 			this.nextEntry = nextEntry;
 			this.state = state;
@@ -28,12 +29,15 @@ public final class SimpleLinkedStack implements IAbstractStack {
 
 		@Override
 		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result
-					+ ((nextEntry == null) ? 0 : nextEntry.hashCode());
-			result = prime * result + ((state == null) ? 0 : state.hashCode());
-			return result;
+			if (hashCode == null) {
+				final int prime = 31;
+				int result = 1;
+				result = prime * result
+						+ ((nextEntry == null) ? 0 : nextEntry.hashCode());
+				result = prime * result + ((state == null) ? 0 : state.hashCode());
+				hashCode = result;
+			}
+			return hashCode;
 		}
 
 		@Override
