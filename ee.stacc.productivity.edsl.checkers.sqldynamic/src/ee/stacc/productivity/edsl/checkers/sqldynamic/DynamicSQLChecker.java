@@ -25,12 +25,12 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 		int totalConcrete = 0;
 		Hashtable<String, Integer> concretes = new Hashtable<String, Integer>();
 		
-		Logs.debug("============================================");
+		System.out.println("============================================");
 		
 		for (IStringNodeDescriptor desc: descriptors) {
-			Logs.debug("ABS: " + desc.getAbstractValue());
+			System.out.println("ABS: " + desc.getAbstractValue());
 			List<String> concreteStr = SampleGenerator.getConcreteStrings(desc.getAbstractValue());
-//			Logs.debug(conc);
+//			System.out.println(conc);
 			totalConcrete += concreteStr.size();
 			
 			int duplicates = 0;
@@ -38,11 +38,11 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 				Integer soFar = concretes.get(s);
 				duplicates = 0;
 				if (soFar == null) {
-					Logs.debug("CON: " + s);
+					System.out.println("CON: " + s);
 					try {
 						analyzer.validate(s);
 					} catch (SQLException e) {
-						Logs.debug("    ERR: " + e.getMessage());
+						System.out.println("    ERR: " + e.getMessage());
 						errorHandler.handleSQLError(e.getMessage(), desc);
 					}
 					
@@ -53,13 +53,13 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 					duplicates++;
 				}
 			}
-			Logs.debug("DUPLICATES: " + duplicates);
-			Logs.debug("____________________________________________");
+			System.out.println("DUPLICATES: " + duplicates);
+			System.out.println("____________________________________________");
 		}
 		
-		Logs.debug("TOTAL ABSTRACT COUNT: " + descriptors.size());
-		Logs.debug("TOTAL CONCRETE COUNT: " + totalConcrete);
-		Logs.debug("DIFFERENT CONCRETE COUNT: " + concretes.size());
+		System.out.println("TOTAL ABSTRACT COUNT: " + descriptors.size());
+		System.out.println("TOTAL CONCRETE COUNT: " + totalConcrete);
+		System.out.println("DIFFERENT CONCRETE COUNT: " + concretes.size());
 	}
 
 }
