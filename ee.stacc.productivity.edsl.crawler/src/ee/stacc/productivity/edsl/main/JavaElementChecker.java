@@ -10,6 +10,8 @@ import org.eclipse.jdt.core.IJavaElement;
 import ee.stacc.productivity.edsl.checkers.IAbstractStringChecker;
 import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
+import ee.stacc.productivity.edsl.common.logging.ILog;
+import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.crawler.AbstractStringEvaluator;
 import ee.stacc.productivity.edsl.crawler.NodeRequest;
 import ee.stacc.productivity.edsl.crawler.NodeSearchEngine;
@@ -24,6 +26,7 @@ import ee.stacc.productivity.edsl.crawler.NodeSearchEngine;
 public class JavaElementChecker {
 
 	private static final String HOTSPOTS = "hotspots";
+	private static final ILog LOG = Logs.getLog(JavaElementChecker.class);
 
 	/*
 	 * The map must contain an entry 
@@ -47,6 +50,12 @@ public class JavaElementChecker {
 			List<IAbstractStringChecker> checkers, 
 			Map<String, Object> options) {
 	
+		LOG.message("Abstract strings:");
+
+		for (IStringNodeDescriptor descriptor : hotspots) {
+			LOG.message(descriptor.getAbstractValue());
+		}
+		
 		for (IAbstractStringChecker checker : checkers) {
 			checker.checkAbstractStrings(hotspots, errorHandler, options);
 		}
@@ -62,7 +71,7 @@ public class JavaElementChecker {
 		}
 		String allHotspots = option.toString();
 		
-		System.out.println("Hotspots:");
+		LOG.message("Hotspots:");
 		List<NodeRequest> requests = new ArrayList<NodeRequest>();
 		for (String hotspot : allHotspots.split(";")) {
 			if (hotspot.length() == 0) {
@@ -70,7 +79,7 @@ public class JavaElementChecker {
 			}
 			String[] split = hotspot.split(",");
 			if (split.length != 3) {
-				System.err.println("Malformed hotspot: " + hotspot);
+				LOG.message("Malformed hotspot: " + hotspot);
 				continue;
 			}
 			String className = split[0];
@@ -80,8 +89,9 @@ public class JavaElementChecker {
 				int index = Integer.parseInt(argumentIndex);
 				NodeRequest nodeRequest = new NodeRequest(className, methodName, index);
 				requests.add(nodeRequest);
+				LOG.message(nodeRequest);
 			} catch (NumberFormatException e) {
-				System.err.println("Number format error: " + argumentIndex);
+				LOG.message("Number format error: " + argumentIndex);
 			}
 		}
 		return requests;

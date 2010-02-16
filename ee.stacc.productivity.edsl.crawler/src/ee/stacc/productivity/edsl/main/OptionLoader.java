@@ -10,13 +10,18 @@ import java.util.Properties;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 
+import ee.stacc.productivity.edsl.common.logging.ILog;
+import ee.stacc.productivity.edsl.common.logging.Logs;
+
 public class OptionLoader {
 
+	private final static ILog LOG = Logs.getLog(OptionLoader.class);
+	
 	public static Map<String, Object> getElementSqlCheckerProperties(IJavaElement element)
 			throws FileNotFoundException, IOException {
 		IJavaProject project = element.getJavaProject();
 		File propsFile = getElementSqlCheckerPropertiesFile(project);
-		System.out.println("PROPS_FILE: " + propsFile);
+		LOG.message("PROPS_FILE: " + propsFile);
 		FileInputStream in = new FileInputStream(propsFile);
 		Properties props = new Properties();
 		props.load(in);

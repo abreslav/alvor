@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import ee.stacc.productivity.edsl.common.logging.ILog;
+import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.lexer.automata.AutomataInclusion;
 import ee.stacc.productivity.edsl.lexer.automata.State;
 import ee.stacc.productivity.edsl.lexer.automata.StringToAutomatonConverter;
@@ -15,6 +17,7 @@ import ee.stacc.productivity.edsl.string.IAbstractString;
 public class SQLLexicalChecker {
 
 	public static final SQLLexicalChecker INSTANCE = new SQLLexicalChecker();
+	private static final ILog LOG = Logs.getLog(SQLLexicalChecker.class);
 	
 	private SQLLexicalChecker() {}
 	
@@ -47,7 +50,7 @@ public class SQLLexicalChecker {
 				if (inChar != (char) -1) {
 					String token = SQLLexerData.TOKENS[inChar];
 					if (token == null) {
-						System.err.println(inChar);
+						LOG.error(inChar);
 					}
 					if (token.endsWith("_ERR")) {
 						errorTokens.add(token);

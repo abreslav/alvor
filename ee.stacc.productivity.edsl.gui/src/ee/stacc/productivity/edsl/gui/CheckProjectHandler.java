@@ -20,6 +20,8 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
 import ee.stacc.productivity.edsl.checkers.AbstractStringCheckerManager;
 import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
+import ee.stacc.productivity.edsl.common.logging.ILog;
+import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.main.JavaElementChecker;
 import ee.stacc.productivity.edsl.main.OptionLoader;
 
@@ -29,11 +31,13 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 	public static final String WARNING_MARKER_ID = "ee.stacc.productivity.edsl.gui.sqlwarning";
 	public static final String HOTSPOT_MARKER_ID = "ee.stacc.productivity.edsl.gui.sqlhotspot";
 	
+	private static final ILog LOG = Logs.getLog(CheckProjectHandler.class);
+	
 	private JavaElementChecker projectChecker = new JavaElementChecker();
 	
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		System.out.println("CheckProjectHandler.execute");
+		LOG.message("CheckProjectHandler.execute");
 		IJavaElement selectedJavaElement = getSelectedJavaElement();
 		cleanMarkers(selectedJavaElement);
 		try {
@@ -76,14 +80,13 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 			scope.getResource().deleteMarkers(ERROR_MARKER_ID, true, IResource.DEPTH_INFINITE);
 			scope.getResource().deleteMarkers(WARNING_MARKER_ID, true, IResource.DEPTH_INFINITE);
 			scope.getResource().deleteMarkers(HOTSPOT_MARKER_ID, true, IResource.DEPTH_INFINITE);
-		} 
-		catch (Exception e) {
-			System.err.println(e.getMessage());
+		} catch (Exception e) {
+			LOG.exception(e);
 		}
 	}
 	
 	private void createMarker(String message, String markerType, IFile file, int charStart, int charEnd) {
-		System.out.println("creating marker: " + message + ", file=" + file
+		LOG.message("creating marker: " + message + ", file=" + file
 				+ ", charStart=" + charStart + ", charEnd=" + charEnd);
 		
 		Map<String, Comparable<?>> map = new HashMap<String, Comparable<?>>();
@@ -101,13 +104,13 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 		try {
 			MarkerUtilities.createMarker(file, map, markerType);
 		} catch (Exception e) {
-			System.err.println("Error creating marker: " + e.getMessage());
+			LOG.exception(e);
 		}
 	}
 
 	private void markHotspots(List<IStringNodeDescriptor> hotspots) {
 		for (IStringNodeDescriptor hotspot : hotspots) {
-			createMarker("Hotspot: " + hotspot.getAbstractValue(), HOTSPOT_MARKER_ID, 
+			createMarker("Abstract string: " + hotspot.getAbstractValue(), HOTSPOT_MARKER_ID, 
 					hotspot.getFile(), 
 					hotspot.getCharStart(), 
 					hotspot.getCharLength() + hotspot.getCharStart());
@@ -116,7 +119,6 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 
 	@Override
 	public void handleSQLError(String message, IStringNodeDescriptor descriptor) {
-		//System.err.println(e.getMessage());
 		createMarker(message, ERROR_MARKER_ID, descriptor.getFile(), descriptor.getCharStart(), 
 				descriptor.getCharStart() + descriptor.getCharLength());		
 	}

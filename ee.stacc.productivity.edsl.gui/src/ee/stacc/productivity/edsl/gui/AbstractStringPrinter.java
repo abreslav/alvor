@@ -13,9 +13,14 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorPart;
 
+import ee.stacc.productivity.edsl.common.logging.ILog;
+import ee.stacc.productivity.edsl.common.logging.Logs;
+
 //import ee.stacc.productivity.edsl.crawler.AbstractStringEvaluator;
 
 public class AbstractStringPrinter implements IEditorActionDelegate{
+	private static final ILog LOG = Logs.getLog(AbstractStringPrinter.class);
+	
 	private ISelection selection;
 	private IEditorPart targetEditor;
 
@@ -27,7 +32,7 @@ public class AbstractStringPrinter implements IEditorActionDelegate{
 		try {
 			doit();
 		} catch (Exception e) {
-			System.err.println("ERROR: " + e.getMessage());
+			LOG.exception(e);
 		}
 	}
 	
@@ -43,18 +48,18 @@ public class AbstractStringPrinter implements IEditorActionDelegate{
 		
 		ASTNode node = NodeFinder.perform(ast, textSel.getOffset(), textSel.getLength());
 		if (node == null) {
-			System.err.println("ERROR: Did not find node");
+			LOG.error("ERROR: Did not find node");
 		}
 		else if (node instanceof Expression) {
-			System.out.println("###############################");
-			System.out.println("Selection is : " + node.getClass().getName());
-			// TODO kontrolli et on string tüüpi expression
-			System.out.println("Abstract value is: ");
+			LOG.message("###############################");
+			LOG.message("Selection is : " + node.getClass().getName());
+			// TODO kontrolli et on string tï¿½ï¿½pi expression
+			LOG.message("Abstract value is: ");
 //			System.out.println(AbstractStringEvaluator.evaluateExpression
 //					((Expression)node).toString());
 		} 
 		else {
-			System.out.println("Selection is not expression, but: "
+			LOG.message("Selection is not expression, but: "
 					+ node.getClass().getName());
 		}
 	}

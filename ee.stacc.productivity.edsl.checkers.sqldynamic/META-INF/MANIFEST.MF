@@ -5,7 +5,8 @@ Bundle-SymbolicName: ee.stacc.productivity.edsl.checkers.sqldynamic;singleton:=t
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: ee.stacc.productivity.edsl.checkers;bundle-version="1.0.0",
- ee.stacc.productivity.edsl.model;bundle-version="1.0.0"
+ ee.stacc.productivity.edsl.model;bundle-version="1.0.0",
+ ee.stacc.productivity.edsl.common;bundle-version="1.0.0"
 Export-Package: ee.stacc.productivity.edsl.checkers.sqldynamic
 Bundle-ClassPath: lib/ojdbc6.jar,
  .

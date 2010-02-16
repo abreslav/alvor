@@ -1,7 +1,6 @@
 package ee.stacc.productivity.edsl.cmdline;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +17,8 @@ import org.eclipse.jdt.core.JavaCore;
 import ee.stacc.productivity.edsl.checkers.AbstractStringCheckerManager;
 import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
+import ee.stacc.productivity.edsl.common.logging.ILog;
+import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.main.JavaElementChecker;
 import ee.stacc.productivity.edsl.main.OptionLoader;
 
@@ -26,11 +27,12 @@ import ee.stacc.productivity.edsl.main.OptionLoader;
  */
 public class EDSLApplication implements IApplication {
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.equinox.app.IApplication#start(org.eclipse.equinox.app.IApplicationContext)
-	 */
+	
+	@Override
 	public Object start(IApplicationContext context) throws Exception {
-		System.out.println("Projects found:");
+		Logs.configureFromStream(EDSLApplication.class.getClassLoader().getResourceAsStream("logging.properties"));
+		final ILog log = Logs.getLog(EDSLApplication.class);
+		log.message("Projects found:");
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		IJavaModel javaModel = JavaCore.create(root);
 		IJavaProject[] projects = javaModel.getJavaProjects();
@@ -40,20 +42,20 @@ public class EDSLApplication implements IApplication {
 			if (!propertiesFile.exists()) {
 				continue;
 			}
-			System.out.println(javaProject.getElementName());
+			log.message(javaProject.getElementName());
 			IJavaElement[] children = javaProject.getChildren();
 			for (IJavaElement iJavaElement : children) {
 				if (iJavaElement instanceof IPackageFragmentRoot) {
 					IPackageFragmentRoot sf = (IPackageFragmentRoot) iJavaElement;
 					if (!sf.isExternal() && !sf.isArchive()) {
-						System.out.println(sf.getElementName());
+						log.message(sf.getElementName());
 						JavaElementChecker projectChecker = new JavaElementChecker();
 						
 						long time = System.currentTimeMillis();
 						Map<String, Object> options = OptionLoader.getElementSqlCheckerProperties(iJavaElement);
 						List<IStringNodeDescriptor> hotspots = projectChecker.findHotspots(sf, options);
 						time = System.currentTimeMillis() - time;
-						System.out.format("%d\n", time);
+						log.format("%d\n", time);
 						for (IStringNodeDescriptor stringNodeDescriptor : hotspots) {
 							System.out.println(stringNodeDescriptor.getAbstractValue());
 						}
@@ -64,8 +66,7 @@ public class EDSLApplication implements IApplication {
 									public void handleSQLError(
 											String errorMessage,
 											IStringNodeDescriptor descriptor) {
-										System.err.println(errorMessage);
-										System.err.flush();
+										log.error(errorMessage);
 									}
 								}, 
 								AbstractStringCheckerManager.INSTANCE.getCheckers(),
@@ -78,9 +79,7 @@ public class EDSLApplication implements IApplication {
 		return IApplication.EXIT_OK;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.equinox.app.IApplication#stop()
-	 */
+	@Override
 	public void stop() {
 		// nothing to do
 	}
