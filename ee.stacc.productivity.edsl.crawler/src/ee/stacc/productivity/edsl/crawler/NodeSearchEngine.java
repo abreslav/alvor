@@ -18,12 +18,14 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.NodeFinder;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
@@ -41,7 +43,7 @@ public class NodeSearchEngine {
 	
 	private static Map<ICompilationUnit, ASTNode> astCache = 
 		new HashMap<ICompilationUnit, ASTNode>();
-	private static IJavaElement[] scopeElems = {null};
+	private static IJavaElement[] _scopeElems = {null};
 	
 	public static void clearCache() {
 		astCache.clear();
@@ -57,13 +59,6 @@ public class NodeSearchEngine {
 		
 		final List<NodeDescriptor> result = new ArrayList<NodeDescriptor>();
 
-		// FIXME temporary, to speed up a bit -- must not be a problem any more
-		/*
-		if (methodName.equals("get")) {
-			return new ArrayList<NodeSearchResult>();
-		}
-		*/
-		
 		// Create one big pattern from all the requests
 		// NB: This is likely to be faster than searching for each request separately,
 		//     but we have to confirm this by and experiment
@@ -80,7 +75,6 @@ public class NodeSearchEngine {
 		}
 		System.out.println(pattern);
 		
-		scopeElems[0] = searchScope;
 		IJavaElement[] elems = {searchScope};
 		IJavaSearchScope scope = SearchEngine.createJavaSearchScope(elems, IJavaSearchScope.SOURCES);
 		
@@ -173,7 +167,7 @@ public class NodeSearchEngine {
 		}
 	}
 	
-	public static List<MethodDeclaration> findMethodDeclarations(final MethodInvocation inv) {
+	public static List<MethodDeclaration> findMethodDeclarations(IJavaElement searchScope, final MethodInvocation inv) {
 		System.out.println("FIND METHOD DECL: " + inv);
 //		ITypeBinding objectType = inv.getExpression().resolveTypeBinding();
 		final List<MethodDeclaration> result = new ArrayList<MethodDeclaration>();
@@ -182,12 +176,12 @@ public class NodeSearchEngine {
 				inv.getName().getIdentifier(), IJavaSearchConstants.METHOD, 
 				IJavaSearchConstants.DECLARATIONS, SearchPattern.R_EXACT_MATCH);
 		
-		IJavaSearchScope scope = SearchEngine.createJavaSearchScope(null,//scopeElems,
-				IJavaSearchScope.SOURCES);		
+		IJavaSearchScope scope = SearchEngine.createJavaSearchScope(
+				new IJavaElement[]{searchScope}, IJavaSearchScope.SOURCES);		
 		
 		SearchRequestor requestor = new SearchRequestor() {
 			public void acceptSearchMatch(SearchMatch match) {
-				ASTNode node = getASTNode(match);
+				ASTNode node = getASTNode(match); // gives SimpleName (IIRC)
 				MethodDeclaration decl = (MethodDeclaration)node.getParent();
 				if (declarationIsCompatibleWithInvocation(decl, inv)) {
 					result.add(decl);
@@ -203,8 +197,30 @@ public class NodeSearchEngine {
 		executeSearch(pattern, requestor, scope);
 		
 		return result;
-		//throw new UnsupportedStringOpEx("Crawler.getMethodDeclarations, expr type = "
-		//		+ objectType.getName());
+	}
+	
+	public static VariableDeclarationFragment findFieldDeclarationFragment
+			(IJavaElement searchScope, String qualifiedName) {
+		System.out.println("Searching for: " + qualifiedName);
+		SearchPattern pattern = SearchPattern.createPattern(
+				qualifiedName, IJavaSearchConstants.FIELD, 
+				IJavaSearchConstants.DECLARATIONS, SearchPattern.R_EXACT_MATCH);
+		
+		IJavaSearchScope scope = SearchEngine.createJavaSearchScope(
+				new IJavaElement[]{searchScope}, IJavaSearchScope.SOURCES);		
+		
+		final List<VariableDeclarationFragment> result = new ArrayList<VariableDeclarationFragment>();
+		SearchRequestor requestor = new SearchRequestor() {
+			public void acceptSearchMatch(SearchMatch match) {
+				ASTNode node = getASTNode(match); // node is SimpleName
+				result.add((VariableDeclarationFragment)node.getParent());
+			}
+		};
+		
+		executeSearch(pattern, requestor, scope);
+		
+		assert (result.size() == 1);
+		return result.get(0);
 	}
 	
 	private static ICompilationUnit getCompilationUnit(SearchMatch match) {

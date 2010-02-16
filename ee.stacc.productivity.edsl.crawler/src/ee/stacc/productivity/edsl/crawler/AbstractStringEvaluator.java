@@ -1,10 +1,12 @@
 package ee.stacc.productivity.edsl.crawler;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -15,6 +17,7 @@ import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
+import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
@@ -22,6 +25,7 @@ import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
@@ -32,6 +36,7 @@ import org.eclipse.jdt.core.dom.ThisExpression;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
@@ -44,8 +49,8 @@ import ee.stacc.productivity.edsl.string.StringSequence;
 
 public class AbstractStringEvaluator {
 	private int maxLevel = 1;
-	private boolean supportParameters = false;
-	private boolean supportInvocations = false;
+	private boolean supportParameters = true;
+	private boolean supportInvocations = true;
 	
 	private int level;
 	private MethodInvocation invocationContext;
@@ -76,10 +81,8 @@ public class AbstractStringEvaluator {
 		if (type.getName().equals("int")) {
 			throw new UnsupportedStringOpEx	("TODO: int expression");
 		}
-		else if (node instanceof SimpleName) {
-			IBinding var = ((SimpleName)node).resolveBinding();
-			assert var instanceof IVariableBinding;
-			return evalVarBefore((IVariableBinding)var, getContainingStmt(node));
+		else if (node instanceof Name) {
+			return evalName((Name)node);
 		}
 		else if (node instanceof StringLiteral) {
 			return new StringConstant(((StringLiteral)node).getLiteralValue());
@@ -99,7 +102,36 @@ public class AbstractStringEvaluator {
 				("TODO: getValOf(" + node.getClass().getName() + ")");
 		}
 	}
-
+	
+	private IAbstractString evalName(Name node) {
+		// can be SimpleName or QualifiedName
+		IVariableBinding var = (IVariableBinding)node.resolveBinding();
+		Statement stmt = getContainingStmt(node);
+		if (stmt == null) {
+			// no containing statement, so assuming we are in in field initializer
+			assert var.isField();
+			return evalField(var);
+		} else {
+			// TODO this statement can modify this var 
+			return evalVarBefore(var, stmt);
+		}
+	}
+	
+	/*
+	private IAbstractString evalQualifiedName(QualifiedName node) {
+		// hoping it's ClassName.staticFinalField (often is)
+		if (!(node.getQualifier() instanceof SimpleName)) {
+			throw new UnsupportedStringOpEx("Too complex QualifiedName.qualifier");
+		}
+		IBinding binding = node.getQualifier().resolveBinding();
+		if (!(binding instanceof ITypeBinding)) {
+			throw new UnsupportedStringOpEx("QualifiedName.qualifier not a type");
+		}
+		return evalField(((ITypeBinding)binding).getQualifiedName() 
+				+ "." + node.getName().getIdentifier());
+	}
+	*/
+	
 	private IAbstractString evalInfix(InfixExpression expr) {
 		if (expr.getOperator() == InfixExpression.Operator.PLUS) {
 			List<IAbstractString> ops = new ArrayList<IAbstractString>();
@@ -152,7 +184,11 @@ public class AbstractStringEvaluator {
 			return (Statement)node.getParent();
 		}
 		else {
-			return getContainingStmt(node.getParent());
+			ASTNode parent = node.getParent();
+			if (parent == null) {
+				return null;
+			}
+			return getContainingStmt(parent);
 		}
 	}
 	
@@ -277,6 +313,19 @@ public class AbstractStringEvaluator {
 		} 
 	}
 	
+	private IAbstractString evalField(IVariableBinding var) {
+		VariableDeclarationFragment frag = NodeSearchEngine
+			.findFieldDeclarationFragment(scope, var.getDeclaringClass().getQualifiedName() 
+				+ "." + var.getName());
+	
+		FieldDeclaration decl = (FieldDeclaration)frag.getParent();
+		if ((decl.getModifiers() & Modifier.FINAL) == 0) {
+			throw new UnsupportedStringOpEx("Only final fields are supported");
+			// TODO if it's not final, then create option with initalizer and AnyString
+		}
+		return eval(frag.getInitializer());
+	}
+	
 	private IAbstractString evalVarAfterMethodInvStmt(IVariableBinding var,
 			ExpressionStatement stmt) {
 		MethodInvocation inv = (MethodInvocation)stmt.getExpression();
@@ -296,9 +345,8 @@ public class AbstractStringEvaluator {
 			}
 		} 
 		else {
-			// TODO at the moment just assuming that if i don't understand
-			//  the construction then it doesn't modify var
-			return evalVarBefore(var, stmt);
+			// TODO 
+			throw new UnsupportedStringOpEx("Chained method invocation");
 		}
 	}
 	
@@ -330,7 +378,7 @@ public class AbstractStringEvaluator {
 				throw new UnsupportedStringOpEx("MethodInvocation, expression not SimpleName");
 			} 
 			else {
-				List<MethodDeclaration> decls = NodeSearchEngine.findMethodDeclarations(inv);
+				List<MethodDeclaration> decls = NodeSearchEngine.findMethodDeclarations(scope, inv);
 				List<IAbstractString> choices = new ArrayList<IAbstractString>();
 				for (MethodDeclaration decl: decls) {
 					choices.add(evaluatorWithNewContext.getMethodReturnValue(decl));
@@ -396,17 +444,19 @@ public class AbstractStringEvaluator {
 			StringNodeDescriptor desc = new StringNodeDescriptor(arg, sr.getFile(),
 					sr.getLineNumber(), sr.getCharStart(), sr.getCharLength(), null);
 			try {
+				System.out.println(levelPrefix + "EVALUATING: file=" + desc.getFile()
+						+ ", line=" + desc.getLineNumber());
 				desc.setAbstractValue(evaluator.eval(arg));
 				result.add(desc);
 			} catch (UnsupportedStringOpEx e) {
 				System.out.println(levelPrefix + "UNSUPPORTED: " + e.getMessage());
 				System.out.println(levelPrefix + "    file: " + sr.getFile() + ", line: " 
 						+ sr.getLineNumber());	
-			} catch (Throwable t) {
-				System.out.println(levelPrefix + "PROGRAM ERROR: " + t.getMessage());
+			} /*catch (Exception e) {
+				System.out.println(levelPrefix + "PROGRAM ERROR: " + e.getMessage());
 				System.out.println(levelPrefix + "    file: " + sr.getFile() + ", line: " 
 						+ sr.getLineNumber());	
-			}
+			} */
 		}
 		return result;
 	}
@@ -416,7 +466,7 @@ public class AbstractStringEvaluator {
 		if (prevStmt == null) {
 			// no previous statement, must be beginning of method declaration
 			if (var.isField()) {
-				throw new UnsupportedStringOpEx("getVarValBefore field");
+				return evalField(var);
 			}
 			else if (var.isParameter()) {
 				if (! supportParameters) {

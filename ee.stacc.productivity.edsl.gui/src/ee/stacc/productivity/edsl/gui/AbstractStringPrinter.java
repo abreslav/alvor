@@ -1,5 +1,7 @@
 package ee.stacc.productivity.edsl.gui;
 
+import static ee.stacc.productivity.edsl.gui.Logger.LOG;
+
 import org.eclipse.jdt.core.ITypeRoot;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -13,13 +15,10 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorPart;
 
-import ee.stacc.productivity.edsl.common.logging.ILog;
-import ee.stacc.productivity.edsl.common.logging.Logs;
-
+import ee.stacc.productivity.edsl.crawler.AbstractStringEvaluator;
 //import ee.stacc.productivity.edsl.crawler.AbstractStringEvaluator;
 
 public class AbstractStringPrinter implements IEditorActionDelegate{
-	private static final ILog LOG = Logs.getLog(AbstractStringPrinter.class);
 	
 	private ISelection selection;
 	private IEditorPart targetEditor;
@@ -55,8 +54,8 @@ public class AbstractStringPrinter implements IEditorActionDelegate{
 			LOG.message("Selection is : " + node.getClass().getName());
 			// TODO kontrolli et on string t��pi expression
 			LOG.message("Abstract value is: ");
-//			System.out.println(AbstractStringEvaluator.evaluateExpression
-//					((Expression)node).toString());
+			System.out.println(AbstractStringEvaluator.evaluateExpression
+					((Expression)node).toString());
 		} 
 		else {
 			LOG.message("Selection is not expression, but: "

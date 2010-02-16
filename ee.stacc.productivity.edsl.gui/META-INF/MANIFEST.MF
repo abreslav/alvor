@@ -21,3 +21,4 @@ Require-Bundle: org.eclipse.ui,
  ee.stacc.productivity.edsl.checkers;bundle-version="1.0.0",
  ee.stacc.productivity.edsl.crawler;bundle-version="1.0.0",
  ee.stacc.productivity.edsl.common;bundle-version="1.0.0"
+Bundle-Activator: ee.stacc.productivity.edsl.gui.Activator

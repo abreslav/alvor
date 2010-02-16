@@ -10,4 +10,5 @@ Require-Bundle: org.eclipse.jdt.core;bundle-version="3.5.1",
  org.eclipse.core.resources;bundle-version="3.5.1",
  org.eclipse.core.runtime;bundle-version="3.5.0",
  ee.stacc.productivity.edsl.common;bundle-version="1.0.0"
-Export-Package: ee.stacc.productivity.edsl.main
+Export-Package: ee.stacc.productivity.edsl.crawler,
+ ee.stacc.productivity.edsl.main
