@@ -1,7 +1,5 @@
 package ee.stacc.productivity.edsl.gui;
 
-import static ee.stacc.productivity.edsl.gui.Logger.LOG;
-
 import org.eclipse.jdt.core.ITypeRoot;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -15,10 +13,13 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorPart;
 
+import ee.stacc.productivity.edsl.common.logging.ILog;
+import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.crawler.AbstractStringEvaluator;
-//import ee.stacc.productivity.edsl.crawler.AbstractStringEvaluator;
 
 public class AbstractStringPrinter implements IEditorActionDelegate{
+	
+	private static final ILog LOG = Logs.getLog(AbstractStringPrinter.class);
 	
 	private ISelection selection;
 	private IEditorPart targetEditor;

@@ -26,7 +26,8 @@ public class Activator extends AbstractUIPlugin  {
 
 	@Override
 	public void start( final BundleContext context ) throws Exception {
-	    super.start( context );
+		super.start( context );
+		Logs.configureFromStream(CheckProjectHandler.class.getClassLoader().getResourceAsStream("logging.properties"));
 	    plugin = this;
 	}
 	

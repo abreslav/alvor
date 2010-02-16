@@ -314,16 +314,17 @@ public class AbstractStringEvaluator {
 	}
 	
 	private IAbstractString evalField(IVariableBinding var) {
-		VariableDeclarationFragment frag = NodeSearchEngine
-			.findFieldDeclarationFragment(scope, var.getDeclaringClass().getQualifiedName() 
-				+ "." + var.getName());
-	
-		FieldDeclaration decl = (FieldDeclaration)frag.getParent();
-		if ((decl.getModifiers() & Modifier.FINAL) == 0) {
-			throw new UnsupportedStringOpEx("Only final fields are supported");
-			// TODO if it's not final, then create option with initalizer and AnyString
-		}
-		return eval(frag.getInitializer());
+		throw new UnsupportedStringOpEx("");
+//		VariableDeclarationFragment frag = NodeSearchEngine
+//			.findFieldDeclarationFragment(scope, var.getDeclaringClass().getQualifiedName() 
+//				+ "." + var.getName());
+//	
+//		FieldDeclaration decl = (FieldDeclaration)frag.getParent();
+//		if ((decl.getModifiers() & Modifier.FINAL) == 0) {
+//			throw new UnsupportedStringOpEx("Only final fields are supported");
+//			// TODO if it's not final, then create option with initalizer and AnyString
+//		}
+//		return eval(frag.getInitializer());
 	}
 	
 	private IAbstractString evalVarAfterMethodInvStmt(IVariableBinding var,
