@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -48,9 +47,9 @@ import ee.stacc.productivity.edsl.string.StringSequence;
 
 
 public class AbstractStringEvaluator {
-	private int maxLevel = 1;
-	private boolean supportParameters = true;
-	private boolean supportInvocations = true;
+	static private int maxLevel = 1;
+	static private boolean supportParameters = true;
+	static private boolean supportInvocations = true;
 	
 	private int level;
 	private MethodInvocation invocationContext;
@@ -79,7 +78,7 @@ public class AbstractStringEvaluator {
 		assert type != null;
 		
 		if (type.getName().equals("int")) {
-			throw new UnsupportedStringOpEx	("TODO: int expression");
+			throw new UnsupportedStringOpEx	("int expression");
 		}
 		else if (node instanceof Name) {
 			return evalName((Name)node);
@@ -99,7 +98,7 @@ public class AbstractStringEvaluator {
 		}
 		else {
 			throw new UnsupportedStringOpEx
-				("TODO: getValOf(" + node.getClass().getName() + ")");
+				("getValOf(" + node.getClass().getName() + ")");
 		}
 	}
 	
@@ -314,17 +313,16 @@ public class AbstractStringEvaluator {
 	}
 	
 	private IAbstractString evalField(IVariableBinding var) {
-		throw new UnsupportedStringOpEx("");
-//		VariableDeclarationFragment frag = NodeSearchEngine
-//			.findFieldDeclarationFragment(scope, var.getDeclaringClass().getQualifiedName() 
-//				+ "." + var.getName());
-//	
-//		FieldDeclaration decl = (FieldDeclaration)frag.getParent();
-//		if ((decl.getModifiers() & Modifier.FINAL) == 0) {
-//			throw new UnsupportedStringOpEx("Only final fields are supported");
-//			// TODO if it's not final, then create option with initalizer and AnyString
-//		}
-//		return eval(frag.getInitializer());
+		VariableDeclarationFragment frag = NodeSearchEngine
+			.findFieldDeclarationFragment(scope, var.getDeclaringClass().getErasure().getQualifiedName() 
+				+ "." + var.getName());
+	
+		FieldDeclaration decl = (FieldDeclaration)frag.getParent();
+		if ((decl.getModifiers() & Modifier.FINAL) == 0) {
+			throw new UnsupportedStringOpEx("Only final fields are supported");
+			// TODO create option with initalizer and AnyString
+		}
+		return eval(frag.getInitializer());
 	}
 	
 	private IAbstractString evalVarAfterMethodInvStmt(IVariableBinding var,
@@ -375,9 +373,6 @@ public class AbstractStringEvaluator {
 						inv.getName().getIdentifier());
 				return evaluatorWithNewContext.getMethodReturnValue(decl);
 			}
-			else if (!(inv.getExpression() instanceof SimpleName)) {
-				throw new UnsupportedStringOpEx("MethodInvocation, expression not SimpleName");
-			} 
 			else {
 				List<MethodDeclaration> decls = NodeSearchEngine.findMethodDeclarations(scope, inv);
 				List<IAbstractString> choices = new ArrayList<IAbstractString>();
@@ -445,19 +440,24 @@ public class AbstractStringEvaluator {
 			StringNodeDescriptor desc = new StringNodeDescriptor(arg, sr.getFile(),
 					sr.getLineNumber(), sr.getCharStart(), sr.getCharLength(), null);
 			try {
-				System.out.println(levelPrefix + "EVALUATING: file=" + desc.getFile()
-						+ ", line=" + desc.getLineNumber());
+				//System.out.println(levelPrefix + "EVALUATING: file=" + desc.getFile()
+				//		+ ", line=" + desc.getLineNumber());
 				desc.setAbstractValue(evaluator.eval(arg));
 				result.add(desc);
 			} catch (UnsupportedStringOpEx e) {
 				System.out.println(levelPrefix + "UNSUPPORTED: " + e.getMessage());
 				System.out.println(levelPrefix + "    file: " + sr.getFile() + ", line: " 
 						+ sr.getLineNumber());	
-			} /*catch (Exception e) {
-				System.out.println(levelPrefix + "PROGRAM ERROR: " + e.getMessage());
-				System.out.println(levelPrefix + "    file: " + sr.getFile() + ", line: " 
+			} /* catch (Exception e) {
+				if (catchAllExceptions) {
+					System.out.println(levelPrefix + "PROGRAM ERROR: " + e.getMessage());
+					System.out.println(levelPrefix + "    file: " + sr.getFile() + ", line: " 
 						+ sr.getLineNumber());	
-			} */
+				} else {
+					throw e;
+				}
+			} */ 
+			
 		}
 		return result;
 	}

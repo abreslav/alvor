@@ -168,7 +168,7 @@ public class NodeSearchEngine {
 	}
 	
 	public static List<MethodDeclaration> findMethodDeclarations(IJavaElement searchScope, final MethodInvocation inv) {
-		System.out.println("FIND METHOD DECL: " + inv);
+		//System.out.println("FIND METHOD DECL: " + inv);
 //		ITypeBinding objectType = inv.getExpression().resolveTypeBinding();
 		final List<MethodDeclaration> result = new ArrayList<MethodDeclaration>();
 		
@@ -201,7 +201,7 @@ public class NodeSearchEngine {
 	
 	public static VariableDeclarationFragment findFieldDeclarationFragment
 			(IJavaElement searchScope, String qualifiedName) {
-		System.out.println("Searching for: " + qualifiedName);
+		//System.out.println("Searching for: " + qualifiedName);
 		SearchPattern pattern = SearchPattern.createPattern(
 				qualifiedName, IJavaSearchConstants.FIELD, 
 				IJavaSearchConstants.DECLARATIONS, SearchPattern.R_EXACT_MATCH);
