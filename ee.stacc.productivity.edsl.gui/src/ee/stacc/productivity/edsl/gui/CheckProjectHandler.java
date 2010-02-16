@@ -31,7 +31,11 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 	public static final String WARNING_MARKER_ID = "ee.stacc.productivity.edsl.gui.sqlwarning";
 	public static final String HOTSPOT_MARKER_ID = "ee.stacc.productivity.edsl.gui.sqlhotspot";
 	
-	private static final ILog LOG = Logs.getLog(CheckProjectHandler.class);
+	private static final ILog LOG;
+	static {
+	    Logs.configureFromStream(CheckProjectHandler.class.getClassLoader().getResourceAsStream("logging.properties"));
+		LOG = Logs.getLog(CheckProjectHandler.class);
+	}
 	
 	private JavaElementChecker projectChecker = new JavaElementChecker();
 	
@@ -50,7 +54,7 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 					options
 			);
 		} catch (Throwable e) {
-			e.printStackTrace();
+			LOG.exception(e);
 			throw new ExecutionException("Error during checking: " + e.getMessage(), e);
 		}
 		return null; // Must be null
