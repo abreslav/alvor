@@ -12,6 +12,8 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.BooleanLiteral;
+import org.eclipse.jdt.core.dom.CharacterLiteral;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
@@ -25,6 +27,7 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
@@ -40,16 +43,20 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
+import ee.stacc.productivity.edsl.common.logging.ILog;
+import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.StringChoice;
 import ee.stacc.productivity.edsl.string.StringConstant;
+import ee.stacc.productivity.edsl.string.StringRandomInteger;
 import ee.stacc.productivity.edsl.string.StringSequence;
 
 
 public class AbstractStringEvaluator {
-	static private int maxLevel = 1;
-	static private boolean supportParameters = true;
-	static private boolean supportInvocations = true;
+	private static final ILog LOG = Logs.getLog(AbstractStringEvaluator.class);
+	private int maxLevel = 1;
+	private boolean supportParameters = true;
+	private boolean supportInvocations = true;
 	
 	private int level;
 	private MethodInvocation invocationContext;
@@ -78,13 +85,16 @@ public class AbstractStringEvaluator {
 		assert type != null;
 		
 		if (type.getName().equals("int")) {
-			throw new UnsupportedStringOpEx	("int expression");
-		}
-		else if (node instanceof Name) {
-			return evalName((Name)node);
+			return new StringRandomInteger();
 		}
 		else if (node instanceof StringLiteral) {
 			return new StringConstant(((StringLiteral)node).getLiteralValue());
+		}
+		else if (node instanceof CharacterLiteral) {
+			return new StringConstant(String.valueOf(((CharacterLiteral)node).charValue()));
+		}
+		else if (node instanceof Name) {
+			return evalName((Name)node);
 		}
 		else if (node instanceof ParenthesizedExpression) {
 			return eval(((ParenthesizedExpression)node).getExpression());
@@ -95,6 +105,29 @@ public class AbstractStringEvaluator {
 		else if (node instanceof MethodInvocation) {
 			MethodInvocation inv = (MethodInvocation)node;
 				return evalInvocation(inv);
+		}
+		else if (node instanceof ClassInstanceCreation) {
+			
+			assert (isStringBuilderOrBuffer(node.resolveTypeBinding()));
+			ClassInstanceCreation cic = (ClassInstanceCreation)node;
+			if (cic.arguments().size() == 1) {
+				Expression arg = (Expression)cic.arguments().get(0);
+				// string initialyzer
+				if (arg.resolveTypeBinding().getName().equals("String")) {
+					return eval(arg);
+				}
+				else if (arg.resolveTypeBinding().getName().equals("int")) {
+					return new StringConstant("");
+				}
+				else { // CharSequence
+					throw new UnsupportedStringOpEx("Unknown StringBuilder/Buffer constructor: " 
+							+ arg.resolveTypeBinding().getName());
+				}
+			}
+			else {
+				assert cic.arguments().size() == 0;
+				return new StringConstant("");
+			}
 		}
 		else {
 			throw new UnsupportedStringOpEx
@@ -116,21 +149,6 @@ public class AbstractStringEvaluator {
 		}
 	}
 	
-	/*
-	private IAbstractString evalQualifiedName(QualifiedName node) {
-		// hoping it's ClassName.staticFinalField (often is)
-		if (!(node.getQualifier() instanceof SimpleName)) {
-			throw new UnsupportedStringOpEx("Too complex QualifiedName.qualifier");
-		}
-		IBinding binding = node.getQualifier().resolveBinding();
-		if (!(binding instanceof ITypeBinding)) {
-			throw new UnsupportedStringOpEx("QualifiedName.qualifier not a type");
-		}
-		return evalField(((ITypeBinding)binding).getQualifiedName() 
-				+ "." + node.getName().getIdentifier());
-	}
-	*/
-	
 	private IAbstractString evalInfix(InfixExpression expr) {
 		if (expr.getOperator() == InfixExpression.Operator.PLUS) {
 			List<IAbstractString> ops = new ArrayList<IAbstractString>();
@@ -148,7 +166,7 @@ public class AbstractStringEvaluator {
 	}
 	
 	private static Statement getPrevStmt(Statement node) {
-		//System.out.println("getPrevStmt: " + node.getClass().getName());
+		//LOG.message("getPrevStmt: " + node.getClass().getName());
 		
 		if (node.getParent() instanceof Block) {
 			Block block = (Block) node.getParent();
@@ -216,35 +234,7 @@ public class AbstractStringEvaluator {
 			VariableDeclaration vDec = (VariableDeclaration)stmt.fragments().get(i);
 			
 			if (vDec.getName().resolveBinding().isEqualTo(var)) {
-				if (isStringBuilderOrBuffer(var.getType())) {
-					if (vDec.getInitializer() instanceof ClassInstanceCreation) {
-						ClassInstanceCreation cic = (ClassInstanceCreation)vDec.getInitializer();
-						assert isStringBuilderOrBuffer(cic.getType().resolveBinding());
-						if (cic.arguments().size() == 1) {
-							Expression arg = (Expression)cic.arguments().get(0);
-							if (arg.resolveTypeBinding().getName().equals("String")) {
-								return eval(arg);
-							}
-							else if (arg.resolveTypeBinding().getName().equals("int")) {
-								return new StringConstant("");
-							}
-							else { // CharSequence
-								throw new UnsupportedStringOpEx("Unknown StringBuilder/Buffer constructor: " 
-										+ arg.resolveTypeBinding().getName());
-							}
-						} else {
-							return new StringConstant("");
-						}
-					}
-					else {
-						throw new UnsupportedStringOpEx("getVarValAfterVarDec: initializer is "
-								+ vDec.getInitializer().getClass());
-					}
-				}
-				else {
-					assert var.getType().getName().equals("String");
-					return eval(vDec.getInitializer());
-				}
+				return eval(vDec.getInitializer());
 			}
 		}
 		return evalVarBefore(var, stmt);
@@ -279,7 +269,7 @@ public class AbstractStringEvaluator {
 	}
 	
 	private IAbstractString evalVarAfter(IVariableBinding var, Statement stmt) {
-		//System.out.println("getVarValAfter: var=" + var.getName()
+		//LOG.message("getVarValAfter: var=" + var.getName()
 		//		+ ", stmt="+ stmt.getClass().getName());
 		
 		if (stmt instanceof ExpressionStatement) {
@@ -327,46 +317,108 @@ public class AbstractStringEvaluator {
 	
 	private IAbstractString evalVarAfterMethodInvStmt(IVariableBinding var,
 			ExpressionStatement stmt) {
-		MethodInvocation inv = (MethodInvocation)stmt.getExpression();
-		Expression expr = inv.getExpression();
 		
-		if (expr instanceof SimpleName && ((SimpleName)expr).resolveBinding().isEqualTo(var)) {
-			assert isStringBuilderOrBuffer(var.getType());
+		if (isStringBuilderOrBuffer(var.getType()) 
+				&& isStringBuilderOrBuffer(stmt.getExpression().resolveTypeBinding())) {
+			MethodInvocation inv = (MethodInvocation)stmt.getExpression();
 			
-			if (inv.getName().getIdentifier().equals("append")) {
-				return new StringSequence(
-						evalVarBefore(var, stmt),
-						eval((Expression)inv.arguments().get(0)));
+			if (builderChainIsStartedByVar(inv, var)) {
+				return eval(inv);
+			}
+			else if (varIsUsedIn(var, inv)) {
+				throw new UnsupportedStringOpEx(
+						"Var '" + var.getName() + "' (possibly) used in unsupported construct");
 			}
 			else {
-				throw new UnsupportedStringOpEx("getVarValAfterMethodInvStmt(StringBuilder/Buffer."
-						+ inv.getName().getIdentifier() + ")");
+				return evalVarBefore(var, stmt);
 			}
-		} 
+		}
 		else {
-			// TODO 
-			throw new UnsupportedStringOpEx("Chained method invocation");
+			// TODO still can't be 100% sure, that var isn't modified
+			return evalVarBefore(var, stmt);
+		}
+	}
+	
+	private boolean varIsUsedIn(IVariableBinding var, Expression expr) {
+		if (expr instanceof MethodInvocation) {
+			MethodInvocation inv = (MethodInvocation) expr;
+			if (inv.getExpression() != null && varIsUsedIn(var, inv.getExpression())) {
+				return true;
+			}
+			else {
+				for (Object arg : inv.arguments()) {
+					if (varIsUsedIn(var, (Expression) arg)) {
+						return true;
+					}
+				}
+				return false;
+			}
+		}
+		else if (expr instanceof Name) {
+			return ((Name) expr).resolveBinding().isEqualTo(var);
+		}
+		else if (expr instanceof InfixExpression) {
+			InfixExpression inf = (InfixExpression) expr;
+			if (varIsUsedIn(var, inf.getLeftOperand())) {
+				return true;
+			}
+			if (varIsUsedIn(var, inf.getRightOperand())) {
+				return true;
+			}
+			for (Object o : inf.extendedOperands()) {
+				if (varIsUsedIn(var, (Expression)o)) {
+					return true;
+				}
+			}
+			return false;
+		}
+		else if (expr instanceof StringLiteral 
+				|| expr instanceof NumberLiteral
+				|| expr instanceof BooleanLiteral) {
+			return false;
+		}
+		else {
+			throw new UnsupportedStringOpEx("Checking whether var is mentioned. "
+					+ "Unsupported expression: "
+					+ expr.getClass());
+		}
+	}
+	
+	private boolean builderChainIsStartedByVar(Expression node, IVariableBinding var) {
+		assert isStringBuilderOrBuffer(node.resolveTypeBinding());
+		if (node instanceof SimpleName) {
+			return ((SimpleName) node).resolveBinding().isEqualTo(var);
+		}
+		else if (node instanceof MethodInvocation) {
+			return builderChainIsStartedByVar(((MethodInvocation)node).getExpression(), var);
+		}
+		else {
+			throw new UnsupportedStringOpEx("unknown construction in builderChain: " 
+					+ node.getClass());
 		}
 	}
 	
 	private IAbstractString evalInvocation(MethodInvocation inv) {
 		if (inv.getExpression() != null
 				&& isStringBuilderOrBuffer(inv.getExpression().resolveTypeBinding())) {
-			if (!(inv.getExpression() instanceof SimpleName)) {
-				throw new UnsupportedStringOpEx("MethodInvocation, SB, expression not SimpleName");
+			if (inv.getName().getIdentifier().equals("toString")) {
+				return eval(inv.getExpression());
 			}
-			if (! "toString".equals(inv.getName().getIdentifier())) {
+			else if (inv.getName().getIdentifier().equals("append")) {
+				return new StringSequence(
+						eval(inv.getExpression()),
+						eval((Expression)inv.arguments().get(0)));
+			}
+			else {
 				throw new UnsupportedStringOpEx("MethodInvocation, StringBuilder/Buffer, method not toString");
 			}
-			IBinding var = ((SimpleName)inv.getExpression()).resolveBinding();
-			return evalVarBefore((IVariableBinding)var, getContainingStmt(inv));
 		}
 		else  {
 			if (! supportInvocations) {
 				throw new UnsupportedStringOpEx("Method call");
 			}
 			AbstractStringEvaluator evaluatorWithNewContext = 
-				new AbstractStringEvaluator(level, inv, scope);
+				new AbstractStringEvaluator(level+1, inv, scope);
 
 			if (inv.getExpression() == null || inv.getExpression() instanceof ThisExpression) {
 				MethodDeclaration decl = getMethodDeclarationByName(NodeSearchEngine.getContainingTypeDeclaration(inv), 
@@ -424,10 +476,10 @@ public class AbstractStringEvaluator {
 		AbstractStringEvaluator evaluator = 
 			new AbstractStringEvaluator(level, null, scope);
 		
-		System.out.println(levelPrefix + "###########################################");
-		System.out.println(levelPrefix + "searching: ");
+		LOG.message(levelPrefix + "###########################################");
+		LOG.message(levelPrefix + "searching: ");
 		for (NodeRequest nodeRequest : requests) {
-			System.out.println(nodeRequest);
+			LOG.message(nodeRequest);
 		}
 		
 		// find value from all call-sites
@@ -440,18 +492,18 @@ public class AbstractStringEvaluator {
 			StringNodeDescriptor desc = new StringNodeDescriptor(arg, sr.getFile(),
 					sr.getLineNumber(), sr.getCharStart(), sr.getCharLength(), null);
 			try {
-				//System.out.println(levelPrefix + "EVALUATING: file=" + desc.getFile()
+				//LOG.message(levelPrefix + "EVALUATING: file=" + desc.getFile()
 				//		+ ", line=" + desc.getLineNumber());
 				desc.setAbstractValue(evaluator.eval(arg));
 				result.add(desc);
 			} catch (UnsupportedStringOpEx e) {
-				System.out.println(levelPrefix + "UNSUPPORTED: " + e.getMessage());
-				System.out.println(levelPrefix + "    file: " + sr.getFile() + ", line: " 
+				LOG.message(levelPrefix + "UNSUPPORTED: " + e.getMessage());
+				LOG.message(levelPrefix + "    file: " + sr.getFile() + ", line: " 
 						+ sr.getLineNumber());	
 			} /* catch (Exception e) {
 				if (catchAllExceptions) {
-					System.out.println(levelPrefix + "PROGRAM ERROR: " + e.getMessage());
-					System.out.println(levelPrefix + "    file: " + sr.getFile() + ", line: " 
+					LOG.message(levelPrefix + "PROGRAM ERROR: " + e.getMessage());
+					LOG.message(levelPrefix + "    file: " + sr.getFile() + ", line: " 
 						+ sr.getLineNumber());	
 				} else {
 					throw e;

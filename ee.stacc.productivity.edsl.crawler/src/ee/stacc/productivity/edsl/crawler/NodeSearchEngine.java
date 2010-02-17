@@ -18,7 +18,6 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
@@ -34,16 +33,19 @@ import org.eclipse.jdt.core.search.SearchParticipant;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
 
+import ee.stacc.productivity.edsl.common.logging.ILog;
+import ee.stacc.productivity.edsl.common.logging.Logs;
+
 /**
  * Implements some Java searches + Node searches required by AbstractStringEvaluator
  * @author Aivar
  *
  */
 public class NodeSearchEngine {
+	private static final ILog LOG = Logs.getLog(NodeSearchEngine.class);
 	
 	private static Map<ICompilationUnit, ASTNode> astCache = 
 		new HashMap<ICompilationUnit, ASTNode>();
-	private static IJavaElement[] _scopeElems = {null};
 	
 	public static void clearCache() {
 		astCache.clear();
@@ -55,7 +57,7 @@ public class NodeSearchEngine {
 			return Collections.emptyList();
 		}
 		
-		//System.out.println("SEARCH SCOPE: " + searchScope);
+		//LOG.message("SEARCH SCOPE: " + searchScope);
 		
 		final List<NodeDescriptor> result = new ArrayList<NodeDescriptor>();
 
@@ -73,7 +75,7 @@ public class NodeSearchEngine {
 				pattern = SearchPattern.createOrPattern(pattern, subPattern);
 			}
 		}
-		System.out.println(pattern);
+		LOG.message(pattern);
 		
 		IJavaElement[] elems = {searchScope};
 		IJavaSearchScope scope = SearchEngine.createJavaSearchScope(elems, IJavaSearchScope.SOURCES);
@@ -126,7 +128,7 @@ public class NodeSearchEngine {
 //				if (!methodBinding.getDeclaringClass().getQualifiedName().equals(typeName)
 //						&& /* FIXME */ !"prepareStatement".equals(methodName)) {
 					/*
-					System.out.println("Wrong match, want: " + typeName + "." + methodName
+					LOG.message("Wrong match, want: " + typeName + "." + methodName
 							+ ", was: " + methodBinding.getDeclaringClass().getQualifiedName()
 							+ "." + methodBinding.getName());
 					*/
@@ -168,7 +170,7 @@ public class NodeSearchEngine {
 	}
 	
 	public static List<MethodDeclaration> findMethodDeclarations(IJavaElement searchScope, final MethodInvocation inv) {
-		//System.out.println("FIND METHOD DECL: " + inv);
+		//LOG.message("FIND METHOD DECL: " + inv);
 //		ITypeBinding objectType = inv.getExpression().resolveTypeBinding();
 		final List<MethodDeclaration> result = new ArrayList<MethodDeclaration>();
 		
@@ -201,7 +203,7 @@ public class NodeSearchEngine {
 	
 	public static VariableDeclarationFragment findFieldDeclarationFragment
 			(IJavaElement searchScope, String qualifiedName) {
-		//System.out.println("Searching for: " + qualifiedName);
+		//LOG.message("Searching for: " + qualifiedName);
 		SearchPattern pattern = SearchPattern.createPattern(
 				qualifiedName, IJavaSearchConstants.FIELD, 
 				IJavaSearchConstants.DECLARATIONS, SearchPattern.R_EXACT_MATCH);
