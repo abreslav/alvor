@@ -8,10 +8,12 @@ import java.util.Map;
 import ee.stacc.productivity.edsl.checkers.IAbstractStringChecker;
 import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
+import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.string.samplegen.SampleGenerator;
 
 public class DynamicSQLChecker implements IAbstractStringChecker {
+	private static final ILog LOG = Logs.getLog(DynamicSQLChecker.class);
 
 	@Override
 	public void checkAbstractStrings(List<IStringNodeDescriptor> descriptors,
@@ -25,12 +27,12 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 		int totalConcrete = 0;
 		Hashtable<String, Integer> concretes = new Hashtable<String, Integer>();
 		
-		System.out.println("============================================");
+		LOG.message("============================================");
 		
 		for (IStringNodeDescriptor desc: descriptors) {
-			System.out.println("ABS: " + desc.getAbstractValue());
+			LOG.message("ABS: " + desc.getAbstractValue());
 			List<String> concreteStr = SampleGenerator.getConcreteStrings(desc.getAbstractValue());
-//			System.out.println(conc);
+//			LOG.message(conc);
 			totalConcrete += concreteStr.size();
 			
 			int duplicates = 0;
@@ -38,11 +40,11 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 				Integer soFar = concretes.get(s);
 				duplicates = 0;
 				if (soFar == null) {
-					System.out.println("CON: " + s);
+					LOG.message("CON: " + s);
 					try {
 						analyzer.validate(s);
 					} catch (SQLException e) {
-						System.out.println("    ERR: " + e.getMessage());
+						LOG.message("    ERR: " + e.getMessage());
 						errorHandler.handleSQLError(e.getMessage(), desc);
 					}
 					
@@ -53,13 +55,13 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 					duplicates++;
 				}
 			}
-			System.out.println("DUPLICATES: " + duplicates);
-			System.out.println("____________________________________________");
+			LOG.message("DUPLICATES: " + duplicates);
+			LOG.message("____________________________________________");
 		}
 		
-		System.out.println("TOTAL ABSTRACT COUNT: " + descriptors.size());
-		System.out.println("TOTAL CONCRETE COUNT: " + totalConcrete);
-		System.out.println("DIFFERENT CONCRETE COUNT: " + concretes.size());
+		LOG.message("TOTAL ABSTRACT COUNT: " + descriptors.size());
+		LOG.message("TOTAL CONCRETE COUNT: " + totalConcrete);
+		LOG.message("DIFFERENT CONCRETE COUNT: " + concretes.size());
 	}
 
 }
