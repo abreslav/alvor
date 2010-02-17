@@ -6,6 +6,7 @@ import java.util.List;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.StringChoice;
 import ee.stacc.productivity.edsl.string.StringConstant;
+import ee.stacc.productivity.edsl.string.StringRandomInteger;
 import ee.stacc.productivity.edsl.string.StringSequence;
 
 public class SampleGenerator {
@@ -37,6 +38,9 @@ public class SampleGenerator {
 					result = tempList;
 				}
 			}
+		}
+		else if (aStr instanceof StringRandomInteger) {
+			result.add(((StringRandomInteger)aStr).getExample());
 		}
 		else {
 			throw new UnsupportedOperationException("getConcreteStrings, class="
