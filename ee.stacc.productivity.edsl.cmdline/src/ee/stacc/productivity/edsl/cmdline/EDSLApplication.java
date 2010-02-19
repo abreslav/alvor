@@ -15,6 +15,7 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 
 import ee.stacc.productivity.edsl.checkers.AbstractStringCheckerManager;
+import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
 import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.common.logging.ILog;
@@ -53,13 +54,15 @@ public class EDSLApplication implements IApplication {
 						
 						long time = System.currentTimeMillis();
 						Map<String, Object> options = OptionLoader.getElementSqlCheckerProperties(iJavaElement);
-						List<IStringNodeDescriptor> hotspots = projectChecker.findHotspots(sf, options);
+						List<INodeDescriptor> hotspots = projectChecker.findHotspots(sf, options);
 						time = System.currentTimeMillis() - time;
 						log.format("%d\n", time);
-						for (IStringNodeDescriptor stringNodeDescriptor : hotspots) {
-							System.out.println(stringNodeDescriptor.getAbstractValue());
+						for (INodeDescriptor nodeDescriptor : hotspots) {
+							if (nodeDescriptor instanceof IStringNodeDescriptor) {
+								System.out.println(((IStringNodeDescriptor)nodeDescriptor).getAbstractValue());
+							}
 						}
-						projectChecker.checkHotspots(hotspots, 
+						projectChecker.processHotspots(hotspots, 
 								new ISQLErrorHandler() {
 
 									@Override
@@ -68,6 +71,14 @@ public class EDSLApplication implements IApplication {
 											IStringNodeDescriptor descriptor) {
 										log.error(errorMessage);
 									}
+									
+									@Override
+									public void handleSQLWarning(
+											String message,
+											INodeDescriptor descriptor) {
+										log.error(message);
+									}
+									
 								}, 
 								AbstractStringCheckerManager.INSTANCE.getCheckers(),
 								options

@@ -8,6 +8,7 @@ import java.util.Map;
 import org.eclipse.jdt.core.IJavaElement;
 
 import ee.stacc.productivity.edsl.checkers.IAbstractStringChecker;
+import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
 import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.common.logging.ILog;
@@ -15,6 +16,7 @@ import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.crawler.AbstractStringEvaluator;
 import ee.stacc.productivity.edsl.crawler.NodeRequest;
 import ee.stacc.productivity.edsl.crawler.NodeSearchEngine;
+import ee.stacc.productivity.edsl.crawler.UnsupportedNodeDescriptor;
 
 /**
  * This is main class
@@ -35,7 +37,7 @@ public class JavaElementChecker {
 	 * hotspots=java.util.Connection,prepareStatement,1;blah.blah.Blah,blah,5
 	 * Trailing ';' is not required 
 	 */
-	public List<IStringNodeDescriptor> findHotspots(IJavaElement scope, Map<String, Object> options) {
+	public List<INodeDescriptor> findHotspots(IJavaElement scope, Map<String, Object> options) {
 		List<NodeRequest> requests = parseNodeRequests(options);
 		if (requests.isEmpty()) {
 			throw new IllegalArgumentException("No hotspots found");
@@ -44,7 +46,7 @@ public class JavaElementChecker {
 		return AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(requests, scope, 0);
 	}
 
-	public void checkHotspots(
+	public void checkValidHotspots(
 			List<IStringNodeDescriptor> hotspots, 
 			ISQLErrorHandler errorHandler, 
 			List<IAbstractStringChecker> checkers, 
@@ -52,13 +54,35 @@ public class JavaElementChecker {
 	
 		LOG.message("Abstract strings:");
 
-		for (IStringNodeDescriptor descriptor : hotspots) {
-			LOG.message(descriptor.getAbstractValue());
+		for (INodeDescriptor descriptor : hotspots) {
+			if (descriptor instanceof IStringNodeDescriptor) {
+				LOG.message(((IStringNodeDescriptor)descriptor).getAbstractValue());
+			}
 		}
 		
 		for (IAbstractStringChecker checker : checkers) {
 			checker.checkAbstractStrings(hotspots, errorHandler, options);
 		}
+	}
+	
+	public void processHotspots(
+		List<INodeDescriptor> hotspots, 
+		ISQLErrorHandler errorHandler, 
+		List<IAbstractStringChecker> checkers, 
+		Map<String, Object> options) {
+		
+		List<IStringNodeDescriptor> validHotspots = new ArrayList<IStringNodeDescriptor>();
+		for (INodeDescriptor hotspot : hotspots) {
+			if (hotspot instanceof IStringNodeDescriptor) {
+				validHotspots.add((IStringNodeDescriptor) hotspot);
+			}
+			else if (hotspot instanceof UnsupportedNodeDescriptor) {
+				errorHandler.handleSQLWarning(((UnsupportedNodeDescriptor)hotspot).getProblemMessage(),
+						hotspot);
+			}
+		}
+		checkValidHotspots(validHotspots, errorHandler, checkers, options);
+		
 	}
 
 	private List<NodeRequest> parseNodeRequests(Map<String, Object> options) {

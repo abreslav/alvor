@@ -29,9 +29,9 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 		
 		LOG.message("============================================");
 		
-		for (IStringNodeDescriptor desc: descriptors) {
-			LOG.message("ABS: " + desc.getAbstractValue());
-			List<String> concreteStr = SampleGenerator.getConcreteStrings(desc.getAbstractValue());
+		for (IStringNodeDescriptor nodeDesc: descriptors) {
+			LOG.message("ABS: " + nodeDesc.getAbstractValue());
+			List<String> concreteStr = SampleGenerator.getConcreteStrings(nodeDesc.getAbstractValue());
 //			LOG.message(conc);
 			totalConcrete += concreteStr.size();
 			
@@ -45,7 +45,7 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 						analyzer.validate(s);
 					} catch (SQLException e) {
 						LOG.message("    ERR: " + e.getMessage());
-						errorHandler.handleSQLError(e.getMessage(), desc);
+						errorHandler.handleSQLError(e.getMessage().trim() + "\nSQL:\n" + s, nodeDesc);
 					}
 					
 					concretes.put(s, 1);

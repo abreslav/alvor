@@ -98,8 +98,6 @@ public class NodeSearchEngine {
 				MethodInvocation invoc = (MethodInvocation)node;
 				IMethodBinding methodBinding = invoc.resolveMethodBinding();
 				
-				// TODO: check that object has that type -- not needed, the type is in the patterns
-				
 				if (methodBinding == null || methodBinding.getDeclaringClass() == null) {
 					System.err.println("TODO: crawler methodBinding.getDeclaringClass() == null");
 					return;

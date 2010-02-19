@@ -161,7 +161,7 @@ public class AbstractStringEvaluator {
 		}
 		else {
 			throw new UnsupportedStringOpEx
-				("TODO: getValOf( infix op = " + expr.getOperator() + ")");
+				("getValOf( infix op = " + expr.getOperator() + ")");
 		}
 	}
 	
@@ -188,7 +188,7 @@ public class AbstractStringEvaluator {
 			return getPrevStmt((TryStatement)node.getParent());
 		}
 		else { 
-			throw new UnsupportedStringOpEx("TODO: getPrevStatement(" + node.getClass().getName() 
+			throw new UnsupportedStringOpEx("getPrevStatement(" + node.getClass().getName() 
 				+ ", parent is " + node.getParent().getClass().getName() + ")");
 		}
 	}
@@ -298,7 +298,7 @@ public class AbstractStringEvaluator {
 			return evalVarBefore(var, stmt);
 		}
 		else { // other kind of statement
-			throw new UnsupportedStringOpEx("TODO: getVarValAfter(_, " + stmt.getClass().getName() + ")");
+			throw new UnsupportedStringOpEx("getVarValAfter(var, " + stmt.getClass().getName() + ")");
 		} 
 	}
 	
@@ -464,7 +464,7 @@ public class AbstractStringEvaluator {
 		return (Statement)block.statements().get(block.statements().size()-1);
 	}
 	
-	public static List<IStringNodeDescriptor> evaluateMethodArgumentAtCallSites
+	public static List<INodeDescriptor> evaluateMethodArgumentAtCallSites
 			(Collection<NodeRequest> requests,
 					IJavaElement scope, int level) {
 		String levelPrefix = "";
@@ -486,7 +486,7 @@ public class AbstractStringEvaluator {
 		List<NodeDescriptor> argumentNodes = NodeSearchEngine.findArgumentNodes
 			(scope, requests);
 		
-		List<IStringNodeDescriptor> result = new ArrayList<IStringNodeDescriptor>();
+		List<INodeDescriptor> result = new ArrayList<INodeDescriptor>();
 		for (INodeDescriptor sr: argumentNodes) {
 			Expression arg = (Expression)sr.getNode();
 			StringNodeDescriptor desc = new StringNodeDescriptor(arg, sr.getFile(),
@@ -499,8 +499,12 @@ public class AbstractStringEvaluator {
 			} catch (UnsupportedStringOpEx e) {
 				LOG.message(levelPrefix + "UNSUPPORTED: " + e.getMessage());
 				LOG.message(levelPrefix + "    file: " + sr.getFile() + ", line: " 
-						+ sr.getLineNumber());	
-			} /* catch (Exception e) {
+						+ sr.getLineNumber());
+				result.add(new UnsupportedNodeDescriptor(arg, sr.getFile(), sr.getLineNumber(), 
+						sr.getCharStart(), sr.getCharLength(), 
+						"Unsupported SQL construction: " + e.getMessage()));
+			}
+			/* catch (Exception e) {
 				if (catchAllExceptions) {
 					LOG.message(levelPrefix + "PROGRAM ERROR: " + e.getMessage());
 					LOG.message(levelPrefix + "    file: " + sr.getFile() + ", line: " 
@@ -537,7 +541,7 @@ public class AbstractStringEvaluator {
 						((Expression)this.invocationContext.arguments().get(paramIndex));
 				}
 				else {
-					List<IStringNodeDescriptor> descList = 
+					List<INodeDescriptor> descList = 
 						AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(
 								Collections.singleton(
 										new NodeRequest(
@@ -547,8 +551,10 @@ public class AbstractStringEvaluator {
 							this.scope, this.level + 1);
 					
 					List<IAbstractString> choices = new ArrayList<IAbstractString>();
-					for (IStringNodeDescriptor choiceDesc: descList) {
-						choices.add(choiceDesc.getAbstractValue());
+					for (INodeDescriptor choiceDesc: descList) {
+						if (choiceDesc instanceof IStringNodeDescriptor) {
+							choices.add(((IStringNodeDescriptor)choiceDesc).getAbstractValue());
+						}
 					}
 					return new StringChoice(choices);
 				}

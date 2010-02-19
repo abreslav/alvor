@@ -18,6 +18,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
 import ee.stacc.productivity.edsl.checkers.AbstractStringCheckerManager;
+import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
 import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.common.logging.ILog;
@@ -41,10 +42,10 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 		cleanMarkers(selectedJavaElement);
 		try {
 			Map<String, Object> options = OptionLoader.getElementSqlCheckerProperties(selectedJavaElement);
-			List<IStringNodeDescriptor> hotspots = projectChecker.findHotspots(selectedJavaElement, options);
+			List<INodeDescriptor> hotspots = projectChecker.findHotspots(selectedJavaElement, options);
 			markHotspots(hotspots);
 			
-			projectChecker.checkHotspots(hotspots, this,
+			projectChecker.processHotspots(hotspots, this,
 					AbstractStringCheckerManager.INSTANCE.getCheckers(),
 					options
 			);
@@ -107,9 +108,13 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 		}
 	}
 
-	private void markHotspots(List<IStringNodeDescriptor> hotspots) {
-		for (IStringNodeDescriptor hotspot : hotspots) {
-			createMarker("Abstract string: " + hotspot.getAbstractValue(), HOTSPOT_MARKER_ID, 
+	private void markHotspots(List<INodeDescriptor> hotspots) {
+		for (INodeDescriptor hotspot : hotspots) {
+			createMarker(
+					(hotspot instanceof IStringNodeDescriptor) ?
+							("Abstract string: " + ((IStringNodeDescriptor)hotspot).getAbstractValue())
+							: "Unsupported construction", 
+					HOTSPOT_MARKER_ID, 
 					hotspot.getFile(), 
 					hotspot.getCharStart(), 
 					hotspot.getCharLength() + hotspot.getCharStart());
@@ -119,6 +124,12 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 	@Override
 	public void handleSQLError(String message, IStringNodeDescriptor descriptor) {
 		createMarker(message, ERROR_MARKER_ID, descriptor.getFile(), descriptor.getCharStart(), 
+				descriptor.getCharStart() + descriptor.getCharLength());		
+	}
+
+	@Override
+	public void handleSQLWarning(String message, INodeDescriptor descriptor) {
+		createMarker(message, WARNING_MARKER_ID, descriptor.getFile(), descriptor.getCharStart(), 
 				descriptor.getCharStart() + descriptor.getCharLength());		
 	}
 }
