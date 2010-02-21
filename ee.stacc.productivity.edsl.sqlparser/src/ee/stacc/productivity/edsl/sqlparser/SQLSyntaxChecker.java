@@ -10,7 +10,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import ee.stacc.productivity.edsl.lexer.automata.AutomataDeterminator;
+import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
+import ee.stacc.productivity.edsl.lexer.alphabet.Token;
 import ee.stacc.productivity.edsl.lexer.automata.AutomataInclusion;
 import ee.stacc.productivity.edsl.lexer.automata.EmptyTransitionEliminator;
 import ee.stacc.productivity.edsl.lexer.automata.IAlphabetConverter;
@@ -20,40 +21,64 @@ import ee.stacc.productivity.edsl.lexer.automata.Transition;
 import ee.stacc.productivity.edsl.lexer.automata.EmptyTransitionEliminator.IEmptinessExpert;
 import ee.stacc.productivity.edsl.lexer.sql.SQLLexer;
 import ee.stacc.productivity.edsl.string.IAbstractString;
-import ee.stacc.productivity.edsl.string.IAbstractStringVisitor;
-import ee.stacc.productivity.edsl.string.StringCharacterSet;
-import ee.stacc.productivity.edsl.string.StringChoice;
-import ee.stacc.productivity.edsl.string.StringConstant;
-import ee.stacc.productivity.edsl.string.StringRepetition;
-import ee.stacc.productivity.edsl.string.StringSequence;
+import ee.stacc.productivity.edsl.string.util.AsbtractStringUtils;
 
 public class SQLSyntaxChecker {
 
+	private static final IStackFactory FACTORY = SimpleLinkedStack.FACTORY;
 	public static final SQLSyntaxChecker INSTANCE = new SQLSyntaxChecker();
 	
 	private SQLSyntaxChecker() {}
 	
 	public List<String> check(IAbstractString str) {
-		if (hasLoops(str)) {
+		if (AsbtractStringUtils.hasLoops(str)) {
 			throw new IllegalArgumentException("The current version does not support loops in abstract strings");
 		}
 		
-		return checkAbstractString(str, SimpleLinkedStack.FACTORY);
+		return checkAbstractString(str, FACTORY);
+	}
+	
+	public List<String> checkAbstractString(IAbstractString as, IStackFactory stackFactory) {
+		final List<String> errors = new ArrayList<String>();
+		State asAut = StringToAutomatonConverter.INSTANCE.convert(as);
+		
+		checkAutomaton(asAut, stackFactory, new IParseErrorHandler() {
+			
+			@Override
+			public void unexpectedItem(IAbstractInputItem item) {
+				if (item instanceof Token) {
+					Token token = (Token) item;
+					errors.add("Unexpected token: " + SQLLexer.tokenToString(token));
+				} else {
+					errors.add("Unexpected token: " + Parsers.SQL_PARSER.getSymbolNumbersToNames().get(item.getCode()));
+				}
+			}
+			
+			@Override
+			public void other() {
+				if (errors.isEmpty()) {
+					errors.add("SQL syntax error. Most likely unfinished query");
+				}
+			}
+		});
+		return errors;
 	}
 
-	public List<String> checkAbstractString(IAbstractString as, IStackFactory stackFactory) {
-		State asAut = StringToAutomatonConverter.INSTANCE.convert(as, SQLLexer.SQL_ALPHABET_CONVERTER);
-		
+	public void checkAutomaton(State asAut, IParseErrorHandler errorHandler) {
+		checkAutomaton(asAut, FACTORY, errorHandler);
+	}
+	
+	private void checkAutomaton(State asAut, IStackFactory stackFactory, IParseErrorHandler errorHandler) {
 		State sqlTransducer = SQLLexer.SQL_TRANSDUCER;
-		State transduction = AutomataInclusion.INSTANCE.getTrasduction(sqlTransducer, asAut);
+		State transduction = AutomataInclusion.INSTANCE.getTrasduction(sqlTransducer, asAut, SQLLexer.SQL_ALPHABET_CONVERTER);
 		transduction = EmptyTransitionEliminator.INSTANCE.eliminateEmptySetTransitions(transduction, new IEmptinessExpert() {
 			
 			@Override
 			public boolean isEmpty(Transition transition) {
-				return transition.isEmpty() || SQLLexer.getTokenName(transition.getInChar()).length() == 0;
+				return transition.isEmpty() || SQLLexer.getTokenName(transition.getInChar().getCode()).length() == 0;
 			}
 		});
-		transduction = AutomataDeterminator.determinate(transduction);
+//		transduction = AutomataDeterminator.determinate(transduction);
 		
 		final LRParser parser = Parsers.SQL_PARSER;
 		
@@ -62,7 +87,7 @@ public class SQLSyntaxChecker {
 			
 			@Override
 			public int convert(int c) {
-				if (c == (char) -1) {
+				if (c == -1) {
 					return eofTokenIndex;
 				}
 				String tokenName = SQLLexer.getTokenName(c);
@@ -76,19 +101,8 @@ public class SQLSyntaxChecker {
 				return tokenNumber;
 			}
 		};
-		final List<String> errors = new ArrayList<String>();
-		FixpointParser fixpointParser = new FixpointParser(parser, converter, SimpleStackSet.FACTORY, stackFactory, eofTokenIndex, new IParseErrorHandler() {
-			
-			@Override
-			public void handleError(String message) {
-				errors.add(message);
-			}
-		});
-		boolean parseResult = fixpointParser.parse(transduction);
-		if (!parseResult && errors.isEmpty()) {
-			errors.add("SQL syntax error. Most likely unfinished query");
-		}
-		return errors;
+		FixpointParser fixpointParser = new FixpointParser(parser, converter, SimpleStackSet.FACTORY, stackFactory, eofTokenIndex, errorHandler);
+		fixpointParser.parse(transduction);
 	}
 	
 	public boolean parseAutomaton(State initial, IAlphabetConverter alphabetConverter, IStackFactory stackFactory) {
@@ -157,30 +171,6 @@ public class SQLSyntaxChecker {
 		IAbstractStackSet newAbstractStackSet();
 	}
 	
-	public interface IParseErrorHandler {
-		IParseErrorHandler NONE = new IParseErrorHandler() {
-			@Override
-			public void handleError(String message) {
-			}
-		}; 
-		
-		IParseErrorHandler SYSTEM_OUT = new IParseErrorHandler() {
-			@Override
-			public void handleError(String message) {
-				System.out.println(message);
-			}
-		}; 
-		
-		IParseErrorHandler EXCEPTION = new IParseErrorHandler() {
-			@Override
-			public void handleError(String message) {
-				throw new IllegalArgumentException(message);
-			}
-		}; 
-		
-		void handleError(String message);
-	}
-	
 	private static final class FixpointParser {
 	
 		private final Map<State, IAbstractStackSet> abstractStackSets = new HashMap<State, IAbstractStackSet>();
@@ -225,6 +215,7 @@ public class SQLSyntaxChecker {
 			
 			if (current.isAccepting()) {
 				if (!closeWithEof(setForCurrent)) {
+					errorHandler.other();
 					return false;
 				}
 			}
@@ -233,14 +224,14 @@ public class SQLSyntaxChecker {
 				if (transition.isEmpty()) {
 					throw new IllegalArgumentException("Empty transitions are not supported");
 				}
-				int tokenIndex = alphabetConverter.convert(transition.getInChar());
+				int tokenIndex = alphabetConverter.convert(transition.getInChar().getCode());
 				IAbstractStackSet setForTo = getSet(transition.getTo());
-				boolean changes = transformSet(setForCurrent, tokenIndex, setForTo);
+				boolean changes = transformSet(setForCurrent, transition.getInChar(), tokenIndex, setForTo);
 				if (changes) {
 					IParserState errorState = setForCurrent.hasError();
 					if (errorState != null) {
-						int unexpectedSymbol = ((ErrorState) errorState).getUnexpectedSymbol();
-						errorHandler.handleError("Unexpected token: " + Parsers.SQL_PARSER.getSymbolNumbersToNames().get(unexpectedSymbol));
+						IAbstractInputItem unexpectedItem = ((ErrorState) errorState).getUnexpectedItem();
+						errorHandler.unexpectedItem(unexpectedItem);
 						return false;
 					}
 					if (!dfs(transition.getTo())) {
@@ -253,11 +244,11 @@ public class SQLSyntaxChecker {
 		}
 
 		private boolean transformSet(IAbstractStackSet setForCurrent,
-				int tokenIndex, IAbstractStackSet setForTo) {
+				IAbstractInputItem token, int tokenIndex, IAbstractStackSet setForTo) {
 			Collection<IAbstractStack> hashSet = setForCurrent.asJavaSet();
  			boolean changes = false;
 			for (IAbstractStack stack : hashSet) {
-				Set<IAbstractStack> newStacks = parser.processToken(tokenIndex, stack);
+				Set<IAbstractStack> newStacks = parser.processToken(token, tokenIndex, stack);
 				for (IAbstractStack newStack : newStacks) {
 					if (setForTo.add(newStack)) {
 						changes = true;
@@ -272,7 +263,7 @@ public class SQLSyntaxChecker {
 			while (!queue.isEmpty()) {
 				IAbstractStack stack = queue.poll();
 				
-				Set<IAbstractStack> newStacks = parser.processToken(eofTokenIndex, stack);
+				Set<IAbstractStack> newStacks = parser.processToken(IAbstractInputItem.EOF, eofTokenIndex, stack);
 				for (IAbstractStack newStack : newStacks) {
 					IParserState top = newStack.top();
 					if (top.isError()) {
@@ -286,51 +277,4 @@ public class SQLSyntaxChecker {
 			return true;
 		}
 	}
-
-	private static boolean hasLoops(IAbstractString str) {
-		return str.accept(LOOP_FINDER, null);
-	}
-
-	private static final IAbstractStringVisitor<Boolean, Void> LOOP_FINDER = new IAbstractStringVisitor<Boolean, Void>() {
-
-		@Override
-		public Boolean visitStringCharacterSet(
-				StringCharacterSet characterSet, Void data) {
-			return false;
-		}
-
-		@Override
-		public Boolean visitStringChoise(StringChoice stringChoise,
-				Void data) {
-			for (IAbstractString item : stringChoise.getItems()) {
-				if (hasLoops(item)) {
-					return true;
-				}
-			}
-			return false;
-		}
-
-		@Override
-		public Boolean visitStringConstant(StringConstant stringConstant,
-				Void data) {
-			return false;
-		}
-
-		@Override
-		public Boolean visitStringRepetition(
-				StringRepetition stringRepetition, Void data) {
-			return true;
-		}
-
-		@Override
-		public Boolean visitStringSequence(StringSequence stringSequence,
-				Void data) {
-			for (IAbstractString item : stringSequence.getItems()) {
-				if (hasLoops(item)) {
-					return true;
-				}
-			}
-			return false;
-		}
-	};
 }

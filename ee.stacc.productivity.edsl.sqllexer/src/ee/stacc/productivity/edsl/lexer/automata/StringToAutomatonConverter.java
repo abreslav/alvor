@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
+import ee.stacc.productivity.edsl.lexer.alphabet.Yield;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.IAbstractStringVisitor;
 import ee.stacc.productivity.edsl.string.StringCharacterSet;
@@ -20,16 +22,16 @@ public class StringToAutomatonConverter {
 	private StringToAutomatonConverter() {}
 	
 	public State convert(IAbstractString string) {
-		return convert(string, IAlphabetConverter.ID);
+		return convert(string, SimpleCharacterFactory.INSTANCE);
 	}
 	
-	public State convert(IAbstractString string, IAlphabetConverter inputConverter) {
+	public State convert(IAbstractString string, IInputItemFactory factory) {
 		State initial = new State("START", false);
 		State eof = new State("EOF", true);
-		Set<State> finalStates = new StringToAutomatonConverterVisitor(inputConverter)
+		Set<State> finalStates = new StringToAutomatonConverterVisitor(factory)
 					.convert(string, initial);
 		for (State state : finalStates) {
-			createTransition(state, eof, -1, inputConverter);
+			createTransition(state, eof, IAbstractInputItem.EOF);
 		}
 		return initial;
 //		return AutomataDeterminator.determinate(initial);
@@ -38,11 +40,10 @@ public class StringToAutomatonConverter {
 	private static final class StringToAutomatonConverterVisitor implements
 			IAbstractStringVisitor<Set<State>, State> {
 		
-		private final IAlphabetConverter inputConverter;
-		
-		public StringToAutomatonConverterVisitor(
-				IAlphabetConverter inputConverter) {
-			this.inputConverter = inputConverter;
+		private final IInputItemFactory factory;
+
+		public StringToAutomatonConverterVisitor(IInputItemFactory factory) {
+			this.factory = factory;
 		}
 
 		public Set<State> convert(IAbstractString str, State initial) {
@@ -54,7 +55,7 @@ public class StringToAutomatonConverter {
 				StringCharacterSet characterSet, State initial) {
 			State fin = new State("F", false);
 			for (Character character : characterSet.getContents()) {
-				createTransition(initial, fin, (int) character);
+				createTransition(initial, fin, factory.createInputItem(characterSet, (int) character));
 			}
 			return Collections.singleton(fin);
 		}
@@ -73,7 +74,7 @@ public class StringToAutomatonConverter {
 				} else {
 					dest = new State("I", false);
 				}
-				createTransition(current, dest, (int) string.charAt(i));
+				createTransition(current, dest, factory.createInputItem(stringConstant, i));
 				current = dest;
 			}
 			return Collections.singleton(fin);
@@ -109,7 +110,7 @@ public class StringToAutomatonConverter {
 		}
 
 		private void copyTransition(State state, Transition transition) {
-			StringToAutomatonConverter.createTransition(state, transition.getTo(), transition.getInChar(), IAlphabetConverter.ID);
+			StringToAutomatonConverter.createTransition(state, transition.getTo(), transition.getInChar());
 		}
 
 		@Override
@@ -127,15 +128,14 @@ public class StringToAutomatonConverter {
 			return current;
 		}
 		
-		private Transition createTransition(State initial, State fin, int character) {
-			return StringToAutomatonConverter.createTransition(initial, fin, character, inputConverter);
-		}
+//		private Transition createTransition(State initial, State fin, int character) {
+//			return StringToAutomatonConverter.createTransition(initial, fin, SimpleCharacter.create(character));
+//		}
 	}
 	
 	private static Transition createTransition(State initial, State fin,
-			int character, IAlphabetConverter inputConverter) {
-		int convert = inputConverter.convert(character);
-		Transition transition = new Transition(initial, fin, convert, "" + (char) convert);
+			IAbstractInputItem inChar) {
+		Transition transition = new Transition(initial, fin, inChar, Collections.singletonList(Yield.create(inChar.getCode())));
 		initial.getOutgoingTransitions().add(transition);
 		return transition;
 	}

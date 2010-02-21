@@ -5,5 +5,6 @@ Bundle-SymbolicName: ee.stacc.productivity.edsl.model
 Bundle-Version: 1.0.0.qualifier
 Export-Package: ee.stacc.productivity.edsl.message,
  ee.stacc.productivity.edsl.string,
- ee.stacc.productivity.edsl.string.samplegen
+ ee.stacc.productivity.edsl.string.samplegen,
+ ee.stacc.productivity.edsl.string.util
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

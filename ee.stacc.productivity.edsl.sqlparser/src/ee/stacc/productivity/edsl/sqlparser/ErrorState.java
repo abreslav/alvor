@@ -3,15 +3,15 @@
  */
 package ee.stacc.productivity.edsl.sqlparser;
 
-import ee.stacc.productivity.edsl.sqlparser.LRParser.State;
+import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
 
 public final class ErrorState implements IParserState {
 	private final IParserState fromState;
-	private final int bySymbol;
+	private final IAbstractInputItem byInputItem;
 	
-	public ErrorState(State fromState, int bySymbol) {
+	public ErrorState(IParserState fromState, IAbstractInputItem byInputItem) {
 		this.fromState = fromState;
-		this.bySymbol = bySymbol;
+		this.byInputItem = byInputItem;
 	}
 
 	@Override
@@ -31,11 +31,11 @@ public final class ErrorState implements IParserState {
 	
 	@Override
 	public String toString() {
-		return "In state " + fromState + " unexpected symbol: " + bySymbol;
+		return "In state " + fromState + " unexpected symbol: " + byInputItem;
 	}
 	
-	public int getUnexpectedSymbol() {
-		return bySymbol;
+	public IAbstractInputItem getUnexpectedItem() {
+		return byInputItem;
 	}
 	
 	public IParserState getFromState() {

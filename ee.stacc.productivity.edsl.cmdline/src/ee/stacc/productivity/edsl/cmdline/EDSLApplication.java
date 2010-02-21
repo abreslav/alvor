@@ -16,6 +16,7 @@ import org.eclipse.jdt.core.JavaCore;
 
 import ee.stacc.productivity.edsl.checkers.AbstractStringCheckerManager;
 import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
+import ee.stacc.productivity.edsl.checkers.IPositionDescriptor;
 import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.common.logging.ILog;
@@ -68,7 +69,7 @@ public class EDSLApplication implements IApplication {
 									@Override
 									public void handleSQLError(
 											String errorMessage,
-											IStringNodeDescriptor descriptor) {
+											IPositionDescriptor descriptor) {
 										log.error(errorMessage);
 									}
 									

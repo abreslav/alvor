@@ -6,8 +6,11 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.junit.Test;
 
@@ -28,50 +31,67 @@ public class LexerPerformanceTest {
 	public void testShorts() throws Exception {
 		List<IAbstractString> strings = AbstractStringParser.parseFile("data/sqls.txt");
 		
+		Map<String, IInputToString> expectedMap = new LinkedHashMap<String, IInputToString>();
+		expectedMap.put("data/sqls.expected", AutomataUtils.SQL_TOKEN_MAPPER);
+		expectedMap.put("data/sqls.tokens.expected", AutomataUtils.SQL_TOKEN_TO_STRING);
+		
+		Map<String, Set<String>> generatedMap = new LinkedHashMap<String, Set<String>>();
+
 		State sqlTransducer = SQLLexer.SQL_TRANSDUCER;
-		Set<String> generated = new HashSet<String>();
 		for (IAbstractString string : strings) {
 			string = optimize(string);
-			State initial = StringToAutomatonConverter.INSTANCE.convert(string, SQLLexer.SQL_ALPHABET_CONVERTER);
-			State transduction = AutomataInclusion.INSTANCE.getTrasduction(sqlTransducer, initial);
+			State initial = StringToAutomatonConverter.INSTANCE.convert(string);
+			State transduction = AutomataInclusion.INSTANCE.getTrasduction(sqlTransducer, initial, SQLLexer.SQL_ALPHABET_CONVERTER);
 			transduction = EmptyTransitionEliminator.INSTANCE.eliminateEmptySetTransitions(transduction);
-			transduction = AutomataDeterminator.determinate(transduction);
+//			transduction = AutomataDeterminator.determinate(transduction);
 
-			List<String> generate = TestUtil.generate(transduction, "", AutomataUtils.SQL_TOKEN_MAPPER);
-			generated.addAll(generate);
-		}
-		
-//		FileWriter fileWriter = new FileWriter("data/sqls.expected");
-//		for (String string : generated) {
-//			fileWriter.write(string + "\n");
-//		}
-//		fileWriter.close();
+			for (Entry<String, IInputToString> entry : expectedMap.entrySet()) {
+				IInputToString toStr = entry.getValue();
+				Set<String> generated = AutomataInclusion.getSet(generatedMap, entry.getKey());
 
-		FileReader fileReader = new FileReader("data/sqls.expected");
-		StringBuilder stringBuilder = new StringBuilder();
-		int c;
-		while ((c = fileReader.read()) != -1) {
-			stringBuilder.append((char) c);
-		}
-		fileReader.close();
-		String[] split = stringBuilder.toString().split("\n");
-		String[] expected = split.clone();
-		Arrays.sort(expected);
-		
-		String[] genarr = generated.toArray(new String[generated.size()]);
-		Arrays.sort(genarr);
-	
-		assertEquals(expected.length, genarr.length);
-		
-		for (int i = 0; i < genarr.length; i++) {
-			if (!expected[i].equals(genarr[i])) {
-				System.out.println(expected[i]);
-				System.out.println(genarr[i]);
-				System.out.println();
+				List<String> generate = TestUtil.generate(transduction, toStr);
+				generated.addAll(generate);
 			}
 		}
 		
-		assertEquals(new HashSet<String>(Arrays.asList(expected)), generated);
+		for (Entry<String, Set<String>> entry : generatedMap.entrySet()) {
+			String fileName = entry.getKey();
+			Set<String> generated = entry.getValue();
+			
+			
+//			FileWriter fileWriter = new FileWriter(fileName);
+//			for (String string : generated) {
+//				fileWriter.write(string + "\n");
+//			}
+//			fileWriter.close();
+			
+
+			FileReader fileReader = new FileReader(fileName);
+			StringBuilder stringBuilder = new StringBuilder();
+			int c;
+			while ((c = fileReader.read()) != -1) {
+				stringBuilder.append((char) c);
+			}
+			fileReader.close();
+			String[] split = stringBuilder.toString().split("\n");
+			String[] expected = split.clone();
+			Arrays.sort(expected);
+			
+			String[] genarr = generated.toArray(new String[generated.size()]);
+			Arrays.sort(genarr);
+		
+			assertEquals(expected.length, genarr.length);
+			
+			for (int i = 0; i < genarr.length; i++) {
+				if (!expected[i].equals(genarr[i])) {
+					System.out.println(expected[i]);
+					System.out.println(genarr[i]);
+					System.out.println();
+				}
+			}
+			
+			assertEquals(new HashSet<String>(Arrays.asList(expected)), generated);
+		}
 	}
 
 	@Test

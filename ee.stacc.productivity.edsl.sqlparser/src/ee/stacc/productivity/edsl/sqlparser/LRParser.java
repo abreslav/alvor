@@ -17,6 +17,8 @@ import java.util.Map.Entry;
 
 import org.jdom.JDOMException;
 
+import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
+
 public class LRParser {
 
 	private static final IAction ACCEPT_ACTION = new AcceptAction();
@@ -107,8 +109,8 @@ public class LRParser {
 		}
 
 		@Override
-		public Set<IAbstractStack> process(int symbolNumber, IAbstractStack stack) {
-			return Collections.singleton(stack.push(new ErrorState(state, symbolNumber)));
+		public Set<IAbstractStack> process(IAbstractInputItem inputItem, IAbstractStack stack) {
+			return Collections.singleton(stack.push(new ErrorState(state, inputItem)));
 		}
 		
 		@Override
@@ -119,7 +121,7 @@ public class LRParser {
 	
 	private static final class AcceptAction extends AbstractAction {
 		@Override
-		public Set<IAbstractStack> process(int symbolNumber, IAbstractStack stack) {
+		public Set<IAbstractStack> process(IAbstractInputItem inputItem, IAbstractStack stack) {
 			return Collections.singleton(stack.push(IParserState.ACCEPT));
 		}
 		
@@ -137,7 +139,7 @@ public class LRParser {
 		}
 
 		@Override
-		public Set<IAbstractStack> process(int symbolNumber, IAbstractStack stack) {
+		public Set<IAbstractStack> process(IAbstractInputItem inputItem, IAbstractStack stack) {
 			return Collections.singleton(stack.push(toState));
 		}
 		
@@ -155,7 +157,7 @@ public class LRParser {
 		}
 
 		@Override
-		public Set<IAbstractStack> process(int symbolNumber, IAbstractStack stack) {
+		public Set<IAbstractStack> process(IAbstractInputItem inputItem, IAbstractStack stack) {
 			return Collections.singleton(stack.push(toState));
 		}
 
@@ -183,12 +185,12 @@ public class LRParser {
 		}
 
 		@Override
-		public Set<IAbstractStack> process(int symbolNumber, IAbstractStack stack) {
+		public Set<IAbstractStack> process(IAbstractInputItem inputItem, IAbstractStack stack) {
 			Set<IAbstractStack> popped = stack.pop(byRule.getRhsLength());
 			Set<IAbstractStack> results = new HashSet<IAbstractStack>();
 			for (IAbstractStack s : popped) {
 				IAction action = s.top().getAction(byRule.getLhsSymbol());
-				results.addAll(action.process(-1, s));
+				results.addAll(action.process(null, s));
 			}
 			return results;
 		}
@@ -259,24 +261,6 @@ public class LRParser {
 				state.addAction(symbolNumber, new GotoAction(states.get(toState)));
 			}
 		});
-//		
-//		int max = 0;
-//		String[] names = new String[namesToSymbolNumbers.size() + 1];
-//		for (Entry<String, Integer> entry : namesToSymbolNumbers.entrySet()) {
-////			System.out.println(entry);
-//			Integer value = entry.getValue();
-//			if (max < value) {
-//				max = value;
-//			}
-//			names[value + 1] = entry.getKey();
-//		}
-//		
-//		for (State state : states) {
-//			System.out.println(state);
-//			for (int i = 0; i <= max; i++) {
-//				System.out.println(names[i + 1] + " " + state.getAction(i));				
-//			}
-//		}
 		
 		return new LRParser(states.get(0), symbolByToken, namesToTokenNumbers);
 	}
@@ -313,9 +297,10 @@ public class LRParser {
 	}
 	
 	// Proceeds until ERROR, ACCEPT or consumption of a given token 
-	public Set<IAbstractStack> processToken(int tokenIndex, IAbstractStack stack) {
-		Integer symbolNumber = symbolByToken[tokenIndex];
+	public Set<IAbstractStack> processToken(IAbstractInputItem token, int tokenIndex, IAbstractStack stack) {
 
+		int symbolNumber = symbolByToken[tokenIndex];
+		
 		Queue<IAbstractStack> queue = new LinkedList<IAbstractStack>();
 		Set<IAbstractStack> visited = new HashSet<IAbstractStack>();
 		queue.offer(stack);
@@ -332,7 +317,7 @@ public class LRParser {
 			}
 			IAction action = currentState.getAction(symbolNumber);
 			println(action);
-			Set<IAbstractStack> newStacks = action.process(symbolNumber, currenStack);
+			Set<IAbstractStack> newStacks = action.process(token, currenStack);
 			println("new stacks: " + newStacks);
 			if (action.consumes()) {
 				result.addAll(newStacks);

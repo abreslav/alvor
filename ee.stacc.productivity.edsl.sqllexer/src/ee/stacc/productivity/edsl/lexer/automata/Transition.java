@@ -1,25 +1,34 @@
 package ee.stacc.productivity.edsl.lexer.automata;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
+import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractOutputItem;
+
 
 public class Transition {
 	private final State from;
 	private final State to;
-	// -1 for EOF
-	private final int inChar; 
+	private final IAbstractInputItem inChar; 
 	private final boolean empty; 
-	private final String outStr; 
+	private final List<IAbstractOutputItem> output; 
 	
-	public Transition(State from, State to, Integer inChar,
-			String outStr) {
+	public Transition(State from, State to, IAbstractInputItem inChar,
+			List<? extends IAbstractOutputItem> output) {
+		if (output == null) {
+			throw new IllegalArgumentException();
+		}
 		this.from = from;
 		this.to = to;
 		this.empty = inChar == null;
-		this.inChar = empty ? 0 : inChar;
-		this.outStr = outStr;
+		this.inChar = empty ? null : inChar;
+		this.output = Collections.unmodifiableList(new ArrayList<IAbstractOutputItem>(output));
 	}
 
-	public Transition(State from, State to, Integer inChar) {
-		this(from, to, inChar, "");
+	public Transition(State from, State to, IAbstractInputItem inChar) {
+		this(from, to, inChar, Collections.<IAbstractOutputItem>emptyList());
 	}
 	
 	public boolean isEmpty() {
@@ -34,16 +43,16 @@ public class Transition {
 		return to;
 	}
 
-	public int getInChar() {
+	public IAbstractInputItem getInChar() {
 		return inChar;
 	}
 	
-	public String getOutStr() {
-		return outStr;
+	public List<IAbstractOutputItem> getOutput() {
+		return output;
 	}
 
 	@Override
 	public String toString() {
-		return from + " -" + inChar + "/" + outStr + "-> " + to;
+		return from + " -" + inChar + "/" + output + "-> " + to;
 	}
 }

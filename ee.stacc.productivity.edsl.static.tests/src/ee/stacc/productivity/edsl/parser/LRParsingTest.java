@@ -121,7 +121,7 @@ public class LRParsingTest {
 				"Tokens: " + tokens;
 		String token = tokens.get(0);
 		Integer tokenNumber = parser.getNamesToTokenNumbers().get(token.trim());
-		Set<IAbstractStack> stacks = parser.processToken(tokenNumber, stack);
+		Set<IAbstractStack> stacks = parser.processToken(null, tokenNumber, stack);
 		for (IAbstractStack newStack : stacks) {
 			boolean r = followParsingTrace(parser, newStack, tokens.subList(1, tokens.size()), trace + "\n===\n", expected, out);
 			if (r != expected) {

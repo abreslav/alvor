@@ -7,12 +7,14 @@ import java.util.List;
 
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
+import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
 import ee.stacc.productivity.edsl.lexer.automata.AutomataInclusion;
 import ee.stacc.productivity.edsl.lexer.automata.State;
 import ee.stacc.productivity.edsl.lexer.automata.StringToAutomatonConverter;
 import ee.stacc.productivity.edsl.lexer.automata.Transition;
 import ee.stacc.productivity.edsl.sqllexer.SQLLexerData;
 import ee.stacc.productivity.edsl.string.IAbstractString;
+import ee.stacc.productivity.edsl.string.util.AsbtractStringUtils;
 
 public class SQLLexicalChecker {
 
@@ -22,11 +24,15 @@ public class SQLLexicalChecker {
 	private SQLLexicalChecker() {}
 	
 	public List<String> check(IAbstractString str) {
+		if (AsbtractStringUtils.hasLoops(str)) {
+			throw new IllegalArgumentException("The current version does not support loops in abstract strings");
+		}
+
 		State sqlTransducer = SQLLexer.SQL_TRANSDUCER;
 		
-		State automaton = StringToAutomatonConverter.INSTANCE.convert(str, SQLLexer.SQL_ALPHABET_CONVERTER);
+		State automaton = StringToAutomatonConverter.INSTANCE.convert(str);
 
-		State transduction = AutomataInclusion.INSTANCE.getTrasduction(sqlTransducer, automaton);
+		State transduction = AutomataInclusion.INSTANCE.getTrasduction(sqlTransducer, automaton, SQLLexer.SQL_ALPHABET_CONVERTER);
 		
 		Collection<String> errorTokens = new ArrayList<String>();
 		findErrorTokens(transduction, new HashSet<Transition>(), errorTokens);
@@ -46,9 +52,9 @@ public class SQLLexicalChecker {
 				continue;
 			}
 			if (!transition.isEmpty()) {
-				int inChar = transition.getInChar();
-				if (inChar != (char) -1) {
-					String token = SQLLexerData.TOKENS[inChar];
+				IAbstractInputItem inChar = transition.getInChar();
+				if (inChar.getCode() != -1) {
+					String token = SQLLexerData.TOKENS[inChar.getCode()];
 					if (token == null) {
 						LOG.error(inChar);
 					}

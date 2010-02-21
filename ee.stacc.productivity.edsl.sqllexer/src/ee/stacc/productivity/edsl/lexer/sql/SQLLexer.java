@@ -8,8 +8,17 @@ import static ee.stacc.productivity.edsl.sqllexer.SQLLexerData.TRANSITIONS;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
+import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
+import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractOutputItem;
+import ee.stacc.productivity.edsl.lexer.alphabet.ISequence;
+import ee.stacc.productivity.edsl.lexer.alphabet.PushInput;
+import ee.stacc.productivity.edsl.lexer.alphabet.SequenceUtil;
+import ee.stacc.productivity.edsl.lexer.alphabet.SimpleCharacter;
+import ee.stacc.productivity.edsl.lexer.alphabet.Token;
+import ee.stacc.productivity.edsl.lexer.alphabet.Yield;
 import ee.stacc.productivity.edsl.lexer.automata.AutomataDeterminator;
 import ee.stacc.productivity.edsl.lexer.automata.IAlphabetConverter;
 import ee.stacc.productivity.edsl.lexer.automata.State;
@@ -31,7 +40,7 @@ public class SQLLexer {
 	public static final State SQL_TRANSDUCER = new AutomataConverter().convert();
 
 	public static String getTokenName(int c) {
-		if (c == (char) -1) {
+		if (c == -1) {
 			return "EOF";
 		}
 		return SQLLexerData.TOKENS[c];		
@@ -56,12 +65,21 @@ public class SQLLexer {
 				for (char cc = 0; cc < CHAR_CLASS_COUNT; cc++) {
 					int toIndex = TRANSITIONS[fromIndex][cc];
 					if (toIndex != -1) {
-						String out = "";
+						List<IAbstractOutputItem> actionList = new ArrayList<IAbstractOutputItem>();
 						if (isImmediatelyGenerating(toIndex)) {
-							int action = ACTIONS[toIndex];
-						    out = action >= 0 ? "" + (char) action : "";
+							int actionIndex = ACTIONS[toIndex];
+							if (actionIndex >= 0) {
+								actionList.add(PushInput.INSTANCE);
+								actionList.add(Yield.create(actionIndex));
+							} else {
+								throw new IllegalStateException();
+							}
+						} else {
+							actionList.add(PushInput.INSTANCE);
 						}
-						Transition transition = new Transition(from, states[toIndex], Integer.valueOf(cc), out);
+						Transition transition = new Transition(from, states[toIndex], 
+									SimpleCharacter.create(Integer.valueOf(cc)), 
+									actionList);
 						from.getOutgoingTransitions().add(transition);
 					}
 				}
@@ -70,7 +88,11 @@ public class SQLLexer {
 				}
 			}
 
-			initialState.getOutgoingTransitions().add(new Transition(initialState, EOFState, -1, "" + (char) -1));
+			initialState.getOutgoingTransitions().add(new Transition(
+					initialState, EOFState, 
+					IAbstractInputItem.EOF, 
+					Collections.singletonList(Yield.create(-1))
+			));
 			
 			// Make it circular
 			// Imagine an \eps-transition into initialState from every accepting state
@@ -84,11 +106,11 @@ public class SQLLexer {
 				Collection<Transition> outgoingTransitions = state.getOutgoingTransitions();
 				for (Transition transition : initialTransitions) {
 					State to = transition.getTo();
-					int inChar = transition.getInChar();
-					String initialOutStr = transition.getOutStr();
-					String resultingOutStr = isImmediatelyGenerating(stateIndex) 
+					IAbstractInputItem inChar = transition.getInChar();
+					List<IAbstractOutputItem> initialOutStr = transition.getOutput();
+					List<IAbstractOutputItem> resultingOutStr = isImmediatelyGenerating(stateIndex) 
 						? initialOutStr 
-						: (char) ACTIONS[stateIndex] + initialOutStr;
+						: prepend(Yield.create(ACTIONS[stateIndex]), initialOutStr);
 					outgoingTransitions.add(new Transition(state, to, inChar, resultingOutStr));
 				}
 			}
@@ -106,4 +128,18 @@ public class SQLLexer {
 		}
 	}
 	
+	private static <T> List<T> prepend(T item, List<? extends T> list) {
+		ArrayList<T> result = new ArrayList<T>();
+		result.add(item);
+		result.addAll(list);
+		return result;
+	}
+	
+	
+	public static String tokenToString(Token token) {
+		String tokenName = SQLLexer.getTokenName(token.getType());
+		ISequence<IAbstractInputItem> text = token.getText();
+		String textToStr = SequenceUtil.toString(text);
+		return tokenName + "[" + textToStr + "]";
+	}
 }

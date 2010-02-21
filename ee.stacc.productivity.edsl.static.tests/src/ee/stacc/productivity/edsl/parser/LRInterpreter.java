@@ -5,6 +5,7 @@ import java.io.PrintStream;
 import java.util.Map;
 import java.util.Set;
 
+import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
 import ee.stacc.productivity.edsl.sqlparser.ErrorState;
 import ee.stacc.productivity.edsl.sqlparser.IAbstractStack;
 import ee.stacc.productivity.edsl.sqlparser.IParserState;
@@ -29,14 +30,26 @@ public class LRInterpreter {
 		trace.append("\n");
 		IAbstractStack stack = factory.newStack(parser.getInitialState());
 		for (String token : split) {
-			Integer tokenNumber = namesToTokenNumbers.get(token.trim());
+			final String trimmedToken = token.trim();
+			Integer tokenNumber = namesToTokenNumbers.get(trimmedToken);
 			trace.append("Token: " + token + "\n");
 			trace.append("Stack: " + stack + "\n");
 			if (tokenNumber == null) {
 				throw new IllegalArgumentException("Unknown token: " + token);
 			}
 			
-			Set<IAbstractStack> stacks = parser.processToken(tokenNumber, stack);
+			Set<IAbstractStack> stacks = parser.processToken(new IAbstractInputItem() {
+				
+				@Override
+				public String toString() {
+					return trimmedToken;
+				}
+				
+				@Override
+				public int getCode() {
+					return 0;
+				}
+			}, tokenNumber, stack);
 			if (stacks.size() > 1) {
 				throw new IllegalStateException("Only simple stacks are supported");
 			}
@@ -45,9 +58,10 @@ public class LRInterpreter {
 		}
 		IParserState top = stack.top();
 		if (expectingAccept && top.isError()) {
-			int unexpectedSymbol = ((ErrorState) top).getUnexpectedSymbol();
+			IAbstractInputItem unexpectedSymbol = ((ErrorState) top).getUnexpectedItem();
 			System.out.println(traceData.toString());
-			System.out.println(parser.getSymbolNumbersToNames().get(unexpectedSymbol));
+			System.out.println(unexpectedSymbol);
+//			System.out.println(parser.getSymbolNumbersToNames().get(unexpectedSymbol));
 		}
 		return top;
 	}

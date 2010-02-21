@@ -65,7 +65,7 @@ public class EmptyTransitionEliminator {
 												oldTransition.getTo(), 
 												accepting),
 												oldTransition.getInChar(),
-												oldTransition.getOutStr()
+												oldTransition.getOutput()
 								));
 					}
 				}

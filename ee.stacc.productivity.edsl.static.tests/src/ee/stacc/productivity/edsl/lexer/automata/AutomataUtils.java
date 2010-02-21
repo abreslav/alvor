@@ -7,19 +7,22 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
+import ee.stacc.productivity.edsl.lexer.alphabet.SimpleCharacter;
+import ee.stacc.productivity.edsl.lexer.alphabet.Token;
 import ee.stacc.productivity.edsl.lexer.sql.SQLLexer;
 import ee.stacc.productivity.edsl.sqllexer.SQLLexerData;
 
 public class AutomataUtils {
 
-	public static final ICharacterMapper SQL_TOKEN_MAPPER = new ICharacterMapper() {
+	public static final ICharacterMapper SQL_TOKEN_MAPPER = new AbstractCharacterMapper() {
 		@Override
 		public String map(int c) {
 			return SQLLexer.getTokenName(c);
 		}
 	};
 	
-	public static final ICharacterMapper SQL_IN_MAPPER = new ICharacterMapper() {
+	public static final ICharacterMapper SQL_IN_MAPPER = new AbstractCharacterMapper() {
 		@Override
 		public String map(int c) {
 			if (c == (char) -1) {
@@ -41,7 +44,7 @@ public class AutomataUtils {
 		}
 	};
 
-	public static final ICharacterMapper ID_MAPPER = new ICharacterMapper() {
+	public static final ICharacterMapper ID_MAPPER = new AbstractCharacterMapper() {
 		@Override
 		public String map(int c) {
 			return "" + (char) c;
@@ -81,12 +84,12 @@ public class AutomataUtils {
 			char charAt = string.charAt(i);
 			State state = new State("" + charAt, false);
 			current.getOutgoingTransitions().add(
-					new Transition(current, state, (int) charAt)	
+					new Transition(current, state, SimpleCharacter.create(charAt))	
 			);
 			current = state;
 		}
 		current.getOutgoingTransitions().add(
-				new Transition(current, new State("EOF", true), -1)	
+				new Transition(current, new State("EOF", true), IAbstractInputItem.EOF)	
 		);
 		
 	}
@@ -140,7 +143,7 @@ public class AutomataUtils {
 			for (Transition transition : state.getOutgoingTransitions()) {
 				String inStr;
 				if (!transition.isEmpty()) {
-					int inChar = transition.getInChar();
+					int inChar = transition.getInChar().getCode();
 					if (inChar == -1) {
 						inStr = "EOF";
 					} else {
@@ -154,7 +157,8 @@ public class AutomataUtils {
 					.append(":")
 					.append(inStr)
 					.append("/")
-					.append(mapString(transition.getOutStr(), outMapper))
+					.append(transition.getOutput())
+//					.append(mapString(transition.getOutput(), outMapper))
 					.append("/")
 					.append(" ");
 			}
@@ -162,18 +166,18 @@ public class AutomataUtils {
 		}
 		return stringBuilder.toString();
 	}
-	
-	private static String mapString(String s, ICharacterMapper mapper) {
-		StringBuilder result = new StringBuilder();
-		for (int i = 0; i < s.length(); i++) {
-			result.append(mapper.map(s.charAt(i)));
-		}
-		return result.toString();
-	}
+//	
+//	private static String mapString(String s, ICharacterMapper mapper) {
+//		StringBuilder result = new StringBuilder();
+//		for (int i = 0; i < s.length(); i++) {
+//			result.append(mapper.map(s.charAt(i)));
+//		}
+//		return result.toString();
+//	}
 
 	
-	public static void generate(State state, String out) {
-		generate(state, out, ID_MAPPER, STANDARD_OUTPUT);
+	public static void generate(State state) {
+		generate(state, ID_MAPPER, STANDARD_OUTPUT);
 	}
 	
 	public interface IOutput {
@@ -188,56 +192,46 @@ public class AutomataUtils {
 		}
 		
 	};
+
+	public static final IInputToString TO_STRING = new IInputToString() {
+			
+		@Override
+		public String toString(IAbstractInputItem item) {
+			return item.toString();
+		}
+	};
+
+	public static final IInputToString SQL_TOKEN_TO_STRING = new IInputToString() {
+		
+		@Override
+		public String toString(IAbstractInputItem item) {
+			Token token = (Token) item;
+			return SQLLexer.tokenToString(token);
+		}
+	};
 	
-	public static void generate(State state, String out, ICharacterMapper outputMapper, IOutput output) {
+	public static void generate(State state, IInputToString toStr, IOutput output) {
 		Set<Transition> visitedTransitions = new HashSet<Transition>();
-//		HashMap<State, Integer> visitCounts = new HashMap<State, Integer>();
-//		int maxVisits = 2;
-//		doGenerate(state, out, outputMapper, visitCounts, maxVisits, visitedTransitions);
 		Collection<Transition> outgoingTransitions = state.getOutgoingTransitions();
 		for (Transition transition : outgoingTransitions) {
-			doGenerate(transition, out, outputMapper, visitedTransitions, output);
+			doGenerate(transition, "", toStr, visitedTransitions, output);
 		}
 	}
 
 	private static void doGenerate(Transition tr, String out, 
-			ICharacterMapper outputMapper, Set<Transition> visitedTransitions, 
+			IInputToString toStr, Set<Transition> visitedTransitions, 
 			IOutput output) {
 		if (!visitedTransitions.add(tr)) {
 			return;
 		}
 		State to = tr.getTo();
-		out += outputMapper.map(tr.getInChar()) + " ";
+		out += toStr.toString(tr.getInChar()) + " ";
 		if (to.isAccepting()) {
 			output.putString(out);
 		}
 		for (Transition transition : to.getOutgoingTransitions()) {
-			doGenerate(transition, out, outputMapper, visitedTransitions, output);
+			doGenerate(transition, out, toStr, visitedTransitions, output);
 		}
 		visitedTransitions.remove(tr);
 	}
-	
-//	private static void doGenerate(State state, String out,
-//			ICharacterMapper outputMapper, HashMap<State, Integer> visitCounts,
-//			int maxVisits, Set<Transition> visitedTransitions) {
-//		Integer count = visitCounts.get(state);
-//		if (count == null) {
-//			count = 0;
-//		}
-//		if (count >= maxVisits) {
-//			return;
-//		}
-//		visitCounts.put(state, count + 1);
-//		if (state.isAccepting()) {
-//			System.out.println(out);
-//		}
-//		Collection<Transition> outgoingTransitions = state.getOutgoingTransitions();
-//		for (Transition transition : outgoingTransitions) {
-//			if (!visitedTransitions.add(transition)) {
-////				continue;
-//			}
-//			doGenerate(transition.getTo(), out + outputMapper.map(transition.getInChar()) + " ", outputMapper,
-//					visitCounts, maxVisits, visitedTransitions);
-//		}
-//	}	
 }

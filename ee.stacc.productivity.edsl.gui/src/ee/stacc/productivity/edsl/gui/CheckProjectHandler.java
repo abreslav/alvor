@@ -19,6 +19,7 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
 
 import ee.stacc.productivity.edsl.checkers.AbstractStringCheckerManager;
 import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
+import ee.stacc.productivity.edsl.checkers.IPositionDescriptor;
 import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.common.logging.ILog;
@@ -122,7 +123,7 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 	}
 
 	@Override
-	public void handleSQLError(String message, IStringNodeDescriptor descriptor) {
+	public void handleSQLError(String message, IPositionDescriptor descriptor) {
 		createMarker(message, ERROR_MARKER_ID, descriptor.getFile(), descriptor.getCharStart(), 
 				descriptor.getCharStart() + descriptor.getCharLength());		
 	}

@@ -9,18 +9,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import ee.stacc.productivity.edsl.lexer.automata.AbstractCharacterMapper;
 import ee.stacc.productivity.edsl.lexer.automata.AutomataUtils;
 import ee.stacc.productivity.edsl.lexer.automata.ICharacterMapper;
+import ee.stacc.productivity.edsl.lexer.automata.IInputToString;
 import ee.stacc.productivity.edsl.lexer.automata.State;
 import ee.stacc.productivity.edsl.lexer.automata.AutomataUtils.IOutput;
 
 public class TestUtil {
 
-//	public static List<String> generate(State state, String out) {
-//		return generate(state, out, AutomataUtils.SQL_TOKEN_MAPPER);
-//	}
-	
-	public static List<String> generate(State state, String out, ICharacterMapper outputMapper) {
+	public static List<String> generate(State state, IInputToString outputMapper) {
 		final List<String> result = new ArrayList<String>();
 		IOutput output = new IOutput() {
 			@Override
@@ -28,7 +26,7 @@ public class TestUtil {
 				result.add(str);
 			}
 		};
-		AutomataUtils.generate(state, out, outputMapper, output);
+		AutomataUtils.generate(state, outputMapper, output);
 		return result;
 	}
 
@@ -37,7 +35,7 @@ public class TestUtil {
 	}
 
 	public static void checkGeneratedcharacterStrings(State transduction, String... expected) {
-		checkGeneratedStrings(transduction, new ICharacterMapper() {
+		checkGeneratedStrings(transduction, new AbstractCharacterMapper() {
 			
 			@Override
 			public String map(int c) {
@@ -51,7 +49,7 @@ public class TestUtil {
 	
 	private static void checkGeneratedStrings(State transduction,
 			ICharacterMapper outputMapper, String... expected) {
-		List<String> generate = generate(transduction, "", outputMapper);
+		List<String> generate = generate(transduction, outputMapper);
 		Set<String> actual = new HashSet<String>();
 		for (String string : generate) {
 //			System.out.println("\"" + string + "\",");

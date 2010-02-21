@@ -1,9 +1,14 @@
 package ee.stacc.productivity.edsl.lexer.automata;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractOutputItem;
+import ee.stacc.productivity.edsl.lexer.alphabet.SimpleCharacter;
 
 
 public class AutomataParser {
@@ -29,9 +34,14 @@ public class AutomataParser {
 				State to = getState(map, matcher.group(1));
 				char c = matcher.group(3).charAt(0);
 				String outStr = matcher.group(5);
-				Transition transition = new Transition(from, to, (int) c, outStr == null ? "" : outStr);
+				List<IAbstractOutputItem> out = new ArrayList<IAbstractOutputItem>();
+				if (outStr != null) {
+					for (int i = 0; i < outStr.length(); i++) {
+						out.add(new SimpleOutput(outStr.charAt(i)));
+					}
+				}
+				Transition transition = new Transition(from, to, SimpleCharacter.create(c), out);
 				from.getOutgoingTransitions().add(transition);
-//				to.getIncomingTransitions().add(transition);
 			}
 		}
 		return initialState;

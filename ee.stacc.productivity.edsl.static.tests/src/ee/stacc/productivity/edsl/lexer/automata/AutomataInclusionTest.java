@@ -2,15 +2,19 @@ package ee.stacc.productivity.edsl.lexer.automata;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import org.junit.Test;
 
+import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
+import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractOutputItem;
+import ee.stacc.productivity.edsl.lexer.alphabet.ISequence;
+import ee.stacc.productivity.edsl.lexer.alphabet.SimpleCharacter;
 import ee.stacc.productivity.edsl.lexer.sql.SQLLexer;
-import ee.stacc.productivity.edsl.sqllexer.SQLLexerData;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.parser.AbstractStringParser;
 import ee.stacc.productivity.edsl.tests.util.TestUtil;
@@ -21,6 +25,13 @@ public class AutomataInclusionTest {
 	public void testInclusion() throws Exception {
 		String automaton1;
 		String automaton2;
+
+
+		automaton1 = "!A - !A:x;";
+		automaton2 = "!A1 - !B1:x;" + "!B1 - !B1:y";
+		assertFalse(AutomataInclusion.INSTANCE.checkInclusion(AutomataParser
+				.parse(automaton1), AutomataParser.parse(
+				automaton2)));
 
 		automaton1 = "A - !B:q;";
 		automaton2 = automaton1;
@@ -54,12 +65,6 @@ public class AutomataInclusionTest {
 
 		automaton1 = "!A - !A:x;";
 		automaton2 = "!A1 - !B1:y;";
-		assertFalse(AutomataInclusion.INSTANCE.checkInclusion(AutomataParser
-				.parse(automaton1), AutomataParser.parse(
-				automaton2)));
-
-		automaton1 = "!A - !A:x;";
-		automaton2 = "!A1 - !B1:x;" + "!B1 - !B1:y";
 		assertFalse(AutomataInclusion.INSTANCE.checkInclusion(AutomataParser
 				.parse(automaton1), AutomataParser.parse(
 				automaton2)));
@@ -135,9 +140,18 @@ public class AutomataInclusionTest {
 		String transducerStr;
 		String checkStr;
 
-		automatonStr = "S1 - !S2:a;" + "!S2 - S3:b;" + "S3 - S2:a";
-		transducerStr = "S1 - !S2:a/x;" + "!S2 - S3:b/y;" + "S3 - S2:a/z";
-		checkStr = "S1 - !S2:x;" + "!S2 - S3:y;" + "S3 - S2:z";
+		automatonStr = 
+			"A1 - !A2:a;" + 
+			"!A2 - A3:b;" + 
+			"A3 - A2:a";
+		transducerStr = 
+			"T1 - !T2:a/x;" + 
+			"!T2 - T3:b/y;" + 
+			"T3 - T2:a/z";
+		checkStr = 
+			"C1 - !C2:x;" + 
+			"!C2 - C3:y;" + 
+			"C3 - C2:z";
 
 		checkTransduction(automatonStr, transducerStr, checkStr);
 
@@ -162,19 +176,33 @@ public class AutomataInclusionTest {
 
 	private void checkTransduction(String automatonStr, String transducerStr,
 			String checkStr) {
-		State automaton;
-		State transducer;
-		State check;
-		State transduction;
-		automaton = AutomataParser.parse(automatonStr);
+		State automaton = AutomataParser.parse(automatonStr);
 		automaton = AutomataDeterminator.determinate(automaton);
-		transducer = AutomataParser.parse(transducerStr);
-		check = AutomataParser.parse(checkStr);
+		State transducer = AutomataParser.parse(transducerStr);
+		State check = AutomataParser.parse(checkStr);
 		check = AutomataDeterminator.determinate(check);
 		
-		transduction = AutomataInclusion.INSTANCE.getTrasduction(transducer, automaton);
+		State transduction = AutomataInclusion.INSTANCE.getTrasduction(transducer, automaton, IAlphabetConverter.ID, new IOutputItemInterpreter() {
+
+			@Override
+			public ISequence<IAbstractInputItem> processOutputCommands(
+					ISequence<IAbstractInputItem> text,
+					IAbstractInputItem inputItem,
+					List<IAbstractOutputItem> output,
+					List<IAbstractInputItem> effect) {
+				for (IAbstractOutputItem command : output) {
+					char outChar = ((SimpleOutput) command).getOutChar();
+					effect.add(SimpleCharacter.create(outChar));
+				}
+				return text;
+			}
+			
+		});
 		transduction = EmptyTransitionEliminator.INSTANCE.eliminateEmptySetTransitions(transduction);
 		transduction = AutomataDeterminator.determinate(transduction);
+//		AutomataUtils.printAutomaton(automaton);
+//		AutomataUtils.printAutomaton(check);
+//		AutomataUtils.printAutomaton(transduction);
 		assertTrue(AutomataInclusion.INSTANCE.checkInclusion(check, transduction));
 		assertTrue(AutomataInclusion.INSTANCE.checkInclusion(transduction, check));
 	}
@@ -193,8 +221,8 @@ public class AutomataInclusionTest {
 				"SELECT AD_Table_ID, TableName FROM AD_Table WHERE IsView='N' ORDER BY 2",
 				"SELECT COUNT(*) FROM AD_PInstance_Para WHERE AD_PInstance_ID=?", };
 		State automaton = AutomataUtils
-				.toAutomaton(convertToSQLChars(new HashSet<String>(Arrays
-						.asList(strings))));
+				.toAutomaton(new HashSet<String>(Arrays
+						.asList(strings)));
 
 		String[] expected = {
 			"SELECT ID . ID FROM ID ID",
@@ -211,8 +239,23 @@ public class AutomataInclusionTest {
 		checkAutomatonTransduction(expected, automaton);
 	}
 
+
+	private void checkAutomatonTransduction(String[] expected, State init) {
+		State sqlTransducer = SQLLexer.SQL_TRANSDUCER;
+		State transduction = AutomataInclusion.INSTANCE.getTrasduction(
+				sqlTransducer, init, SQLLexer.SQL_ALPHABET_CONVERTER);
+		transduction = EmptyTransitionEliminator.INSTANCE
+				.eliminateEmptySetTransitions(transduction);
+//		AutomataUtils.generate(transduction, AutomataUtils.SQL_TOKEN_TO_STRING, AutomataUtils.STANDARD_OUTPUT);
+		transduction = AutomataDeterminator.determinate(transduction);
+
+		TestUtil.checkGeneratedSQLStrings(transduction, expected);
+	}
+
 	@Test
 	public void testLoops() throws Exception {
+		fail("Loops are not supported");
+		
 		String abstractString;
 		String[] expected;
 
@@ -266,36 +309,24 @@ public class AutomataInclusionTest {
 
 	private void checkAbstractStringTransduction(IAbstractString str,
 			String[] expected) {
-		State init = StringToAutomatonConverter.INSTANCE.convert(str,
-				SQLLexer.SQL_ALPHABET_CONVERTER);
+		State init = StringToAutomatonConverter.INSTANCE.convert(str);
 //		init = AutomataDeterminator.determinate(init);
 
 		checkAutomatonTransduction(expected, init);
 	}
-
-	private void checkAutomatonTransduction(String[] expected, State init) {
-		State sqlTransducer = SQLLexer.SQL_TRANSDUCER;
-		State transduction = AutomataInclusion.INSTANCE.getTrasduction(
-				sqlTransducer, init);
-		transduction = EmptyTransitionEliminator.INSTANCE
-				.eliminateEmptySetTransitions(transduction);
-		transduction = AutomataDeterminator.determinate(transduction);
-
-		TestUtil.checkGeneratedSQLStrings(transduction, expected);
-	}
-
-	private Set<String> convertToSQLChars(Set<String> hashSet) {
-		Set<String> result = new HashSet<String>();
-		for (String string : hashSet) {
-			StringBuilder builder = new StringBuilder(string.length());
-			for (int i = 0; i < string.length(); i++) {
-				builder.append(SQLLexerData.CHAR_CLASSES[string.charAt(i)]);
-			}
-			String res1 = builder.toString();
-			String res = res1;
-			result.add(res);
-		}
-		return result;
-	}
+	
+//	private Set<String> convertToSQLChars(Set<String> hashSet) {
+//		Set<String> result = new HashSet<String>();
+//		for (String string : hashSet) {
+//			StringBuilder builder = new StringBuilder(string.length());
+//			for (int i = 0; i < string.length(); i++) {
+//				builder.append(SQLLexerData.CHAR_CLASSES[string.charAt(i)]);
+//			}
+//			String res1 = builder.toString();
+//			String res = res1;
+//			result.add(res);
+//		}
+//		return result;
+//	}
 
 }

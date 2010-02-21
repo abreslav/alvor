@@ -6,8 +6,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -57,6 +60,7 @@ public class AbstractStringEvaluator {
 	private int maxLevel = 1;
 	private boolean supportParameters = true;
 	private boolean supportInvocations = true;
+	private final IPositionStorage positionStorage;
 	
 	private int level;
 	private MethodInvocation invocationContext;
@@ -64,12 +68,12 @@ public class AbstractStringEvaluator {
 	
 	public static IAbstractString evaluateExpression(Expression node) {
 		AbstractStringEvaluator evaluator = 
-			new AbstractStringEvaluator(0, null, getNodeProject(node));
+			new AbstractStringEvaluator(0, null, getNodeProject(node), IPositionStorage.NONE);
 		return evaluator.eval(node);
 	}
 	
 	private AbstractStringEvaluator(int level, MethodInvocation invocationContext,
-			IJavaElement scope) {
+			IJavaElement scope, IPositionStorage positionStorage) {
 		
 		if (level > maxLevel) {
 			throw new UnsupportedStringOpEx("Analysis level (" + level + ") too deep");
@@ -78,6 +82,7 @@ public class AbstractStringEvaluator {
 		this.level = level;
 		this.invocationContext = invocationContext;
 		this.scope = scope;
+		this.positionStorage = positionStorage;
 	}
 	
 	private IAbstractString eval(Expression node) {
@@ -88,10 +93,10 @@ public class AbstractStringEvaluator {
 			return new StringRandomInteger();
 		}
 		else if (node instanceof StringLiteral) {
-			return new StringConstant(((StringLiteral)node).getLiteralValue());
+			return createStringConstant(node, ((StringLiteral)node).getLiteralValue());
 		}
 		else if (node instanceof CharacterLiteral) {
-			return new StringConstant(String.valueOf(((CharacterLiteral)node).charValue()));
+			return createStringConstant(node, String.valueOf(((CharacterLiteral)node).charValue()));
 		}
 		else if (node instanceof Name) {
 			return evalName((Name)node);
@@ -133,6 +138,22 @@ public class AbstractStringEvaluator {
 			throw new UnsupportedStringOpEx
 				("getValOf(" + node.getClass().getName() + ")");
 		}
+	}
+
+	private IAbstractString createStringConstant(Expression node, String string) {
+		StringConstant stringConstant = new StringConstant(string);
+		ICompilationUnit unit = (ICompilationUnit) ((CompilationUnit) node.getRoot()).getJavaElement();
+		
+		try {
+			positionStorage.setPosition(
+					stringConstant, 
+					new PositionDescriptor((IFile) unit.getCorrespondingResource(), 
+							node.getStartPosition(), 
+							node.getLength()));
+		} catch (JavaModelException e) {
+			LOG.exception(e);
+		}
+		return stringConstant;
 	}
 	
 	private IAbstractString evalName(Name node) {
@@ -418,7 +439,7 @@ public class AbstractStringEvaluator {
 				throw new UnsupportedStringOpEx("Method call");
 			}
 			AbstractStringEvaluator evaluatorWithNewContext = 
-				new AbstractStringEvaluator(level+1, inv, scope);
+				new AbstractStringEvaluator(level+1, inv, scope, positionStorage);
 
 			if (inv.getExpression() == null || inv.getExpression() instanceof ThisExpression) {
 				MethodDeclaration decl = getMethodDeclarationByName(NodeSearchEngine.getContainingTypeDeclaration(inv), 
@@ -473,9 +494,6 @@ public class AbstractStringEvaluator {
 		}
 
 		
-		AbstractStringEvaluator evaluator = 
-			new AbstractStringEvaluator(level, null, scope);
-		
 		LOG.message(levelPrefix + "###########################################");
 		LOG.message(levelPrefix + "searching: ");
 		for (NodeRequest nodeRequest : requests) {
@@ -492,6 +510,9 @@ public class AbstractStringEvaluator {
 			StringNodeDescriptor desc = new StringNodeDescriptor(arg, sr.getFile(),
 					sr.getLineNumber(), sr.getCharStart(), sr.getCharLength(), null);
 			try {
+				AbstractStringEvaluator evaluator = 
+					new AbstractStringEvaluator(level, null, scope, desc);
+				
 				//LOG.message(levelPrefix + "EVALUATING: file=" + desc.getFile()
 				//		+ ", line=" + desc.getLineNumber());
 				desc.setAbstractValue(evaluator.eval(arg));
@@ -535,7 +556,7 @@ public class AbstractStringEvaluator {
 				if (this.invocationContext != null) {
 					// TODO: check that invocation context matches
 					AbstractStringEvaluator nextLevelEvaluator = 
-						new AbstractStringEvaluator(level+1, null, scope);
+						new AbstractStringEvaluator(level+1, null, scope, positionStorage);
 					
 					return nextLevelEvaluator.eval
 						((Expression)this.invocationContext.arguments().get(paramIndex));

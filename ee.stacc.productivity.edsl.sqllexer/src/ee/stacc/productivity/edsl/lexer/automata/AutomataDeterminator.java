@@ -10,6 +10,8 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import ee.stacc.productivity.edsl.lexer.alphabet.SimpleCharacter;
+
 public class AutomataDeterminator {
 	
 	public interface IStateSetPredicate {
@@ -25,7 +27,7 @@ public class AutomataDeterminator {
 	
 	/**
 	 * @param initial an \epsilon-free automaton
-	 * @return an initial state of an equivalent deterministic automaton
+	 * @return an initial state of an equivalent deterministic automaton (with SimpleCharacters as inputs)
 	 */
 	public static State determinate(State initial) {
 		return new AutomataDeterminator(NONE, null).doDeterminate(initial);
@@ -86,14 +88,15 @@ public class AutomataDeterminator {
 			State newState = entry.getValue();
 			Map<Integer, Set<State>> transitionMap = newTransitions.get(oldStates);
 			for (Entry<Integer, Set<State>> trEntry : transitionMap.entrySet()) {
-				Integer Integer = trEntry.getKey();
+				Integer integer = trEntry.getKey();
 				Set<State> targetOldStates = trEntry.getValue();
 				State targetNewState = visited.get(targetOldStates);
 				
 				Transition transition = new Transition(
 						newState, 
 						targetNewState, 
-						(int) Integer);
+						SimpleCharacter.create(integer));
+//						(int) integer);
 				newState.getOutgoingTransitions().add(transition);
 			}
 		}
@@ -134,7 +137,7 @@ public class AutomataDeterminator {
 		if (transition.isEmpty()) {
 			throw new IllegalArgumentException("Only nonempty transitions suported");
 		}
-		Set<State> stateSet = AutomataInclusion.getSet(map, transition.getInChar());
+		Set<State> stateSet = AutomataInclusion.getSet(map, transition.getInChar().getCode());
 		stateSet.add(transition.getTo());
 	}
 
@@ -184,7 +187,7 @@ public class AutomataDeterminator {
 			Iterator<Transition> iterator = state.getOutgoingTransitions().iterator();
 			while (iterator.hasNext()) {
 				Transition transition = iterator.next();
-				int inChar = transition.getInChar();
+				int inChar = transition.getInChar().getCode();
 				if (usedIns.contains(inChar)) {
 					iterator.remove();
 				} else {

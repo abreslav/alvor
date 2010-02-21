@@ -2,8 +2,12 @@ package ee.stacc.productivity.edsl.lexer.automata;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.List;
+
 import org.junit.Test;
 
+import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractOutputItem;
+import ee.stacc.productivity.edsl.lexer.alphabet.Yield;
 import ee.stacc.productivity.edsl.lexer.sql.SQLLexer;
 import ee.stacc.productivity.edsl.sqllexer.SQLLexerData;
 
@@ -72,17 +76,20 @@ public class AutomataConverterTest {
 //			}
 			boolean worked = false;
 			for (Transition transition : current.getOutgoingTransitions()) {
-				if (!transition.isEmpty() && transition.getInChar() == c) {
+				if (!transition.isEmpty() && transition.getInChar().getCode() == c) {
 					current = transition.getTo();
-					String outStr = transition.getOutStr();
-					for (int j = 0; j < outStr.length(); j++) {
-						char charAt = outStr.charAt(j);
-						if (charAt == (char) -1) {
-							output.append("EOF");
-						} else {
-							output.append(SQLLexerData.TOKENS[charAt]);
+					List<IAbstractOutputItem> outStr = transition.getOutput();
+					for (IAbstractOutputItem item : outStr) {
+						if (item instanceof Yield) {
+							Yield yield = (Yield) item;
+							int type = yield.getTokenType();
+							if (type == -1) {
+								output.append("EOF");
+							} else {
+								output.append(SQLLexerData.TOKENS[type]);
+							}
+							output.append(" ");
 						}
-						output.append(" ");
 					}
 					worked = true;
 					break;
