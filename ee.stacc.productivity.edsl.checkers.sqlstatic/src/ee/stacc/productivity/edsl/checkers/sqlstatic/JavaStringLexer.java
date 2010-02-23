@@ -18,6 +18,9 @@ public class JavaStringLexer {
 	
 	public static void tokenizeJavaString(String escapedValue,
 			IAbstractInputItem[] result, IPositionDescriptor stringPosition) {
+		if (escapedValue == null) {
+			throw new MalformedStringLiteralException("Literal value is null");
+		}
 		boolean isCharacter = escapedValue.startsWith("'");
 		LexerState state = isCharacter ? LexerState.EXPECT_CHAR_START : LexerState.EXPECT_STRING_START;
 		

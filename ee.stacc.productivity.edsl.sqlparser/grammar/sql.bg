@@ -214,10 +214,15 @@ simpleExpr
 	| simpleExpr '/' simpleExpr
 	| simpleExpr CONCAT simpleExpr
 	| '(' select ')'
+	| ID '.' '*'
 	| '*'
 	| '?'
 	| NULL
 	;	
+identRest
+	: '(' simExList ')'
+	| /*empty*/
+	;
 whenList
 	: when
 	| when whenList
@@ -227,10 +232,6 @@ when
 	;
 else
 	: ELSE simpleExpr
-	| /*empty*/
-	;
-identRest
-	: '(' simExList ')'
 	| /*empty*/
 	;
 simExList
