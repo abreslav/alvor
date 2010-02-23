@@ -1,8 +1,7 @@
-package ee.stacc.productivity.edsl.crawler;
+package ee.stacc.productivity.edsl.checkers;
 
 import org.eclipse.core.resources.IFile;
 
-import ee.stacc.productivity.edsl.checkers.IPositionDescriptor;
 
 public class PositionDescriptor implements IPositionDescriptor {
 
