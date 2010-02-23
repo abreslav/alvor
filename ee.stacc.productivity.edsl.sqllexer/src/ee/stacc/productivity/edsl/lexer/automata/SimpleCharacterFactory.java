@@ -12,9 +12,14 @@ public class SimpleCharacterFactory implements IInputItemFactory {
 	private SimpleCharacterFactory() {}
 	
 	@Override
-	public IAbstractInputItem createInputItem(StringConstant constant,
-			int position) {
-		return SimpleCharacter.create(constant.getConstant().charAt(position));
+	public IAbstractInputItem[] createInputItems(StringConstant constant) {
+		String string = constant.getConstant();
+		int length = string.length();
+		IAbstractInputItem[] result = new IAbstractInputItem[length];
+		for (int i = 0; i < length; i++) {
+			result[i] = SimpleCharacter.create(constant.getConstant().charAt(i));
+		}
+		return result;
 	}
 
 	@Override

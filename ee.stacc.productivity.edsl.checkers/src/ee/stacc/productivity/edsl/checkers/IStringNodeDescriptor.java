@@ -12,5 +12,6 @@ public interface IStringNodeDescriptor extends INodeDescriptor {
 	 * @return position of the AST node from which the literal was created
 	 */
 	IPositionDescriptor getPosition(StringConstant literal);
+	String getEscapedValue(StringConstant literal);
 
 }

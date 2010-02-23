@@ -64,17 +64,16 @@ public class StringToAutomatonConverter {
 		public Set<State> visitStringConstant(StringConstant stringConstant,
 				State initial) {
 			State fin = new State("F", false);
-			String string = stringConstant.getConstant();
 			State current = initial;
-			int length = string.length();
-			for (int i = 0; i < length; i++) {
+			IAbstractInputItem[] items = factory.createInputItems(stringConstant);
+			for (int i = 0; i < items.length; i++) {
 				State dest;
-				if (i == length - 1) {
+				if (i == items.length - 1) {
 					dest = fin;
 				} else {
 					dest = new State("I", false);
 				}
-				createTransition(current, dest, factory.createInputItem(stringConstant, i));
+				createTransition(current, dest, items[i]);
 				current = dest;
 			}
 			return Collections.singleton(fin);

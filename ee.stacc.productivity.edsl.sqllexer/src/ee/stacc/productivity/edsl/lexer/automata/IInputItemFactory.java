@@ -6,6 +6,6 @@ import ee.stacc.productivity.edsl.string.StringConstant;
 
 public interface IInputItemFactory {
 
-	IAbstractInputItem createInputItem(StringConstant constant, int position);
+	IAbstractInputItem[] createInputItems(StringConstant constant);
 	IAbstractInputItem createInputItem(StringCharacterSet set, int character);
 }

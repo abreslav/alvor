@@ -30,37 +30,43 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 			final ISQLErrorHandler errorHandler, Map<String, Object> options) {
 		for (final IStringNodeDescriptor descriptor : descriptors) {
 			IAbstractString abstractString = descriptor.getAbstractValue();
-			State automaton = StringToAutomatonConverter.INSTANCE.convert(abstractString, new IInputItemFactory() {
+			try {
+				State automaton = StringToAutomatonConverter.INSTANCE.convert(abstractString, new IInputItemFactory() {
+					
+					@Override
+					public IAbstractInputItem createInputItem(StringCharacterSet set,
+							int character) {
+						throw new IllegalArgumentException("Character sets are not supported");
+					}
+					
+					@Override
+					public IAbstractInputItem[] createInputItems(StringConstant constant) {
+						IAbstractInputItem[] result = new IAbstractInputItem[constant.getConstant().length()];
+	
+						String escapedValue = descriptor.getEscapedValue(constant);
+						System.out.println(escapedValue);
+	
+						JavaStringLexer.tokenizeJavaString(escapedValue, result, descriptor.getPosition(constant));
+						return result;
+					}
+	
+				});
 				
-				@Override
-				public IAbstractInputItem createInputItem(StringCharacterSet set,
-						int character) {
-					throw new IllegalArgumentException("Character sets are not supported");
-				}
-				
-				@Override
-				public IAbstractInputItem createInputItem(StringConstant constant,
-						int position) {
-					return new PositionedCharacter(
-							constant.getConstant().charAt(position), 
-							descriptor.getPosition(constant), 
-							position,
-							1);
-				}
-			});
-			
-			SQLSyntaxChecker.INSTANCE.checkAutomaton(automaton, new IParseErrorHandler() {
-				
-				@Override
-				public void unexpectedItem(IAbstractInputItem item) {
-					errorHandler.handleSQLError("Unexpected " + item, descriptor);
-				}
-				
-				@Override
-				public void other() {
-					errorHandler.handleSQLError("Unfinished", descriptor);
-				}
-			});
+				SQLSyntaxChecker.INSTANCE.checkAutomaton(automaton, new IParseErrorHandler() {
+					
+					@Override
+					public void unexpectedItem(IAbstractInputItem item) {
+						errorHandler.handleSQLError("Unexpected " + item, descriptor);
+					}
+					
+					@Override
+					public void other() {
+						errorHandler.handleSQLError("Unfinished", descriptor);
+					}
+				});
+			} catch (MalformedStringLiteralException e) {
+				errorHandler.handleSQLError("Malformed string literal: " + e.getMessage(), descriptor);
+			}
 		}
 	}
 	
@@ -74,8 +80,8 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 		
 		Iterator<PositionedCharacter> iterator = chars.iterator();
 		PositionedCharacter currentChar = iterator.next();
-		IFile currentFile = currentChar.stringPosition.getFile();
-		int charStart = currentChar.stringPosition.getCharStart() + currentChar.indexInString;
+		IFile currentFile = currentChar.getStringPosition().getFile();
+		int charStart = currentChar.getStringPosition().getCharStart() + currentChar.getIndexInString();
 		int charLength = 1;
 		
 		while (iterator.hasNext()) {
@@ -85,32 +91,4 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 		return positions;
 	}
 	
-	private static final class PositionedCharacter implements IAbstractInputItem {
-		
-		private final int code;
-		private final IPositionDescriptor stringPosition;
-		private final int indexInString;
-		private final int lengthInSource;
-		
-		public PositionedCharacter(int code,
-				IPositionDescriptor stringPosition, int indexInString,
-				int lengthInSource) {
-			this.code = code;
-			this.stringPosition = stringPosition;
-			this.indexInString = indexInString;
-			this.lengthInSource = lengthInSource;
-		}
-
-		@Override
-		public int getCode() {
-			return code;
-		}
-
-		@Override
-		public String toString() {
-			return ((char) code) + "[" + stringPosition + ";" + indexInString + ":" + lengthInSource + "]";
-		}
-		
-	}
-
 }

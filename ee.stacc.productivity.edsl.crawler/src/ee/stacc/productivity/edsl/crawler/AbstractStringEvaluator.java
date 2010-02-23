@@ -46,6 +46,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
+import ee.stacc.productivity.edsl.checkers.PositionDescriptor;
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.string.IAbstractString;
@@ -60,7 +61,7 @@ public class AbstractStringEvaluator {
 	private int maxLevel = 1;
 	private boolean supportParameters = true;
 	private boolean supportInvocations = true;
-	private final IPositionStorage positionStorage;
+	private final IStringPositionStorage positionStorage;
 	
 	private int level;
 	private MethodInvocation invocationContext;
@@ -68,12 +69,12 @@ public class AbstractStringEvaluator {
 	
 	public static IAbstractString evaluateExpression(Expression node) {
 		AbstractStringEvaluator evaluator = 
-			new AbstractStringEvaluator(0, null, getNodeProject(node), IPositionStorage.NONE);
+			new AbstractStringEvaluator(0, null, getNodeProject(node), IStringPositionStorage.NONE);
 		return evaluator.eval(node);
 	}
 	
 	private AbstractStringEvaluator(int level, MethodInvocation invocationContext,
-			IJavaElement scope, IPositionStorage positionStorage) {
+			IJavaElement scope, IStringPositionStorage positionStorage) {
 		
 		if (level > maxLevel) {
 			throw new UnsupportedStringOpEx("Analysis level (" + level + ") too deep");
@@ -93,10 +94,12 @@ public class AbstractStringEvaluator {
 			return new StringRandomInteger();
 		}
 		else if (node instanceof StringLiteral) {
-			return createStringConstant(node, ((StringLiteral)node).getLiteralValue());
+			StringLiteral stringLiteral = (StringLiteral)node;
+			return createStringConstant(node, stringLiteral.getLiteralValue(), stringLiteral.getEscapedValue());
 		}
 		else if (node instanceof CharacterLiteral) {
-			return createStringConstant(node, String.valueOf(((CharacterLiteral)node).charValue()));
+			CharacterLiteral characterLiteral = (CharacterLiteral)node;
+			return createStringConstant(node, String.valueOf(characterLiteral.charValue()), characterLiteral.getEscapedValue());
 		}
 		else if (node instanceof Name) {
 			return evalName((Name)node);
@@ -140,16 +143,16 @@ public class AbstractStringEvaluator {
 		}
 	}
 
-	private IAbstractString createStringConstant(Expression node, String string) {
-		StringConstant stringConstant = new StringConstant(string);
+	private IAbstractString createStringConstant(Expression node, String literalValue, String escapedValue) {
+		StringConstant stringConstant = new StringConstant(literalValue);
 		ICompilationUnit unit = (ICompilationUnit) ((CompilationUnit) node.getRoot()).getJavaElement();
 		
 		try {
-			positionStorage.setPosition(
+			positionStorage.setPositionInformation(
 					stringConstant, 
 					new PositionDescriptor((IFile) unit.getCorrespondingResource(), 
 							node.getStartPosition(), 
-							node.getLength()));
+							node.getLength()), escapedValue);
 		} catch (JavaModelException e) {
 			LOG.exception(e);
 		}

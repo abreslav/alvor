@@ -18,7 +18,6 @@ import ee.stacc.productivity.edsl.checkers.AbstractStringCheckerManager;
 import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
 import ee.stacc.productivity.edsl.checkers.IPositionDescriptor;
 import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
-import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.main.JavaElementChecker;
@@ -58,11 +57,6 @@ public class EDSLApplication implements IApplication {
 						List<INodeDescriptor> hotspots = projectChecker.findHotspots(sf, options);
 						time = System.currentTimeMillis() - time;
 						log.format("%d\n", time);
-						for (INodeDescriptor nodeDescriptor : hotspots) {
-							if (nodeDescriptor instanceof IStringNodeDescriptor) {
-								System.out.println(((IStringNodeDescriptor)nodeDescriptor).getAbstractValue());
-							}
-						}
 						projectChecker.processHotspots(hotspots, 
 								new ISQLErrorHandler() {
 

@@ -11,10 +11,11 @@ import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.StringConstant;
 
-public class StringNodeDescriptor extends NodeDescriptor implements IStringNodeDescriptor, IPositionStorage {
+public class StringNodeDescriptor extends NodeDescriptor implements IStringNodeDescriptor, IStringPositionStorage {
 
 	private IAbstractString abstractValue;
 	private final Map<StringConstant, IPositionDescriptor> positionMap = new HashMap<StringConstant, IPositionDescriptor>();
+	private final Map<StringConstant, String> escapedValuesMap = new HashMap<StringConstant, String>();
 
 	public StringNodeDescriptor(ASTNode node, IFile file, int lineNumber,
 			int charStart, int charLength, IAbstractString abstractValue) {
@@ -31,13 +32,19 @@ public class StringNodeDescriptor extends NodeDescriptor implements IStringNodeD
 	}
 	
 	@Override
-	public IPositionDescriptor getPosition(StringConstant literal) {
-		return positionMap.get(literal);
+	public void setPositionInformation(StringConstant literal, IPositionDescriptor descriptor, String escapedValue) {
+		positionMap.put(literal, descriptor);
+		escapedValuesMap.put(literal, escapedValue);
 	}
 	
 	@Override
-	public void setPosition(StringConstant literal, IPositionDescriptor descriptor) {
-		positionMap.put(literal, descriptor);
+	public IPositionDescriptor getPosition(StringConstant literal) {
+		return positionMap.get(literal);
+	}
+
+	@Override
+	public String getEscapedValue(StringConstant literal) {
+		return escapedValuesMap.get(literal);
 	}
 	
 }
