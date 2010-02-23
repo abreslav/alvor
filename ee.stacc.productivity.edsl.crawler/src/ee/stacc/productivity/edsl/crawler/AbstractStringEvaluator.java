@@ -120,12 +120,12 @@ public class AbstractStringEvaluator {
 			ClassInstanceCreation cic = (ClassInstanceCreation)node;
 			if (cic.arguments().size() == 1) {
 				Expression arg = (Expression)cic.arguments().get(0);
-				// string initialyzer
+				// string initializer
 				if (arg.resolveTypeBinding().getName().equals("String")) {
 					return eval(arg);
 				}
 				else if (arg.resolveTypeBinding().getName().equals("int")) {
-					return new StringConstant("");
+					return createStringConstant(node, "", "");
 				}
 				else { // CharSequence
 					throw new UnsupportedStringOpEx("Unknown StringBuilder/Buffer constructor: " 
@@ -134,7 +134,7 @@ public class AbstractStringEvaluator {
 			}
 			else {
 				assert cic.arguments().size() == 0;
-				return new StringConstant("");
+				return createStringConstant(node, "", "");
 			}
 		}
 		else {
@@ -490,7 +490,7 @@ public class AbstractStringEvaluator {
 	
 	public static List<INodeDescriptor> evaluateMethodArgumentAtCallSites
 			(Collection<NodeRequest> requests,
-					IJavaElement scope, int level) {
+					IJavaElement scope, int level, IStringPositionStorage storage) {
 		String levelPrefix = "";
 		for (int i = 0; i < level; i++) {
 			levelPrefix += "    ";
@@ -514,7 +514,7 @@ public class AbstractStringEvaluator {
 					sr.getLineNumber(), sr.getCharStart(), sr.getCharLength(), null);
 			try {
 				AbstractStringEvaluator evaluator = 
-					new AbstractStringEvaluator(level, null, scope, desc);
+					new AbstractStringEvaluator(level, null, scope, storage == null ? desc : storage);
 				
 				//LOG.message(levelPrefix + "EVALUATING: file=" + desc.getFile()
 				//		+ ", line=" + desc.getLineNumber());
@@ -572,7 +572,7 @@ public class AbstractStringEvaluator {
 												getMethodClassName(method), 
 												method.getName().toString(),
 												paramIndex)), 
-							this.scope, this.level + 1);
+							this.scope, this.level + 1, positionStorage);
 					
 					List<IAbstractString> choices = new ArrayList<IAbstractString>();
 					for (INodeDescriptor choiceDesc: descList) {

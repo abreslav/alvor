@@ -46,5 +46,9 @@ public class StringNodeDescriptor extends NodeDescriptor implements IStringNodeD
 	public String getEscapedValue(StringConstant literal) {
 		return escapedValuesMap.get(literal);
 	}
-	
+
+	@Override
+	public String toString() {
+		return getFile() + ":" + getLineNumber();
+	}
 }

@@ -12,14 +12,13 @@ public class JavaStringLexer {
 		BACKSLASH_U,
 		BACKSLASH_DIGIT,
 		EXPECT_CHAR_START,
-//		EXPECT_CHAR_STOP,
 		OK;
 	}
 	
 	public static void tokenizeJavaString(String escapedValue,
 			IAbstractInputItem[] result, IPositionDescriptor stringPosition) {
 		if (escapedValue == null) {
-			throw new MalformedStringLiteralException("Literal value is null");
+			throw new MalformedStringLiteralException("[Internal] Escaped value is null");
 		}
 		boolean isCharacter = escapedValue.startsWith("'");
 		LexerState state = isCharacter ? LexerState.EXPECT_CHAR_START : LexerState.EXPECT_STRING_START;
@@ -33,14 +32,14 @@ public class JavaStringLexer {
 				if (c == '\'') {
 					state = LexerState.FIRST_NORMAL;
 				} else {
-					throw new MalformedStringLiteralException("Character must start with a single quote");
+					throw new MalformedStringLiteralException("[Internal] Character must start with a single quote");
 				}
 				break;
 			case EXPECT_STRING_START:
 				if (c == '\"') {
 					state = LexerState.FIRST_NORMAL;
 				} else {
-					throw new MalformedStringLiteralException("String must start with a double quote");
+					throw new MalformedStringLiteralException("[Internal] String must start with a double quote");
 				}
 				break;
 			case SECOND_NORMAL:
@@ -49,7 +48,7 @@ public class JavaStringLexer {
 						state = LexerState.OK;
 						break;
 					} else {
-						throw new MalformedStringLiteralException("Character literal sould have ended");
+						throw new MalformedStringLiteralException("Character literal should have ended");
 					}
 				}
 				/* FALL THROUGH */
@@ -141,11 +140,11 @@ public class JavaStringLexer {
 				}
 				break;
 			case OK:
-				throw new MalformedStringLiteralException("Text after closing quote");
+				throw new MalformedStringLiteralException("[Internal] Text after closing quote");
 			}
 		}
 		if (state != LexerState.OK) {
-			throw new MalformedStringLiteralException("Unfinished literal");
+			throw new MalformedStringLiteralException("[Internal] Unfinished literal");
 		}
 		assert currentResultPosition == result.length;
 	}
@@ -200,7 +199,7 @@ public class JavaStringLexer {
 		case '\\':
 			return  c;
 		default:
-			throw new MalformedStringLiteralException("Incorrect escape char: " + c);
+			throw new MalformedStringLiteralException("Illegal escape: \\" + c);
 		}
 	}
 	
