@@ -1,7 +1,13 @@
 package ee.stacc.productivity.edsl.checkers.sqlstatic;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.eclipse.core.resources.IFile;
 
 import ee.stacc.productivity.edsl.checkers.IAbstractStringChecker;
 import ee.stacc.productivity.edsl.checkers.IPositionDescriptor;
@@ -35,7 +41,11 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 				@Override
 				public IAbstractInputItem createInputItem(StringConstant constant,
 						int position) {
-					return new PositionedCharacter(constant.getConstant().charAt(position), descriptor.getPosition(constant), position);
+					return new PositionedCharacter(
+							constant.getConstant().charAt(position), 
+							descriptor.getPosition(constant), 
+							position,
+							1);
 				}
 			});
 			
@@ -54,17 +64,41 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 		}
 	}
 	
+	private static Collection<IPositionDescriptor> getMarkerPositions(List<PositionedCharacter> chars) {
+		if (chars.isEmpty()) {
+			return Collections.emptySet();
+		}
+		
+		Collection<IPositionDescriptor> positions = new ArrayList<IPositionDescriptor>();
+		
+		
+		Iterator<PositionedCharacter> iterator = chars.iterator();
+		PositionedCharacter currentChar = iterator.next();
+		IFile currentFile = currentChar.stringPosition.getFile();
+		int charStart = currentChar.stringPosition.getCharStart() + currentChar.indexInString;
+		int charLength = 1;
+		
+		while (iterator.hasNext()) {
+//			rough edge
+		}
+		
+		return positions;
+	}
+	
 	private static final class PositionedCharacter implements IAbstractInputItem {
 		
 		private final int code;
 		private final IPositionDescriptor stringPosition;
 		private final int indexInString;
+		private final int lengthInSource;
 		
 		public PositionedCharacter(int code,
-				IPositionDescriptor stringPosition, int indexInString) {
+				IPositionDescriptor stringPosition, int indexInString,
+				int lengthInSource) {
 			this.code = code;
 			this.stringPosition = stringPosition;
 			this.indexInString = indexInString;
+			this.lengthInSource = lengthInSource;
 		}
 
 		@Override
@@ -74,7 +108,7 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 
 		@Override
 		public String toString() {
-			return ((char) code) + "[" + stringPosition + ";" + indexInString + "]";
+			return ((char) code) + "[" + stringPosition + ";" + indexInString + ":" + lengthInSource + "]";
 		}
 		
 	}
