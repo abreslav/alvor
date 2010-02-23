@@ -46,7 +46,6 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 	
 						String escapedValue = descriptor.getEscapedValue(constant);
 	
-						System.out.println(escapedValue);
 						JavaStringLexer.tokenizeJavaString(escapedValue, result, descriptor.getPosition(constant));
 						return result;
 					}
@@ -59,13 +58,13 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 					public void unexpectedItem(IAbstractInputItem item) {
 						Collection<IPositionDescriptor> markerPositions = getMarkerPositions(((Token) item).getText());
 						for (IPositionDescriptor pos : markerPositions) {
-							errorHandler.handleSQLError("Unexpected " + item, pos);
+							errorHandler.handleSQLError("Unexpected token: " + render(item), pos);
 						}
 					}
-					
+
 					@Override
 					public void other() {
-						errorHandler.handleSQLError("Unfinished", descriptor);
+						errorHandler.handleSQLError("SQL syntax error. Most likely, unfinished query", descriptor);
 					}
 				});
 			} catch (MalformedStringLiteralException e) {
@@ -124,4 +123,20 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 		}
 	}
 	
+	
+	private String render(IAbstractInputItem item) {
+		if (item instanceof Token) {
+			Token token = (Token) item;
+			StringBuilder text = token.getText().fold(new StringBuilder(), new IFoldFunction<StringBuilder, IAbstractInputItem>() {
+				
+				@Override
+				public StringBuilder body(StringBuilder init, IAbstractInputItem arg,
+						boolean last) {
+					return init.append((char) arg.getCode());
+				}
+			});
+			return text.toString();
+		}
+		return item.toString();
+	}
 }
