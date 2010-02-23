@@ -5,46 +5,75 @@ import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
 
 public class JavaStringLexer {
 	private static enum LexerState {
-		INITIAL,
-		NORMAL,
+		EXPECT_STRING_START,
+		FIRST_NORMAL,
+		SECOND_NORMAL,
 		BACKSLASH,
 		BACKSLASH_U,
 		BACKSLASH_DIGIT,
+		EXPECT_CHAR_START,
+//		EXPECT_CHAR_STOP,
 		OK;
 	}
 	
 	public static void tokenizeJavaString(String escapedValue,
 			IAbstractInputItem[] result, IPositionDescriptor stringPosition) {
+		boolean isCharacter = escapedValue.startsWith("'");
+		LexerState state = isCharacter ? LexerState.EXPECT_CHAR_START : LexerState.EXPECT_STRING_START;
+		
 		int currentResultPosition = 0;
-		LexerState state = LexerState.INITIAL;
 		int symbolStart = -1;
 		for (int i = 0; i < escapedValue.length(); i++) {
 			char c = escapedValue.charAt(i);
 			switch (state) {
-			case INITIAL:
-					if (c == '\"') {
-						state = LexerState.NORMAL;
-					} else {
-						throw new MalformedStringLiteralException("String must start with a double quote");
-					}
-					break;
-			case NORMAL:
-					switch (c) {
-					case '\"':
+			case EXPECT_CHAR_START:
+				if (c == '\'') {
+					state = LexerState.FIRST_NORMAL;
+				} else {
+					throw new MalformedStringLiteralException("Character must start with a single quote");
+				}
+				break;
+			case EXPECT_STRING_START:
+				if (c == '\"') {
+					state = LexerState.FIRST_NORMAL;
+				} else {
+					throw new MalformedStringLiteralException("String must start with a double quote");
+				}
+				break;
+			case SECOND_NORMAL:
+				if (isCharacter) {
+					if (c == '\'') {
 						state = LexerState.OK;
 						break;
-					case '\\':
-						state = LexerState.BACKSLASH;
-						break;
-					case '\n':
-					case '\r':
-						throw new MalformedStringLiteralException("Illegal character: code = " + (int) c);
-					default:
+					} else {
+						throw new MalformedStringLiteralException("Character literal sould have ended");
+					}
+				}
+				/* FALL THROUGH */
+			case FIRST_NORMAL:
+				switch (c) {
+				case '\"':
+					if (isCharacter) {
 						result[currentResultPosition] = new PositionedCharacter(c, stringPosition, i, 1);
 						currentResultPosition++;
-						break;
+						state = LexerState.SECOND_NORMAL;
+					} else {
+						state = LexerState.OK;
 					}
 					break;
+				case '\\':
+					state = LexerState.BACKSLASH;
+					break;
+				case '\n':
+				case '\r':
+					throw new MalformedStringLiteralException("Illegal character: code = " + (int) c);
+				default:
+					result[currentResultPosition] = new PositionedCharacter(c, stringPosition, i, 1);
+					currentResultPosition++;
+					state = LexerState.SECOND_NORMAL;
+					break;
+				}
+				break;
 			case BACKSLASH:
 				switch (c) {
 				case 'b':
@@ -57,7 +86,7 @@ public class JavaStringLexer {
 				case '\\':
 					result[currentResultPosition] = new PositionedCharacter(escapeToChar(c), stringPosition, i - 1, 2);
 					currentResultPosition++;
-					state = LexerState.NORMAL;
+					state = LexerState.SECOND_NORMAL;
 					break;
 				case '0':
 				case '1':
@@ -88,7 +117,7 @@ public class JavaStringLexer {
 							symbolStart, i - symbolStart);
 					currentResultPosition++;
 					symbolStart = -1;
-					state = LexerState.NORMAL;
+					state = LexerState.SECOND_NORMAL;
 					i--;
 				} else {
 					// Just go on
@@ -102,7 +131,7 @@ public class JavaStringLexer {
 							symbolStart, i - symbolStart);
 					currentResultPosition++;
 					symbolStart = -1;
-					state = LexerState.NORMAL;
+					state = LexerState.SECOND_NORMAL;
 					i--;
 				} else {
 					// Just go on
@@ -111,7 +140,10 @@ public class JavaStringLexer {
 			case OK:
 				throw new MalformedStringLiteralException("Text after closing quote");
 			}
-		}	
+		}
+		if (state != LexerState.OK) {
+			throw new MalformedStringLiteralException("Unfinished literal");
+		}
 		assert currentResultPosition == result.length;
 	}
 	

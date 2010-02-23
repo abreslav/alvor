@@ -65,7 +65,7 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 					}
 				});
 			} catch (MalformedStringLiteralException e) {
-				errorHandler.handleSQLError("Malformed string literal: " + e.getMessage(), descriptor);
+				errorHandler.handleSQLError("Malformed literal: " + e.getMessage(), descriptor);
 			}
 		}
 	}

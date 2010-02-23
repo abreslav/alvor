@@ -23,6 +23,16 @@ public class JavaStringLexerTest {
 				new PositionedCharacter('c', null, 3, 1)
 		);
 		
+		string = "\"\\\"\"";
+		check(string,
+				new PositionedCharacter('"', null, 1, 2)
+		);
+		
+		string = "\"'\"";
+		check(string,
+				new PositionedCharacter('\'', null, 1, 1)
+		);
+		
 		string = "\"abc \\b \\f\\n\"";
 		check(string,
 				new PositionedCharacter('a', null, 1, 1),
@@ -55,6 +65,41 @@ public class JavaStringLexerTest {
 				new PositionedCharacter('b', null, 2, 1),
 				new PositionedCharacter('c', null, 3, 1),
 				new PositionedCharacter(1, null, 4, 6)
+		);
+		
+		string = "'a'";
+		check(string,
+				new PositionedCharacter('a', null, 1, 1)
+		);
+		
+		string = "'\"'";
+		check(string,
+				new PositionedCharacter('"', null, 1, 1)
+		);
+		
+		string = "'\\1'";
+		check(string,
+				new PositionedCharacter(1, null, 1, 2)
+		);
+		
+		string = "'\\01'";
+		check(string,
+				new PositionedCharacter(1, null, 1, 3)
+		);
+		
+		string = "'\\001'";
+		check(string,
+				new PositionedCharacter(1, null, 1, 4)
+		);
+		
+		string = "'\\u0001'";
+		check(string,
+				new PositionedCharacter(1, null, 1, 6)
+		);
+		
+		string = "'\\n'";
+		check(string,
+				new PositionedCharacter('\n', null, 1, 2)
 		);
 	}
 	
