@@ -31,5 +31,10 @@ public class StringConstant implements IAbstractString {
 	public <R, D> R accept(
 			IAbstractStringVisitor<? extends R, ? super D> visitor, D data) {
 		return visitor.visitStringConstant(this, data);
-	};
+	}
+	
+	@Override
+	public boolean isEmpty() {
+		return constant.isEmpty();
+	}
 }

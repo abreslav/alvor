@@ -22,5 +22,10 @@ public class StringRepetition implements IAbstractString {
 
 	public <R, D> R accept(IAbstractStringVisitor<? extends R,? super D> visitor, D data) {
 		return visitor.visitStringRepetition(this, data);
-	};
+	}
+	
+	@Override
+	public boolean isEmpty() {
+		return body.isEmpty();
+	}
 }

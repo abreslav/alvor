@@ -117,6 +117,9 @@ public class StringToAutomatonConverter {
 				State initial) {
 			Set<State> current = Collections.singleton(initial);
 			for (IAbstractString item : stringSequence.getItems()) {
+				if (item.isEmpty()) {
+					continue;
+				}
 				Set<State> newCurrent = new HashSet<State>();
 				for (State state : current) {
 					Set<State> finalStates = convert(item, state);

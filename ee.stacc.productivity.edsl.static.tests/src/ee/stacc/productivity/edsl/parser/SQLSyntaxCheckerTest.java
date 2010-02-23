@@ -29,6 +29,7 @@ public class SQLSyntaxCheckerTest {
 		addFromFile("data/earved_escape.txt", true, result);
 		addFromFile("data/earved_basic.txt", true, result);
 		addFromFile("data/earved_bugs.txt", false, result);
+		addFromFile("data/expect_fail.txt", false, result);
 		return result;
 	}
 

@@ -20,5 +20,14 @@ public class AbstractStringCollection {
 	public List<IAbstractString> getItems() {
 		return Collections.unmodifiableList(items);
 	}
+	
+	public boolean isEmpty() {
+		for (IAbstractString s : items) {
+			if (!s.isEmpty()) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 }

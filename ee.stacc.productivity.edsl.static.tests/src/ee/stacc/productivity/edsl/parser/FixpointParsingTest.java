@@ -129,6 +129,14 @@ public class FixpointParsingTest {
 		
 		abstractString = "\"SELECT asd\" {\", dsd\", \"\", \", a, s, v\"} \" FROM asd, sdf\"";
 		assertTrue(parseAbstractString(abstractString));
+
+		
+		abstractString = "\"a\" \"SELECT * FROM t\"";
+		assertFalse(parseAbstractString(abstractString));
+		
+		
+		abstractString = "\"\" \"a\" \"SELECT * FROM t\"";
+		assertFalse(parseAbstractString(abstractString));
 	}
 
 	@Test
