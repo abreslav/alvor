@@ -342,23 +342,25 @@ public class AbstractStringEvaluator {
 	private IAbstractString evalVarAfterMethodInvStmt(IVariableBinding var,
 			ExpressionStatement stmt) {
 		
-		if (isStringBuilderOrBuffer(var.getType()) 
-				&& isStringBuilderOrBuffer(stmt.getExpression().resolveTypeBinding())) {
+		if (isStringBuilderOrBuffer(var.getType())) {
 			MethodInvocation inv = (MethodInvocation)stmt.getExpression();
 			
-			if (builderChainIsStartedByVar(inv, var)) {
+			// TODO: check that it's really chain of sb.append("...").append("...")
+			// and nothing else
+			if (isStringBuilderOrBuffer(stmt.getExpression().resolveTypeBinding())
+					&& builderChainIsStartedByVar(inv, var)) {
 				return eval(inv);
 			}
 			else if (varIsUsedIn(var, inv)) {
 				throw new UnsupportedStringOpEx(
 						"Var '" + var.getName() + "' (possibly) used in unsupported construct");
 			}
-			else {
+			else { // SB is not changed in this statement
 				return evalVarBefore(var, stmt);
 			}
 		}
-		else {
-			// TODO still can't be 100% sure, that var isn't modified
+		else { // variable is of type String
+			// it cannot be changed here  
 			return evalVarBefore(var, stmt);
 		}
 	}
