@@ -25,7 +25,8 @@ import ee.stacc.productivity.edsl.string.util.AsbtractStringUtils;
 
 public class SQLSyntaxChecker {
 
-	private static final IStackFactory FACTORY = SimpleLinkedStack.FACTORY;
+	private static final IStackFactory FACTORY = BoundedStack.getFactory(100, null);
+//	private static final IStackFactory FACTORY = SimpleLinkedStack.FACTORY;
 	public static final SQLSyntaxChecker INSTANCE = new SQLSyntaxChecker();
 	
 	private SQLSyntaxChecker() {}

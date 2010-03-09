@@ -16,6 +16,7 @@ import org.junit.runners.Parameterized.Parameters;
 import ee.stacc.productivity.edsl.lexer.automata.AutomataParser;
 import ee.stacc.productivity.edsl.lexer.automata.IAlphabetConverter;
 import ee.stacc.productivity.edsl.lexer.automata.State;
+import ee.stacc.productivity.edsl.sqlparser.BoundedStack;
 import ee.stacc.productivity.edsl.sqlparser.IStackFactory;
 import ee.stacc.productivity.edsl.sqlparser.LRParser;
 import ee.stacc.productivity.edsl.sqlparser.Parsers;
@@ -34,6 +35,7 @@ public class FixpointParsingTest {
 				{SimpleStack.FACTORY},
 				{SimpleLinkedStack.FACTORY},
 				{SimpleFoldedStack.FACTORY},
+				{BoundedStack.getFactory(100, null)},
 		});
 	}
 
