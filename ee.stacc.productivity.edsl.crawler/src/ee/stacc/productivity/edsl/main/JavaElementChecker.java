@@ -36,6 +36,10 @@ public class JavaElementChecker {
 	 * E.g.:
 	 * hotspots=java.util.Connection,prepareStatement,1;blah.blah.Blah,blah,5
 	 * Trailing ';' is not required 
+	 * 
+	 * Actually returns abstract strings corresponding to hotspots
+	 * (or markers for unsupported cases)  
+	 * TODO rename?
 	 */
 	public List<INodeDescriptor> findHotspots(IJavaElement scope, Map<String, Object> options) {
 		List<NodeRequest> requests = parseNodeRequests(options);
@@ -46,25 +50,6 @@ public class JavaElementChecker {
 		return AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(requests, scope, 0, null);
 	}
 
-	public void checkValidHotspots(
-			List<IStringNodeDescriptor> hotspots, 
-			ISQLErrorHandler errorHandler, 
-			List<IAbstractStringChecker> checkers, 
-			Map<String, Object> options) {
-	
-		LOG.message("Abstract strings:");
-
-		for (INodeDescriptor descriptor : hotspots) {
-			if (descriptor instanceof IStringNodeDescriptor) {
-				LOG.message(((IStringNodeDescriptor)descriptor).getAbstractValue());
-			}
-		}
-		
-		for (IAbstractStringChecker checker : checkers) {
-			checker.checkAbstractStrings(hotspots, errorHandler, options);
-		}
-	}
-	
 	public void processHotspots(
 		List<INodeDescriptor> hotspots, 
 		ISQLErrorHandler errorHandler, 
@@ -85,6 +70,25 @@ public class JavaElementChecker {
 		
 	}
 
+	private void checkValidHotspots(
+			List<IStringNodeDescriptor> hotspots, 
+			ISQLErrorHandler errorHandler, 
+			List<IAbstractStringChecker> checkers, 
+			Map<String, Object> options) {
+	
+		LOG.message("Abstract strings:");
+
+		for (INodeDescriptor descriptor : hotspots) {
+			if (descriptor instanceof IStringNodeDescriptor) {
+				LOG.message(((IStringNodeDescriptor)descriptor).getAbstractValue());
+			}
+		}
+		
+		for (IAbstractStringChecker checker : checkers) {
+			checker.checkAbstractStrings(hotspots, errorHandler, options);
+		}
+	}
+	
 	private List<NodeRequest> parseNodeRequests(Map<String, Object> options) {
 		if (options == null) {
 			return Collections.emptyList();
