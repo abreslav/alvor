@@ -16,12 +16,12 @@ import org.eclipse.jdt.core.JavaCore;
 
 import ee.stacc.productivity.edsl.checkers.AbstractStringCheckerManager;
 import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
-import ee.stacc.productivity.edsl.checkers.IPositionDescriptor;
 import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.main.JavaElementChecker;
 import ee.stacc.productivity.edsl.main.OptionLoader;
+import ee.stacc.productivity.edsl.string.IPosition;
 
 /**
  * This class controls all aspects of the application's execution
@@ -34,14 +34,14 @@ public class EDSLApplication implements IApplication {
 		@Override
 		public void handleSQLError(
 				String errorMessage,
-				IPositionDescriptor descriptor) {
+				IPosition position) {
 			log.error(errorMessage);
 		}
 		
 		@Override
 		public void handleSQLWarning(
 				String message,
-				INodeDescriptor descriptor) {
+				IPosition position) {
 			log.error(message);
 		}
 		
@@ -73,6 +73,22 @@ public class EDSLApplication implements IApplication {
 						Map<String, Object> options = OptionLoader.getElementSqlCheckerProperties(iJavaElement);
 						List<INodeDescriptor> hotspots = findHotspots(sf,
 								projectChecker, options);
+//						findHotspots(sf,
+//								projectChecker, Collections.<String, Object>singletonMap("hotspots", ",queryForLong,1"));
+//						findHotspots(sf,
+//								projectChecker, Collections.<String, Object>singletonMap("hotspots", ",queryForInt,1"));
+//						findHotspots(sf,
+//								projectChecker, Collections.<String, Object>singletonMap("hotspots", ",queryForLong,1"));
+//						findHotspots(sf,
+//								projectChecker, Collections.<String, Object>singletonMap("hotspots", ",queryForInt,1"));
+//						findHotspots(sf,
+//								projectChecker, Collections.<String, Object>singletonMap("hotspots", ",queryForObject,1"));
+//						findHotspots(sf,
+//								projectChecker, Collections.<String, Object>singletonMap("hotspots", ",queryForObject,1"));
+//						findHotspots(sf,
+//								projectChecker, Collections.<String, Object>singletonMap("hotspots", ",queryForObject,1;,queryForInt,1;,queryForLong,1;"));
+//						findHotspots(sf,
+//								projectChecker, options);
 //						int count = 5;
 //						long totalTime = 0;
 //						for (int i = 0; i < count; i++) {

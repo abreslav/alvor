@@ -6,11 +6,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -44,12 +41,13 @@ import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
+import ee.stacc.productivity.edsl.cache.CacheService;
 import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
-import ee.stacc.productivity.edsl.checkers.PositionDescriptor;
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.string.IAbstractString;
+import ee.stacc.productivity.edsl.string.Position;
 import ee.stacc.productivity.edsl.string.StringChoice;
 import ee.stacc.productivity.edsl.string.StringConstant;
 import ee.stacc.productivity.edsl.string.StringRandomInteger;
@@ -61,7 +59,6 @@ public class AbstractStringEvaluator {
 	private int maxLevel = 1;
 	private boolean supportParameters = true;
 	private boolean supportInvocations = true;
-	private final IStringPositionStorage positionStorage;
 	
 	private int level;
 	private MethodInvocation invocationContext;
@@ -69,12 +66,12 @@ public class AbstractStringEvaluator {
 	
 	public static IAbstractString evaluateExpression(Expression node) {
 		AbstractStringEvaluator evaluator = 
-			new AbstractStringEvaluator(0, null, getNodeProject(node), IStringPositionStorage.NONE);
+			new AbstractStringEvaluator(0, null, getNodeProject(node));
 		return evaluator.eval(node);
 	}
 	
 	private AbstractStringEvaluator(int level, MethodInvocation invocationContext,
-			IJavaElement scope, IStringPositionStorage positionStorage) {
+			IJavaElement scope) {
 		
 		if (level > maxLevel) {
 			throw new UnsupportedStringOpEx("Analysis level (" + level + ") too deep");
@@ -83,10 +80,21 @@ public class AbstractStringEvaluator {
 		this.level = level;
 		this.invocationContext = invocationContext;
 		this.scope = scope;
-		this.positionStorage = positionStorage;
 	}
 	
 	private IAbstractString eval(Expression node) {
+		String fileString = PositionUtil.getFileString(node);
+		int startPosition = node.getStartPosition();
+		int length = node.getLength();
+		IAbstractString result = null; //CacheService.getCacheService().getAbstractString(fileString, startPosition, length);
+		if (result == null) {
+			result = doEval(node);
+//			CacheService.getCacheService().addAbstractString(fileString, startPosition, length, result);
+		}
+		return result;
+	}
+	
+	private IAbstractString doEval(Expression node) {
 		ITypeBinding type = node.resolveTypeBinding();
 		assert type != null;
 		
@@ -144,21 +152,15 @@ public class AbstractStringEvaluator {
 	}
 
 	private IAbstractString createStringConstant(Expression node, String literalValue, String escapedValue) {
-		StringConstant stringConstant = new StringConstant(literalValue);
-		ICompilationUnit unit = (ICompilationUnit) ((CompilationUnit) node.getRoot()).getJavaElement();
-		
-		try {
-			positionStorage.setPositionInformation(
-					stringConstant, 
-					new PositionDescriptor((IFile) unit.getCorrespondingResource(), 
-							node.getStartPosition(), 
-							node.getLength()), escapedValue);
-		} catch (JavaModelException e) {
-			LOG.exception(e);
-		}
+		StringConstant stringConstant = new StringConstant(new Position(
+					PositionUtil.getFileString(node), 
+					node.getStartPosition(), 
+					node.getLength()
+				), 
+				literalValue, escapedValue);
 		return stringConstant;
 	}
-	
+
 	private IAbstractString evalName(Name node) {
 		// can be SimpleName or QualifiedName
 		IVariableBinding var = (IVariableBinding)node.resolveBinding();
@@ -444,7 +446,7 @@ public class AbstractStringEvaluator {
 				throw new UnsupportedStringOpEx("Method call");
 			}
 			AbstractStringEvaluator evaluatorWithNewContext = 
-				new AbstractStringEvaluator(level+1, inv, scope, positionStorage);
+				new AbstractStringEvaluator(level+1, inv, scope);
 
 			if (inv.getExpression() == null || inv.getExpression() instanceof ThisExpression) {
 				MethodDeclaration decl = getMethodDeclarationByName(NodeSearchEngine.getContainingTypeDeclaration(inv), 
@@ -492,7 +494,7 @@ public class AbstractStringEvaluator {
 	
 	public static List<INodeDescriptor> evaluateMethodArgumentAtCallSites
 			(Collection<NodeRequest> requests,
-					IJavaElement scope, int level, IStringPositionStorage storage) {
+					IJavaElement scope, int level) {
 		String levelPrefix = "";
 		for (int i = 0; i < level; i++) {
 			levelPrefix += "    ";
@@ -511,12 +513,12 @@ public class AbstractStringEvaluator {
 		
 		List<INodeDescriptor> result = new ArrayList<INodeDescriptor>();
 		for (INodeDescriptor sr: argumentNodes) {
+
 			Expression arg = (Expression)sr.getNode();
-			StringNodeDescriptor desc = new StringNodeDescriptor(arg, sr.getFile(),
-					sr.getLineNumber(), sr.getCharStart(), sr.getCharLength(), null);
+			StringNodeDescriptor desc = new StringNodeDescriptor(arg, sr.getLineNumber(), null);
 			try {
 				AbstractStringEvaluator evaluator = 
-					new AbstractStringEvaluator(level, null, scope, storage == null ? desc : storage);
+					new AbstractStringEvaluator(level, null, scope);
 				
 				//LOG.message(levelPrefix + "EVALUATING: file=" + desc.getFile()
 				//		+ ", line=" + desc.getLineNumber());
@@ -524,10 +526,9 @@ public class AbstractStringEvaluator {
 				result.add(desc);
 			} catch (UnsupportedStringOpEx e) {
 				LOG.message(levelPrefix + "UNSUPPORTED: " + e.getMessage());
-				LOG.message(levelPrefix + "    file: " + sr.getFile() + ", line: " 
+				LOG.message(levelPrefix + "    file: " + sr.getPosition().getPath() + ", line: " 
 						+ sr.getLineNumber());
-				result.add(new UnsupportedNodeDescriptor(arg, sr.getFile(), sr.getLineNumber(), 
-						sr.getCharStart(), sr.getCharLength(), 
+				result.add(new UnsupportedNodeDescriptor(arg, sr.getLineNumber(), 
 						"Unsupported SQL construction: " + e.getMessage()));
 			}
 			/* catch (Exception e) {
@@ -561,7 +562,7 @@ public class AbstractStringEvaluator {
 				if (this.invocationContext != null) {
 					// TODO: check that invocation context matches
 					AbstractStringEvaluator nextLevelEvaluator = 
-						new AbstractStringEvaluator(level+1, null, scope, positionStorage);
+						new AbstractStringEvaluator(level+1, null, scope);
 					
 					return nextLevelEvaluator.eval
 						((Expression)this.invocationContext.arguments().get(paramIndex));
@@ -574,7 +575,7 @@ public class AbstractStringEvaluator {
 												getMethodClassName(method), 
 												method.getName().toString(),
 												paramIndex)), 
-							this.scope, this.level + 1, positionStorage);
+							this.scope, this.level + 1);
 					
 					List<IAbstractString> choices = new ArrayList<IAbstractString>();
 					for (INodeDescriptor choiceDesc: descList) {

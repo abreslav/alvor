@@ -3,18 +3,18 @@
  */
 package ee.stacc.productivity.edsl.checkers.sqlstatic;
 
-import ee.stacc.productivity.edsl.checkers.IPositionDescriptor;
 import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
+import ee.stacc.productivity.edsl.string.IPosition;
 
 public final class PositionedCharacter implements IAbstractInputItem {
 	
 	private final int code;
-	private final IPositionDescriptor stringPosition;
+	private final IPosition stringPosition;
 	private final int indexInString;
 	private final int lengthInSource;
 	
 	public PositionedCharacter(int code,
-			IPositionDescriptor stringPosition, int indexInString,
+			IPosition stringPosition, int indexInString,
 			int lengthInSource) {
 		this.code = code;
 		this.stringPosition = stringPosition;
@@ -35,7 +35,7 @@ public final class PositionedCharacter implements IAbstractInputItem {
 		return lengthInSource;
 	}
 	
-	public IPositionDescriptor getStringPosition() {
+	public IPosition getStringPosition() {
 		return stringPosition;
 	}
 

@@ -3,13 +3,20 @@
  */
 package ee.stacc.productivity.edsl.string;
 
-public class StringConstant implements IAbstractString {
+public class StringConstant extends PositionedString {
 	private final String constant;
+	private final String escaped;
 
 	public StringConstant(String constant) {
-		this.constant = constant;
+		this(null, constant, constant);
 	}
 
+	public StringConstant(IPosition pos, String constant, String escaped) {
+		super(pos);
+		this.constant = constant;
+		this.escaped = escaped;
+	}
+	
 	public String toString() {
 		if (constant.length() == 0) {
 			return "\"\"";
@@ -36,5 +43,9 @@ public class StringConstant implements IAbstractString {
 	@Override
 	public boolean isEmpty() {
 		return constant.isEmpty();
+	}
+	
+	public String getEscapedValue() {
+		return escaped;
 	}
 }

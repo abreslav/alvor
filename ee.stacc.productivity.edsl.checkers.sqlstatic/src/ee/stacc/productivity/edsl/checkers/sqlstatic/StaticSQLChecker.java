@@ -15,7 +15,7 @@ public abstract class StaticSQLChecker implements IAbstractStringChecker {
 		for (IStringNodeDescriptor descriptor : descriptors) {
 			List<String> errors = check(descriptor);
 			for (String errorMessage : errors) {
-				errorHandler.handleSQLError(errorMessage, descriptor);
+				errorHandler.handleSQLError(errorMessage, descriptor.getPosition());
 			}
 		}
 	}

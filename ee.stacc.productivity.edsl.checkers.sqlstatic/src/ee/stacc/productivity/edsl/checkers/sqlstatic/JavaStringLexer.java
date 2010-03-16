@@ -1,7 +1,7 @@
 package ee.stacc.productivity.edsl.checkers.sqlstatic;
 
-import ee.stacc.productivity.edsl.checkers.IPositionDescriptor;
 import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
+import ee.stacc.productivity.edsl.string.IPosition;
 
 public class JavaStringLexer {
 	private static enum LexerState {
@@ -16,7 +16,7 @@ public class JavaStringLexer {
 	}
 	
 	public static void tokenizeJavaString(String escapedValue,
-			IAbstractInputItem[] result, IPositionDescriptor stringPosition) {
+			IAbstractInputItem[] result, IPosition stringPosition) {
 		if (escapedValue == null) {
 			throw new MalformedStringLiteralException("[Internal] Escaped value is null");
 		}

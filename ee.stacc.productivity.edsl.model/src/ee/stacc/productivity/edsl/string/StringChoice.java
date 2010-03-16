@@ -16,6 +16,14 @@ public class StringChoice extends AbstractStringCollection implements IAbstractS
 		super(options);
 	}
 
+	public StringChoice(IPosition pos, IAbstractString... options) {
+		super(pos, options);
+	}
+	
+	public StringChoice(IPosition pos, List<? extends IAbstractString> options) {
+		super(pos, options);
+	}
+	
 	public String toString() {
 		StringBuilder stringBuilder = new StringBuilder("{");
 		for (Iterator<IAbstractString> i = getItems().iterator(); i.hasNext();) {

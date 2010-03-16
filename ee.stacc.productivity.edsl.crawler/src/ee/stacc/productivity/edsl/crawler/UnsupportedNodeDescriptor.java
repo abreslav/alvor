@@ -1,13 +1,11 @@
 package ee.stacc.productivity.edsl.crawler;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.dom.ASTNode;
 
 public class UnsupportedNodeDescriptor extends NodeDescriptor {
 	private String problemMessage;
-	public UnsupportedNodeDescriptor(ASTNode node, IFile file, int lineNumber,
-			int charStart, int charLength, String problemMessage) {
-		super(node, file, lineNumber, charStart, charLength);
+	public UnsupportedNodeDescriptor(ASTNode node, int lineNumber, String problemMessage) {
+		super(node, lineNumber);
 		this.problemMessage = problemMessage;
 	}
 	

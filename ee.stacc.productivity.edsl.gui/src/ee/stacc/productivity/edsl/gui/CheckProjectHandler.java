@@ -10,7 +10,9 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -19,13 +21,13 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
 
 import ee.stacc.productivity.edsl.checkers.AbstractStringCheckerManager;
 import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
-import ee.stacc.productivity.edsl.checkers.IPositionDescriptor;
 import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.main.JavaElementChecker;
 import ee.stacc.productivity.edsl.main.OptionLoader;
+import ee.stacc.productivity.edsl.string.IPosition;
 
 public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHandler {
 	public static final String ERROR_MARKER_ID = "ee.stacc.productivity.edsl.gui.sqlerror";
@@ -86,7 +88,11 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 		}
 	}
 	
-	private void createMarker(String message, String markerType, IFile file, int charStart, int charEnd) {
+	private void createMarker(String message, String markerType, IPosition pos) {
+		IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(Path.fromPortableString(pos.getPath()));
+		int charStart = pos.getStart();
+		int charEnd = charStart + pos.getLength();
+		
 		LOG.message("creating marker: " + message + ", file=" + file
 				+ ", charStart=" + charStart + ", charEnd=" + charEnd);
 		
@@ -116,21 +122,17 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 							("Abstract string: " + ((IStringNodeDescriptor)hotspot).getAbstractValue())
 							: "Unsupported construction", 
 					HOTSPOT_MARKER_ID, 
-					hotspot.getFile(), 
-					hotspot.getCharStart(), 
-					hotspot.getCharLength() + hotspot.getCharStart());
+					hotspot.getPosition());
 		}		
 	}
 
 	@Override
-	public void handleSQLError(String message, IPositionDescriptor descriptor) {
-		createMarker(message, ERROR_MARKER_ID, descriptor.getFile(), descriptor.getCharStart(), 
-				descriptor.getCharStart() + descriptor.getCharLength());		
+	public void handleSQLError(String message, IPosition position) {
+		createMarker(message, ERROR_MARKER_ID, position);		
 	}
 
 	@Override
-	public void handleSQLWarning(String message, INodeDescriptor descriptor) {
-		createMarker(message, WARNING_MARKER_ID, descriptor.getFile(), descriptor.getCharStart(), 
-				descriptor.getCharStart() + descriptor.getCharLength());		
+	public void handleSQLWarning(String message, IPosition position) {
+		createMarker(message, WARNING_MARKER_ID, position);		
 	}
 }

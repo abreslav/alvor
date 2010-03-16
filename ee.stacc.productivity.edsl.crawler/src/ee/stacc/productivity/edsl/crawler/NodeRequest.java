@@ -7,11 +7,14 @@ package ee.stacc.productivity.edsl.crawler;
  *
  */
 public final class NodeRequest {
+	private final String signatureString;
 	private final String patternString;
 	private final int argumentIndex;
 	
 	public NodeRequest(String className, String methodName, int argumentIndex) {
-		this.patternString = className + "." + methodName;
+		this.patternString = (!className.isEmpty() ? className + "." : "") + methodName;
+//		this.patternString = methodName;
+		this.signatureString = (!className.isEmpty() ? className + "." : "") + methodName;
 		this.argumentIndex = argumentIndex;
 	}
 	
@@ -24,7 +27,7 @@ public final class NodeRequest {
 		if (methodSignature.contains("(")) {
 			throw new IllegalArgumentException("Argument types are not supported");
 		}
-		return methodSignature.endsWith(patternString);
+		return methodSignature.endsWith(signatureString);
 	}
 	
 	/**

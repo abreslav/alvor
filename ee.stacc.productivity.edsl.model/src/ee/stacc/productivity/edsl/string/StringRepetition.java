@@ -4,13 +4,18 @@
 package ee.stacc.productivity.edsl.string;
 
 
-public class StringRepetition implements IAbstractString {
+public class StringRepetition extends PositionedString {
 	private final IAbstractString body;
 	
 	public StringRepetition(IAbstractString subStr) {
-		this.body = subStr;
+		this(null, subStr);
 	}
 
+	public StringRepetition(IPosition pos, IAbstractString subStr) {
+		super(pos);
+		this.body = subStr;
+	}
+	
 	public IAbstractString getBody() {
 		return body;
 	}

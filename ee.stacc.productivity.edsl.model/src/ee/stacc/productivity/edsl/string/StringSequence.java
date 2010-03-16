@@ -15,6 +15,14 @@ public class StringSequence extends AbstractStringCollection implements IAbstrac
 	public StringSequence(List<IAbstractString> options) {
 		super(options);
 	}
+	
+	public StringSequence(IPosition pos, IAbstractString... options) {
+		super(pos, options);
+	}
+	
+	public StringSequence(IPosition pos, List<IAbstractString> options) {
+		super(pos, options);
+	}
 
 	public String toString() {
 		StringBuilder stringBuilder = new StringBuilder();

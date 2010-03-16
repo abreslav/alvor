@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
@@ -105,12 +104,12 @@ public class NodeSearchEngine {
 				
 				// Find a request corresponding to the current match
 				// TODO: Bad assumption: only one argument for each method
+				String signature =
+					methodBinding.getDeclaringClass().getQualifiedName()
+					+ "." + 
+					methodBinding.getMethodDeclaration().getName();
 				int requestedArgumentIndex = -1;
 				for (NodeRequest request : requests) {
-						String signature =
-							methodBinding.getDeclaringClass().getQualifiedName()
-							+ "." + 
-							methodBinding.getMethodDeclaration().getName();
 						if (request.signatureMatches(signature)) {
 							requestedArgumentIndex = request.getArgumentIndex();
 							break;
@@ -143,10 +142,7 @@ public class NodeSearchEngine {
 				ASTNode arg = (ASTNode) invoc.arguments().get(requestedArgumentIndex - 1);
 				if (arg instanceof Expression) {
 					result.add(new NodeDescriptor((Expression)arg, 
-							(IFile)match.getResource(), 
-							getNodeLineNumber(match, arg),
-							arg.getStartPosition(),
-							arg.getLength()));
+							getNodeLineNumber(match, arg)));
 				}
 			}
 		};

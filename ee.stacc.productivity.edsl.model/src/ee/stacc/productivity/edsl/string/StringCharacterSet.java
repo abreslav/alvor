@@ -9,15 +9,25 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-public class StringCharacterSet implements IAbstractString {
+public class StringCharacterSet extends PositionedString {
 
 	private final Set<Character> set;
 	
 	public StringCharacterSet(Collection<Character> set) {
+		this(null, set);
+	}
+	
+	public StringCharacterSet(IPosition pos, Collection<Character> set) {
+		super(pos);
 		this.set = new HashSet<Character>(set);
 	}
 
 	public StringCharacterSet(String set) {
+		this(null, set);
+	}
+	
+	public StringCharacterSet(IPosition pos, String set) {
+		super(pos);
 		HashSet<Character> hashSet = new HashSet<Character>();
 		for (int i = 0; i < set.length(); i++) {
 			hashSet.add(set.charAt(i));

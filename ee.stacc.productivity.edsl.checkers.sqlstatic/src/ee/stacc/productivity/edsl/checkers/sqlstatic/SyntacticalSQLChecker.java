@@ -7,10 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import ee.stacc.productivity.edsl.checkers.IAbstractStringChecker;
-import ee.stacc.productivity.edsl.checkers.IPositionDescriptor;
 import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
-import ee.stacc.productivity.edsl.checkers.PositionDescriptor;
 import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
 import ee.stacc.productivity.edsl.lexer.alphabet.ISequence;
 import ee.stacc.productivity.edsl.lexer.alphabet.Token;
@@ -21,6 +19,8 @@ import ee.stacc.productivity.edsl.lexer.automata.StringToAutomatonConverter;
 import ee.stacc.productivity.edsl.sqlparser.IParseErrorHandler;
 import ee.stacc.productivity.edsl.sqlparser.SQLSyntaxChecker;
 import ee.stacc.productivity.edsl.string.IAbstractString;
+import ee.stacc.productivity.edsl.string.IPosition;
+import ee.stacc.productivity.edsl.string.Position;
 import ee.stacc.productivity.edsl.string.StringCharacterSet;
 import ee.stacc.productivity.edsl.string.StringConstant;
 
@@ -44,9 +44,9 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 					public IAbstractInputItem[] createInputItems(StringConstant constant) {
 						IAbstractInputItem[] result = new IAbstractInputItem[constant.getConstant().length()];
 	
-						String escapedValue = descriptor.getEscapedValue(constant);
+						String escapedValue = constant.getEscapedValue();
 	
-						JavaStringLexer.tokenizeJavaString(escapedValue, result, descriptor.getPosition(constant));
+						JavaStringLexer.tokenizeJavaString(escapedValue, result, constant.getPosition());
 						return result;
 					}
 	
@@ -56,24 +56,24 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 					
 					@Override
 					public void unexpectedItem(IAbstractInputItem item) {
-						Collection<IPositionDescriptor> markerPositions = getMarkerPositions(((Token) item).getText());
-						for (IPositionDescriptor pos : markerPositions) {
+						Collection<IPosition> markerPositions = getMarkerPositions(((Token) item).getText());
+						for (IPosition pos : markerPositions) {
 							errorHandler.handleSQLError("Unexpected token: " + render(item), pos);
 						}
 					}
 
 					@Override
 					public void other() {
-						errorHandler.handleSQLError("SQL syntax error. Most likely, unfinished query", descriptor);
+						errorHandler.handleSQLError("SQL syntax error. Most likely, unfinished query", descriptor.getPosition());
 					}
 				});
 			} catch (MalformedStringLiteralException e) {
-				errorHandler.handleSQLError("Malformed literal: " + e.getMessage(), descriptor);
+				errorHandler.handleSQLError("Malformed literal: " + e.getMessage(), descriptor.getPosition());
 			}
 		}
 	}
 	
-	private static Collection<IPositionDescriptor> getMarkerPositions(ISequence<IAbstractInputItem> text) {
+	private static Collection<IPosition> getMarkerPositions(ISequence<IAbstractInputItem> text) {
 		if (text.isEmpty()) {
 			return Collections.emptySet();
 		}
@@ -88,14 +88,14 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 			}
 		});
 		
-		Collection<IPositionDescriptor> positions = new ArrayList<IPositionDescriptor>();
+		Collection<IPosition> positions = new ArrayList<IPosition>();
 		
 		int charLength = -1;
 		int charStart = -1;
-		IPositionDescriptor currentStringPosition = null;
+		IPosition currentStringPosition = null;
 		
 		for (PositionedCharacter currentChar : chars) {
-			IPositionDescriptor stringPosition = currentChar.getStringPosition();
+			IPosition stringPosition = currentChar.getStringPosition();
 			if (stringPosition == currentStringPosition) {
 				charLength += currentChar.getLengthInSource();
 			} else {
@@ -113,12 +113,12 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 	}
 
 	private static void addTokenPositionDescriptor(
-			Collection<IPositionDescriptor> positions, int charStart,
-			int charLength, IPositionDescriptor stringPosition) {
+			Collection<IPosition> positions, int charStart,
+			int charLength, IPosition stringPosition) {
 		if (stringPosition != null) {
-			positions.add(new PositionDescriptor(
-					stringPosition.getFile(), 
-					stringPosition.getCharStart() + charStart, 
+			positions.add(new Position(
+					stringPosition.getPath(), 
+					stringPosition.getStart() + charStart, 
 					charLength));
 		}
 	}

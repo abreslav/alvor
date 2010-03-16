@@ -5,15 +5,25 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class AbstractStringCollection {
+public abstract class AbstractStringCollection extends PositionedString {
 
 	private final List<IAbstractString> items;
 
 	public AbstractStringCollection(List<? extends IAbstractString> options) {
+		this(null, options);
+	}
+	
+	public AbstractStringCollection(IPosition pos, List<? extends IAbstractString> options) {
+		super(pos);
 		this.items = new ArrayList<IAbstractString>(options);
 	}
 
 	public AbstractStringCollection(IAbstractString... options) {
+		this(null, options);
+	}
+	
+	public AbstractStringCollection(IPosition pos, IAbstractString... options) {
+		super(pos);
 		this.items = Arrays.asList(options);
 	}	
 	

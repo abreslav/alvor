@@ -47,7 +47,7 @@ public class JavaElementChecker {
 			throw new IllegalArgumentException("No hotspots found");
 		}
 		NodeSearchEngine.clearCache();
-		return AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(requests, scope, 0, null);
+		return AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(requests, scope, 0);
 	}
 
 	public void processHotspots(
@@ -63,7 +63,7 @@ public class JavaElementChecker {
 			}
 			else if (hotspot instanceof UnsupportedNodeDescriptor) {
 				errorHandler.handleSQLWarning(((UnsupportedNodeDescriptor)hotspot).getProblemMessage(),
-						hotspot);
+						hotspot.getPosition());
 			}
 		}
 		checkValidHotspots(validHotspots, errorHandler, checkers, options);

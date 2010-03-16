@@ -1,43 +1,32 @@
 package ee.stacc.productivity.edsl.crawler;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.dom.ASTNode;
 
 import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
+import ee.stacc.productivity.edsl.string.IPosition;
+import ee.stacc.productivity.edsl.string.Position;
 
 public class NodeDescriptor implements INodeDescriptor {
 	private ASTNode node;
-	private IFile file;
 	private int lineNumber;
-	private int charStart;
-	private int charLength;
+	private final IPosition position;
 	
-	public NodeDescriptor(ASTNode node, IFile file, int lineNumber,
-			int charStart, int charLength) {
+	public NodeDescriptor(ASTNode node, int lineNumber) {
 		this.node = node;
-		this.file = file;
 		this.lineNumber = lineNumber;
-		this.charStart = charStart;
-		this.charLength = charLength;
+		this.position = new Position(PositionUtil.getFileString(node), node.getStartPosition(), node.getLength());
 	}
 
 	public ASTNode getNode() {
 		return node;
 	}
 	
-	public IFile getFile() {
-		return file;
-	}
-	
 	public int getLineNumber() {
 		return lineNumber;
 	}
-	
-	public int getCharStart() {
-		return charStart;
-	}
-	
-	public int getCharLength() {
-		return charLength;
+
+	@Override
+	public IPosition getPosition() {
+		return position;
 	}
 }
