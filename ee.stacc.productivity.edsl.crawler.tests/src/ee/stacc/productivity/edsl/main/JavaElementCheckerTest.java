@@ -2,7 +2,11 @@ package ee.stacc.productivity.edsl.main;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +19,8 @@ import org.eclipse.jdt.core.JavaCore;
 import org.junit.Test;
 
 import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
+import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
+import ee.stacc.productivity.edsl.crawler.UnsupportedNodeDescriptor;
 
 public class JavaElementCheckerTest {
 	JavaElementChecker checker = new JavaElementChecker();
@@ -52,9 +58,28 @@ public class JavaElementCheckerTest {
 		Map<String, Object> options = OptionLoader.getElementSqlCheckerProperties(element);
 		List<INodeDescriptor> hotspots = checker.findHotspots(element, options);
 		
-		// temporary
-		assertEquals(359, hotspots.size());
-		// TODO serialize hotspots to a file
-		// and compare with expected file
+		File outputFile = element.getResource().getLocation().append("FoundAbstractStrings.txt").toFile();
+		if (outputFile.exists()) {
+			outputFile.delete();
+		}
+		
+		PrintStream output = new PrintStream(outputFile);
+		
+		
+		for (INodeDescriptor desc : hotspots) {
+			output.print(desc.getFile() + ":" + desc.getLineNumber() + ", ");
+			if (desc instanceof IStringNodeDescriptor) {
+				output.println(((IStringNodeDescriptor)desc).getAbstractValue());
+			}
+			else if (desc instanceof UnsupportedNodeDescriptor) {
+				output.println("unsupported: " 
+						+ ((UnsupportedNodeDescriptor)desc).getProblemMessage());
+			}
+			else {
+				output.println();
+			}
+		}
+		
+		// TODO compare with "ExpectedAbstractStrings.txt"
 	}
 }
