@@ -8,6 +8,8 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
+import ee.stacc.productivity.edsl.string.IPosition;
+import ee.stacc.productivity.edsl.string.Position;
 
 public class PositionUtil {
 	private static final ILog LOG = Logs.getLog(AbstractStringEvaluator.class);
@@ -27,5 +29,7 @@ public class PositionUtil {
 		return getFile(node).getFullPath().toPortableString();
 	}
 
-	
+	public static IPosition getPosition(ASTNode node) {
+		return new Position(getFileString(node), node.getStartPosition(), node.getLength());
+	}
 }

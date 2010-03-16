@@ -47,7 +47,6 @@ import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.string.IAbstractString;
-import ee.stacc.productivity.edsl.string.Position;
 import ee.stacc.productivity.edsl.string.StringChoice;
 import ee.stacc.productivity.edsl.string.StringConstant;
 import ee.stacc.productivity.edsl.string.StringRandomInteger;
@@ -83,13 +82,10 @@ public class AbstractStringEvaluator {
 	}
 	
 	private IAbstractString eval(Expression node) {
-		String fileString = PositionUtil.getFileString(node);
-		int startPosition = node.getStartPosition();
-		int length = node.getLength();
-		IAbstractString result = null; //CacheService.getCacheService().getAbstractString(fileString, startPosition, length);
+		IAbstractString result = null;//CacheService.getCacheService().getAbstractString(PositionUtil.getPosition(node));
 		if (result == null) {
 			result = doEval(node);
-//			CacheService.getCacheService().addAbstractString(fileString, startPosition, length, result);
+//			CacheService.getCacheService().addAbstractString(PositionUtil.getPosition(node), result);
 		}
 		return result;
 	}
@@ -99,18 +95,22 @@ public class AbstractStringEvaluator {
 		assert type != null;
 		
 		if (type.getName().equals("int")) {
-			return new StringRandomInteger();
+			return new StringRandomInteger(PositionUtil.getPosition(node));
 		}
 		else if (node instanceof StringLiteral) {
 			StringLiteral stringLiteral = (StringLiteral)node;
-			return createStringConstant(node, stringLiteral.getLiteralValue(), stringLiteral.getEscapedValue());
+			StringConstant stringConstant = new StringConstant(PositionUtil.getPosition(node), 
+					stringLiteral.getLiteralValue(), stringLiteral.getEscapedValue());
+			return stringConstant;
 		}
 		else if (node instanceof CharacterLiteral) {
 			CharacterLiteral characterLiteral = (CharacterLiteral)node;
-			return createStringConstant(node, String.valueOf(characterLiteral.charValue()), characterLiteral.getEscapedValue());
+			StringConstant stringConstant = new StringConstant(PositionUtil.getPosition(node), 
+					String.valueOf(characterLiteral.charValue()), characterLiteral.getEscapedValue());
+			return stringConstant;
 		}
 		else if (node instanceof Name) {
-			return evalName((Name)node);
+			return evalName((Name)node); 
 		}
 		else if (node instanceof ParenthesizedExpression) {
 			return eval(((ParenthesizedExpression)node).getExpression());
@@ -133,7 +133,9 @@ public class AbstractStringEvaluator {
 					return eval(arg);
 				}
 				else if (arg.resolveTypeBinding().getName().equals("int")) {
-					return createStringConstant(node, "", "");
+					StringConstant stringConstant = new StringConstant(PositionUtil.getPosition(node), 
+							"", "");
+					return stringConstant;
 				}
 				else { // CharSequence
 					throw new UnsupportedStringOpEx("Unknown StringBuilder/Buffer constructor: " 
@@ -142,7 +144,9 @@ public class AbstractStringEvaluator {
 			}
 			else {
 				assert cic.arguments().size() == 0;
-				return createStringConstant(node, "", "");
+				StringConstant stringConstant = new StringConstant(PositionUtil.getPosition(node), 
+						"", "");
+				return stringConstant;
 			}
 		}
 		else {
@@ -151,27 +155,15 @@ public class AbstractStringEvaluator {
 		}
 	}
 
-	private IAbstractString createStringConstant(Expression node, String literalValue, String escapedValue) {
-		StringConstant stringConstant = new StringConstant(new Position(
-					PositionUtil.getFileString(node), 
-					node.getStartPosition(), 
-					node.getLength()
-				), 
-				literalValue, escapedValue);
-		return stringConstant;
-	}
-
 	private IAbstractString evalName(Name node) {
 		// can be SimpleName or QualifiedName
-		IVariableBinding var = (IVariableBinding)node.resolveBinding();
 		Statement stmt = getContainingStmt(node);
 		if (stmt == null) {
-			// no containing statement, so assuming we are in in field initializer
-			assert var.isField();
-			return evalField(var);
+			assert ((IVariableBinding)node.resolveBinding()).isField();
+			return evalField(node);
 		} else {
 			// TODO this statement can modify this var 
-			return evalVarBefore(var, stmt);
+			return evalVarBefore(node, stmt);
 		}
 	}
 	
@@ -183,7 +175,7 @@ public class AbstractStringEvaluator {
 			for (Object operand: expr.extendedOperands()) {
 				ops.add(eval((Expression)operand));
 			}
-			return new StringSequence(ops);
+			return new StringSequence(PositionUtil.getPosition(expr), ops);
 		}
 		else {
 			throw new UnsupportedStringOpEx
@@ -235,25 +227,26 @@ public class AbstractStringEvaluator {
 		}
 	}
 	
-	private IAbstractString evalVarAfterIf(IVariableBinding var, IfStatement stmt) {
-		IAbstractString ifVal = evalVarAfter(var, stmt.getThenStatement());
+	private IAbstractString evalVarAfterIf(Name name, IfStatement stmt) {
+		IAbstractString ifVal = evalVarAfter(name, stmt.getThenStatement());
 		IAbstractString elseVal = null;
 		
 		if (stmt.getElseStatement() != null) {
-			elseVal = evalVarAfter(var, stmt.getElseStatement());
+			elseVal = evalVarAfter(name, stmt.getElseStatement());
 		} else {
-			elseVal = evalVarBefore(var, stmt);
+			elseVal = evalVarBefore(name, stmt);
 		}
 		
 		if (ifVal.equals(elseVal)) {
 			return ifVal;
 		} else {
-			return new StringChoice(ifVal, elseVal);
+			return new StringChoice(PositionUtil.getPosition(stmt), ifVal, elseVal);
 		}
 	}
 	
-	private IAbstractString evalVarAfterDecl(IVariableBinding var,
+	private IAbstractString evalVarAfterDecl(Name name,
 			VariableDeclarationStatement stmt) {
+		IVariableBinding var = (IVariableBinding) name.resolveBinding();
 		
 		// May include declarations for several variables
 		for (int i=stmt.fragments().size()-1; i>=0; i--) {
@@ -263,12 +256,14 @@ public class AbstractStringEvaluator {
 				return eval(vDec.getInitializer());
 			}
 		}
-		return evalVarBefore(var, stmt);
+		return evalVarBefore(name, stmt);
 	}
 	
-	private IAbstractString evalVarAfterAss(IVariableBinding var, 
+	private IAbstractString evalVarAfterAss(Name name, 
 			ExpressionStatement stmt) {
 		assert stmt.getExpression() instanceof Assignment;
+
+		IVariableBinding var = (IVariableBinding) name.resolveBinding();
 		
 		// TODO StringBuilder variable can be assigned also
 		
@@ -283,28 +278,29 @@ public class AbstractStringEvaluator {
 				return rhs;
 			}
 			else if (ass.getOperator() == Assignment.Operator.PLUS_ASSIGN) {
-				return new StringSequence(evalVarBefore(var, stmt), rhs);
+				return new StringSequence(PositionUtil.getPosition(name), evalVarBefore(name, stmt), rhs);
 			}
 			else {
 				throw new UnsupportedStringOpEx("getVarValAfterAss: unknown operator");
 			}
 		}
 		else { // wrong assignment, this statement doesn't change var (hopefully :)
-			return evalVarBefore(var, stmt);
+			return evalVarBefore(name, stmt);
 		}
 	}
 	
-	private IAbstractString evalVarAfter(IVariableBinding var, Statement stmt) {
+	private IAbstractString evalVarAfter(Name name, Statement stmt) {
+		IVariableBinding var = (IVariableBinding) name.resolveBinding();
 		//LOG.message("getVarValAfter: var=" + var.getName()
 		//		+ ", stmt="+ stmt.getClass().getName());
 		
 		if (stmt instanceof ExpressionStatement) {
 			Expression expr = ((ExpressionStatement)stmt).getExpression(); 
 			if (expr instanceof Assignment) {
-				return evalVarAfterAss(var, (ExpressionStatement)stmt);
+				return evalVarAfterAss(name, (ExpressionStatement)stmt);
 			}
 			else if (expr instanceof MethodInvocation) {
-				return evalVarAfterMethodInvStmt(var, (ExpressionStatement)stmt);
+				return evalVarAfterMethodInvStmt(name, (ExpressionStatement)stmt);
 			}
 			else {
 				throw new UnsupportedStringOpEx
@@ -312,23 +308,24 @@ public class AbstractStringEvaluator {
 			}
 		}
 		else if (stmt instanceof VariableDeclarationStatement) {
-			return evalVarAfterDecl(var, (VariableDeclarationStatement)stmt);
+			return evalVarAfterDecl(name, (VariableDeclarationStatement)stmt);
 		}
 		else if (stmt instanceof IfStatement) {
-			return evalVarAfterIf(var, (IfStatement)stmt);
+			return evalVarAfterIf(name, (IfStatement)stmt);
 		}
 		else if (stmt instanceof Block) {
-			return evalVarAfter(var, getLastStmt((Block)stmt));
+			return evalVarAfter(name, getLastStmt((Block)stmt));
 		}
 		else if (stmt instanceof ReturnStatement) {
-			return evalVarBefore(var, stmt);
+			return evalVarBefore(name, stmt);
 		}
 		else { // other kind of statement
 			throw new UnsupportedStringOpEx("getVarValAfter(var, " + stmt.getClass().getName() + ")");
 		} 
 	}
 	
-	private IAbstractString evalField(IVariableBinding var) {
+	private IAbstractString evalField(Name node) {
+		IVariableBinding var = (IVariableBinding) node.resolveBinding();
 		VariableDeclarationFragment frag = NodeSearchEngine
 			.findFieldDeclarationFragment(scope, var.getDeclaringClass().getErasure().getQualifiedName() 
 				+ "." + var.getName());
@@ -341,8 +338,9 @@ public class AbstractStringEvaluator {
 		return eval(frag.getInitializer());
 	}
 	
-	private IAbstractString evalVarAfterMethodInvStmt(IVariableBinding var,
+	private IAbstractString evalVarAfterMethodInvStmt(Name name,
 			ExpressionStatement stmt) {
+		IVariableBinding var = (IVariableBinding) name.resolveBinding();
 		
 		if (isStringBuilderOrBuffer(var.getType())) {
 			MethodInvocation inv = (MethodInvocation)stmt.getExpression();
@@ -358,12 +356,12 @@ public class AbstractStringEvaluator {
 						"Var '" + var.getName() + "' (possibly) used in unsupported construct");
 			}
 			else { // SB is not changed in this statement
-				return evalVarBefore(var, stmt);
+				return evalVarBefore(name, stmt);
 			}
 		}
 		else { // variable is of type String
 			// it cannot be changed here  
-			return evalVarBefore(var, stmt);
+			return evalVarBefore(name, stmt);
 		}
 	}
 	
@@ -434,6 +432,7 @@ public class AbstractStringEvaluator {
 			}
 			else if (inv.getName().getIdentifier().equals("append")) {
 				return new StringSequence(
+						PositionUtil.getPosition(inv), 
 						eval(inv.getExpression()),
 						eval((Expression)inv.arguments().get(0)));
 			}
@@ -459,7 +458,7 @@ public class AbstractStringEvaluator {
 				for (MethodDeclaration decl: decls) {
 					choices.add(evaluatorWithNewContext.getMethodReturnValue(decl));
 				}
-				return new StringChoice(choices);
+				return new StringChoice(PositionUtil.getPosition(inv), choices);
 			}
 		}			
 	}
@@ -485,7 +484,7 @@ public class AbstractStringEvaluator {
 		for (ReturnStatement ret: returnStmts) {
 			options.add(eval(ret.getExpression()));
 		}
-		return new StringChoice(options);
+		return new StringChoice(PositionUtil.getPosition(decl), options);
 	}
 	
 	private static Statement getLastStmt(Block block) {
@@ -545,12 +544,13 @@ public class AbstractStringEvaluator {
 		return result;
 	}
 	
-	private IAbstractString evalVarBefore(IVariableBinding var, Statement stmt) {
+	private IAbstractString evalVarBefore(Name name, Statement stmt) {
+		IVariableBinding var = (IVariableBinding) name.resolveBinding();
 		Statement prevStmt = getPrevStmt(stmt);
 		if (prevStmt == null) {
 			// no previous statement, must be beginning of method declaration
 			if (var.isField()) {
-				return evalField(var);
+				return evalField(name);
 			}
 			else if (var.isParameter()) {
 				if (! supportParameters) {
@@ -583,7 +583,7 @@ public class AbstractStringEvaluator {
 							choices.add(((IStringNodeDescriptor)choiceDesc).getAbstractValue());
 						}
 					}
-					return new StringChoice(choices);
+					return new StringChoice(PositionUtil.getPosition(name), choices);
 				}
 			}
 			else {
@@ -592,7 +592,7 @@ public class AbstractStringEvaluator {
 			}
 		}
 		else {
-			return evalVarAfter(var, prevStmt);
+			return evalVarAfter(name, prevStmt);
 		}
 	}
 	
