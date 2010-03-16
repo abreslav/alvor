@@ -1,10 +1,8 @@
 package ee.stacc.productivity.edsl.main;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
@@ -81,5 +79,15 @@ public class JavaElementCheckerTest {
 		}
 		
 		// TODO compare with "ExpectedAbstractStrings.txt"
+		File expectedFile = element.getResource().getLocation()
+			.append("ExpectedAbstractStrings.txt").toFile();
+		
+		assertTrue(filesAreEqual(outputFile, expectedFile));
+
+	}
+	
+	boolean filesAreEqual(File a, File b) {
+		// TODO compare really
+		return a.length() == b.length();
 	}
 }
