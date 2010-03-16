@@ -1,0 +1,102 @@
+SET DATABASE DEFAULT TABLE TYPE CACHED
+
+CREATE CACHED TABLE
+	Files
+(
+	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+	
+	name VARCHAR(4096) UNIQUE
+)
+
+CREATE CACHED TABLE
+	SourceRanges
+(
+	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+	
+	file INTEGER REFERENCES Files(id),
+	start INTEGER,
+	length INTEGER,
+	
+	UNIQUE(file, start, length)
+)
+
+CREATE CACHED TABLE
+	StringLiterals
+(
+	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+	
+	literalValue LONGVARCHAR,
+	escapeValue LONGVARCHAR,
+	sourceRange INTEGER REFERENCES SourceRanges(id)
+)
+
+CREATE CACHED TABLE
+	CharacterSets
+(
+	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+	
+	data BIT(65536)
+)
+
+CREATE CACHED TABLE
+	AbstractStrings
+(
+	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+	
+	/*
+		0 - literal(a),
+		1 - char set(a),
+		2 - sequence(a, b),
+		3 - alternative(a, b),
+		4 - repetition(a) 
+		5 - sameAs(a)
+	*/
+	type TINYINT NOT NULL, 
+	a INTEGER NOT NULL,
+	b INTEGER
+)
+
+CREATE CACHED TABLE
+	FileDependencies
+(
+	abstractString INTEGER REFERENCES AbstractStrings(id),
+	file INTEGER REFERENCES Files(id)
+)
+
+CREATE CACHED TABLE
+	Expressions
+(
+	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+
+	sourceRange INTEGER REFERENCES SourceRanges(id),
+	abstractString INTEGER REFERENCES AbstractStrings(id)
+)
+
+CREATE CACHED TABLE
+	Methods
+(
+	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+	
+	class VARCHAR(128),
+	name VARCHAR(128),
+	arguments INTEGER,
+	declaringFile INTEGER REFERENCES Files(id)
+)
+
+CREATE CACHED TABLE
+	MethodUsages
+(
+	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+
+	sourceRange INTEGER REFERENCES SourceRanges(id),
+	method INTEGER REFERENCES Methods(id)		
+)
+
+CREATE CACHED TABLE
+	MethodImplementation
+(
+	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+
+	sourceRange INTEGER REFERENCES SourceRanges(id),
+	method INTEGER REFERENCES Methods(id)		
+)
