@@ -1,10 +1,14 @@
 package ee.stacc.productivity.edsl.main;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -76,6 +80,26 @@ public class JavaElementCheckerTest {
 			}
 		}
 		
-		// TODO compare with "ExpectedAbstractStrings.txt"
+		File expectedFile = element.getResource().getLocation()
+			.append("ExpectedAbstractStrings.txt").toFile();
+		
+		assertTrue("Expected abstract strings != found abstract strings: " + expectedFile.getParent(), 
+					filesAreEqual(outputFile, expectedFile));
+
+	}
+	
+	boolean filesAreEqual(File a, File b) throws FileNotFoundException {
+		assert a.exists() && b.exists();
+		
+		Scanner scA = new Scanner(a);
+		Scanner scB = new Scanner(b);
+		
+		while (scA.hasNextLine()) {
+			if (!scB.hasNextLine() || ! scA.nextLine().equals(scB.nextLine())) {
+				return false;
+			}
+		}
+		
+		return true;
 	}
 }
