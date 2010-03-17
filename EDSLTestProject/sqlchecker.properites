@@ -1,0 +1,5 @@
+DBDriverName=oracle.jdbc.OracleDriver
+DBUrl=jdbc:oracle:thin:@localhost:1521:xe
+DBUsername=compiere
+DBPassword=password
+hotspots=java.sql.Connection,prepareStatement,1

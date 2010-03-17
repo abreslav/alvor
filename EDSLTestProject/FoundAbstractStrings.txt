@@ -1,0 +1,11 @@
+/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/LoopTests.java:10, "select * from tab where id in " {" (?, ?)", " (?, ?)", " (?, ?)", {" (?, ?)"}} 
+/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/SomeSubclass.java:13, unsupported: Unsupported SQL construction: Only final fields are supported
+/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/TestProjectMain.java:42, "select * from dual where id > " "666" 
+/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/TestProjectMain.java:56, "select * from dual"
+/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/TestProjectMain.java:71, "select id, name from " {} 
+/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/TestProjectMain.java:76, "select ad_org_id, name from ad_org " {"where createds is null"} 
+/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/TestProjectMain.java:91, "select id, name, " {"address2", "address"}  " dt_fld from customers"  " order by " {"address2", "address"}  
+/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/TestProjectMain.java:110, {"select id, name " "from customers "  "where id is not null" , "select id, name " "from customers " }
+/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/TestProjectMain.java:117, "a" "urraa"  "b"  "c" 
+/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/TestProjectMain.java:127, "a" "x"  "urraa"  "b"  "c" 
+/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/TestProjectMain.java:134, "" "x"  "urraa"  "b"  "c" 
