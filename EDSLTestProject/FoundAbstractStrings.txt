@@ -1,5 +1,15 @@
-/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/LoopTests.java:10, "select * from tab where id in " {" (?, ?)", " (?, ?)", " (?, ?)", {" (?, ?)"}} 
+/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/LoopTests.java:10, unsupported: Unsupported SQL construction: Analysis level (3) too deep
+/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/Overloading.java:27, {{"str version"}, {"int version"}}
+/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/Overloading.java:28, {{"str version"}, {"int version"}}
+/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/Overloading.java:29, {{"str version"}, {"int version"}}
+/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/Overloading.java:31, {{"int,String version"}, {"int,int version"}}
+/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/Overloading.java:32, {{"int,String version"}, {"int,int version"}}
 /EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/SomeSubclass.java:13, unsupported: Unsupported SQL construction: Only final fields are supported
+/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/SomeSubclass.java:24, {"SomeSubclass.getSomeStr()"}
+/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/SomeSubclass.java:25, {"SomeSubclass.getSomeStr()"}
+/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/SomeSubclass.java:26, {"SomeSuperclass.getSomeStr()"}
+/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/SomeSubclass.java:27, {"SomeSuperclass.getSomeStr()"}
+/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/SomeSubclass.java:29, {"SomeSuperclass.getSomeStr(int i)"}
 /EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/TestProjectMain.java:42, "select * from dual where id > " "666" 
 /EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/TestProjectMain.java:56, "select * from dual"
 /EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/TestProjectMain.java:71, "select id, name from " {} 
