@@ -17,7 +17,6 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IMethodBinding;
-import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.NodeFinder;
@@ -154,14 +153,13 @@ public class NodeSearchEngine {
 		final List<MethodDeclaration> result = new ArrayList<MethodDeclaration>();
 		
 		String patternStr = inv.getName().getIdentifier() + "(";
-		for (Object arg : inv.arguments()) {
+		for (int i = 0; i < inv.arguments().size(); i++) {
 			// following works only when argument types are exactly same as parameter types 			
 			// patternStr += ((Expression)arg).resolveTypeBinding().getQualifiedName() + ",";
-			
-			patternStr += "?,";
-		}
-		if (patternStr.endsWith(",")) {
-			patternStr = patternStr.substring(0, patternStr.length()-1);
+			if (i > 0) {
+				patternStr += ',';
+			}
+			patternStr += "?";
 		}
 		patternStr += ")";
 		

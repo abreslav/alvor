@@ -6,6 +6,7 @@ import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -14,6 +15,7 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.NumberLiteral;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.TryStatement;
@@ -172,6 +174,37 @@ public class ASTUtil {
 		assert node.getRoot() instanceof CompilationUnit;
 		CompilationUnit cUnit = (CompilationUnit)node.getRoot();
 		return cUnit.getJavaElement().getJavaProject();
+	}
+
+	static Statement getLastStmt(Block block) {
+		return (Statement)block.statements().get(block.statements().size()-1);
+	}
+	
+	static String getMethodClassName(MethodDeclaration method) {
+		assert (method.getParent() instanceof TypeDeclaration);
+		TypeDeclaration typeDecl = (TypeDeclaration)method.getParent();
+		ITypeBinding classBinding = typeDecl.resolveBinding();
+		return classBinding.getQualifiedName();
+	}
+	
+	static MethodDeclaration getContainingMethodDeclaration(ASTNode node) {
+		ASTNode result = node;
+		while (result != null && ! (result instanceof MethodDeclaration)) {
+			result = result.getParent();
+		}
+		return (MethodDeclaration)result;
+	}
+	
+	static int getParamIndex(MethodDeclaration method, IBinding param) {
+		int i = 1;
+		for (Object elem: method.parameters()) {
+			SingleVariableDeclaration decl = (SingleVariableDeclaration)elem;
+			if (decl.resolveBinding().equals(param)) {
+				return i;
+			}
+			i++;
+		}
+		return -1;
 	}
 	
 	/*

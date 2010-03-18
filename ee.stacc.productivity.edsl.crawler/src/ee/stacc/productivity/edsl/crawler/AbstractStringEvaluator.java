@@ -5,20 +5,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
- 
+
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CharacterLiteral;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
-import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -29,12 +25,10 @@ import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
-import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.TagElement;
 import org.eclipse.jdt.core.dom.TextElement;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
@@ -267,7 +261,7 @@ public class AbstractStringEvaluator {
 			return evalVarAfterIf(name, (IfStatement)stmt);
 		}
 		else if (stmt instanceof Block) {
-			return evalVarAfter(name, getLastStmt((Block)stmt));
+			return evalVarAfter(name, ASTUtil.getLastStmt((Block)stmt));
 		}
 		else if (stmt instanceof ReturnStatement) {
 			return evalVarBefore(name, stmt);
@@ -426,10 +420,6 @@ public class AbstractStringEvaluator {
 		return null;
 	}
 	
-	private static Statement getLastStmt(Block block) {
-		return (Statement)block.statements().get(block.statements().size()-1);
-	}
-	
 	public static List<INodeDescriptor> evaluateMethodArgumentAtCallSites
 			(Collection<NodeRequest> requests,
 					IJavaElement scope, int level) {
@@ -495,8 +485,8 @@ public class AbstractStringEvaluator {
 				if (! supportParameters) {
 					throw new UnsupportedStringOpEx("eval Parameter");
 				}
-				MethodDeclaration method = getContainingMethodDeclaration(stmt);
-				int paramIndex = getParamIndex(method, var);
+				MethodDeclaration method = ASTUtil.getContainingMethodDeclaration(stmt);
+				int paramIndex = ASTUtil.getParamIndex(method, var);
 				
 				if (this.invocationContext != null) {
 					// TODO: check that invocation context matches
@@ -511,7 +501,7 @@ public class AbstractStringEvaluator {
 						AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(
 								Collections.singleton(
 										new NodeRequest(
-												getMethodClassName(method), 
+												ASTUtil.getMethodClassName(method), 
 												method.getName().toString(),
 												paramIndex)), 
 							this.scope, this.level + 1);
@@ -533,33 +523,6 @@ public class AbstractStringEvaluator {
 		else {
 			return evalVarAfter(name, prevStmt);
 		}
-	}
-	
-	private static MethodDeclaration getContainingMethodDeclaration(ASTNode node) {
-		ASTNode result = node;
-		while (result != null && ! (result instanceof MethodDeclaration)) {
-			result = result.getParent();
-		}
-		return (MethodDeclaration)result;
-	}
-	
-	private static int getParamIndex(MethodDeclaration method, IBinding param) {
-		int i = 1;
-		for (Object elem: method.parameters()) {
-			SingleVariableDeclaration decl = (SingleVariableDeclaration)elem;
-			if (decl.resolveBinding().equals(param)) {
-				return i;
-			}
-			i++;
-		}
-		return -1;
-	}
-	
-	private static String getMethodClassName(MethodDeclaration method) {
-		assert (method.getParent() instanceof TypeDeclaration);
-		TypeDeclaration typeDecl = (TypeDeclaration)method.getParent();
-		ITypeBinding classBinding = typeDecl.resolveBinding();
-		return classBinding.getQualifiedName();
 	}
 	
 	private static boolean isStringBuilderOrBuffer(ITypeBinding typeBinding) {
