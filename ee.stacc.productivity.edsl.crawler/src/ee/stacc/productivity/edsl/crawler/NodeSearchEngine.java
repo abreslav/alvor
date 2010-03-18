@@ -15,14 +15,12 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.NodeFinder;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
@@ -121,17 +119,6 @@ public class NodeSearchEngine {
 					return;
 				}
 				
-// This code should not be needed: everything is encoded in the pattern				
-//				if (!methodBinding.getDeclaringClass().getQualifiedName().equals(typeName)
-//						&& /* FIXME */ !"prepareStatement".equals(methodName)) {
-					/*
-					LOG.message("Wrong match, want: " + typeName + "." + methodName
-							+ ", was: " + methodBinding.getDeclaringClass().getQualifiedName()
-							+ "." + methodBinding.getName());
-					*/
-//					return;
-//				}
-				
 				// TODO overloading may complicate things -- no, patterns support complete signatures
 				if (invoc.arguments().size() < requestedArgumentIndex) {
 					throw new UnsupportedStringOpEx("can't find required argument (" + requestedArgumentIndex + "), method="
@@ -142,7 +129,7 @@ public class NodeSearchEngine {
 				ASTNode arg = (ASTNode) invoc.arguments().get(requestedArgumentIndex - 1);
 				if (arg instanceof Expression) {
 					result.add(new NodeDescriptor((Expression)arg, 
-							getNodeLineNumber(match, arg)));
+							ASTUtil.getNodeLineNumber(match, arg)));
 				}
 			}
 		};
@@ -164,13 +151,27 @@ public class NodeSearchEngine {
 	}
 	
 	public static List<MethodDeclaration> findMethodDeclarations(IJavaElement searchScope, final MethodInvocation inv) {
-		//LOG.message("FIND METHOD DECL: " + inv);
-//		ITypeBinding objectType = inv.getExpression().resolveTypeBinding();
 		final List<MethodDeclaration> result = new ArrayList<MethodDeclaration>();
 		
+		String patternStr = inv.getName().getIdentifier() + "(";
+		for (Object arg : inv.arguments()) {
+			// following works only when argument types are exactly same as parameter types 			
+			// patternStr += ((Expression)arg).resolveTypeBinding().getQualifiedName() + ",";
+			
+			patternStr += "?,";
+		}
+		if (patternStr.endsWith(",")) {
+			patternStr = patternStr.substring(0, patternStr.length()-1);
+		}
+		patternStr += ")";
+		
+		LOG.message("findMethodDeclarations: " + patternStr);
+		
 		SearchPattern pattern = SearchPattern.createPattern(
-				inv.getName().getIdentifier(), IJavaSearchConstants.METHOD, 
-				IJavaSearchConstants.DECLARATIONS, SearchPattern.R_EXACT_MATCH);
+				patternStr, 
+				IJavaSearchConstants.METHOD, 
+				IJavaSearchConstants.DECLARATIONS, 
+				SearchPattern.R_EXACT_MATCH);
 		
 		IJavaSearchScope scope = SearchEngine.createJavaSearchScope(
 				new IJavaElement[]{searchScope}, IJavaSearchScope.SOURCES);		
@@ -179,19 +180,14 @@ public class NodeSearchEngine {
 			public void acceptSearchMatch(SearchMatch match) {
 				ASTNode node = getASTNode(match); // gives SimpleName (IIRC)
 				MethodDeclaration decl = (MethodDeclaration)node.getParent();
-				if (declarationIsCompatibleWithInvocation(decl, inv)) {
+				if (ASTUtil.invocationMayReferToDeclaration(inv, decl)) {
 					result.add(decl);
-					/*
-					System.err.println("decl " + inv.getName().getIdentifier() 
-							+ " in " + match.getResource()
-							+ ", offset=" + match.getOffset());
-					*/
 				}
 			}
 		};
 		
 		executeSearch(pattern, requestor, scope);
-		
+		// TODO: if it finds nothing then something's wrong
 		return result;
 	}
 	
@@ -249,34 +245,4 @@ public class NodeSearchEngine {
 		return NodeFinder.perform(ast, match.getOffset(), match.getLength());
 	}
 	
-	private static boolean declarationIsCompatibleWithInvocation
-		(MethodDeclaration decl, MethodInvocation inv) {
-		ITypeBinding declType = getContainingTypeDeclaration(decl).resolveBinding();
-		ITypeBinding invExprType = inv.getExpression().resolveTypeBinding();
-		
-		// TODO take subtyping into account
-		/*
-		if (!declType.isEqualTo(invExprType)) {
-			System.err.println("not compatible, decl=: " + declType.getQualifiedName()
-					+ ", invExp=" + invExprType.getQualifiedName());
-		}
-		*/
-		return declType.isEqualTo(invExprType);
-	}
-	
-	static TypeDeclaration getContainingTypeDeclaration(ASTNode node) {
-		ASTNode result = node;
-		while (result != null && ! (result instanceof TypeDeclaration)) {
-			result = result.getParent();
-		}
-		return (TypeDeclaration)result;
-	}
-	
-	private static int getNodeLineNumber(SearchMatch match, ASTNode node) {
-		if (node.getRoot() instanceof CompilationUnit) {
-			return ((CompilationUnit)node.getRoot()).getLineNumber(match.getOffset());
-		}
-		else {
-			return -1;
-		}
-	}}
+}

@@ -1,14 +1,22 @@
 package ee.stacc.productivity.edsl.crawler;
 
+import ee.stacc.productivity.edsl.string.IPosition;
+
 public class UnsupportedStringOpEx extends UnsupportedOperationException {
 
-	public UnsupportedStringOpEx(String message) {
-		super(message);
-	}
-
-	/**
-	 * 
-	 */
+	private IPosition position = null;
 	private static final long serialVersionUID = 1L;
 
+	public UnsupportedStringOpEx(String message) {
+		this(message, null);
+	}
+
+	public UnsupportedStringOpEx(String message, IPosition position) {
+		super(message);
+		this.position = position;
+	}
+
+	public IPosition getPosition() {
+		return position;
+	}
 }

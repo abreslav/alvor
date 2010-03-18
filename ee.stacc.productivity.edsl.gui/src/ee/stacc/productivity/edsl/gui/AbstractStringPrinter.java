@@ -16,6 +16,7 @@ import org.eclipse.ui.IEditorPart;
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.crawler.AbstractStringEvaluator;
+import ee.stacc.productivity.edsl.crawler.NodeSearchEngine;
 
 public class AbstractStringPrinter implements IEditorActionDelegate{
 	
@@ -53,8 +54,9 @@ public class AbstractStringPrinter implements IEditorActionDelegate{
 		else if (node instanceof Expression) {
 			LOG.message("###############################");
 			LOG.message("Selection is : " + node.getClass().getName());
-			// TODO kontrolli et on string t��pi expression
 			LOG.message("Abstract value is: ");
+			
+			NodeSearchEngine.clearCache();
 			System.out.println(AbstractStringEvaluator.evaluateExpression
 					((Expression)node).toString());
 		} 

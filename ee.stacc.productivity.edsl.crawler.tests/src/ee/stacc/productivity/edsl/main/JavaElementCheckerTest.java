@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -31,6 +32,11 @@ public class JavaElementCheckerTest {
 	}
 	
 	@Test
+	public void testEDSLTestProjectStrings() throws IOException, CoreException {
+		testJavaElementAbstractStrings("EDSLTestProject", "");
+	}
+	
+	@Test
 	public void testEArvedStrings() throws IOException, CoreException {
 		testJavaElementAbstractStrings("earved", "src");
 	}
@@ -43,14 +49,21 @@ public class JavaElementCheckerTest {
 	
 	private void testJavaElementAbstractStrings(String projectName, 
 			String packageFragmentRoot) throws IOException, CoreException {
-		IJavaProject project = (IJavaProject)root.getProject(projectName).getNature(JavaCore.NATURE_ID);
-		//out.println(project);
+		
+		IProject project = root.getProject(projectName);
+		
+		if (!project.isOpen()) {
+			project.open(null);
+		}
+		
+		IJavaProject javaProject = (IJavaProject)project.getNature(JavaCore.NATURE_ID);
+		
 		if (packageFragmentRoot.isEmpty()) {
-			testJavaElementAbstractStrings(project);
+			testJavaElementAbstractStrings(javaProject);
 		}
 		else {
-			testJavaElementAbstractStrings(project.findPackageFragmentRoot
-					(project.getPath().append(packageFragmentRoot)));
+			testJavaElementAbstractStrings(javaProject.findPackageFragmentRoot
+					(javaProject.getPath().append(packageFragmentRoot)));
 		}
 	}
 	

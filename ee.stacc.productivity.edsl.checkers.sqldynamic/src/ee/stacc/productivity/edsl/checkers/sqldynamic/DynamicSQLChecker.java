@@ -45,7 +45,7 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 						analyzer.validate(s);
 					} catch (SQLException e) {
 						LOG.message("    ERR: " + e.getMessage());
-						errorHandler.handleSQLError(e.getMessage().trim() + "\nSQL:\n" + s, nodeDesc);
+						errorHandler.handleSQLError(e.getMessage().trim() + "\nSQL:\n" + s, nodeDesc.getPosition());
 					}
 					
 					concretes.put(s, 1);

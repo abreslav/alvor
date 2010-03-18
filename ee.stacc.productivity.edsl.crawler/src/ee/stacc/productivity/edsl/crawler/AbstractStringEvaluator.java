@@ -12,7 +12,6 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.CharacterLiteral;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -27,21 +26,19 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
-import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
-import org.eclipse.jdt.core.dom.ThisExpression;
-import org.eclipse.jdt.core.dom.TryStatement;
+import org.eclipse.jdt.core.dom.TagElement;
+import org.eclipse.jdt.core.dom.TextElement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
-import ee.stacc.productivity.edsl.cache.CacheService;
 import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.common.logging.ILog;
@@ -55,7 +52,7 @@ import ee.stacc.productivity.edsl.string.StringSequence;
 
 public class AbstractStringEvaluator {
 	private static final ILog LOG = Logs.getLog(AbstractStringEvaluator.class);
-	private int maxLevel = 1;
+	private int maxLevel = 2;
 	private boolean supportParameters = true;
 	private boolean supportInvocations = true;
 	
@@ -65,7 +62,7 @@ public class AbstractStringEvaluator {
 	
 	public static IAbstractString evaluateExpression(Expression node) {
 		AbstractStringEvaluator evaluator = 
-			new AbstractStringEvaluator(0, null, getNodeProject(node));
+			new AbstractStringEvaluator(0, null, ASTUtil.getNodeProject(node));
 		return evaluator.eval(node);
 	}
 	
@@ -157,7 +154,7 @@ public class AbstractStringEvaluator {
 
 	private IAbstractString evalName(Name node) {
 		// can be SimpleName or QualifiedName
-		Statement stmt = getContainingStmt(node);
+		Statement stmt = ASTUtil.getContainingStmt(node);
 		if (stmt == null) {
 			assert ((IVariableBinding)node.resolveBinding()).isField();
 			return evalField(node);
@@ -180,50 +177,6 @@ public class AbstractStringEvaluator {
 		else {
 			throw new UnsupportedStringOpEx
 				("getValOf( infix op = " + expr.getOperator() + ")");
-		}
-	}
-	
-	private static Statement getPrevStmt(Statement node) {
-		//LOG.message("getPrevStmt: " + node.getClass().getName());
-		
-		if (node.getParent() instanceof Block) {
-			Block block = (Block) node.getParent();
-			int i = block.statements().indexOf(node);
-			
-			if (i == 0) { // this is first in block, eg. this block is done
-				return getPrevStmt(block);
-			} else {
-				return (Statement)block.statements().get(i-1);
-			}
-		} 
-		else if (node.getParent() instanceof MethodDeclaration) {
-			return null;
-		}
-		else if (node.getParent() instanceof IfStatement) {
-			return getPrevStmt((IfStatement)node.getParent());
-		}
-		else if (node.getParent() instanceof TryStatement) {
-			return getPrevStmt((TryStatement)node.getParent());
-		}
-		else { 
-			throw new UnsupportedStringOpEx("getPrevStatement(" + node.getClass().getName() 
-				+ ", parent is " + node.getParent().getClass().getName() + ")");
-		}
-	}
-	
-	
-	private static Statement getContainingStmt(ASTNode node) {
-		assert node != null;
-		
-		if (node.getParent() instanceof Statement) {
-			return (Statement)node.getParent();
-		}
-		else {
-			ASTNode parent = node.getParent();
-			if (parent == null) {
-				return null;
-			}
-			return getContainingStmt(parent);
 		}
 	}
 	
@@ -290,7 +243,7 @@ public class AbstractStringEvaluator {
 	}
 	
 	private IAbstractString evalVarAfter(Name name, Statement stmt) {
-		IVariableBinding var = (IVariableBinding) name.resolveBinding();
+		//IVariableBinding var = (IVariableBinding) name.resolveBinding();
 		//LOG.message("getVarValAfter: var=" + var.getName()
 		//		+ ", stmt="+ stmt.getClass().getName());
 		
@@ -351,7 +304,7 @@ public class AbstractStringEvaluator {
 					&& builderChainIsStartedByVar(inv, var)) {
 				return eval(inv);
 			}
-			else if (varIsUsedIn(var, inv)) {
+			else if (ASTUtil.varIsUsedIn(var, inv)) {
 				throw new UnsupportedStringOpEx(
 						"Var '" + var.getName() + "' (possibly) used in unsupported construct");
 			}
@@ -365,50 +318,7 @@ public class AbstractStringEvaluator {
 		}
 	}
 	
-	private boolean varIsUsedIn(IVariableBinding var, Expression expr) {
-		if (expr instanceof MethodInvocation) {
-			MethodInvocation inv = (MethodInvocation) expr;
-			if (inv.getExpression() != null && varIsUsedIn(var, inv.getExpression())) {
-				return true;
-			}
-			else {
-				for (Object arg : inv.arguments()) {
-					if (varIsUsedIn(var, (Expression) arg)) {
-						return true;
-					}
-				}
-				return false;
-			}
-		}
-		else if (expr instanceof Name) {
-			return ((Name) expr).resolveBinding().isEqualTo(var);
-		}
-		else if (expr instanceof InfixExpression) {
-			InfixExpression inf = (InfixExpression) expr;
-			if (varIsUsedIn(var, inf.getLeftOperand())) {
-				return true;
-			}
-			if (varIsUsedIn(var, inf.getRightOperand())) {
-				return true;
-			}
-			for (Object o : inf.extendedOperands()) {
-				if (varIsUsedIn(var, (Expression)o)) {
-					return true;
-				}
-			}
-			return false;
-		}
-		else if (expr instanceof StringLiteral 
-				|| expr instanceof NumberLiteral
-				|| expr instanceof BooleanLiteral) {
-			return false;
-		}
-		else {
-			throw new UnsupportedStringOpEx("Checking whether var is mentioned. "
-					+ "Unsupported expression: "
-					+ expr.getClass());
-		}
-	}
+	
 	
 	private boolean builderChainIsStartedByVar(Expression node, IVariableBinding var) {
 		assert isStringBuilderOrBuffer(node.resolveTypeBinding());
@@ -437,7 +347,9 @@ public class AbstractStringEvaluator {
 						eval((Expression)inv.arguments().get(0)));
 			}
 			else {
-				throw new UnsupportedStringOpEx("MethodInvocation, StringBuilder/Buffer, method not toString");
+				throw new UnsupportedStringOpEx("StringBuilder/Buffer, method=" 
+						+ inv.getName().getIdentifier(),
+						PositionUtil.getPosition(inv)); 
 			}
 		}
 		else  {
@@ -447,13 +359,11 @@ public class AbstractStringEvaluator {
 			AbstractStringEvaluator evaluatorWithNewContext = 
 				new AbstractStringEvaluator(level+1, inv, scope);
 
-			if (inv.getExpression() == null || inv.getExpression() instanceof ThisExpression) {
-				MethodDeclaration decl = getMethodDeclarationByName(NodeSearchEngine.getContainingTypeDeclaration(inv), 
-						inv.getName().getIdentifier());
-				return evaluatorWithNewContext.getMethodReturnValue(decl);
-			}
-			else {
-				List<MethodDeclaration> decls = NodeSearchEngine.findMethodDeclarations(scope, inv);
+			List<MethodDeclaration> decls = NodeSearchEngine.findMethodDeclarations(scope, inv);
+			
+			if (decls.size() == 1) {
+				return evaluatorWithNewContext.getMethodReturnValue(decls.get(0));
+			} else {
 				List<IAbstractString> choices = new ArrayList<IAbstractString>();
 				for (MethodDeclaration decl: decls) {
 					choices.add(evaluatorWithNewContext.getMethodReturnValue(decl));
@@ -464,6 +374,12 @@ public class AbstractStringEvaluator {
 	}
 	
 	private IAbstractString getMethodReturnValue(MethodDeclaration decl) {
+		// if it has @ResultForSQLChecker in JAVADOC then return this
+		IAbstractString javadocResult = getMethodReturnValueFromJavadoc(decl);
+		if (javadocResult != null) {
+			return javadocResult;
+		}
+		// TODO: if ResultForSQLChecker is specified in the configuration file ...
 		
 		assert decl != null;
 		
@@ -485,6 +401,29 @@ public class AbstractStringEvaluator {
 			options.add(eval(ret.getExpression()));
 		}
 		return new StringChoice(PositionUtil.getPosition(decl), options);
+	}
+	
+	private IAbstractString getMethodReturnValueFromJavadoc(MethodDeclaration decl) {
+		// TODO: allow also specifying result as regex
+		
+		if (decl.getJavadoc() == null) {
+			return null;
+		}
+		
+		for (Object element : decl.getJavadoc().tags()) {
+			TagElement tag = (TagElement)element;
+			if (tag != null && "@ResultForSQLChecker".equals(tag.getTagName())) {
+				if (tag.fragments().size() == 1 
+						&& tag.fragments().get(0) instanceof TextElement) {
+					TextElement textElement = (TextElement)tag.fragments().get(0);
+					return new StringConstant(textElement.getText());
+				} else {
+					throw new UnsupportedStringOpEx("Problem reading @ResultForSQLChecker");
+				}
+			}
+		}
+		
+		return null;
 	}
 	
 	private static Statement getLastStmt(Block block) {
@@ -546,7 +485,7 @@ public class AbstractStringEvaluator {
 	
 	private IAbstractString evalVarBefore(Name name, Statement stmt) {
 		IVariableBinding var = (IVariableBinding) name.resolveBinding();
-		Statement prevStmt = getPrevStmt(stmt);
+		Statement prevStmt = ASTUtil.getPrevStmt(stmt);
 		if (prevStmt == null) {
 			// no previous statement, must be beginning of method declaration
 			if (var.isField()) {
@@ -596,20 +535,6 @@ public class AbstractStringEvaluator {
 		}
 	}
 	
-	private static IJavaProject getNodeProject(ASTNode node) {
-		assert node.getRoot() instanceof CompilationUnit;
-		CompilationUnit cUnit = (CompilationUnit)node.getRoot();
-		return cUnit.getJavaElement().getJavaProject();
-	}
-	
-	/*
-	private static IFile getNodeFile(ASTNode node) {
-		assert node.getRoot() instanceof CompilationUnit;
-		CompilationUnit cUnit = (CompilationUnit)node.getRoot();
-		return (IFile)cUnit.getTypeRoot().getResource();
-	}
-	*/
-	
 	private static MethodDeclaration getContainingMethodDeclaration(ASTNode node) {
 		ASTNode result = node;
 		while (result != null && ! (result instanceof MethodDeclaration)) {
@@ -642,13 +567,4 @@ public class AbstractStringEvaluator {
 		|| typeBinding.getQualifiedName().equals("java.lang.StringBuilder");
 	}
 	
-	private static MethodDeclaration getMethodDeclarationByName(TypeDeclaration typeDecl,
-			String methodName) {
-		for (MethodDeclaration method: typeDecl.getMethods()) {
-			if (method.getName().getIdentifier().equals(methodName)) {
-				return method;
-			}
-		}
-		throw new IllegalArgumentException("Method '" + methodName + "' not found");
-	}
 }
