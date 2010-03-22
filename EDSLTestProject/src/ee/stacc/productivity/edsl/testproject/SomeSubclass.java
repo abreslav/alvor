@@ -29,8 +29,27 @@ public class SomeSubclass extends SomeSuperclass {
 		conn.prepareStatement(SomeSuperclass.getSomeStr(3));
 	}
 	
+	@Override
 	String getSomeStr() {
 		return "SomeSubclass.getSomeStr()";
+	}
+	
+	void testBinding() throws SQLException {
+		SomeSuperclass x = new SomeSubclass();
+		x.getSomeStr();
+		
+		Connection conn = null;
+		conn.prepareStatement(dup(null));
+	}
+	
+	/**
+	 * 
+	 * @param x
+	 * @return
+	 * @SimplifiedBodyForSQLChecker {return "tore" + "oblaa";}
+	 */
+	String dup(SomeSuperclass x) {
+		return "tere"; //x + x;
 	}
 	
 	static String getSomeStr(int i) {
