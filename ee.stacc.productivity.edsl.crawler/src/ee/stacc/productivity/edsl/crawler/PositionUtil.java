@@ -16,7 +16,17 @@ public class PositionUtil {
 
 	public static IFile getFile(ASTNode node) {
 		try {
-			ICompilationUnit unit = (ICompilationUnit) ((CompilationUnit) node.getRoot()).getJavaElement();
+			ICompilationUnit unit = ASTUtil.getICompilationUnit(node);
+			if (unit == null) {
+				// probably node is from a patched unit, try to recover ICompilationUnit
+				CompilationUnit cUnit = ASTUtil.getCompilationUnit(node);
+				if (cUnit.getProperty(ASTUtil.ORIGINAL_I_COMPILATION_UNIT) != null) {
+					unit = (ICompilationUnit)cUnit.getProperty(ASTUtil.ORIGINAL_I_COMPILATION_UNIT);
+				}
+				else {
+					throw new IllegalStateException("Can't getFile for node");
+				}
+			}
 			IFile correspondingResource = (IFile) unit.getCorrespondingResource();
 			return correspondingResource;
 		} catch (JavaModelException e) {
@@ -31,5 +41,32 @@ public class PositionUtil {
 
 	public static IPosition getPosition(ASTNode node) {
 		return new Position(getFileString(node), node.getStartPosition(), node.getLength());
+	}
+
+	/**
+	 * Takes into account that node may not have a ICompilationUnit (ie. underlying resource)
+	 * @param node
+	 * @return
+	 */
+	public static IPosition getPositionNew(ASTNode node) {
+		if (ASTUtil.getICompilationUnit(node) != null) {
+			return getPosition(node);
+		} else {
+		// 	TODO find right file and translate position
+			CompilationUnit cu = ASTUtil.getCompilationUnit(node);
+			ICompilationUnit iCUnit = null;
+			if (cu.getProperty("OriginalICompilationUnit") != null) {
+				iCUnit = (ICompilationUnit)cu.getProperty("OriginalICompilationUnit");
+			}
+			
+			try {
+				IFile f = (IFile)iCUnit.getCorrespondingResource();
+				return new Position(f.getFullPath().toPortableString(),
+					node.getStartPosition(), node.getLength());
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
 	}
 }

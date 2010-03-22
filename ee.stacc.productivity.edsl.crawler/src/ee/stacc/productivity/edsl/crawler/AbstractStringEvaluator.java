@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
@@ -28,7 +29,6 @@ import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.TagElement;
-import org.eclipse.jdt.core.dom.TextElement;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
@@ -45,6 +45,8 @@ import ee.stacc.productivity.edsl.string.StringSequence;
 
 
 public class AbstractStringEvaluator {
+	private static final String RESULT_FOR_SQL_CHECKER = "@ResultForSQLChecker";
+	private static final String SIMPLIFIED_BODY_FOR_SC = "@SimplifiedBodyForSQLChecker";
 	private static final ILog LOG = Logs.getLog(AbstractStringEvaluator.class);
 	private int maxLevel = 2;
 	private boolean supportParameters = true;
@@ -356,15 +358,55 @@ public class AbstractStringEvaluator {
 			List<MethodDeclaration> decls = NodeSearchEngine.findMethodDeclarations(scope, inv);
 			
 			if (decls.size() == 1) {
-				return evaluatorWithNewContext.getMethodReturnValue(decls.get(0));
-			} else {
+				return evaluatorWithNewContext.getMethodReturnValue
+					(simplifyMethodDeclaration(decls.get(0)));
+			}
+			else if (decls.size() == 0) {
+				throw new UnsupportedStringOpEx("Possible problem, no declarations found for: " + inv.toString());
+			}
+			else {
 				List<IAbstractString> choices = new ArrayList<IAbstractString>();
 				for (MethodDeclaration decl: decls) {
-					choices.add(evaluatorWithNewContext.getMethodReturnValue(decl));
+					choices.add(evaluatorWithNewContext.getMethodReturnValue
+							(simplifyMethodDeclaration(decl)));
 				}
 				return new StringChoice(PositionUtil.getPosition(inv), choices);
 			}
 		}			
+	}
+	
+	/**
+	 * If decl has special annotations then return patched and reparsed version
+	 * of the method
+	 * 
+	 * @param decl
+	 * @return
+	 */
+	private MethodDeclaration simplifyMethodDeclaration(MethodDeclaration decl) {
+		TagElement tag = ASTUtil.getJavadocTag(decl.getJavadoc(), SIMPLIFIED_BODY_FOR_SC);
+		if (tag == null) {
+			return decl; // can't simplify
+		}
+		String tagText = ASTUtil.getTagElementText(tag);
+		if (tagText == null) {
+			throw new UnsupportedStringOpEx("Problem reading "+ SIMPLIFIED_BODY_FOR_SC);
+		}
+		
+		// replace method body with given string and reparse
+		try {
+			Block newBody = (Block)ASTTransformer.patchAndReParse(decl.getBody(), tagText);
+			MethodDeclaration newDecl = (MethodDeclaration)newBody.getParent();
+		
+			// remove annotation from new version to avoid recursion, TODO test
+			newDecl.getJavadoc().delete();
+			return newDecl;
+		} catch (ParseException e) {
+			throw new UnsupportedStringOpEx("Reparsing declaration. ParseException: "
+					+ e.toString());
+		} catch (JavaModelException e) {
+			throw new UnsupportedStringOpEx("Reparsing declaration. JavaModelException: "
+					+ e.toString());
+		}
 	}
 	
 	private IAbstractString getMethodReturnValue(MethodDeclaration decl) {
@@ -403,21 +445,19 @@ public class AbstractStringEvaluator {
 		if (decl.getJavadoc() == null) {
 			return null;
 		}
+		TagElement tag = ASTUtil.getJavadocTag(decl.getJavadoc(), RESULT_FOR_SQL_CHECKER);
 		
-		for (Object element : decl.getJavadoc().tags()) {
-			TagElement tag = (TagElement)element;
-			if (tag != null && "@ResultForSQLChecker".equals(tag.getTagName())) {
-				if (tag.fragments().size() == 1 
-						&& tag.fragments().get(0) instanceof TextElement) {
-					TextElement textElement = (TextElement)tag.fragments().get(0);
-					return new StringConstant(textElement.getText());
-				} else {
-					throw new UnsupportedStringOpEx("Problem reading @ResultForSQLChecker");
-				}
+		if (tag != null) {
+			String tagText = ASTUtil.getTagElementText(tag);
+			if (tagText == null) {
+				throw new UnsupportedStringOpEx("Problem reading " + RESULT_FOR_SQL_CHECKER);
+			} else {
+				return new StringConstant(tagText);
 			}
 		}
-		
-		return null;
+		else {
+			return null;
+		}
 	}
 	
 	public static List<INodeDescriptor> evaluateMethodArgumentAtCallSites

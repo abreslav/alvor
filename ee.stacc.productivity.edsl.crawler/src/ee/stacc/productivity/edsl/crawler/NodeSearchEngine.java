@@ -178,14 +178,13 @@ public class NodeSearchEngine {
 			public void acceptSearchMatch(SearchMatch match) {
 				ASTNode node = getASTNode(match); // gives SimpleName (IIRC)
 				MethodDeclaration decl = (MethodDeclaration)node.getParent();
-				if (ASTUtil.invocationMayReferToDeclaration(inv, decl)) {
+				if (ASTUtil.invocationMayUseDeclaration(inv, decl)) {
 					result.add(decl);
 				}
 			}
 		};
 		
 		executeSearch(pattern, requestor, scope);
-		// TODO: if it finds nothing then something's wrong
 		return result;
 	}
 	
@@ -213,6 +212,7 @@ public class NodeSearchEngine {
 		return result.get(0);
 	}
 	
+	
 	private static ICompilationUnit getCompilationUnit(SearchMatch match) {
 		if (match.getElement() instanceof IMember) {
 			return ((IMember)match.getElement()).getCompilationUnit();
@@ -231,8 +231,7 @@ public class NodeSearchEngine {
 		assert cUnit != null;
 		
 		ASTNode ast = astCache.get(cUnit);
-		// TODO check if AST is still good (or file has been edited after creating AST)
-		if (ast == null) {
+		if (ast == null || cUnit.hasResourceChanged()) {
 			ASTParser parser = ASTParser.newParser(AST.JLS3);
 			parser.setKind(ASTParser.K_COMPILATION_UNIT);
 			parser.setResolveBindings(true);
@@ -242,5 +241,4 @@ public class NodeSearchEngine {
 		}
 		return NodeFinder.perform(ast, match.getOffset(), match.getLength());
 	}
-	
 }

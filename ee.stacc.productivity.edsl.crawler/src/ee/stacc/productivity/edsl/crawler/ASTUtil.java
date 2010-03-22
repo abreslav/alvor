@@ -1,5 +1,6 @@
 package ee.stacc.productivity.edsl.crawler;
 
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
@@ -11,6 +12,7 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.Javadoc;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
@@ -18,11 +20,16 @@ import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
+import org.eclipse.jdt.core.dom.TagElement;
+import org.eclipse.jdt.core.dom.TextElement;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.search.SearchMatch;
 
+
 public class ASTUtil {
+	static final String ORIGINAL_I_COMPILATION_UNIT = "OriginalICompilationUnit";
+
 	static TypeDeclaration getContainingTypeDeclaration(ASTNode node) {
 		ASTNode result = node;
 		while (result != null && ! (result instanceof TypeDeclaration)) {
@@ -139,35 +146,61 @@ public class ASTUtil {
 		}
 	}
 	
-	static boolean invocationMayReferToDeclaration (MethodInvocation inv, MethodDeclaration decl) {
-		ITypeBinding declType = ASTUtil.getContainingTypeDeclaration(decl).resolveBinding();
-		ITypeBinding invExprType;
-		if (inv.getExpression() != null) {
-			invExprType = inv.getExpression().resolveTypeBinding();
-		} else {
-			invExprType = ASTUtil.getContainingTypeDeclaration(inv).resolveBinding();
+	static boolean invocationMayUseDeclaration (MethodInvocation inv, MethodDeclaration decl) {
+		assert inv.getName().equals(decl.getName());
+		
+		if (inv.arguments().size() != decl.parameters().size()) {
+			return false;
 		}
 		
-		// TODO check also arguments' types
-		
-		
-		// TODO this is not sound
-		return declType.isEqualTo(invExprType);
-		
-		// TODO following seems to be too conservative
-		// but actually it returns false even when isEqualTo returns true
+		// not working
 		/*
-		if (invExprType.isRecovered()) {
-			invExprType = invExprType.getDeclaringClass();
-			assert (!invExprType.isRecovered());
+		ITypeBinding invType = inv.resolveTypeBinding();
+		ITypeBinding declType = ASTUtil.getContainingTypeDeclaration(decl).resolveBinding();
+		if (! declType.isSubTypeCompatible(invType)) {
+			return false;
 		}
-		if (declType.isRecovered()) {
-			declType = declType.getDeclaringClass();
-			assert (!declType.isRecovered());
-		}
-		return invExprType.isAssignmentCompatible(declType)
-			|| declType.isAssignmentCompatible(invExprType);
 		*/
+		
+		// finally compare parameter types
+		ITypeBinding[] invPTypes = inv.resolveMethodBinding().getParameterTypes();
+		ITypeBinding[] declPTypes = decl.resolveBinding().getParameterTypes();
+		
+		for (int i = 0; i < invPTypes.length; i++) {
+			if (!invPTypes[i].isEqualTo(declPTypes[i])) {
+				return false;
+			}
+		}
+		
+		return true;
+		
+		
+		// Approach 2
+		// Does not work for some reason
+		//return invBinding.isEqualTo(declBinding) || declBinding.overrides(invBinding);
+	}
+	
+	static TagElement getJavadocTag(Javadoc javadoc, String name) {
+		if (javadoc == null) {
+			return null;
+		}
+		for (Object element : javadoc.tags()) {
+			TagElement tag = (TagElement)element;
+			if (tag != null && name.equals(tag.getTagName())) {
+				return tag;
+			}
+		}
+		return null;
+	}
+	
+	static String getTagElementText(TagElement tag) {
+		if (tag.fragments().size() == 1 
+				&& tag.fragments().get(0) instanceof TextElement) {
+			TextElement textElement = (TextElement)tag.fragments().get(0);
+			return textElement.getText();
+		} else {
+			return null;
+		}
 	}
 	
 	static IJavaProject getNodeProject(ASTNode node) {
@@ -207,6 +240,14 @@ public class ASTUtil {
 		return -1;
 	}
 	
+	static CompilationUnit getCompilationUnit(ASTNode node) {
+		return (CompilationUnit)node.getRoot();
+	}
+	
+	static ICompilationUnit getICompilationUnit(ASTNode node) {
+		return (ICompilationUnit)getCompilationUnit(node).getJavaElement();
+	}
+	
 	/*
 	private static IFile getNodeFile(ASTNode node) {
 		assert node.getRoot() instanceof CompilationUnit;
@@ -214,5 +255,4 @@ public class ASTUtil {
 		return (IFile)cUnit.getTypeRoot().getResource();
 	}
 	*/
-	
 }
