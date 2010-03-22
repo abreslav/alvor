@@ -547,6 +547,12 @@ public class AbstractStringEvaluator {
 							this.scope, this.level + 1);
 					
 					List<IAbstractString> choices = new ArrayList<IAbstractString>();
+					
+					if (choices.size() == 0) {
+						throw new UnsupportedStringOpEx("Possible problem, no callsites found for: "
+								+ method.getName());
+					}
+					
 					for (INodeDescriptor choiceDesc: descList) {
 						if (choiceDesc instanceof IStringNodeDescriptor) {
 							choices.add(((IStringNodeDescriptor)choiceDesc).getAbstractValue());
