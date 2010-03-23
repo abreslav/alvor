@@ -67,7 +67,11 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 						errorHandler.handleSQLError("SQL syntax error. Most likely, unfinished query", descriptor.getPosition());
 					}
 				});
-			} catch (MalformedStringLiteralException e) {
+			}
+			catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			}
+			catch (MalformedStringLiteralException e) {
 				errorHandler.handleSQLError("Malformed literal: " + e.getMessage(), descriptor.getPosition());
 			}
 		}
