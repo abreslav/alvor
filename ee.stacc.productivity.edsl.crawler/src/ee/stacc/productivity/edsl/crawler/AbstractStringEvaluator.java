@@ -13,6 +13,7 @@ import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CharacterLiteral;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
+import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
@@ -88,6 +89,7 @@ public class AbstractStringEvaluator {
 		assert type != null;
 		
 		if (type.getName().equals("int")) {
+			System.out.println("INT: " + PositionUtil.getPosition(node));
 			return new StringRandomInteger(PositionUtil.getPosition(node));
 		}
 		else if (node instanceof StringLiteral) {
@@ -104,6 +106,11 @@ public class AbstractStringEvaluator {
 		}
 		else if (node instanceof Name) {
 			return evalName((Name)node); 
+		}
+		else if (node instanceof ConditionalExpression) {
+			return new StringChoice(PositionUtil.getPosition(node),
+					eval(((ConditionalExpression)node).getThenExpression()),
+					eval(((ConditionalExpression)node).getElseExpression()));
 		}
 		else if (node instanceof ParenthesizedExpression) {
 			return eval(((ParenthesizedExpression)node).getExpression());
@@ -452,7 +459,9 @@ public class AbstractStringEvaluator {
 			if (tagText == null) {
 				throw new UnsupportedStringOpEx("Problem reading " + RESULT_FOR_SQL_CHECKER);
 			} else {
-				return new StringConstant(tagText);
+				//return new StringConstant(tagText);
+				return new StringConstant(PositionUtil.getPosition(tag), 
+						tagText, '"'+tagText+'"');
 			}
 		}
 		else {

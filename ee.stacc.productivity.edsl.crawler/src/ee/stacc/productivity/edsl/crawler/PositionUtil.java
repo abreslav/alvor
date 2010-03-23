@@ -43,30 +43,4 @@ public class PositionUtil {
 		return new Position(getFileString(node), node.getStartPosition(), node.getLength());
 	}
 
-	/**
-	 * Takes into account that node may not have a ICompilationUnit (ie. underlying resource)
-	 * @param node
-	 * @return
-	 */
-	public static IPosition getPositionNew(ASTNode node) {
-		if (ASTUtil.getICompilationUnit(node) != null) {
-			return getPosition(node);
-		} else {
-		// 	TODO find right file and translate position
-			CompilationUnit cu = ASTUtil.getCompilationUnit(node);
-			ICompilationUnit iCUnit = null;
-			if (cu.getProperty("OriginalICompilationUnit") != null) {
-				iCUnit = (ICompilationUnit)cu.getProperty("OriginalICompilationUnit");
-			}
-			
-			try {
-				IFile f = (IFile)iCUnit.getCorrespondingResource();
-				return new Position(f.getFullPath().toPortableString(),
-					node.getStartPosition(), node.getLength());
-			} catch (Exception e) {
-				e.printStackTrace();
-				return null;
-			}
-		}
-	}
 }

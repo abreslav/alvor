@@ -147,7 +147,7 @@ public class ASTUtil {
 	}
 	
 	static boolean invocationMayUseDeclaration (MethodInvocation inv, MethodDeclaration decl) {
-		assert inv.getName().equals(decl.getName());
+		assert inv.getName().getIdentifier().equals(decl.getName().getIdentifier());
 		
 		if (inv.arguments().size() != decl.parameters().size()) {
 			return false;
