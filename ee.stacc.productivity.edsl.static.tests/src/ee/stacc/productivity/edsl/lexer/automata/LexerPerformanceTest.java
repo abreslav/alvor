@@ -20,6 +20,7 @@ import ee.stacc.productivity.edsl.string.IAbstractStringVisitor;
 import ee.stacc.productivity.edsl.string.StringCharacterSet;
 import ee.stacc.productivity.edsl.string.StringChoice;
 import ee.stacc.productivity.edsl.string.StringConstant;
+import ee.stacc.productivity.edsl.string.StringParameter;
 import ee.stacc.productivity.edsl.string.StringRepetition;
 import ee.stacc.productivity.edsl.string.StringSequence;
 import ee.stacc.productivity.edsl.string.parser.AbstractStringParser;
@@ -124,10 +125,10 @@ public class LexerPerformanceTest {
 		}
 
 		@Override
-		public Integer visitStringChoise(StringChoice stringChoise,
+		public Integer visitStringChoice(StringChoice stringChoice,
 				Void data) {
 			int result = BASE;
-			for (IAbstractString item : stringChoise.getItems()) {
+			for (IAbstractString item : stringChoice.getItems()) {
 				result += size(item);
 			}
 			return result;
@@ -154,6 +155,12 @@ public class LexerPerformanceTest {
 			}
 			return result;
 		}
+
+		@Override
+		public Integer visitStringParameter(StringParameter stringParameter,
+				Void data) {
+			throw new IllegalArgumentException();
+		}
 	};
 
 	private static IAbstractString optimize(IAbstractString str) {
@@ -169,11 +176,11 @@ public class LexerPerformanceTest {
 		}
 
 		@Override
-		public IAbstractString visitStringChoise(StringChoice stringChoise,
+		public IAbstractString visitStringChoice(StringChoice stringChoice,
 				Void data) {
 			List<IAbstractString> optimized = new ArrayList<IAbstractString>();
 			List<StringConstant> constants = new ArrayList<StringConstant>();
-			for (IAbstractString item : stringChoise.getItems()) {
+			for (IAbstractString item : stringChoice.getItems()) {
 				IAbstractString optimizedItem = optimize(item);
 				if (optimizedItem instanceof StringChoice) {
 					optimized.addAll(((StringChoice) optimizedItem).getItems());
@@ -262,6 +269,12 @@ public class LexerPerformanceTest {
 				newConstant.setLength(0);
 			}
 			return new StringSequence(changed);
+		}
+
+		@Override
+		public IAbstractString visitStringParameter(
+				StringParameter stringParameter, Void data) {
+			throw new IllegalArgumentException();
 		}
 	};
 	

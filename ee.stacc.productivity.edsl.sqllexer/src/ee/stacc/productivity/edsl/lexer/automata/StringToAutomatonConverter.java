@@ -14,6 +14,7 @@ import ee.stacc.productivity.edsl.string.StringChoice;
 import ee.stacc.productivity.edsl.string.StringConstant;
 import ee.stacc.productivity.edsl.string.StringRepetition;
 import ee.stacc.productivity.edsl.string.StringSequence;
+import ee.stacc.productivity.edsl.string.StringParameter;
 
 public class StringToAutomatonConverter {
 
@@ -61,6 +62,12 @@ public class StringToAutomatonConverter {
 		}
 
 		@Override
+		public Set<State> visitStringParameter(
+				StringParameter stringParameter, State initial) {
+			throw new IllegalArgumentException();
+		}
+
+		@Override
 		public Set<State> visitStringConstant(StringConstant stringConstant,
 				State initial) {
 			State fin = new State("F", false);
@@ -80,10 +87,10 @@ public class StringToAutomatonConverter {
 		}
 
 		@Override
-		public Set<State> visitStringChoise(StringChoice stringChoise,
+		public Set<State> visitStringChoice(StringChoice stringChoice,
 				State initial) {
 			Set<State> result = new HashSet<State>();
-			for (IAbstractString item : stringChoise.getItems()) {
+			for (IAbstractString item : stringChoice.getItems()) {
 				Set<State> finalStates = convert(item, initial);
 				result.addAll(finalStates);
 			}

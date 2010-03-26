@@ -7,6 +7,7 @@ import ee.stacc.productivity.edsl.string.StringChoice;
 import ee.stacc.productivity.edsl.string.StringConstant;
 import ee.stacc.productivity.edsl.string.StringRepetition;
 import ee.stacc.productivity.edsl.string.StringSequence;
+import ee.stacc.productivity.edsl.string.StringParameter;
 
 public class AsbtractStringUtils {
 
@@ -19,9 +20,15 @@ public class AsbtractStringUtils {
 		}
 	
 		@Override
-		public Boolean visitStringChoise(StringChoice stringChoise,
+		public Boolean visitStringParameter(
+				StringParameter stringParameter, Void data) {
+			throw new IllegalArgumentException();
+		}
+	
+		@Override
+		public Boolean visitStringChoice(StringChoice stringChoice,
 				Void data) {
-			for (IAbstractString item : stringChoise.getItems()) {
+			for (IAbstractString item : stringChoice.getItems()) {
 				if (AsbtractStringUtils.hasLoops(item)) {
 					return true;
 				}

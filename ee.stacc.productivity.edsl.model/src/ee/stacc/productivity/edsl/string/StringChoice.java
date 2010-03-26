@@ -38,6 +38,6 @@ public class StringChoice extends AbstractStringCollection implements IAbstractS
 	}
 
 	public <R, D> R accept(IAbstractStringVisitor<? extends R,? super D> visitor, D data) {
-		return visitor.visitStringChoise(this, data);
+		return visitor.visitStringChoice(this, data);
 	};
 }
