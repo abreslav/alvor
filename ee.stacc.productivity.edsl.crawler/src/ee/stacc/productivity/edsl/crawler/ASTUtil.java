@@ -228,11 +228,25 @@ public class ASTUtil {
 		return (MethodDeclaration)result;
 	}
 	
+	// NB! uses 1-based indexing
 	static int getParamIndex(MethodDeclaration method, IBinding param) {
 		int i = 1;
 		for (Object elem: method.parameters()) {
 			SingleVariableDeclaration decl = (SingleVariableDeclaration)elem;
-			if (decl.resolveBinding().equals(param)) {
+			if (decl.resolveBinding().isEqualTo(param)) {
+				return i;
+			}
+			i++;
+		}
+		return -1;
+	}
+	
+	// NB! uses 1-based indexing
+	static int getArgumentIndex(MethodInvocation inv, IBinding var) {
+		int i = 1;
+		for (Object elem: inv.arguments()) {
+			if (elem instanceof Name 
+					&& ((Name)elem).resolveBinding().isEqualTo(var)) {
 				return i;
 			}
 			i++;

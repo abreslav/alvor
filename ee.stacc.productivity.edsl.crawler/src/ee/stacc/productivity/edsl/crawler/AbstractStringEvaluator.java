@@ -17,6 +17,7 @@ import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
+import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -27,6 +28,7 @@ import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.TagElement;
@@ -120,7 +122,7 @@ public class AbstractStringEvaluator {
 		}
 		else if (node instanceof MethodInvocation) {
 			MethodInvocation inv = (MethodInvocation)node;
-				return evalInvocation(inv);
+				return evalInvocationResult(inv);
 		}
 		else if (node instanceof ClassInstanceCreation) {
 			
@@ -275,11 +277,18 @@ public class AbstractStringEvaluator {
 		else if (stmt instanceof ReturnStatement) {
 			return evalVarBefore(name, stmt);
 		}
+		else if (stmt instanceof ForStatement) {
+			return evalVarAfterFor(name, (ForStatement)stmt);
+		}
 		else { // other kind of statement
 			throw new UnsupportedStringOpEx("getVarValAfter(var, " + stmt.getClass().getName() + ")");
 		} 
 	}
 	
+	private IAbstractString evalVarAfterFor(Name name, ForStatement stmt) {
+		throw new UnsupportedStringOpEx("Loops not supported yet");
+	}
+
 	private IAbstractString evalField(Name node) {
 		IVariableBinding var = (IVariableBinding) node.resolveBinding();
 		VariableDeclarationFragment frag = NodeSearchEngine
@@ -296,6 +305,8 @@ public class AbstractStringEvaluator {
 	
 	private IAbstractString evalVarAfterMethodInvStmt(Name name,
 			ExpressionStatement stmt) {
+		assert (stmt.getExpression() instanceof MethodInvocation);
+		
 		IVariableBinding var = (IVariableBinding) name.resolveBinding();
 		
 		if (isStringBuilderOrBuffer(var.getType())) {
@@ -307,9 +318,13 @@ public class AbstractStringEvaluator {
 					&& builderChainIsStartedByVar(inv, var)) {
 				return eval(inv);
 			}
+			// if it's passed as argument then track changes to it
+			else if (ASTUtil.getArgumentIndex(inv, var) > -1) {
+				return evalInvocationArgOut(inv, ASTUtil.getArgumentIndex(inv, var));
+			}
 			else if (ASTUtil.varIsUsedIn(var, inv)) {
 				throw new UnsupportedStringOpEx(
-						"Var '" + var.getName() + "' (possibly) used in unsupported construct");
+						"Var '" + var.getName() + "' used (possibly modified) in unsupported construct");
 			}
 			else { // SB is not changed in this statement
 				return evalVarBefore(name, stmt);
@@ -322,7 +337,17 @@ public class AbstractStringEvaluator {
 	}
 	
 	
-	
+	/**
+	 * Gives the value of arg at position=argumentIndex after this invocation
+	 * @param inv
+	 * @param argumentIndex
+	 * @return
+	 */
+	private IAbstractString evalInvocationArgOut(MethodInvocation inv,
+			int argumentIndex) {
+		return evalInvocationResultOrArgOut(inv, argumentIndex); 
+	}
+
 	private boolean builderChainIsStartedByVar(Expression node, IVariableBinding var) {
 		assert isStringBuilderOrBuffer(node.resolveTypeBinding());
 		if (node instanceof SimpleName) {
@@ -337,7 +362,20 @@ public class AbstractStringEvaluator {
 		}
 	}
 	
-	private IAbstractString evalInvocation(MethodInvocation inv) {
+	/**
+	 * For getting the result of normal (ie. not special cases) invocation, 
+	 * the argument values are not computed before analyzing method body. 
+	 * Another AbstractStringEvaluator is created for that method body and
+	 * before starting the analysis, it's invocationContext is set to that invocation -
+	 * this basically switches evaluator to context-sensitive mode -- ie. when it needs
+	 * value of method argument then it only looks into invocationContext 
+	 * (as opposed to looking for all callsites of this method).
+	 * 
+
+	 * @param inv
+	 * @return
+	 */
+	private IAbstractString evalInvocationResult(MethodInvocation inv) {
 		if (inv.getExpression() != null
 				&& isStringBuilderOrBuffer(inv.getExpression().resolveTypeBinding())) {
 			if (inv.getName().getIdentifier().equals("toString")) {
@@ -356,40 +394,67 @@ public class AbstractStringEvaluator {
 			}
 		}
 		else  {
-			if (! supportInvocations) {
-				throw new UnsupportedStringOpEx("Method call");
-			}
-			AbstractStringEvaluator evaluatorWithNewContext = 
-				new AbstractStringEvaluator(level+1, inv, scope);
-
-			List<MethodDeclaration> decls = NodeSearchEngine.findMethodDeclarations(scope, inv);
-			
-			if (decls.size() == 1) {
-				return evaluatorWithNewContext.getMethodReturnValue
-					(simplifyMethodDeclaration(decls.get(0)));
-			}
-			else if (decls.size() == 0) {
-				throw new UnsupportedStringOpEx("Possible problem, no declarations found for: " + inv.toString());
-			}
-			else {
-				List<IAbstractString> choices = new ArrayList<IAbstractString>();
-				for (MethodDeclaration decl: decls) {
-					choices.add(evaluatorWithNewContext.getMethodReturnValue
-							(simplifyMethodDeclaration(decl)));
-				}
-				return new StringChoice(PositionUtil.getPosition(inv), choices);
-			}
+			return evalInvocationResultOrArgOut(inv, -1);
 		}			
 	}
 	
+	private IAbstractString evalInvocationResultOrArgOut(MethodInvocation inv,
+			int argumentIndex) {
+		if (! supportInvocations) {
+			throw new UnsupportedStringOpEx("Method call");
+		}
+		AbstractStringEvaluator evaluatorWithNewContext = 
+			new AbstractStringEvaluator(level+1, inv, scope);
+
+		List<MethodDeclaration> decls = NodeSearchEngine.findMethodDeclarations(scope, inv);
+		
+		if (decls.size() == 0) {
+			throw new UnsupportedStringOpEx("Possible problem, no declarations found for: " + inv.toString());
+		}
+		else {
+			List<IAbstractString> choices = new ArrayList<IAbstractString>();
+			for (MethodDeclaration decl: decls) {
+				if (argumentIndex == -1) {
+					choices.add(evaluatorWithNewContext.getMethodReturnValue(decl));
+				}
+				else {
+					choices.add(evaluatorWithNewContext.getMethodArgOutValue
+							(decl, argumentIndex));
+				}
+			}
+			if (choices.size() == 1) {
+				return choices.get(0);
+			}
+			else {
+				return new StringChoice(PositionUtil.getPosition(inv), choices);
+			}
+		}
+	}
+
+	
+	
+	private IAbstractString getMethodArgOutValue(MethodDeclaration decl,
+			int argumentIndex) {
+		// TODO: at first look for javadoc annotation for this arg
+		
+		SingleVariableDeclaration paramDecl = 
+				(SingleVariableDeclaration)decl.parameters().get(argumentIndex-1);
+		
+		return evalVarAfter(paramDecl.getName(), decl.getBody());
+		
+		
+		//throw new UnsupportedStringOpEx("getMethodArgOutValue");
+	}
+
 	/**
 	 * If decl has special annotations then return patched and reparsed version
 	 * of the method
 	 * 
 	 * @param decl
 	 * @return
+	 * @deprecated
 	 */
-	private MethodDeclaration simplifyMethodDeclaration(MethodDeclaration decl) {
+	private MethodDeclaration simplifyMethodDeclaration__(MethodDeclaration decl) {
 		TagElement tag = ASTUtil.getJavadocTag(decl.getJavadoc(), SIMPLIFIED_BODY_FOR_SC);
 		if (tag == null) {
 			return decl; // can't simplify
@@ -543,7 +608,7 @@ public class AbstractStringEvaluator {
 						new AbstractStringEvaluator(level+1, null, scope);
 					
 					return nextLevelEvaluator.eval
-						((Expression)this.invocationContext.arguments().get(paramIndex));
+						((Expression)this.invocationContext.arguments().get(paramIndex-1));
 				}
 				else {
 					List<INodeDescriptor> descList = 
