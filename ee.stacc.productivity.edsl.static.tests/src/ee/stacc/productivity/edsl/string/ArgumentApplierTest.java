@@ -75,6 +75,7 @@ public class ArgumentApplierTest {
 	}
 
 	
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testApplyZeroArguments() {
 		IAbstractString abs = new StringSequence(
