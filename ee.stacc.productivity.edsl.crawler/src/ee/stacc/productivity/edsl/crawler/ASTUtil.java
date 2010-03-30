@@ -24,13 +24,15 @@ import org.eclipse.jdt.core.dom.TagElement;
 import org.eclipse.jdt.core.dom.TextElement;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.search.SearchMatch;
 
 
 public class ASTUtil {
-	static final String ORIGINAL_I_COMPILATION_UNIT = "OriginalICompilationUnit";
+	public static final String ORIGINAL_I_COMPILATION_UNIT = "OriginalICompilationUnit";
 
-	static TypeDeclaration getContainingTypeDeclaration(ASTNode node) {
+	public static TypeDeclaration getContainingTypeDeclaration(ASTNode node) {
 		ASTNode result = node;
 		while (result != null && ! (result instanceof TypeDeclaration)) {
 			result = result.getParent();
@@ -38,7 +40,7 @@ public class ASTUtil {
 		return (TypeDeclaration)result;
 	}
 	
-	static MethodDeclaration getMethodDeclarationByName(TypeDeclaration typeDecl,
+	public static MethodDeclaration getMethodDeclarationByName(TypeDeclaration typeDecl,
 			String methodName) {
 		for (MethodDeclaration method: typeDecl.getMethods()) {
 			if (method.getName().getIdentifier().equals(methodName)) {
@@ -48,7 +50,7 @@ public class ASTUtil {
 		throw new IllegalArgumentException("Method '" + methodName + "' not found");
 	}
 
-	static boolean varIsUsedIn(IVariableBinding var, Expression expr) {
+	public static boolean varIsUsedIn(IVariableBinding var, Expression expr) {
 		if (expr instanceof MethodInvocation) {
 			MethodInvocation inv = (MethodInvocation) expr;
 			if (inv.getExpression() != null && varIsUsedIn(var, inv.getExpression())) {
@@ -93,7 +95,7 @@ public class ASTUtil {
 		}
 	}
 	
-	static int getNodeLineNumber(SearchMatch match, ASTNode node) {
+	public static int getNodeLineNumber(SearchMatch match, ASTNode node) {
 		if (node.getRoot() instanceof CompilationUnit) {
 			return ((CompilationUnit)node.getRoot()).getLineNumber(match.getOffset());
 		}
@@ -102,7 +104,7 @@ public class ASTUtil {
 		}
 	}
 	
-	static Statement getPrevStmt(Statement node) {
+	public static Statement getPrevStmt(Statement node) {
 		//LOG.message("getPrevStmt: " + node.getClass().getName());
 		
 		if (node.getParent() instanceof Block) {
@@ -131,7 +133,7 @@ public class ASTUtil {
 	}
 	
 	
-	static Statement getContainingStmt(ASTNode node) {
+	public static Statement getContainingStmt(ASTNode node) {
 		assert node != null;
 		
 		if (node.getParent() instanceof Statement) {
@@ -146,7 +148,7 @@ public class ASTUtil {
 		}
 	}
 	
-	static boolean invocationMayUseDeclaration (MethodInvocation inv, MethodDeclaration decl) {
+	public static boolean invocationMayUseDeclaration (MethodInvocation inv, MethodDeclaration decl) {
 		assert inv.getName().getIdentifier().equals(decl.getName().getIdentifier());
 		
 		if (inv.arguments().size() != decl.parameters().size()) {
@@ -180,7 +182,7 @@ public class ASTUtil {
 		//return invBinding.isEqualTo(declBinding) || declBinding.overrides(invBinding);
 	}
 	
-	static TagElement getJavadocTag(Javadoc javadoc, String name) {
+	public static TagElement getJavadocTag(Javadoc javadoc, String name) {
 		if (javadoc == null) {
 			return null;
 		}
@@ -193,7 +195,7 @@ public class ASTUtil {
 		return null;
 	}
 	
-	static String getTagElementText(TagElement tag) {
+	public static String getTagElementText(TagElement tag) {
 		if (tag.fragments().size() == 1 
 				&& tag.fragments().get(0) instanceof TextElement) {
 			TextElement textElement = (TextElement)tag.fragments().get(0);
@@ -203,24 +205,24 @@ public class ASTUtil {
 		}
 	}
 	
-	static IJavaProject getNodeProject(ASTNode node) {
+	public static IJavaProject getNodeProject(ASTNode node) {
 		assert node.getRoot() instanceof CompilationUnit;
 		CompilationUnit cUnit = (CompilationUnit)node.getRoot();
 		return cUnit.getJavaElement().getJavaProject();
 	}
 
-	static Statement getLastStmt(Block block) {
+	public static Statement getLastStmt(Block block) {
 		return (Statement)block.statements().get(block.statements().size()-1);
 	}
 	
-	static String getMethodClassName(MethodDeclaration method) {
+	public static String getMethodClassName(MethodDeclaration method) {
 		assert (method.getParent() instanceof TypeDeclaration);
 		TypeDeclaration typeDecl = (TypeDeclaration)method.getParent();
 		ITypeBinding classBinding = typeDecl.resolveBinding();
 		return classBinding.getQualifiedName();
 	}
 	
-	static MethodDeclaration getContainingMethodDeclaration(ASTNode node) {
+	public static MethodDeclaration getContainingMethodDeclaration(ASTNode node) {
 		ASTNode result = node;
 		while (result != null && ! (result instanceof MethodDeclaration)) {
 			result = result.getParent();
@@ -229,7 +231,7 @@ public class ASTUtil {
 	}
 	
 	// NB! uses 1-based indexing
-	static int getParamIndex(MethodDeclaration method, IBinding param) {
+	public static int getParamIndex(MethodDeclaration method, IBinding param) {
 		int i = 1;
 		for (Object elem: method.parameters()) {
 			SingleVariableDeclaration decl = (SingleVariableDeclaration)elem;
@@ -242,7 +244,7 @@ public class ASTUtil {
 	}
 	
 	// NB! uses 1-based indexing
-	static int getArgumentIndex(MethodInvocation inv, IBinding var) {
+	public static int getArgumentIndex(MethodInvocation inv, IBinding var) {
 		int i = 1;
 		for (Object elem: inv.arguments()) {
 			if (elem instanceof Name 
@@ -254,12 +256,32 @@ public class ASTUtil {
 		return -1;
 	}
 	
-	static CompilationUnit getCompilationUnit(ASTNode node) {
+	public static VariableDeclaration getVarDeclFragment(VariableDeclarationStatement stmt, Name name) {
+		for (Object frag : stmt.fragments()) {
+			VariableDeclaration vDec = (VariableDeclaration)frag;
+			
+			if (sameBinding(vDec.getName(), name)) {
+				return vDec;
+			}
+		}
+		return null;
+	}
+	
+	public static CompilationUnit getCompilationUnit(ASTNode node) {
 		return (CompilationUnit)node.getRoot();
 	}
 	
-	static ICompilationUnit getICompilationUnit(ASTNode node) {
+	public static ICompilationUnit getICompilationUnit(ASTNode node) {
 		return (ICompilationUnit)getCompilationUnit(node).getJavaElement();
+	}
+	
+	public static boolean sameBinding(Expression exp, Name name) {
+		return sameBinding(exp, name.resolveBinding());
+	}
+	
+	public static boolean sameBinding(Expression exp, IBinding var) {
+		return (exp instanceof Name)
+			&& ((Name)exp).resolveBinding().isEqualTo(var);
 	}
 	
 	/*

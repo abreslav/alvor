@@ -91,7 +91,6 @@ public class AbstractStringEvaluator {
 		assert type != null;
 		
 		if (type.getName().equals("int")) {
-			System.out.println("INT: " + PositionUtil.getPosition(node));
 			return new StringRandomInteger(PositionUtil.getPosition(node));
 		}
 		else if (node instanceof StringLiteral) {
@@ -452,9 +451,10 @@ public class AbstractStringEvaluator {
 	 * 
 	 * @param decl
 	 * @return
-	 * @deprecated
+	 * 
 	 */
-	private MethodDeclaration simplifyMethodDeclaration__(MethodDeclaration decl) {
+	@Deprecated
+	MethodDeclaration simplifyMethodDeclaration__(MethodDeclaration decl) {
 		TagElement tag = ASTUtil.getJavadocTag(decl.getJavadoc(), SIMPLIFIED_BODY_FOR_SC);
 		if (tag == null) {
 			return decl; // can't simplify
