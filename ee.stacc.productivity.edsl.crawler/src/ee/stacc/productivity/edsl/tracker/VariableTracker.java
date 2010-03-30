@@ -118,7 +118,7 @@ public class VariableTracker {
 		Statement prevStmt = ASTUtil.getPrevStmt(stmt);
 		
 		// TODO if at the boundary of loop then ...
-		/*
+		/* 
 		if (prevStmt == null) {
 			// no previous statement, must be beginning of method declaration
 			if (var.isField()) {
