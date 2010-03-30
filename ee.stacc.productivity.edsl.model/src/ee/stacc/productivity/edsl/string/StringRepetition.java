@@ -3,7 +3,11 @@
  */
 package ee.stacc.productivity.edsl.string;
 
-
+/**
+ * 
+ * Represents repetition once or more (so it's +)
+ *
+ */
 public class StringRepetition extends PositionedString {
 	private final IAbstractString body;
 	
