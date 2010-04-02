@@ -295,5 +295,52 @@ public class VariableTracker {
 		
 		return usages;
 	}
-	
+
+/*
+getPrevSib(node):ASTNode
+
+getNameDefsBefore(var, node) =
+
+    var sib := node
+    while sib := getPrevSib(sib) do
+        defs := getLastDefinitionsIn(var, sib)
+        if defs then
+            if sib is Loop then
+                add also defs before loop
+            return defs
+    
+    // nothing from siblings
+    
+    parent = node.parent
+    defs = getNameDefsBefore(var, parent)
+    
+    if parent is loop // means we're getting out of loop, add also defs in loop
+        loopDefs = getLastDefsIn(var, parent)
+            // should i return normal choice??
+            // and later detect that one is in loop and other not?
+            // no - LoopChoice keeps distinction between first iteration value and rest
+        if loopDefs.notEmpty then
+            return DefLoopChoice(defs, loopDefs)
+        else
+            return defs
+    
+    else // not loop
+        return getNameDefsBefore(var, node.parent)
+
+
+
+getLastDefsIn(var, node) =
+    if node is IfStatement then
+    
+    if node is Block then
+        return getLastDefsIn(var, node.lastStmt)
+    
+    if node is WhileStatement then
+        return getLastDefsIn(var, node.body)
+        
+    
+        
+        
+        
+ */
 }
