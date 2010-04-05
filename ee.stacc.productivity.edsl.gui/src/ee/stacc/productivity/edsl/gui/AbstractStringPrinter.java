@@ -16,6 +16,7 @@ import org.eclipse.ui.IEditorPart;
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.crawler.AbstractStringEvaluator;
+import ee.stacc.productivity.edsl.crawler.NewASE;
 import ee.stacc.productivity.edsl.crawler.NodeSearchEngine;
 
 public class AbstractStringPrinter implements IEditorActionDelegate{
@@ -57,7 +58,7 @@ public class AbstractStringPrinter implements IEditorActionDelegate{
 			LOG.message("Abstract value is: ");
 			
 			NodeSearchEngine.clearCache();
-			System.out.println(AbstractStringEvaluator.evaluateExpression
+			System.out.println(NewASE.evaluateExpression
 					((Expression)node).toString());
 		} 
 		else {
