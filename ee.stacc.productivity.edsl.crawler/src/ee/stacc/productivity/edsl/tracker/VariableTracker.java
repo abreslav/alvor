@@ -6,8 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.Annotation;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.BooleanLiteral;
+import org.eclipse.jdt.core.dom.CharacterLiteral;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
@@ -16,9 +19,16 @@ import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.NullLiteral;
+import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.StringLiteral;
+import org.eclipse.jdt.core.dom.ThisExpression;
+import org.eclipse.jdt.core.dom.TypeLiteral;
+import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
 import ee.stacc.productivity.edsl.crawler.ASTUtil;
@@ -45,11 +55,7 @@ public class VariableTracker {
 	static boolean onlyAssignments=true;
 	
 	public static NameUsage getPreviousUsage(Name name) {
-		return null;
-	}
-	
-	public static List<NameUsage> getPreviousModfications(Name name) {
-		return getUsagesBefore((IVariableBinding) name.resolveBinding(), name);
+		return getUsageBefore((IVariableBinding) name.resolveBinding(), name);
 	}
 	
 	/*
@@ -112,6 +118,7 @@ public class VariableTracker {
 	}
 	*/
 	
+	/*
 	private static List<Expression> getPreviousExpressions(ASTNode node) {
 		ASTNode parent = node.getParent();
 		if (parent == null) {
@@ -167,6 +174,7 @@ public class VariableTracker {
 		throw new UnsupportedConstructionException("getPrecedingExpression - node: " + node.getClass()
 				+ ", parent:" + parent.getClass());
 	}
+	*/
 	
 	
 	/*
@@ -176,13 +184,160 @@ public class VariableTracker {
 	*/
 	
 	// used for moving left in AST
+	private static ASTNode getLastChild(ASTNode parent) {
+		return getLastChildBefore(parent, null);
+	}
+	
 	private static ASTNode getPreviousSibling(ASTNode node) {
-		return null;
+		if (node.getParent() == null) {
+			return null;
+		}
+		return getLastChildBefore(node.getParent(), node);
+	}
+	
+	/*
+	 * if node == null return last child
+	 */
+	private static ASTNode getLastChildBefore(ASTNode parent, ASTNode node) {
+		assert node == null || node.getParent() == parent;
+		
+		if (parent instanceof Block) {
+			Block block = (Block)parent;
+			if (node == null) {
+				return (Statement)block.statements().get(block.statements().size()-1);
+			}
+			else {
+				int i = block.statements().indexOf(node);
+				if (i == 0) {
+					return null;
+				}
+				else {
+					return (Statement)block.statements().get(i-1);
+				}
+			}
+		}
+		else if (parent instanceof ExpressionStatement) {
+			if (node == null) {
+				return ((ExpressionStatement)parent).getExpression();
+			}
+			else {
+				assert node == ((ExpressionStatement)parent).getExpression();
+				return null;
+			}
+		}
+		else if (parent instanceof Assignment) {
+			Assignment ass = (Assignment)parent;
+			if (node == null) {
+				return ass.getRightHandSide();
+			}
+			else if (node == ass.getRightHandSide()) {
+				return ass.getLeftHandSide();
+			}
+			else {
+				assert node == ass.getLeftHandSide();
+				return null;
+			}
+		}
+		else if (parent instanceof InfixExpression) {
+			InfixExpression infx = (InfixExpression)parent;
+			if (node == null) {
+				if (infx.extendedOperands().size() > 0) {
+					return (Expression)infx.extendedOperands()
+						.get(infx.extendedOperands().size()-1);
+				}
+				else {
+					return infx.getRightOperand();
+				}
+			}
+			else if (infx.getLeftOperand() == node) {
+				return null;
+			}
+			else if (infx.getRightOperand() == node) {
+				return infx.getLeftOperand();
+			}
+			else { // must be one of extended operands
+				int opIndex = infx.extendedOperands().indexOf(node);
+				assert opIndex > -1;
+				if (opIndex == 0) {
+					return infx.getRightOperand();
+				}
+				else {
+					return (Expression)infx.extendedOperands().get(opIndex-1);
+				}
+			}
+		}
+		else if (parent instanceof WhileStatement) {
+			WhileStatement wStmt = (WhileStatement)parent;
+			if (node == null) {
+				return wStmt.getBody();
+			}
+			else if (node == wStmt.getBody()) {
+				// FIXME - should give loop expression
+				return null;
+			}
+			else {
+				assert node == wStmt.getExpression();
+				return null;
+			}
+		}
+		else if (parent instanceof MethodInvocation) {
+			MethodInvocation inv = (MethodInvocation)parent;
+			// expression is first thing to be evaluated in invocation
+			if (node == null) {
+				if (inv.arguments().size() > 0) {
+					return (Expression)inv.arguments().get(inv.arguments().size()-1);
+				}
+				else {
+					// TODO probably should leave name out of this, because no modification can be there
+					return inv.getName();
+				}
+			}
+			else if (node == inv.getExpression()) {
+				return null;
+			}
+			else if (node == inv.getName()) {
+				// this case probably is not used, but let it be, for completeness
+				return inv.getExpression();
+			}
+			else { // node must be one of arguments
+				int argIndex = inv.arguments().indexOf(node);
+				assert argIndex > -1;
+				if (argIndex == 0) {
+					return inv.getExpression();
+				}
+				else {
+					return (Expression)inv.arguments().get(argIndex-1);
+				}
+			}
+		}
+		else {
+			throw new UnsupportedConstructionException("getPreviousSibling - parent:" 
+				+ parent.getClass()	+ ", node: " + node.getClass());
+		}
+	}
+	
+	private static boolean isSimpleNode(ASTNode node) {
+		return node instanceof Name
+			|| node instanceof NullLiteral
+			|| node instanceof NumberLiteral
+			|| node instanceof StringLiteral
+			|| node instanceof BooleanLiteral
+			|| node instanceof CharacterLiteral
+			|| node instanceof TypeLiteral
+			|| node instanceof Annotation
+			|| node instanceof ThisExpression;
 	}
 	
 	private static NameUsage getLastUsageIn(IVariableBinding var, ASTNode node) {
-		if (node instanceof Assignment) {
+		if (isSimpleNode(node)) {
+			return null;			
+		}
+		// first search among children
+		
+		
+	    else if (node instanceof Assignment) {
 			Assignment ass = (Assignment)node;
+			// TODO first check into RHS
 			if (ASTUtil.sameBinding(ass.getLeftHandSide(), var)) {
 				return new NameAssignment(ass.getOperator(), ass.getRightHandSide());
 			}
@@ -190,6 +345,9 @@ public class VariableTracker {
 				return getLastUsageIn(var, ass.getRightHandSide());
 			}
 		}
+	    else if (node instanceof VariableDeclarationStatement) {
+	    	return getUsageBefore(var, node);
+	    }
 		else if (node instanceof IfStatement) {
 			IfStatement ifStmt = (IfStatement)node;
 			NameUsage thenUsage = getLastUsageIn(var, ifStmt.getThenStatement());
@@ -239,12 +397,16 @@ public class VariableTracker {
 		}
 		// no usage in siblings, go up
 		ASTNode parent = node.getParent();
-		NameUsage prevUsage = getUsageBefore(var, node.getParent());
+		if (parent instanceof MethodDeclaration) {
+			throw new UnsupportedStringOpEx("ParameterUsage");
+			// TODO parameters
+		}
+		NameUsage prevUsage = getUsageBefore(var, parent);
 		
 		if (isLoopStatement(parent)) { // ie. coming out of loop
 			// go look if this name was modded in loop body
-			// yes, in some cases it means duplicate work
-			// but it should be remedied by cache
+			// (yes, in some cases it means duplicate work
+			// but it should be remedied by cache)
 			NameUsage loopUsage = getLastUsageIn(var, parent);
 			if (loopUsage != null) {
 				return new NameUsageLoopChoice(prevUsage, loopUsage);
@@ -279,6 +441,7 @@ public class VariableTracker {
 		}
 	}
 	
+	/*
 	private static List<NameUsage> getUsagesBefore(IVariableBinding var, ASTNode node) {
 		List<Expression> prevs = getPreviousExpressions(node);
 		List<NameUsage> usages = new ArrayList<NameUsage>();
@@ -295,6 +458,7 @@ public class VariableTracker {
 		
 		return usages;
 	}
+	*/
 
 /*
 getPrevSib(node):ASTNode
