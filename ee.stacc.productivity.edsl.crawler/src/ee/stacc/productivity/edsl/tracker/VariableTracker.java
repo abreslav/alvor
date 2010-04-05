@@ -198,16 +198,16 @@ public class VariableTracker {
 	/*
 	 * if node == null return last child
 	 */
-	private static ASTNode getLastChildBefore(ASTNode parent, ASTNode node) {
-		assert node == null || node.getParent() == parent;
+	private static ASTNode getLastChildBefore(ASTNode node, ASTNode limit) {
+		assert limit == null || limit.getParent() == node;
 		
-		if (parent instanceof Block) {
-			Block block = (Block)parent;
-			if (node == null) {
+		if (node instanceof Block) {
+			Block block = (Block)node;
+			if (limit == null) {
 				return (Statement)block.statements().get(block.statements().size()-1);
 			}
 			else {
-				int i = block.statements().indexOf(node);
+				int i = block.statements().indexOf(limit);
 				if (i == 0) {
 					return null;
 				}
@@ -216,31 +216,31 @@ public class VariableTracker {
 				}
 			}
 		}
-		else if (parent instanceof ExpressionStatement) {
-			if (node == null) {
-				return ((ExpressionStatement)parent).getExpression();
+		else if (node instanceof ExpressionStatement) {
+			if (limit == null) {
+				return ((ExpressionStatement)node).getExpression();
 			}
 			else {
-				assert node == ((ExpressionStatement)parent).getExpression();
+				assert limit == ((ExpressionStatement)node).getExpression();
 				return null;
 			}
 		}
-		else if (parent instanceof Assignment) {
-			Assignment ass = (Assignment)parent;
-			if (node == null) {
+		else if (node instanceof Assignment) {
+			Assignment ass = (Assignment)node;
+			if (limit == null) {
 				return ass.getRightHandSide();
 			}
-			else if (node == ass.getRightHandSide()) {
+			else if (limit == ass.getRightHandSide()) {
 				return ass.getLeftHandSide();
 			}
 			else {
-				assert node == ass.getLeftHandSide();
+				assert limit == ass.getLeftHandSide();
 				return null;
 			}
 		}
-		else if (parent instanceof InfixExpression) {
-			InfixExpression infx = (InfixExpression)parent;
-			if (node == null) {
+		else if (node instanceof InfixExpression) {
+			InfixExpression infx = (InfixExpression)node;
+			if (limit == null) {
 				if (infx.extendedOperands().size() > 0) {
 					return (Expression)infx.extendedOperands()
 						.get(infx.extendedOperands().size()-1);
@@ -249,14 +249,14 @@ public class VariableTracker {
 					return infx.getRightOperand();
 				}
 			}
-			else if (infx.getLeftOperand() == node) {
+			else if (infx.getLeftOperand() == limit) {
 				return null;
 			}
-			else if (infx.getRightOperand() == node) {
+			else if (infx.getRightOperand() == limit) {
 				return infx.getLeftOperand();
 			}
 			else { // must be one of extended operands
-				int opIndex = infx.extendedOperands().indexOf(node);
+				int opIndex = infx.extendedOperands().indexOf(limit);
 				assert opIndex > -1;
 				if (opIndex == 0) {
 					return infx.getRightOperand();
@@ -266,24 +266,24 @@ public class VariableTracker {
 				}
 			}
 		}
-		else if (parent instanceof WhileStatement) {
-			WhileStatement wStmt = (WhileStatement)parent;
-			if (node == null) {
+		else if (node instanceof WhileStatement) {
+			WhileStatement wStmt = (WhileStatement)node;
+			if (limit == null) {
 				return wStmt.getBody();
 			}
-			else if (node == wStmt.getBody()) {
+			else if (limit == wStmt.getBody()) {
 				// FIXME - should give loop expression
 				return null;
 			}
 			else {
-				assert node == wStmt.getExpression();
+				assert limit == wStmt.getExpression();
 				return null;
 			}
 		}
-		else if (parent instanceof MethodInvocation) {
-			MethodInvocation inv = (MethodInvocation)parent;
+		else if (node instanceof MethodInvocation) {
+			MethodInvocation inv = (MethodInvocation)node;
 			// expression is first thing to be evaluated in invocation
-			if (node == null) {
+			if (limit == null) {
 				if (inv.arguments().size() > 0) {
 					return (Expression)inv.arguments().get(inv.arguments().size()-1);
 				}
@@ -292,15 +292,15 @@ public class VariableTracker {
 					return inv.getName();
 				}
 			}
-			else if (node == inv.getExpression()) {
+			else if (limit == inv.getExpression()) {
 				return null;
 			}
-			else if (node == inv.getName()) {
+			else if (limit == inv.getName()) {
 				// this case probably is not used, but let it be, for completeness
 				return inv.getExpression();
 			}
 			else { // node must be one of arguments
-				int argIndex = inv.arguments().indexOf(node);
+				int argIndex = inv.arguments().indexOf(limit);
 				assert argIndex > -1;
 				if (argIndex == 0) {
 					return inv.getExpression();
@@ -312,7 +312,7 @@ public class VariableTracker {
 		}
 		else {
 			throw new UnsupportedConstructionException("getPreviousSibling - parent:" 
-				+ parent.getClass()	+ ", node: " + node.getClass());
+				+ node.getClass()	+ ", node: " + limit.getClass());
 		}
 	}
 	
@@ -328,25 +328,54 @@ public class VariableTracker {
 			|| node instanceof ThisExpression;
 	}
 	
+	private static NameUsage getLastUsageInChildrenBefore(IVariableBinding var, 
+			ASTNode parent, ASTNode limit) {
+		ASTNode bookmark = limit;
+		while (true) {
+			ASTNode child = getLastChildBefore(parent, bookmark);
+			if (child == null) {
+				return null;
+			}
+			
+			NameUsage usage = getLastUsageInBefore(var, child, null);
+			if (usage != null) {
+				if (isLoopStatement(child)) {
+					// include also usage before loop because loop may not execute
+					return new NameUsageChoice(usage, getUsageBefore(var, child));
+				}
+				return usage;
+			}
+			else {
+				bookmark = child;
+			}
+		}
+	}
+	
 	private static NameUsage getLastUsageIn(IVariableBinding var, ASTNode node) {
+		return getLastUsageInBefore(var, node, null);
+	}
+	
+	private static NameUsage getLastUsageInBefore(IVariableBinding var, ASTNode node, ASTNode limit) {
 		if (isSimpleNode(node)) {
 			return null;			
 		}
-		// first search among children
-		
-		
+
+		// first search among children (if it has children)
+		NameUsage usage = getLastUsageInChildrenBefore(var, node, limit); 
+		if (usage != null) {
+			return usage;
+		}		
 	    else if (node instanceof Assignment) {
 			Assignment ass = (Assignment)node;
-			// TODO first check into RHS
 			if (ASTUtil.sameBinding(ass.getLeftHandSide(), var)) {
 				return new NameAssignment(ass.getOperator(), ass.getRightHandSide());
 			}
 			else {
-				return getLastUsageIn(var, ass.getRightHandSide());
+				return null;
 			}
 		}
 	    else if (node instanceof VariableDeclarationStatement) {
-	    	return getUsageBefore(var, node);
+	    	throw new UnsupportedStringOpEx("VariableDeclarationStatement");
 	    }
 		else if (node instanceof IfStatement) {
 			IfStatement ifStmt = (IfStatement)node;
@@ -384,19 +413,16 @@ public class VariableTracker {
 	}
 	
 	private static NameUsage getUsageBefore(IVariableBinding var, ASTNode node) {
-		ASTNode sibling = node;
-		while ((sibling = getPreviousSibling(sibling)) != null) {
-			NameUsage usage = getLastUsageIn(var, sibling);
-			if (usage != null) {
-				if (isLoopStatement(sibling)) {
-					// include also usage before loop because loop may not execute
-					return new NameUsageChoice(usage, getUsageBefore(var, sibling));
-				}
-				return usage;
-			}
-		}
-		// no usage in siblings, go up
+		
 		ASTNode parent = node.getParent();
+				
+		// first check it's siblings
+		NameUsage usage = getLastUsageInChildrenBefore(var, parent, node);
+		if (usage != null) {
+			return usage;
+		}
+		
+		// no usage in siblings, go search in parent
 		if (parent instanceof MethodDeclaration) {
 			throw new UnsupportedStringOpEx("ParameterUsage");
 			// TODO parameters
