@@ -1,5 +1,7 @@
 package ee.stacc.productivity.edsl.tracker;
 
+import java.lang.reflect.Modifier;
+
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Annotation;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -13,6 +15,7 @@ import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
+import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
@@ -36,7 +39,11 @@ import ee.stacc.productivity.edsl.crawler.UnsupportedStringOpEx;
 
 public class VarTrack {
 	public static NameUsage getLastMod(Name name) {
-		return getLastReachingMod((IVariableBinding)name.resolveBinding(), name);
+		IVariableBinding var = (IVariableBinding)name.resolveBinding();
+		if (var.isField() && (var.getModifiers() & Modifier.FINAL) == 0) {
+			throw new UnsupportedStringOpEx("Non-final fields are not supported");
+		}
+		return getLastReachingMod(var, name);
 	}
 	
 	private static NameUsage getLastReachingMod(IVariableBinding var, ASTNode target) {
@@ -72,6 +79,9 @@ public class VarTrack {
 		else if (scope instanceof Block) {
 			return getLastReachingModInBlock(var, target, (Block)scope);
 		}
+		else if (scope instanceof InfixExpression) {
+			return getLastReachingModInInfix(var, target, (InfixExpression)scope);
+		}
 		else if (scope instanceof ExpressionStatement) {
 			if (target == null) {
 				return getLastModIn(var, ((ExpressionStatement)scope).getExpression());
@@ -81,13 +91,52 @@ public class VarTrack {
 				return null;
 			}
 		}
-		/*
 		else if (isLoopStatement(scope)) {
-			return getLastModIn(var, getLoopBody(scope));
+			return getLastReachingModInLoop(var, target, (Statement)scope);
 		}
-		*/
 		else {
 			throw new UnsupportedStringOpEx("getLastReachingModIn " + scope.getClass());
+		}
+	}
+
+	private static NameUsage getLastReachingModInInfix(IVariableBinding var,
+			ASTNode target, InfixExpression inf) {
+		int opIdx;
+		if (target == null) {
+			opIdx = inf.extendedOperands().size()-1;
+		} 
+		else {
+			opIdx = inf.extendedOperands().indexOf(target)-1;
+		}
+		for (int i = opIdx; i >= 0; i--) {
+			NameUsage usage = getLastModIn(var, (Expression)inf.extendedOperands().get(i));
+			if (usage != null) {
+				return usage;
+			}
+		}
+		if (target == null || opIdx > -1) {
+			NameUsage usage = getLastModIn(var, inf.getRightOperand());
+			if (usage != null) {
+				return usage;
+			}
+		}
+		if (target == null) {
+			NameUsage usage = getLastModIn(var, inf.getLeftOperand());
+			if (usage != null) {
+				return usage;
+			}
+		}
+		return null;
+	}
+
+	private static NameUsage getLastReachingModInLoop(IVariableBinding var,
+			ASTNode target, Statement loop) {
+		if (target == getLoopBody(loop)) {
+			// FIXME check also loop header
+			return null;
+		}
+		else {
+			return getLastModIn(var, getLoopBody(loop));
 		}
 	}
 

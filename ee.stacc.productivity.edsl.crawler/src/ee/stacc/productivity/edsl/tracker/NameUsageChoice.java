@@ -3,13 +3,21 @@ package ee.stacc.productivity.edsl.tracker;
 import java.util.List;
 
 public class NameUsageChoice extends NameUsage {
-
+	private NameUsage thenUsage;
+	private NameUsage elseUsage;
+	
 	public NameUsageChoice(NameUsage thenUsage, NameUsage elseUsage) {
-		// TODO Auto-generated constructor stub
+		this.thenUsage = thenUsage;
+		this.elseUsage = elseUsage;
 	}
 	
-	public List<NameUsage> getChoices() {
-		return null;
+	public NameUsage getElseUsage() {
+		return elseUsage;
 	}
+	
+	public NameUsage getThenUsage() {
+		return thenUsage;
+	}
+	
 
 }

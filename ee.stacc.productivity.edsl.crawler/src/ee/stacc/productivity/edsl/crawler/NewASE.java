@@ -34,7 +34,7 @@ import ee.stacc.productivity.edsl.tracker.NameUsage;
 import ee.stacc.productivity.edsl.tracker.NameUsageChoice;
 import ee.stacc.productivity.edsl.tracker.NameAssignment;
 import ee.stacc.productivity.edsl.tracker.NameUsageLoopChoice;
-import ee.stacc.productivity.edsl.tracker.VariableTracker;
+import ee.stacc.productivity.edsl.tracker.VarTrack;
 
 
 // TODO test Expression.resolveConstantExpressionValue
@@ -89,7 +89,7 @@ public class NewASE {
 			return stringConstant;
 		}
 		else if (node instanceof Name) {
-			NameUsage usage = VariableTracker.getPreviousUsage((Name)node);
+			NameUsage usage = VarTrack.getLastMod((Name)node);
 			return evalNameAfterUsage(usage); 
 		}
 		else if (node instanceof ConditionalExpression) {
@@ -217,11 +217,15 @@ public class NewASE {
 		
 		// can use this evaluator
 		if (usage instanceof NameUsageChoice) {
+			NameUsageChoice uc = (NameUsageChoice)usage;
+			/*
 			List<IAbstractString> stringChoices = new ArrayList<IAbstractString>();
 			for (NameUsage usageItem : ((NameUsageChoice)usage).getChoices()) {
 				stringChoices.add(this.evalNameAfterUsage(usageItem));
 			}
-			return new StringChoice(stringChoices); 
+			*/
+			return new StringChoice(this.evalNameAfterUsage(uc.getThenUsage()),
+					this.evalNameAfterUsage(uc.getElseUsage())); 
 		}
 		else if (usage instanceof NameUsageLoopChoice) {
 			NameUsageLoopChoice loopChoice = (NameUsageLoopChoice)usage;
