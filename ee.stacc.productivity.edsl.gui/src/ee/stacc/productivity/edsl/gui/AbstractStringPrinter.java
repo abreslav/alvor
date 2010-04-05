@@ -15,7 +15,6 @@ import org.eclipse.ui.IEditorPart;
 
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
-import ee.stacc.productivity.edsl.crawler.AbstractStringEvaluator;
 import ee.stacc.productivity.edsl.crawler.NewASE;
 import ee.stacc.productivity.edsl.crawler.NodeSearchEngine;
 

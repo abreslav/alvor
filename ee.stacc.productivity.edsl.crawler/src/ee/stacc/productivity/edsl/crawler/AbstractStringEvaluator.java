@@ -318,8 +318,8 @@ public class AbstractStringEvaluator {
 				return eval(inv);
 			}
 			// if it's passed as argument then track changes to it
-			else if (ASTUtil.getArgumentIndex(inv, var) > -1) {
-				return evalInvocationArgOut(inv, ASTUtil.getArgumentIndex(inv, var));
+			else if (ASTUtil.getArgumentIndex0(inv, var) > -1) {
+				return evalInvocationArgOut(inv, ASTUtil.getArgumentIndex0(inv, var)+1);
 			}
 			else if (ASTUtil.varIsUsedIn(var, inv)) {
 				throw new UnsupportedStringOpEx(
@@ -600,7 +600,7 @@ public class AbstractStringEvaluator {
 					throw new UnsupportedStringOpEx("eval Parameter");
 				}
 				MethodDeclaration method = ASTUtil.getContainingMethodDeclaration(stmt);
-				int paramIndex = ASTUtil.getParamIndex(method, var);
+				int paramIndex = ASTUtil.getParamIndex0(method, var)+1;
 				
 				if (this.invocationContext != null) {
 					// TODO: check that invocation context matches

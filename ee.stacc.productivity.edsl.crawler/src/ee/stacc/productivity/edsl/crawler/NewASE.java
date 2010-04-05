@@ -4,19 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.CharacterLiteral;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
-import org.eclipse.jdt.internal.core.NameLookup;
 
 import ee.stacc.productivity.edsl.string.AbstractStringCollection;
 import ee.stacc.productivity.edsl.string.IAbstractString;
@@ -34,7 +33,7 @@ import ee.stacc.productivity.edsl.tracker.NameUsage;
 import ee.stacc.productivity.edsl.tracker.NameUsageChoice;
 import ee.stacc.productivity.edsl.tracker.NameAssignment;
 import ee.stacc.productivity.edsl.tracker.NameUsageLoopChoice;
-import ee.stacc.productivity.edsl.tracker.VarTrack;
+import ee.stacc.productivity.edsl.tracker.VariableTracker;
 
 
 // TODO test Expression.resolveConstantExpressionValue
@@ -89,7 +88,7 @@ public class NewASE {
 			return stringConstant;
 		}
 		else if (node instanceof Name) {
-			NameUsage usage = VarTrack.getLastMod((Name)node);
+			NameUsage usage = VariableTracker.getLastMod((Name)node);
 			return evalNameAfterUsage(usage); 
 		}
 		else if (node instanceof ConditionalExpression) {
@@ -204,8 +203,12 @@ public class NewASE {
 		throw new IllegalArgumentException();
 	}
 	
-	IAbstractString evalNameAfterUsage(NameUsage usage) {
-		// check, if it's necessary to start new evaluator (entering the loop from below) 
+	private IAbstractString evalNameAfterUsage(NameUsage usage) {
+		
+		assert usage != null;
+		
+		// check, if it's necessary to start new evaluator (entering the loop from below)
+		/* TODO
 		if (usage.getMainStatement() != this.mainBlock
 				// and if usage.mainStmt inside this.mainBlock and it's a loop then 
 				) {
@@ -214,6 +217,8 @@ public class NewASE {
 			newEval.startingPlace = usage;
 			return widenToRegular(newEval.evalNameAfterUsage(usage));
 		}
+		*/
+		
 		
 		// can use this evaluator
 		if (usage instanceof NameUsageChoice) {
@@ -230,6 +235,9 @@ public class NewASE {
 		else if (usage instanceof NameUsageLoopChoice) {
 			NameUsageLoopChoice loopChoice = (NameUsageLoopChoice)usage;
 			
+			IAbstractString baseString = evalNameAfterUsage(loopChoice.getBaseUsage());
+			return new RecursiveStringChoice(baseString, null); // null means outermost string TODO too ugly
+			/*
 			if (loopChoice.getLoopUsage() == this.startingPlace) {
 				IAbstractString baseString = evalNameAfterUsage(loopChoice.getBaseUsage());
 				return new RecursiveStringChoice(baseString, null); // null means outermost string TODO too ugly
@@ -237,9 +245,20 @@ public class NewASE {
 			else {
 				throw new UnsupportedStringOpEx("NameUsageLoopChoice weird case");
 			}
+			*/
 		}
 		else if (usage instanceof NameAssignment) {
-			return eval(((NameAssignment) usage).getValueExpression());
+			NameAssignment ass = (NameAssignment)usage;
+			if (ass.getOperator() == Assignment.Operator.ASSIGN) {
+				return eval(ass.getRightHandSide());
+			}
+			else if (ass.getOperator() == Assignment.Operator.PLUS_ASSIGN) {
+				return new StringSequence(eval(ass.getName()),
+						eval(ass.getRightHandSide()));
+			}
+			else {
+				throw new UnsupportedStringOpEx("Unknown assignment operator: " + ass.getOperator());
+			}
 		}
 		else if (usage instanceof NameInParameter) {
 			return new StringParameter(((NameInParameter)usage).getIndex());

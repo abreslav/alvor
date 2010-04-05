@@ -37,5 +37,10 @@ public class RecursiveStringChoice implements IAbstractString {
 	public boolean isEmpty() {
 		throw new UnsupportedOperationException();
 	}
+	
+	@Override
+	public String toString() {
+		return "<<<" + base.toString() + ">>>";
+	}
 
 }
