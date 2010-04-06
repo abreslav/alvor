@@ -4,18 +4,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.CharacterLiteral;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
+import org.eclipse.jdt.core.dom.ReturnStatement;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
+import org.eclipse.jdt.core.dom.TagElement;
 
 import ee.stacc.productivity.edsl.string.AbstractStringCollection;
 import ee.stacc.productivity.edsl.string.IAbstractString;
@@ -26,6 +32,7 @@ import ee.stacc.productivity.edsl.string.StringParameter;
 import ee.stacc.productivity.edsl.string.StringRandomInteger;
 import ee.stacc.productivity.edsl.string.StringRepetition;
 import ee.stacc.productivity.edsl.string.StringSequence;
+import ee.stacc.productivity.edsl.string.util.ArgumentApplier;
 import ee.stacc.productivity.edsl.tracker.NameInArgument;
 import ee.stacc.productivity.edsl.tracker.NameInParameter;
 import ee.stacc.productivity.edsl.tracker.NameMethodCall;
@@ -49,6 +56,7 @@ public class NewASE {
 	
 	private NameUsage startingPlace;
 	private Statement mainBlock;
+	private static final String RESULT_FOR_SQL_CHECKER = "@ResultForSQLChecker";
 	
 	private NewASE(int level, MethodInvocation invocationContext, IJavaElement scope) {
 		
@@ -115,13 +123,148 @@ public class NewASE {
 	}
 
 	private IAbstractString evalInvocationResult(MethodInvocation inv) {
-		// get all possible methods
-		// get parameterised abs-string for each
-		// apply arguments to each
-		// return choice
-		return null;
+		if (inv.getExpression() != null
+				&& isStringBuilderOrBuffer(inv.getExpression().resolveTypeBinding())) {
+			if (inv.getName().getIdentifier().equals("toString")) {
+				return eval(inv.getExpression());
+			}
+			else if (inv.getName().getIdentifier().equals("append")) {
+				return new StringSequence(
+						PositionUtil.getPosition(inv), 
+						eval(inv.getExpression()),
+						eval((Expression)inv.arguments().get(0)));
+			}
+			else {
+				throw new UnsupportedStringOpEx("StringBuilder/Buffer, method=" 
+						+ inv.getName().getIdentifier(),
+						PositionUtil.getPosition(inv)); 
+			}
+		}
+		else  {
+			return evalInvocationResultOrArgOut(inv, -1);
+		}			
+	}
+	
+	/**
+	 * 
+	 * @param inv 
+	 * @param argumentIndex -1 means return value
+	 * @return
+	 */
+	private IAbstractString evalInvocationResultOrArgOut(MethodInvocation inv,
+			int argumentIndex) {
+		if (! supportInvocations) {
+			throw new UnsupportedStringOpEx("Method call");
+		}
+
+		List<MethodDeclaration> decls = NodeSearchEngine.findMethodDeclarations(scope, inv);
+		
+		if (decls.size() == 0) {
+			throw new UnsupportedStringOpEx("Possible problem, no declarations found for: " + inv.toString());
+		}
+		else {
+			// evaluate argumets
+			List<IAbstractString> arguments = new ArrayList<IAbstractString>();
+			for (Object item : inv.arguments()) {
+				Expression arg = (Expression)item;
+				ITypeBinding typ = arg.resolveTypeBinding();
+				if (isString(typ) || isStringBuilderOrBuffer(typ)) {
+					arguments.add(eval(arg));
+				}
+				else {
+					arguments.add(null);
+				}
+			}
+			
+			// evaluate method bodies and apply arguments
+			List<IAbstractString> choices = new ArrayList<IAbstractString>();
+			for (MethodDeclaration decl: decls) {
+				IAbstractString methodString;
+				if (argumentIndex == -1) {
+					methodString = getMethodReturnValue(decl);
+				}
+				else {
+					methodString = getMethodArgOutValue(decl, argumentIndex);
+				}
+				System.out.println("METHOD STRING: " + methodString);
+				choices.add(ArgumentApplier.applyArguments(methodString, arguments));
+			}
+			
+			// return single result or list
+			if (choices.size() == 1) {
+				return choices.get(0);
+			}
+			else {
+				return new StringChoice(PositionUtil.getPosition(inv), choices);
+			}
+		}
 	}
 
+	IAbstractString getMethodReturnValue(MethodDeclaration decl) {
+		// if it has @ResultForSQLChecker in JAVADOC then return this
+		IAbstractString javadocResult = getMethodReturnValueFromJavadoc(decl);
+		if (javadocResult != null) {
+			return javadocResult;
+		}
+		
+		assert decl != null;
+		
+		// find all return statements
+		final List<ReturnStatement> returnStmts = new ArrayList<ReturnStatement>();
+		ASTVisitor visitor = new ASTVisitor() {
+			@Override
+			public boolean visit(ReturnStatement node) {
+				returnStmts.add(node);
+				return true;
+			}
+		};
+		decl.accept(visitor);
+		
+		// get choice out of different return expressions
+		
+		List<IAbstractString> options = new ArrayList<IAbstractString>();
+		for (ReturnStatement ret: returnStmts) {
+			options.add(eval(ret.getExpression()));
+		}
+		return new StringChoice(PositionUtil.getPosition(decl), options);
+	}
+
+	private IAbstractString getMethodArgOutValue(MethodDeclaration decl,
+			int argumentIndex) {
+		// TODO: at first look for javadoc annotation for this arg
+		Name paramName = 
+			((SingleVariableDeclaration)decl.parameters().get(argumentIndex-1)).getName();
+		
+		NameUsage lastMod = VariableTracker.getLastModIn(
+				(IVariableBinding)paramName.resolveBinding(), decl);
+
+		// lastMod may be NameInParameter, then StringParameter is returned
+		return evalNameAfterUsage(lastMod);
+	}
+
+	private IAbstractString getMethodReturnValueFromJavadoc(MethodDeclaration decl) {
+		// TODO: allow also specifying result as regex
+		
+		if (decl.getJavadoc() == null) {
+			return null;
+		}
+		TagElement tag = ASTUtil.getJavadocTag(decl.getJavadoc(), RESULT_FOR_SQL_CHECKER);
+		
+		if (tag != null) {
+			String tagText = ASTUtil.getTagElementText(tag);
+			if (tagText == null) {
+				throw new UnsupportedStringOpEx("Problem reading " + RESULT_FOR_SQL_CHECKER);
+			} else {
+				//return new StringConstant(tagText);
+				return new StringConstant(PositionUtil.getPosition(tag), 
+						tagText, '"'+tagText+'"');
+			}
+		}
+		else {
+			return null;
+		}
+	}
+	
 	private IAbstractString evalClassInstanceCreation(ClassInstanceCreation node) {
 		assert (isStringBuilderOrBuffer(node.resolveTypeBinding()));
 		if (node.arguments().size() == 1) {
@@ -167,6 +310,10 @@ public class NewASE {
 	private static boolean isStringBuilderOrBuffer(ITypeBinding typeBinding) {
 		return typeBinding.getQualifiedName().equals("java.lang.StringBuffer")
 		|| typeBinding.getQualifiedName().equals("java.lang.StringBuilder");
+	}
+	
+	private static boolean isString(ITypeBinding typeBinding) {
+		return typeBinding.getQualifiedName().equals("java.lang.String");
 	}
 	
 	IAbstractString widenToRegular(IAbstractString str) {
@@ -274,6 +421,14 @@ public class NewASE {
 		else if (usage instanceof NameMethodCall) {
 			// get abstract representation of return value of the method
 			// apply this to real arguments and return
+			NameMethodCall call = (NameMethodCall)usage;
+			/*
+			if (isString(call.getObject().resolveTypeBinding())) {
+				// the call is not modifying object
+				evalNameAfterUsage(VariableTracker.getLastReachingMod
+						(call.getObject().resolveBinding(), call.getInv()));
+			}
+			*/
 			throw new UnsupportedStringOpEx("NameMethodCall");
 		}
 		else {

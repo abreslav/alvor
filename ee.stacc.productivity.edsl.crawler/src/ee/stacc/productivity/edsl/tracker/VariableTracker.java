@@ -21,6 +21,7 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.NullLiteral;
 import org.eclipse.jdt.core.dom.NumberLiteral;
+import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.ThisExpression;
@@ -52,7 +53,7 @@ public class VariableTracker {
 	 * @param target The node that gonna be affected by the Mod
 	 * @return
 	 */
-	private static NameUsage getLastReachingMod(IVariableBinding var, ASTNode target) {
+	public static NameUsage getLastReachingMod(IVariableBinding var, ASTNode target) {
 		assert target != null;
 		
 		ASTNode parent = target.getParent();
@@ -65,7 +66,7 @@ public class VariableTracker {
 		}
 	}
 	
-	private static NameUsage getLastModIn(IVariableBinding var, ASTNode scope) {
+	public static NameUsage getLastModIn(IVariableBinding var, ASTNode scope) {
 		return getLastReachingModIn(var, null, scope);
 	}
 	
@@ -94,6 +95,9 @@ public class VariableTracker {
 		else if (scope instanceof InfixExpression) {
 			return getLastReachingModInInfix(var, target, (InfixExpression)scope);
 		}
+		else if (scope instanceof ReturnStatement) {
+			return getLastReachingModInReturn(var, target, (ReturnStatement)scope);
+		}
 		else if (scope instanceof ExpressionStatement) {
 			if (target == null) {
 				return getLastModIn(var, ((ExpressionStatement)scope).getExpression());
@@ -108,6 +112,16 @@ public class VariableTracker {
 		}
 		else {
 			throw new UnsupportedStringOpEx("getLastReachingModIn " + scope.getClass());
+		}
+	}
+
+	private static NameUsage getLastReachingModInReturn(IVariableBinding var,
+			ASTNode target, ReturnStatement ret) {
+		if (target == null) {
+			return getLastReachingMod(var, ret.getExpression());
+		}
+		else {
+			return null;
 		}
 	}
 
@@ -199,11 +213,19 @@ public class VariableTracker {
 
 	private static NameUsage getLastReachingModInInv(IVariableBinding var,
 			ASTNode target, MethodInvocation inv) {
-		if (target == null) {
-			// TODO check the effect of method call
-			throw new UnsupportedStringOpEx("method call");
+		
+		if (target == null) { // check the effect of method call
+			Expression exp = inv.getExpression();
+			if (exp instanceof Name	&& ASTUtil.sameBinding(exp, var)) {
+				return new NameMethodCall(inv, (Name)exp);
+			}
+			// TODO check also for var in argument positions
+			
+			throw new UnsupportedStringOpEx("Unknown effect of method call ("
+					+ inv +	") to var (" + var.getName() + ")");
 		}
 		
+		// check the effect of evaluating arguments (and TODO method expression)
 		int argIdx; // last argument expression that can affect target
 		if (target == null) { // all arguments are of interest
 			argIdx = inv.arguments().size()-1;
