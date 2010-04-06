@@ -1,15 +1,20 @@
 package ee.stacc.productivity.edsl.cache;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import ee.stacc.productivity.edsl.common.logging.ILog;
+import ee.stacc.productivity.edsl.common.logging.Logs;
+
 public class CreateDBHSQL {
+
+	private static final ILog LOG = Logs.getLog(CreateDBHSQL.class);
+	
 	public static void main(String[] args) {
 	    try {
 	        Class.forName("org.hsqldb.jdbc.JDBCDriver" );
@@ -21,11 +26,25 @@ public class CreateDBHSQL {
 
 	    Connection conn = null;
 		try {
-			conn = DriverManager.getConnection("jdbc:hsqldb:file:cache;shutdown=true", "SA", "");
-			
+			runScript(conn);
+		} finally {
+	    	if (conn != null) {
+	    		try {
+					conn.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+	    	}
+	    }
+	    
+	}
+
+	public static void runScript(Connection conn) {
+		try {
+			LOG.message("DB creation started");
 			PreparedStatement commit = conn.prepareStatement("COMMIT");
 			
-			FileReader fileReader = new FileReader(new File("db/cache.sql"));
+			Reader fileReader = new InputStreamReader(CreateDBHSQL.class.getClassLoader().getResourceAsStream("cache_hsqldb.sql"));
 			StringBuilder builder = new StringBuilder();
 			int c;
 			while ((c = fileReader.read()) != -1) {
@@ -39,27 +58,17 @@ public class CreateDBHSQL {
 					conn.prepareStatement(string).execute();
 					commit.execute();
 				} catch (SQLException e) {
-					System.out.println("Failed to run \"" + string + "\", " + e.getMessage());
+					LOG.error("Failed to run \"" + string + "\", " + e.getMessage());
 				}
 			}
 
-			System.out.println("Done");
+			LOG.message("DB creation done");
 	    } catch (SQLException e) {
-	    	e.printStackTrace();
+	    	LOG.exception(e);
 	    } catch (FileNotFoundException e) {
-			e.printStackTrace();
+	    	LOG.exception(e);
 		} catch (IOException e) {
-			e.printStackTrace();
-		} finally { 
-	    	if (conn != null) {
-	    		try {
-					conn.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-	    	}
-	    }
-		
-	    
+			LOG.exception(e);
+		}
 	}
 }

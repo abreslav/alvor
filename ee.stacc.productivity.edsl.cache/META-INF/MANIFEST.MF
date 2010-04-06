@@ -9,7 +9,8 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: library.jar,
  .,
- lib/hsqldb.jar
+ lib/hsqldb.jar,
+ db/
 Export-Package: ee.stacc.productivity.edsl.cache
-Bundle-Activator: ee.stacc.productivity.edsl.cache.Activator
+Bundle-Activator: ee.stacc.productivity.edsl.cache.EDSLCachePlugin
 Bundle-ActivationPolicy: lazy

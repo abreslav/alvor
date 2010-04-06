@@ -4,7 +4,6 @@
 package ee.stacc.productivity.edsl.cache;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -104,19 +103,18 @@ public final class CacheServiceImpl implements ICacheService {
 		
 	}
 	
+	private final IDBLayer dbLayer;
 	private final DBQueries queries;
 	private final Connection connection;
 	private final IScopedCache<IHotspotPattern, IPosition> usageCache = new UsageCache();	
 
 	boolean nocache = false;
 	
-	public CacheServiceImpl() {
+	public CacheServiceImpl(IDBLayer dbLayer) {
+		this.dbLayer = dbLayer; 
 	    try {
-//	        Class.forName("org.apache.derby.jdbc.EmbeddedDriver" );
-//	        connection = DriverManager.getConnection("jdbc:derby:directory:/media/data/work/STACC/cache_ws/ee.stacc.productivity.edsl.cache/test", "SA", "");
-	        Class.forName("org.hsqldb.jdbc.JDBCDriver" );
-	        connection = DriverManager.getConnection("jdbc:hsqldb:file:C:/edslws/ee.stacc.productivity.edsl.cache/cache;shutdown=true;ifExists=true", "SA", "");
-
+	        connection = dbLayer.connect();
+	        
 	        queries = new DBQueries();
 	        
 	    } catch (Exception e) { // Yes, we catch Exception here. But it is immediately rethrown inside an ISE
@@ -132,15 +130,7 @@ public final class CacheServiceImpl implements ICacheService {
 
 	public void shutdown() {
 		try {
-			connection.close();
-
-//			try {
-//				DriverManager.getConnection("jdbc:derby:;shutdown=true");
-//			} catch (SQLException e) {
-//				if (!"XJ015".equals(e.getSQLState())) {
-//					throw e;
-//				}
-//			}
+			dbLayer.shutdown();
 		} catch (SQLException e) {
 			LOG.exception(e);
 			throw new IllegalStateException(e);
