@@ -42,10 +42,16 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		LOG.message("CheckProjectHandler.execute");
 		IJavaElement selectedJavaElement = getSelectedJavaElement();
-		cleanMarkers(selectedJavaElement);
+		performCheck(selectedJavaElement, new IJavaElement[] {selectedJavaElement});
+		return null; // Must be null
+	}
+
+	public void performCheck(IJavaElement optionsFrom, IJavaElement[] scope)
+			throws ExecutionException {
+		cleanMarkers(scope);
 		try {
-			Map<String, Object> options = OptionLoader.getElementSqlCheckerProperties(selectedJavaElement);
-			List<INodeDescriptor> hotspots = projectChecker.findHotspots(selectedJavaElement, options);
+			Map<String, Object> options = OptionLoader.getElementSqlCheckerProperties(optionsFrom);
+			List<INodeDescriptor> hotspots = projectChecker.findHotspots(scope, options);
 			markHotspots(hotspots);
 			
 			projectChecker.processHotspots(hotspots, this,
@@ -56,7 +62,6 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 			LOG.exception(e);
 			throw new ExecutionException("Error during checking: " + e.getMessage(), e);
 		}
-		return null; // Must be null
 	}
 	
 	/*
@@ -78,11 +83,13 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 		throw new IllegalStateException("No Java element selected");
 	}
 
-	private void cleanMarkers(IJavaElement scope) {
+	private void cleanMarkers(IJavaElement[] scope) {
 		try {
-			scope.getResource().deleteMarkers(ERROR_MARKER_ID, true, IResource.DEPTH_INFINITE);
-			scope.getResource().deleteMarkers(WARNING_MARKER_ID, true, IResource.DEPTH_INFINITE);
-			scope.getResource().deleteMarkers(HOTSPOT_MARKER_ID, true, IResource.DEPTH_INFINITE);
+			for (IJavaElement element : scope) {
+				element.getResource().deleteMarkers(ERROR_MARKER_ID, true, IResource.DEPTH_INFINITE);
+				element.getResource().deleteMarkers(WARNING_MARKER_ID, true, IResource.DEPTH_INFINITE);
+				element.getResource().deleteMarkers(HOTSPOT_MARKER_ID, true, IResource.DEPTH_INFINITE);
+			}
 		} catch (Exception e) {
 			LOG.exception(e);
 		}

@@ -9,5 +9,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/ee.stacc.productivity.edsl.sqlparser"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ee.stacc.productivity.edsl.checkers.sqlstatic"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ee.stacc.productivity.edsl.checkers"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/ee.stacc.productivity.edsl.common"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

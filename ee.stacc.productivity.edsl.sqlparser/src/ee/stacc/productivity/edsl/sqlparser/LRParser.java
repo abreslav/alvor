@@ -309,16 +309,16 @@ public class LRParser {
 		Set<IAbstractStack> result = new HashSet<IAbstractStack>();
 		while (!queue.isEmpty()) {
 			IAbstractStack currenStack = queue.poll();
-			println(currenStack);
+//			println(currenStack);
 			IParserState currentState = currenStack.top();
 			if (currentState.isTerminating()) {
 				result.add(currenStack);
 				continue;
 			}
 			IAction action = currentState.getAction(symbolNumber);
-			println(action);
+//			println(action);
 			Set<IAbstractStack> newStacks = action.process(token, currenStack);
-			println("new stacks: " + newStacks);
+//			println("new stacks: " + newStacks);
 			if (action.consumes()) {
 				result.addAll(newStacks);
 			} else {

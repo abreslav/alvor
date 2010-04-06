@@ -30,8 +30,8 @@ import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
+import ee.stacc.productivity.edsl.cache.UnsupportedStringOpEx;
 import ee.stacc.productivity.edsl.crawler.ASTUtil;
-import ee.stacc.productivity.edsl.crawler.UnsupportedStringOpEx;
 
 /*
  * getLastReachingModIn* methods stay in given scope

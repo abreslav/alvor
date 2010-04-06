@@ -31,6 +31,8 @@ public class SQLSyntaxChecker {
 	
 	private SQLSyntaxChecker() {}
 	
+	public long allTime;
+	
 	public List<String> check(IAbstractString str) {
 		if (AsbtractStringUtils.hasLoops(str)) {
 			throw new IllegalArgumentException("The current version does not support loops in abstract strings");
@@ -72,6 +74,7 @@ public class SQLSyntaxChecker {
 	private void checkAutomaton(State asAut, IStackFactory stackFactory, IParseErrorHandler errorHandler) {
 		State sqlTransducer = SQLLexer.SQL_TRANSDUCER;
 		State transduction = AutomataInclusion.INSTANCE.getTrasduction(sqlTransducer, asAut, SQLLexer.SQL_ALPHABET_CONVERTER);
+		long time = System.nanoTime();
 		transduction = EmptyTransitionEliminator.INSTANCE.eliminateEmptySetTransitions(transduction, new IEmptinessExpert() {
 			
 			@Override
@@ -104,6 +107,8 @@ public class SQLSyntaxChecker {
 		};
 		FixpointParser fixpointParser = new FixpointParser(parser, converter, SimpleStackSet.FACTORY, stackFactory, eofTokenIndex, errorHandler);
 		fixpointParser.parse(transduction);
+		time = System.nanoTime() - time;
+		allTime += time;
 	}
 	
 	public boolean parseAutomaton(State initial, IAlphabetConverter alphabetConverter, IStackFactory stackFactory) {

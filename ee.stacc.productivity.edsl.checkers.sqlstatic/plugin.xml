@@ -4,9 +4,6 @@
    <extension
          point="ee.stacc.productivity.edsl.checkers.checkers">
       <checker
-            class="ee.stacc.productivity.edsl.checkers.sqlstatic.LexicalSQLChecker">
-      </checker>
-      <checker
             class="ee.stacc.productivity.edsl.checkers.sqlstatic.SyntacticalSQLChecker">
       </checker>
    </extension>

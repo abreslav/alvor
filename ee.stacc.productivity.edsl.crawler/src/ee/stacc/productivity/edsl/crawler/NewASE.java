@@ -23,6 +23,7 @@ import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.TagElement;
 
+import ee.stacc.productivity.edsl.cache.UnsupportedStringOpEx;
 import ee.stacc.productivity.edsl.string.AbstractStringCollection;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.StringCharacterSet;
@@ -33,12 +34,12 @@ import ee.stacc.productivity.edsl.string.StringRandomInteger;
 import ee.stacc.productivity.edsl.string.StringRepetition;
 import ee.stacc.productivity.edsl.string.StringSequence;
 import ee.stacc.productivity.edsl.string.util.ArgumentApplier;
+import ee.stacc.productivity.edsl.tracker.NameAssignment;
 import ee.stacc.productivity.edsl.tracker.NameInArgument;
 import ee.stacc.productivity.edsl.tracker.NameInParameter;
 import ee.stacc.productivity.edsl.tracker.NameMethodCall;
 import ee.stacc.productivity.edsl.tracker.NameUsage;
 import ee.stacc.productivity.edsl.tracker.NameUsageChoice;
-import ee.stacc.productivity.edsl.tracker.NameAssignment;
 import ee.stacc.productivity.edsl.tracker.NameUsageLoopChoice;
 import ee.stacc.productivity.edsl.tracker.VariableTracker;
 
@@ -157,7 +158,7 @@ public class NewASE {
 			throw new UnsupportedStringOpEx("Method call");
 		}
 
-		List<MethodDeclaration> decls = NodeSearchEngine.findMethodDeclarations(scope, inv);
+		List<MethodDeclaration> decls = NodeSearchEngine.findMethodDeclarations(new IJavaElement[] {scope}, inv);
 		
 		if (decls.size() == 0) {
 			throw new UnsupportedStringOpEx("Possible problem, no declarations found for: " + inv.toString());

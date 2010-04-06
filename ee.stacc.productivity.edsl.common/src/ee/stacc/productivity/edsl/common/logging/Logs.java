@@ -11,6 +11,7 @@ import java.util.Properties;
 import java.util.Map.Entry;
 
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Platform;
 
 public class Logs {
 
@@ -34,7 +35,9 @@ public class Logs {
 				boolean allToOut = "true".equals(allToOutStr);
 				
 				String logRootDirStr = properties.getProperty("$log.root.dir", ".");
-				logRootDirStr = logRootDirStr.replace("$workspace", ResourcesPlugin.getWorkspace().getRoot().getLocation().toPortableString());
+				if (Platform.isRunning()) {
+					logRootDirStr = logRootDirStr.replace("$workspace", ResourcesPlugin.getWorkspace().getRoot().getLocation().toPortableString());
+				}
 				File logRootDir = new File(logRootDirStr);
 				
 				Map<String, ILog> createdLogs = new HashMap<String, ILog>();

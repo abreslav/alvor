@@ -1,14 +1,15 @@
 package ee.stacc.productivity.edsl.crawler;
 
-import org.eclipse.jdt.core.dom.ASTNode;
+import ee.stacc.productivity.edsl.string.IPosition;
 
 public class UnsupportedNodeDescriptor extends NodeDescriptor {
 	private String problemMessage;
-	public UnsupportedNodeDescriptor(ASTNode node, int lineNumber, String problemMessage) {
-		super(node, lineNumber);
+	
+	public UnsupportedNodeDescriptor(IPosition position, String problemMessage) {
+		super(position);
 		this.problemMessage = problemMessage;
 	}
-	
+
 	public String getProblemMessage() {
 		return problemMessage;
 	}

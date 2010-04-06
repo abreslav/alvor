@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         id="esqlBuilder"
+         name="Embedded SQL Checker"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            callOnEmptyDelta="false"
+            hasNature="true">
+         <run
+               class="ee.stacc.productivity.edsl.javaproject.builder.ESQLBuilder">
+         </run>
+      </builder>
+   </extension>
+   <extension
+         id="esqlNature"
+         name="Embedded SQL Nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="ee.stacc.productivity.edsl.javaproject.builder.ESQLNature">
+         </run>
+      </runtime>
+      <builder
+            id="ee.stacc.productivity.edsl.javaproject.esqlBuilder">
+      </builder>
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="true"
+            objectClass="org.eclipse.core.resources.IProject"
+            nameFilter="*"
+            id="ee.stacc.productivity.edsl.javaproject.contribution1">
+         <action
+               label="Add/Remove ESQL Nature"
+               class="ee.stacc.productivity.edsl.javaproject.builder.ToggleNatureAction"
+               menubarPath="additions"
+               enablesFor="+"
+               id="ee.stacc.productivity.edsl.javaproject.addRemoveNatureAction">
+         </action>
+      </objectContribution>
+   </extension>
+
+</plugin>

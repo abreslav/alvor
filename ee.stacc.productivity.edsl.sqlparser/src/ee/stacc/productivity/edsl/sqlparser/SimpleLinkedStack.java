@@ -71,7 +71,7 @@ public final class SimpleLinkedStack implements IAbstractStack {
 		this.top = top;
 	}
 
-	/*package*/ SimpleLinkedStack(IParserState state) {
+	private SimpleLinkedStack(IParserState state) {
 		this(new StackEntry(null, state));
 	}
 	

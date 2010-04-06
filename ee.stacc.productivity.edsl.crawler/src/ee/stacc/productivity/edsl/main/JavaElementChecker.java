@@ -17,6 +17,7 @@ import ee.stacc.productivity.edsl.crawler.AbstractStringEvaluator;
 import ee.stacc.productivity.edsl.crawler.NodeRequest;
 import ee.stacc.productivity.edsl.crawler.NodeSearchEngine;
 import ee.stacc.productivity.edsl.crawler.UnsupportedNodeDescriptor;
+import ee.stacc.productivity.edsl.string.IPosition;
 
 /**
  * This is main class
@@ -41,7 +42,7 @@ public class JavaElementChecker {
 	 * (or markers for unsupported cases)  
 	 * TODO rename?
 	 */
-	public List<INodeDescriptor> findHotspots(IJavaElement scope, Map<String, Object> options) {
+	public List<INodeDescriptor> findHotspots(IJavaElement[] scope, Map<String, Object> options) {
 		List<NodeRequest> requests = parseNodeRequests(options);
 		if (requests.isEmpty()) {
 			throw new IllegalArgumentException("No hotspots found");
@@ -87,6 +88,12 @@ public class JavaElementChecker {
 		for (IAbstractStringChecker checker : checkers) {
 			checker.checkAbstractStrings(hotspots, errorHandler, options);
 		}
+	}
+	
+	public void recheckHotspot(IPosition position, ISQLErrorHandler errorHandler, 
+			List<IAbstractStringChecker> checkers, 
+			Map<String, Object> options) {
+//		AbstractStringEvaluator.evaluateExpression(null)
 	}
 	
 	private List<NodeRequest> parseNodeRequests(Map<String, Object> options) {

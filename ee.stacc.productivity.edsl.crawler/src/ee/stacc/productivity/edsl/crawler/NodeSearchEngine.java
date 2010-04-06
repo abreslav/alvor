@@ -4,14 +4,21 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -29,8 +36,11 @@ import org.eclipse.jdt.core.search.SearchParticipant;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
 
+import ee.stacc.productivity.edsl.cache.CacheService;
+import ee.stacc.productivity.edsl.cache.ICacheService;
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
+import ee.stacc.productivity.edsl.string.IPosition;
 
 /**
  * Implements some Java searches + Node searches required by AbstractStringEvaluator
@@ -40,6 +50,17 @@ import ee.stacc.productivity.edsl.common.logging.Logs;
 public class NodeSearchEngine {
 	private static final ILog LOG = Logs.getLog(NodeSearchEngine.class);
 	
+	private static final CachedSearcher<NodeRequest, IPosition> ARGUMENT_NODES_SEARCHER = new CachedSearcher<NodeRequest, IPosition>() {
+
+		@Override
+		protected void performSearchInScope(List<IJavaElement> scopeToSearchIn,
+				NodeRequest key, List<? super IPosition> values) {
+			NodeSearchEngine.performSearchInScope(key, scopeToSearchIn, values);
+			
+		}
+
+	};
+	
 	private static Map<ICompilationUnit, ASTNode> astCache = 
 		new HashMap<ICompilationUnit, ASTNode>();
 	
@@ -47,35 +68,66 @@ public class NodeSearchEngine {
 		astCache.clear();
 	}
 	
-	public static List<NodeDescriptor> findArgumentNodes(IJavaElement searchScope, final Collection<NodeRequest> requests) {
+	public static List<IPosition> findArgumentNodes(IJavaElement[] scope, final Collection<NodeRequest> requests) {
 		// No requests -- no results
 		if (requests.isEmpty()) {
 			return Collections.emptyList();
 		}
 		
 		//LOG.message("SEARCH SCOPE: " + searchScope);
-		
-		final List<NodeDescriptor> result = new ArrayList<NodeDescriptor>();
 
-		// Create one big pattern from all the requests
-		// NB: This is likely to be faster than searching for each request separately,
-		//     but we have to confirm this by and experiment
-		SearchPattern pattern = null;
+		final ICacheService cacheService = CacheService.getCacheService();
+		final List<IFile> allFilesInScope = getAllFilesInScope(scope);
+
+		final List<IPosition> result = new ArrayList<IPosition>();
 		for (NodeRequest nodeRequest : requests) {
-			SearchPattern subPattern = SearchPattern.createPattern(nodeRequest.getPatternString(), 
-					IJavaSearchConstants.METHOD, IJavaSearchConstants.REFERENCES, 
-					SearchPattern.R_ERASURE_MATCH | SearchPattern.R_CASE_SENSITIVE);
-			if (pattern == null) {
-				pattern = subPattern;
-			} else {
-				pattern = SearchPattern.createOrPattern(pattern, subPattern);
+			LOG.message("Request " + nodeRequest);
+			
+			ARGUMENT_NODES_SEARCHER.performCachedSearch(
+					allFilesInScope, 
+					cacheService.getHotspotCache(), 
+					nodeRequest, result);
+		}
+		return result;
+	}
+
+	/*package*/ static List<IFile> getAllFilesInScope(IJavaElement[] searchScope) {
+		final List<IFile> allFilesInScope = new ArrayList<IFile>();
+		IResourceVisitor visitor = new IResourceVisitor() {
+			@Override
+			public boolean visit(IResource resource) throws CoreException {
+				if (resource.isPhantom() || resource.isHidden() || resource.isTeamPrivateMember()) {
+					return false;
+				}
+				if (resource.getType() == IResource.FILE) {
+					allFilesInScope.add((IFile) resource);
+				}
+				return true;
+			}
+		};
+		for (IJavaElement scopeElement : searchScope) {
+			IResource resource = scopeElement.getResource();
+			try {
+				resource.accept(visitor);
+			} catch (CoreException e) {
+				LOG.exception(e);
+				e.printStackTrace();
 			}
 		}
+		
+		return allFilesInScope;
+	}
+
+	private static void performSearchInScope(
+			final NodeRequest nodeRequest, List<IJavaElement> scopeToSearchIn,
+			final List<? super IPosition> result) {
+		SearchPattern pattern = SearchPattern.createPattern(nodeRequest.getPatternString(), 
+				IJavaSearchConstants.METHOD, IJavaSearchConstants.REFERENCES, 
+				SearchPattern.R_ERASURE_MATCH | SearchPattern.R_CASE_SENSITIVE);
 		LOG.message(pattern);
-		
-		IJavaElement[] elems = {searchScope};
+				
+		IJavaElement[] elems = scopeToSearchIn.toArray(new IJavaElement[scopeToSearchIn.size()]);
 		IJavaSearchScope scope = SearchEngine.createJavaSearchScope(elems, IJavaSearchScope.SOURCES);
-		
 		
 		SearchRequestor requestor = new SearchRequestor() {
 			public void acceptSearchMatch(SearchMatch match) {
@@ -105,40 +157,38 @@ public class NodeSearchEngine {
 					methodBinding.getDeclaringClass().getQualifiedName()
 					+ "." + 
 					methodBinding.getMethodDeclaration().getName();
-				int requestedArgumentIndex = -1;
-				for (NodeRequest request : requests) {
-						if (request.signatureMatches(signature)) {
-							requestedArgumentIndex = request.getArgumentIndex();
-							break;
-						}
-				}
+				if (!nodeRequest.signatureMatches(signature)) {
+					LOG.error("Signature does not match: " + methodBinding);
+					return;
+				}					
 				
-				if (requestedArgumentIndex < 0) {
-					System.err.println("No matching request found for method: " + methodBinding);
+				// TODO overloading may complicate things -- no, patterns support complete signatures
+				int requestedArgumentIndex = nodeRequest.getArgumentIndex();
+				if (invoc.arguments().size() < requestedArgumentIndex) {
+					LOG.error("can't find required argument (" + requestedArgumentIndex + "), method="
+							+ methodBinding.getDeclaringClass().getQualifiedName()
+							+ "." + methodBinding.getName());
 					return;
 				}
 				
-				// TODO overloading may complicate things -- no, patterns support complete signatures
-				if (invoc.arguments().size() < requestedArgumentIndex) {
-					throw new UnsupportedStringOpEx("can't find required argument (" + requestedArgumentIndex + "), method="
-							+ methodBinding.getDeclaringClass().getQualifiedName()
-							+ "." + methodBinding.getName());
-				}
-				
+
 				ASTNode arg = (ASTNode) invoc.arguments().get(requestedArgumentIndex - 1);
 				if (arg instanceof Expression) {
-					result.add(new NodeDescriptor((Expression)arg, 
-							ASTUtil.getNodeLineNumber(match, arg)));
+					IPosition position = PositionUtil.getPosition(arg);
+					result.add(position);
+					CacheService.getCacheService().getHotspotCache().add(nodeRequest, position);
+//					CacheService.getCacheService().addHotspot(nodeRequest, position);
 				}
 			}
+
 		};
 		
 		executeSearch(pattern, requestor, scope);
-		return result;
 	}
-	
+
 	private static void executeSearch(SearchPattern pattern, SearchRequestor requestor,
 			IJavaSearchScope scope) {
+		System.out.println("SEARCH");
 		SearchEngine searchEngine = new SearchEngine();
 		try {
 			searchEngine.search(pattern,
@@ -149,7 +199,7 @@ public class NodeSearchEngine {
 		}
 	}
 	
-	public static List<MethodDeclaration> findMethodDeclarations(IJavaElement searchScope, final MethodInvocation inv) {
+	public static List<MethodDeclaration> findMethodDeclarations(IJavaElement[] searchScope, final MethodInvocation inv) {
 		final List<MethodDeclaration> result = new ArrayList<MethodDeclaration>();
 		
 		String patternStr = inv.getName().getIdentifier() + "(";
@@ -171,8 +221,13 @@ public class NodeSearchEngine {
 				IJavaSearchConstants.DECLARATIONS, 
 				SearchPattern.R_EXACT_MATCH);
 		
+		Set<IJavaProject> projects = new HashSet<IJavaProject>();
+		for (IJavaElement element : searchScope) {
+			projects.add(element.getJavaProject());
+		}
+		
 		IJavaSearchScope scope = SearchEngine.createJavaSearchScope(
-				new IJavaElement[]{searchScope}, IJavaSearchScope.SOURCES);		
+				projects.toArray(new IJavaElement[projects.size()]), IJavaSearchScope.SOURCES);		
 		
 		SearchRequestor requestor = new SearchRequestor() {
 			public void acceptSearchMatch(SearchMatch match) {
@@ -189,14 +244,14 @@ public class NodeSearchEngine {
 	}
 	
 	public static VariableDeclarationFragment findFieldDeclarationFragment
-			(IJavaElement searchScope, String qualifiedName) {
+			(IJavaElement[] searchScope, String qualifiedName) {
 		//LOG.message("Searching for: " + qualifiedName);
 		SearchPattern pattern = SearchPattern.createPattern(
 				qualifiedName, IJavaSearchConstants.FIELD, 
 				IJavaSearchConstants.DECLARATIONS, SearchPattern.R_EXACT_MATCH);
 		
 		IJavaSearchScope scope = SearchEngine.createJavaSearchScope(
-				new IJavaElement[]{searchScope}, IJavaSearchScope.SOURCES);		
+				searchScope, IJavaSearchScope.SOURCES);		
 		
 		final List<VariableDeclarationFragment> result = new ArrayList<VariableDeclarationFragment>();
 		SearchRequestor requestor = new SearchRequestor() {
@@ -212,7 +267,18 @@ public class NodeSearchEngine {
 		return result.get(0);
 	}
 	
-	
+	/*package*/ static ASTNode getASTNode(IPosition position) {
+		IFile file = PositionUtil.getFile(position);
+		ICompilationUnit cUnit = JavaCore.createCompilationUnitFrom(file);
+		int start = position.getStart();
+		int length = position.getLength();
+		
+		if (cUnit == null) {
+			System.err.println("Compilation unit is null for the position: " + position);
+		}
+		return getASTNode(cUnit, start, length);
+	}
+
 	private static ICompilationUnit getCompilationUnit(SearchMatch match) {
 		if (match.getElement() instanceof IMember) {
 			return ((IMember)match.getElement()).getCompilationUnit();
@@ -224,10 +290,16 @@ public class NodeSearchEngine {
 	
 	private static ASTNode getASTNode(SearchMatch match) {
 		ICompilationUnit cUnit = getCompilationUnit(match);
+		int start = match.getOffset();
+		int length = match.getLength();
 		
 		if (cUnit == null) {
-			System.err.println("Compilation unit is null for the match: " + match.getElement());
+			System.err.println("Compilation unit is null for the match: " + match);
 		}
+		return getASTNode(cUnit, start, length);
+	}
+
+	private static ASTNode getASTNode(ICompilationUnit cUnit, int start, int length) {
 		assert cUnit != null;
 		
 		ASTNode ast = astCache.get(cUnit);
@@ -239,6 +311,6 @@ public class NodeSearchEngine {
 			ast = parser.createAST(null);
 			astCache.put(cUnit, ast);
 		}
-		return NodeFinder.perform(ast, match.getOffset(), match.getLength());
+		return NodeFinder.perform(ast, start, length);
 	}
 }

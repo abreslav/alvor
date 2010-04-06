@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ForStatement;
+import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -36,11 +37,14 @@ import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
+import ee.stacc.productivity.edsl.cache.CacheService;
+import ee.stacc.productivity.edsl.cache.UnsupportedStringOpEx;
 import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.string.IAbstractString;
+import ee.stacc.productivity.edsl.string.IPosition;
 import ee.stacc.productivity.edsl.string.StringChoice;
 import ee.stacc.productivity.edsl.string.StringConstant;
 import ee.stacc.productivity.edsl.string.StringRandomInteger;
@@ -57,16 +61,16 @@ public class AbstractStringEvaluator {
 	
 	private int level;
 	private MethodInvocation invocationContext;
-	private IJavaElement scope;
+	private IJavaElement[] scope;
 	
 	public static IAbstractString evaluateExpression(Expression node) {
 		AbstractStringEvaluator evaluator = 
-			new AbstractStringEvaluator(0, null, ASTUtil.getNodeProject(node));
+			new AbstractStringEvaluator(0, null, new IJavaElement[] {ASTUtil.getNodeProject(node)});
 		return evaluator.eval(node);
 	}
 	
 	private AbstractStringEvaluator(int level, MethodInvocation invocationContext,
-			IJavaElement scope) {
+			IJavaElement[] scope2) {
 		
 		if (level > maxLevel) {
 			throw new UnsupportedStringOpEx("Analysis level (" + level + ") too deep");
@@ -74,14 +78,20 @@ public class AbstractStringEvaluator {
 		
 		this.level = level;
 		this.invocationContext = invocationContext;
-		this.scope = scope;
+		this.scope = scope2;
 	}
 	
 	private IAbstractString eval(Expression node) {
-		IAbstractString result = null;//CacheService.getCacheService().getAbstractString(PositionUtil.getPosition(node));
+		IAbstractString result = CacheService.getCacheService().getAbstractString(PositionUtil.getPosition(node));
 		if (result == null) {
-			result = doEval(node);
-//			CacheService.getCacheService().addAbstractString(PositionUtil.getPosition(node), result);
+//			System.out.println("Eval at: " + PositionUtil.getPosition(node));
+			try {
+				result = doEval(node);
+				CacheService.getCacheService().addAbstractString(PositionUtil.getPosition(node), result);
+			} catch (UnsupportedStringOpEx e) {
+				CacheService.getCacheService().addUnsupported(PositionUtil.getPosition(node), e.getMessage());
+				throw e;
+			}
 		}
 		return result;
 	}
@@ -402,7 +412,11 @@ public class AbstractStringEvaluator {
 		if (! supportInvocations) {
 			throw new UnsupportedStringOpEx("Method call");
 		}
-		AbstractStringEvaluator evaluatorWithNewContext = 
+
+		if (! supportInvocations) {
+			throw new UnsupportedStringOpEx("Method call");
+		}
+		final AbstractStringEvaluator evaluatorWithNewContext = 
 			new AbstractStringEvaluator(level+1, inv, scope);
 
 		List<MethodDeclaration> decls = NodeSearchEngine.findMethodDeclarations(scope, inv);
@@ -427,11 +441,31 @@ public class AbstractStringEvaluator {
 			else {
 				return new StringChoice(PositionUtil.getPosition(inv), choices);
 			}
+//			List<IFile> allFilesInScope = NodeSearchEngine.getAllFilesInScope(scope);
+//			String signature = getErasedSignature(inv.resolveMethodBinding());
+//			
+//			IScopedCache<String, IAbstractString> methodReturnValueCache = CacheService.getCacheService().getMethodReturnValueCache();
+//			CachedSearcher<String, IAbstractString> searcher = new CachedSearcher<String, IAbstractString>() {
+//				
+//				@Override
+//				protected void performSearchInScope(List<IJavaElement> scopeToSearchIn,
+//						String key, List<? super IAbstractString> values) {
+//			List<IAbstractString> abstractStrings = new ArrayList<IAbstractString>();
+//			List<MethodDeclaration> decls = NodeSearchEngine.findMethodDeclarations(scope, inv);
+//			for (MethodDeclaration decl: decls) {
+//				abstractStrings.add(evaluatorWithNewContext.getMethodReturnValue(decl));
+//			}
+			
+//			searcher.performCachedSearch(allFilesInScope, methodReturnValueCache, signature, abstractStrings);
+			
+//			if (abstractStrings.size() == 1) {
+//				return abstractStrings.get(0);
+//			} else {
+//				return new StringChoice(PositionUtil.getPosition(inv), abstractStrings);
+//			}
 		}
 	}
 
-	
-	
 	private IAbstractString getMethodArgOutValue(MethodDeclaration decl,
 			int argumentIndex) {
 		// TODO: at first look for javadoc annotation for this arg
@@ -481,7 +515,28 @@ public class AbstractStringEvaluator {
 		}
 	}
 	
+	private String getErasedSignature(IMethodBinding m) {
+		String paramString;
+		ITypeBinding[] parameterTypes = m.getParameterTypes();
+		if (parameterTypes.length == 1) {
+			paramString = parameterTypes[0].getQualifiedName();
+		} else if (parameterTypes.length > 0) {
+			StringBuilder params = new StringBuilder();
+			for (ITypeBinding t : parameterTypes) {
+				params.append(t.getQualifiedName()).append(" ");
+			}
+			paramString = params.toString();
+		} else {
+			paramString = "";
+		}
+		return m.getDeclaringClass().getQualifiedName()
+			+ "." + m.getName()
+			+ "(" + paramString + ")"
+			;
+	}
+
 	private IAbstractString getMethodReturnValue(MethodDeclaration decl) {
+		
 		// if it has @ResultForSQLChecker in JAVADOC then return this
 		IAbstractString javadocResult = getMethodReturnValueFromJavadoc(decl);
 		if (javadocResult != null) {
@@ -536,7 +591,7 @@ public class AbstractStringEvaluator {
 	
 	public static List<INodeDescriptor> evaluateMethodArgumentAtCallSites
 			(Collection<NodeRequest> requests,
-					IJavaElement scope, int level) {
+					IJavaElement[] scope, int level) {
 		String levelPrefix = "";
 		for (int i = 0; i < level; i++) {
 			levelPrefix += "    ";
@@ -550,38 +605,30 @@ public class AbstractStringEvaluator {
 		}
 		
 		// find value from all call-sites
-		List<NodeDescriptor> argumentNodes = NodeSearchEngine.findArgumentNodes
+		Collection<IPosition> argumentPositions = NodeSearchEngine.findArgumentNodes
 			(scope, requests);
 		
 		List<INodeDescriptor> result = new ArrayList<INodeDescriptor>();
-		for (INodeDescriptor sr: argumentNodes) {
+		for (IPosition sr: argumentPositions) {
 
-			Expression arg = (Expression)sr.getNode();
-			StringNodeDescriptor desc = new StringNodeDescriptor(arg, sr.getLineNumber(), null);
-			try {
-				AbstractStringEvaluator evaluator = 
-					new AbstractStringEvaluator(level, null, scope);
-				
-				//LOG.message(levelPrefix + "EVALUATING: file=" + desc.getFile()
-				//		+ ", line=" + desc.getLineNumber());
-				desc.setAbstractValue(evaluator.eval(arg));
-				result.add(desc);
-			} catch (UnsupportedStringOpEx e) {
-				LOG.message(levelPrefix + "UNSUPPORTED: " + e.getMessage());
-				LOG.message(levelPrefix + "    file: " + sr.getPosition().getPath() + ", line: " 
-						+ sr.getLineNumber());
-				result.add(new UnsupportedNodeDescriptor(arg, sr.getLineNumber(), 
-						"Unsupported SQL construction: " + e.getMessage()));
-			}
-			/* catch (Exception e) {
-				if (catchAllExceptions) {
-					LOG.message(levelPrefix + "PROGRAM ERROR: " + e.getMessage());
-					LOG.message(levelPrefix + "    file: " + sr.getFile() + ", line: " 
-						+ sr.getLineNumber());	
-				} else {
-					throw e;
+				try {
+					IAbstractString abstractString = CacheService.getCacheService().getAbstractString(sr);
+					
+					if (abstractString == null) {
+						Expression arg = (Expression) NodeSearchEngine.getASTNode(sr);
+						AbstractStringEvaluator evaluator = 
+							new AbstractStringEvaluator(level, null, scope);
+						abstractString = evaluator.eval(arg);
+					}
+					result.add(new StringNodeDescriptor(sr, abstractString));
+					
+				} catch (UnsupportedStringOpEx e) {
+					LOG.message(levelPrefix + "UNSUPPORTED: " + e.getMessage());
+					LOG.message(levelPrefix + "    file: " + sr.getPath() + ", line: " 
+							/*+ sr.getLineNumber()*/);
+					result.add(new UnsupportedNodeDescriptor(sr, 
+							"Unsupported SQL construction: " + e.getMessage() + " at " + PositionUtil.getLineString(sr)));
 				}
-			} */ 
 			
 		}
 		return result;

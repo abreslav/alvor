@@ -49,19 +49,19 @@ public class AutomataInclusion {
 		Map<State, StatesWithTexts> stateMap = checker.stateMap;
 		Map<State, State> oldToNewStates = new HashMap<State, State>();
 		for (State oldState : stateMap.keySet()) {
-			println("oldState: " + oldState + System.identityHashCode(oldState));
+//			println("oldState: " + oldState + System.identityHashCode(oldState));
 			
 			State newState = getNewState(oldToNewStates, oldState);
-			println("newState: " + newState + System.identityHashCode(newState));
+//			println("newState: " + newState + System.identityHashCode(newState));
 		
 			for (Transition oldTransition : oldState.getOutgoingTransitions()) {
-				println("  oldTransition: " + oldTransition);
+//				println("  oldTransition: " + oldTransition);
 				
 				for (List<IAbstractInputItem> text : getSet(transitionMap, oldTransition)) {
-					println("  transducerTransition text : " + text);
+//					println("  transducerTransition text : " + text);
 					
 					final State newTo = getNewState(oldToNewStates, oldTransition.getTo());
-					println("  newTo: " + newTo + System.identityHashCode(newTo));
+//					println("  newTo: " + newTo + System.identityHashCode(newTo));
 					
 					if (text.isEmpty()) {
 						createTransition(newState, newTo, null);
@@ -87,14 +87,15 @@ public class AutomataInclusion {
 
 	private void createTransition(State from, State to, IAbstractInputItem c) {
 		Transition transition = new Transition(from, to, c);
-		println("    newTransition: " + transition);
+//		println("    newTransition: " + transition);
 		from.getOutgoingTransitions().add(transition);
 	}
 
 	private State getNewState(Map<State, State> oldToNewStates, State oldState) {
 		State newState = oldToNewStates.get(oldState);
 		if (newState == null) {
-			newState = new State(oldState.getName() + "'", oldState.isAccepting());
+			// ' was appended here
+			newState = new State(oldState.getName(), oldState.isAccepting());
 			oldToNewStates.put(oldState, newState);
 		}
 		return newState;

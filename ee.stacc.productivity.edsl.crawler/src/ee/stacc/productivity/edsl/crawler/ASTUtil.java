@@ -26,8 +26,8 @@ import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
-import org.eclipse.jdt.core.search.SearchMatch;
 
+import ee.stacc.productivity.edsl.cache.UnsupportedStringOpEx;
 
 public class ASTUtil {
 	public static final String ORIGINAL_I_COMPILATION_UNIT = "OriginalICompilationUnit";
@@ -95,9 +95,9 @@ public class ASTUtil {
 		}
 	}
 	
-	public static int getNodeLineNumber(SearchMatch match, ASTNode node) {
+	/*package*/ static int getNodeLineNumber(int offset, ASTNode node) {
 		if (node.getRoot() instanceof CompilationUnit) {
-			return ((CompilationUnit)node.getRoot()).getLineNumber(match.getOffset());
+			return ((CompilationUnit)node.getRoot()).getLineNumber(offset);
 		}
 		else {
 			return -1;

@@ -21,6 +21,7 @@ import org.junit.Test;
 
 import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
+import ee.stacc.productivity.edsl.crawler.PositionUtil;
 import ee.stacc.productivity.edsl.crawler.UnsupportedNodeDescriptor;
 
 public class JavaElementCheckerTest {
@@ -69,7 +70,7 @@ public class JavaElementCheckerTest {
 	
 	private void testJavaElementAbstractStrings(IJavaElement element) throws IOException {
 		Map<String, Object> options = OptionLoader.getElementSqlCheckerProperties(element);
-		List<INodeDescriptor> hotspots = checker.findHotspots(element, options);
+		List<INodeDescriptor> hotspots = checker.findHotspots(new IJavaElement[] {element}, options);
 		
 		File outputFile = element.getResource().getLocation().append("FoundAbstractStrings.txt").toFile();
 		if (outputFile.exists()) {
@@ -80,7 +81,7 @@ public class JavaElementCheckerTest {
 		
 		
 		for (INodeDescriptor desc : hotspots) {
-			output.print(desc.getPosition().getPath() + ":" + desc.getLineNumber() + ", ");
+			output.print(PositionUtil.getLineString(desc.getPosition()) + ", ");
 			if (desc instanceof IStringNodeDescriptor) {
 				output.println(((IStringNodeDescriptor)desc).getAbstractValue());
 			}

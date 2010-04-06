@@ -1,21 +1,27 @@
 package ee.stacc.productivity.edsl.crawler;
 
+import ee.stacc.productivity.edsl.cache.IHotspotPattern;
+
 /**
  * Tells {@link NodeSearchEngine} which methods to look for and which arguments to process for each method
  * 
  * @author abreslav
  *
  */
-public final class NodeRequest {
+public final class NodeRequest implements IHotspotPattern {
+	private final String className;
+	private final String methodName;
 	private final String signatureString;
 	private final String patternString;
 	private final int argumentIndex;
 	
 	public NodeRequest(String className, String methodName, int argumentIndex) {
-		this.patternString = (!className.isEmpty() ? className + "." : "") + methodName;
-//		this.patternString = methodName;
+//		this.patternString = (!className.isEmpty() ? className + "." : "") + methodName;
+		this.patternString = methodName;
 		this.signatureString = (!className.isEmpty() ? className + "." : "") + methodName;
 		this.argumentIndex = argumentIndex;
+		this.className = className;
+		this.methodName = methodName;
 	}
 	
 	/**
@@ -40,6 +46,14 @@ public final class NodeRequest {
 	
 	public int getArgumentIndex() {
 		return argumentIndex;
+	}
+
+	public String getClassName() {
+		return className;
+	}
+	
+	public String getMethodName() {
+		return methodName;
 	}
 	
 	@Override

@@ -15,12 +15,17 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.parser.AbstractStringParser;
 
 @RunWith(Parameterized.class)
 public class SQLLexicalCheckerTest {
 
+	static {
+		Logs.configureFromStream(SQLLexicalCheckerTest.class.getClassLoader().getResourceAsStream("logging.properties"));
+	}
+	
 	@Parameters
 	public static Collection<Object[]> parameters() throws FileNotFoundException {
 		List<IAbstractString> abstractStrings = AbstractStringParser.parseFile("data/earved_sqls.txt");

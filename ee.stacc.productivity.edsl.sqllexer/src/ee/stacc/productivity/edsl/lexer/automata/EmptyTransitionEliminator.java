@@ -81,7 +81,8 @@ public class EmptyTransitionEliminator {
 			State oldState, Set<State> accepting) {
 		State newState = newStates.get(oldState);
 		if (newState == null) {
-			newState = new State(oldState.getName() + "'", accepting.contains(oldState));
+			// ' was appended here
+			newState = new State(oldState.getName(), accepting.contains(oldState));
 			newStates.put(oldState, newState);
 		}
 		return newState;
