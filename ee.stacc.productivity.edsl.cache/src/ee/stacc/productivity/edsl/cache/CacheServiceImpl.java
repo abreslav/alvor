@@ -195,6 +195,7 @@ public final class CacheServiceImpl implements ICacheService {
 		insert.setString(1, message);
 		return insertAndGetId(insert);
 	}
+	
 	/*
 	 * If position is null, it must be taken from the string
 	 */
@@ -214,7 +215,11 @@ public final class CacheServiceImpl implements ICacheService {
 			@Override
 			public Integer visitStringCharacterSet(
 					StringCharacterSet characterSet, Void data) {
-				throw new IllegalArgumentException("Unsupported");
+				try {
+					return createStringCharacterSet(characterSet);
+				} catch (SQLException e) {
+					throw new RethrowException(e);
+				}
 			}
 
 			@Override
@@ -265,6 +270,48 @@ public final class CacheServiceImpl implements ICacheService {
 		} catch (RethrowException e) {
 			throw e.getCause();
 		}
+	}
+	
+	private Integer createStringCharacterSet(
+			StringCharacterSet characterSet) throws SQLException {
+		if (characterSet.getContents().size() > 10) {
+			throw new IllegalArgumentException("Character set is too big " + characterSet);
+		}
+		
+		int rangeId = createSourceRange(characterSet.getPosition());
+		int constantId = createCharacterSetEntry(characterSet);
+		
+		PreparedStatement preparedStatement = connection.prepareStatement(
+				"INSERT INTO AbstractStrings(type, a, sourceRange) VALUES (0, ?, ?)",
+				Statement.RETURN_GENERATED_KEYS
+		);
+		preparedStatement.setInt(1, constantId);
+		preparedStatement.setInt(2, rangeId);
+		
+		return insertAndGetId(preparedStatement);
+	}
+
+	private int createCharacterSetEntry(StringCharacterSet characterSet) throws SQLException {
+		PreparedStatement query = connection.prepareStatement(
+				"SELECT id FROM CharacterSets WHERE (data = ?)"
+		);
+		String string = makeString(characterSet.getContents());
+		query.setString(1, string);
+		
+		PreparedStatement insert = connection.prepareStatement(
+				"INSERT INTO CharacterSets(data) VALUES (?)",
+				Statement.RETURN_GENERATED_KEYS
+		);
+		insert.setString(1, string);
+		return insertIfNotYet(query, insert);
+	}
+
+	private String makeString(Set<Character> contents) {
+		StringBuilder b = new StringBuilder();
+		for (Character character : contents) {
+			b.append(character);
+		}
+		return b.toString();
 	}
 
 	private int createSame(Integer id, IPosition position) throws SQLException {
@@ -464,7 +511,8 @@ public final class CacheServiceImpl implements ICacheService {
 		case StringTypes.CONSTANT:
 			return getStringConstant(a, position); 
 		case StringTypes.CHAR_SET:
-			throw new UnsupportedStringOpEx("CACHE: Char sets are not supported yet");
+			return getStringCharacterSet(a, position); 
+//			throw new UnsupportedStringOpEx("CACHE: Char sets are not supported yet");
 //			throw new IllegalArgumentException("Char sets are not yet supported");
 		case StringTypes.SEQUENCE:
 			return new StringSequence(position,	getCollectionContents(id));
@@ -480,6 +528,22 @@ public final class CacheServiceImpl implements ICacheService {
 		default:
 			throw new IllegalStateException("Unknown AbstractString type: " + type);
 		}
+	}
+
+	private IAbstractString getStringCharacterSet(Integer id, IPosition position) throws SQLException {
+		PreparedStatement preparedStatement = connection.prepareStatement(
+				"SELECT data FROM CharacterSets " + 
+				"WHERE id = ?"
+		);
+		preparedStatement.setInt(1, id);
+		ResultSet res = preparedStatement.executeQuery();
+		if (!res.next()) {
+			return null;
+		}
+		
+		return new StringCharacterSet(
+				position, 
+				notNull(res, res.getString("data")));
 	}
 
 	private void throwUnsupportedStringOpEx(IPosition position, Integer id) throws SQLException {
