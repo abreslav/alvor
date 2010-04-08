@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.CharacterLiteral;
@@ -123,7 +124,12 @@ public class NewASE {
 	}
 	
 	private IAbstractString evalName(Name name) {
-		NameUsage usage = VariableTracker.getLastMod(name);
+		return evalNameBefore(name, name); 
+	}
+
+	private IAbstractString evalNameBefore(Name name, ASTNode target) {
+		NameUsage usage = VariableTracker.getLastReachingMod
+			((IVariableBinding)name.resolveBinding(), target);
 		return evalNameAfterUsage(name, usage); 
 	}
 
@@ -150,6 +156,11 @@ public class NewASE {
 		}			
 	}
 	
+	private IAbstractString evalInvocationArgOut(MethodInvocation inv,
+			int argumentIndex) {
+		return evalInvocationResultOrArgOut(inv, argumentIndex); 
+	}
+
 	/**
 	 * 
 	 * @param inv 
@@ -186,10 +197,10 @@ public class NewASE {
 			for (MethodDeclaration decl: decls) {
 				IAbstractString methodString;
 				if (argumentIndex == -1) {
-					methodString = getMethodReturnValue(decl);
+					methodString = getMethodReturnTemplate(decl);
 				}
 				else {
-					methodString = getMethodArgOutValue(decl, argumentIndex);
+					methodString = getMethodArgOutTemplate(decl, argumentIndex);
 				}
 				System.out.println("METHOD STRING: " + methodString);
 				choices.add(ArgumentApplier.applyArguments(methodString, arguments));
@@ -205,7 +216,7 @@ public class NewASE {
 		}
 	}
 
-	IAbstractString getMethodReturnValue(MethodDeclaration decl) {
+	IAbstractString getMethodReturnTemplate(MethodDeclaration decl) {
 		// if it has @ResultForSQLChecker in JAVADOC then return this
 		IAbstractString javadocResult = getMethodReturnValueFromJavadoc(decl);
 		if (javadocResult != null) {
@@ -234,11 +245,11 @@ public class NewASE {
 		return new StringChoice(PositionUtil.getPosition(decl), options);
 	}
 
-	private IAbstractString getMethodArgOutValue(MethodDeclaration decl,
+	private IAbstractString getMethodArgOutTemplate(MethodDeclaration decl,
 			int argumentIndex) {
 		// TODO: at first look for javadoc annotation for this arg
 		Name paramName = 
-			((SingleVariableDeclaration)decl.parameters().get(argumentIndex-1)).getName();
+			((SingleVariableDeclaration)decl.parameters().get(argumentIndex)).getName();
 		
 		NameUsage lastMod = VariableTracker.getLastModIn(
 				(IVariableBinding)paramName.resolveBinding(), decl);
@@ -400,6 +411,8 @@ public class NewASE {
 		}
 		else if (usage instanceof NameUsageLoopChoice) {
 			NameUsageLoopChoice loopChoice = (NameUsageLoopChoice)usage;
+			assert loopChoice.getBaseUsage() != null;
+			assert loopChoice.getLoopUsage() != null;
 			
 			IAbstractString baseString = evalNameAfterUsage(name, loopChoice.getBaseUsage());
 			return new RecursiveStringChoice(baseString, loopChoice.getLoopUsage().getASTNode()); // null means outermost string TODO too ugly
@@ -430,25 +443,40 @@ public class NewASE {
 			return new StringParameter(((NameInParameter)usage).getIndex());
 		}
 		else if (usage instanceof NameInArgument) {
-			// if (stringBuffer) {
-				// get abstract representation of respective parameter of the method
-				// apply this to real arguments and return
-			// }
-			// else goto previous usage place
-			throw new UnsupportedStringOpEx("NameInArgument");
+			if (isString(name.resolveTypeBinding())) {
+				// this usage doesn't affect it, keep looking
+				return evalNameBefore(name, usage.getASTNode());
+			}
+			else {
+				assert isStringBuilderOrBuffer(name.resolveTypeBinding());
+				NameInArgument argUsage = (NameInArgument)usage;
+				System.out.println("ARG USAGE: " +argUsage);
+				return evalInvocationArgOut(argUsage.getInv(), argUsage.getIndex()); 
+			}
 		}
 		else if (usage instanceof NameMethodCall) {
-			// get abstract representation of return value of the method
-			// apply this to real arguments and return
-			NameMethodCall call = (NameMethodCall)usage;
-			/*
-			if (isString(call.getObject().resolveTypeBinding())) {
-				// the call is not modifying object
-				evalNameAfterUsage(VariableTracker.getLastReachingMod
-						(call.getObject().resolveBinding(), call.getInv()));
+			if (isString(name.resolveTypeBinding())) {
+				// this usage doesn't affect it, keep looking
+				return evalNameBefore(name, usage.getASTNode());
 			}
-			*/
-			throw new UnsupportedStringOpEx("NameMethodCall");
+			else {
+				assert isStringBuilderOrBuffer(name.resolveTypeBinding());
+				NameMethodCall call = (NameMethodCall)usage;
+				MethodInvocation inv = call.getInv();
+				if (inv.getName().getIdentifier().equals("append")) {
+					return new StringSequence(
+							PositionUtil.getPosition(inv),
+							eval(inv.getExpression()),
+							eval((Expression)inv.arguments().get(0)));
+				}
+				else if (inv.getName().getIdentifier().equals("toString")) {
+					return eval(inv.getExpression());
+				}
+				else {
+					throw new UnsupportedStringOpEx("Unknown method called on StringBuilder: " 
+							+ inv.getName());
+				}
+			}
 		}
 		else {
 			throw new UnsupportedStringOpEx("Unsupported NameUsage: " + usage.getClass());

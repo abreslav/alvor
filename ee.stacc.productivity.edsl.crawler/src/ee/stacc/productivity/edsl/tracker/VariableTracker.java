@@ -3,32 +3,22 @@ package ee.stacc.productivity.edsl.tracker;
 import java.lang.reflect.Modifier;
 
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.Annotation;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.BooleanLiteral;
-import org.eclipse.jdt.core.dom.CharacterLiteral;
-import org.eclipse.jdt.core.dom.DoStatement;
-import org.eclipse.jdt.core.dom.EnhancedForStatement;
+import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
-import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
-import org.eclipse.jdt.core.dom.NullLiteral;
-import org.eclipse.jdt.core.dom.NumberLiteral;
+import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
-import org.eclipse.jdt.core.dom.StringLiteral;
-import org.eclipse.jdt.core.dom.ThisExpression;
-import org.eclipse.jdt.core.dom.TypeLiteral;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
-import org.eclipse.jdt.core.dom.WhileStatement;
 
 import ee.stacc.productivity.edsl.cache.UnsupportedStringOpEx;
 import ee.stacc.productivity.edsl.crawler.ASTUtil;
@@ -71,7 +61,7 @@ public class VariableTracker {
 	}
 	
 	private static NameUsage getLastReachingModIn(IVariableBinding var, ASTNode target, ASTNode scope) {
-		if (isSimpleNode(scope)) {
+		if (ASTUtil.isSimpleNode(scope)) {
 			return null;			
 		}
 	    else if (scope instanceof Assignment) {
@@ -130,15 +120,20 @@ public class VariableTracker {
 
 	private static NameUsage getLastReachingModInMethodDecl(
 			IVariableBinding var, ASTNode target, MethodDeclaration decl) {
-		assert target == decl.getBody();
-		assert var.isParameter();
+		assert target == null ||  target == decl.getBody();
 		
-		int idx = ASTUtil.getParamIndex0(decl, var);
-		if (idx < 0) {
-			throw new IllegalStateException("getLastReachingModInMethodDecl, idx < 0");
+		if (target == null) {
+			return getLastModIn(var, decl.getBody());
 		}
-		
-		return new NameInParameter(idx);
+		else {
+			assert var.isParameter();
+			assert target == decl.getBody();
+			int idx = ASTUtil.getParamIndex0(decl, var);
+			if (idx == -1) {
+				throw new IllegalStateException("getLastReachingModInMethodDecl, idx < 0");
+			}
+			return new NameInParameter(decl, idx);
+		}
 	}
 
 	private static NameUsage getLastReachingModInInfix(IVariableBinding var,
@@ -206,7 +201,8 @@ public class VariableTracker {
 				// should create new Tracker at loop entry
 				// and another in loop exit ???
 				if (ASTUtil.isLoopStatement(target)) {
-					return new NameUsageLoopChoice(target, usage, getLastModIn(var, ASTUtil.getLoopBody(target)));
+					return new NameUsageLoopChoice(target, usage, 
+							getLastModIn(var, ASTUtil.getLoopBody(target)));
 				}
 				else {
 					return usage;
@@ -221,20 +217,28 @@ public class VariableTracker {
 	private static NameUsage getLastReachingModInInv(IVariableBinding var,
 			ASTNode target, MethodInvocation inv) {
 		
-		// TODO first check quickly, if var is there ??
+		// TODO optimize for immutable types
 		
-		if (target == null) { // check the effect of method call
+		if (target == null) { // check the effect of evaluating the method call
+			// TODO if name is at more than 1 position, then this means trouble (because of aliasing)
+			
+			// check expression position			
 			Expression exp = inv.getExpression();
 			if (exp instanceof Name	&& ASTUtil.sameBinding(exp, var)) {
 				return new NameMethodCall(inv, (Name)exp);
 			}
-			// TODO check also for presence of var in argument positions
-			// at the moment only these expressions count that return the pointer to the var
-			// ie. Name, CastExpression, Assignment
 			
+			// TODO sameBinding and returnsVarPointer are same things actually
 			
-			throw new UnsupportedStringOpEx("Unknown effect of method call ("
-					+ inv +	") to var (" + var.getName() + ")");
+			// check in arguments
+			for (int i = 0; i < inv.arguments().size(); i++) {
+				Expression arg = (Expression)inv.arguments().get(i);
+				if (returnsVarPointer(arg, var)) {
+					return new NameInArgument(inv, i);
+				}
+			}
+			
+			return null;
 		}
 		
 		// check the effect of evaluating arguments (and TODO method expression)
@@ -254,6 +258,21 @@ public class VariableTracker {
 		
 		// FIXME ignoring expressions for now
 		return null;
+	}
+	
+	private static boolean returnsVarPointer(Expression exp, IVariableBinding var) {
+		if (exp instanceof Name) {
+			return ASTUtil.sameBinding(exp, var);
+		}
+		else if (exp instanceof CastExpression) {
+			return returnsVarPointer(((CastExpression)exp).getExpression(), var);
+		}
+		else if (exp instanceof ParenthesizedExpression) {
+			return returnsVarPointer(((ParenthesizedExpression)exp).getExpression(), var);
+		}
+		else {
+			return false; // TODO anything else?
+		}
 	}
 
 	// get last modification in node that can affect limit
@@ -322,17 +341,4 @@ public class VariableTracker {
 			//return getPrevReachingModIn(var, null, ifStmt.getExpression());
 		}
 	}
-	
-	private static boolean isSimpleNode(ASTNode node) {
-		return node instanceof Name
-			|| node instanceof NullLiteral
-			|| node instanceof NumberLiteral
-			|| node instanceof StringLiteral
-			|| node instanceof BooleanLiteral
-			|| node instanceof CharacterLiteral
-			|| node instanceof TypeLiteral
-			|| node instanceof Annotation
-			|| node instanceof ThisExpression;
-	}
-	
 }

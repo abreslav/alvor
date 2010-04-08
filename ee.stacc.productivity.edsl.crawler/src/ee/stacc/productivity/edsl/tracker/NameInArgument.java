@@ -5,13 +5,23 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 
 public class NameInArgument extends NameUsage {
 	MethodInvocation inv;
+	int index;
 	
+	public NameInArgument(MethodInvocation inv, int index) {
+		this.inv = inv;
+		this.index = index;
+	}
+
 	public MethodInvocation getInv() {
 		return inv;
 	}
 	
+	public int getIndex() {
+		return index;
+	}
+	
 	public ASTNode getASTNode() {
-		throw new UnsupportedOperationException();
+		return inv;
 	}
 	
 }

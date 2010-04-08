@@ -1,12 +1,19 @@
 package ee.stacc.productivity.edsl.tracker;
 
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 
 public class NameInParameter extends NameUsage {
 	private int index;
+	private MethodDeclaration methodDecl;
 	
-	public NameInParameter(int index) {
+	public NameInParameter(MethodDeclaration methodDecl, int index) {
 		this.index = index;
+		this.methodDecl = methodDecl;
+	}
+	
+	public MethodDeclaration getMethodDecl() {
+		return methodDecl;
 	}
 
 	public int getIndex() {
@@ -14,7 +21,7 @@ public class NameInParameter extends NameUsage {
 	}
 	
 	public ASTNode getASTNode() {
-		throw new UnsupportedOperationException();
+		return methodDecl;
 	}
 	
 }
