@@ -6,6 +6,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -77,21 +80,29 @@ public class JavaElementCheckerTest {
 			outputFile.delete();
 		}
 		
-		PrintStream output = new PrintStream(outputFile);
-		
+		List<String> lines = new ArrayList<String>();
 		
 		for (INodeDescriptor desc : hotspots) {
-			output.print(PositionUtil.getLineString(desc.getPosition()) + ", ");
+			String start = PositionUtil.getLineString(desc.getPosition()) + ", ";
+			
 			if (desc instanceof IStringNodeDescriptor) {
-				output.println(((IStringNodeDescriptor)desc).getAbstractValue());
+				lines.add(start + 
+						((IStringNodeDescriptor)desc).getAbstractValue().toString());
 			}
 			else if (desc instanceof UnsupportedNodeDescriptor) {
-				output.println("unsupported: " 
+				lines.add(start + "unsupported: " 
 						+ ((UnsupportedNodeDescriptor)desc).getProblemMessage());
 			}
 			else {
-				output.println();
+				lines.add("???");
 			}
+		}
+		
+		//Collections.sort(lines);
+		PrintStream output = new PrintStream(outputFile);
+		
+		for (String s : lines) {
+			output.println(s);
 		}
 		
 		File expectedFile = element.getResource().getLocation()
