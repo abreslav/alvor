@@ -6,7 +6,10 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.DoStatement;
+import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
@@ -26,6 +29,7 @@ import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.jdt.core.dom.WhileStatement;
 
 import ee.stacc.productivity.edsl.cache.UnsupportedStringOpEx;
 
@@ -282,6 +286,57 @@ public class ASTUtil {
 	public static boolean sameBinding(Expression exp, IBinding var) {
 		return (exp instanceof Name)
 			&& ((Name)exp).resolveBinding().isEqualTo(var);
+	}
+	
+	/*
+	 * Return true if a is in a loop and b is not in this loop
+	 */
+	public static boolean inALoopSeparatingFrom(ASTNode nodeA, ASTNode nodeB) {
+		assert nodeA != null;
+		assert nodeB != null;
+		
+		if (nodeA == nodeB) {
+			return false;
+		}
+		else if (nodeA instanceof MethodDeclaration) {
+			return false;
+		}
+		else if (!isLoopStatement(nodeA)) {
+			// go up with A until reach a loop
+			return inALoopSeparatingFrom(nodeA.getParent(), nodeB);
+		}
+		// here nodeA is loop
+		else if (nodeB instanceof MethodDeclaration) {
+			return true;
+		}
+		else {
+			return inALoopSeparatingFrom(nodeA, nodeB.getParent());
+		}
+	}
+	
+	public static boolean isLoopStatement(ASTNode node) {
+		return node instanceof WhileStatement
+			|| node instanceof ForStatement
+			|| node instanceof EnhancedForStatement
+			|| node instanceof DoStatement; 
+	}
+	
+	public static Statement getLoopBody(ASTNode loop) {
+		if (loop instanceof ForStatement) {
+			return ((ForStatement)loop).getBody();
+		}
+		else if (loop instanceof EnhancedForStatement) {
+			return ((EnhancedForStatement)loop).getBody();
+		}
+		else if (loop instanceof WhileStatement) {
+			return ((WhileStatement)loop).getBody();
+		}
+		else if (loop instanceof DoStatement) {
+			return ((DoStatement)loop).getBody();
+		}
+		else {
+			throw new IllegalArgumentException();
+		}
 	}
 	
 	/*

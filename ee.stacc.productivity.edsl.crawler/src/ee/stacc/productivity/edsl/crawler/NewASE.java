@@ -97,8 +97,7 @@ public class NewASE {
 			return stringConstant;
 		}
 		else if (node instanceof Name) {
-			NameUsage usage = VariableTracker.getLastMod((Name)node);
-			return evalNameAfterUsage(usage); 
+			return evalName((Name)node);
 		}
 		else if (node instanceof ConditionalExpression) {
 			return new StringChoice(PositionUtil.getPosition(node),
@@ -121,6 +120,11 @@ public class NewASE {
 			throw new UnsupportedStringOpEx
 				("getValOf(" + node.getClass().getName() + ")");
 		}
+	}
+	
+	private IAbstractString evalName(Name name) {
+		NameUsage usage = VariableTracker.getLastMod(name);
+		return evalNameAfterUsage(name, usage); 
 	}
 
 	private IAbstractString evalInvocationResult(MethodInvocation inv) {
@@ -240,7 +244,7 @@ public class NewASE {
 				(IVariableBinding)paramName.resolveBinding(), decl);
 
 		// lastMod may be NameInParameter, then StringParameter is returned
-		return evalNameAfterUsage(lastMod);
+		return evalNameAfterUsage(paramName, lastMod);
 	}
 
 	private IAbstractString getMethodReturnValueFromJavadoc(MethodDeclaration decl) {
@@ -351,10 +355,24 @@ public class NewASE {
 		throw new IllegalArgumentException();
 	}
 	
-	private IAbstractString evalNameAfterUsage(NameUsage usage) {
-		
+	private IAbstractString evalNameAfterUsage(Name name, NameUsage usage) {
 		assert usage != null;
 		
+		
+		// if usage in loop and name outside the loop then
+		// wrap result into loop-wrapper
+		// alternatively, resolve recursion
+		
+		if (ASTUtil.inALoopSeparatingFrom(usage.getASTNode(), name)) {
+			return new NamedString(usage.getASTNode(), evalNameAfterUsageWithoutLoopCheck(name, usage));
+		}
+		else {
+			return evalNameAfterUsageWithoutLoopCheck(name, usage);
+		}
+	}
+	
+	
+	private IAbstractString evalNameAfterUsageWithoutLoopCheck(Name name, NameUsage usage) {
 		// check, if it's necessary to start new evaluator (entering the loop from below)
 		/* TODO
 		if (usage.getMainStatement() != this.mainBlock
@@ -377,14 +395,14 @@ public class NewASE {
 				stringChoices.add(this.evalNameAfterUsage(usageItem));
 			}
 			*/
-			return new StringChoice(this.evalNameAfterUsage(uc.getThenUsage()),
-					this.evalNameAfterUsage(uc.getElseUsage())); 
+			return new StringChoice(this.evalNameAfterUsage(name, uc.getThenUsage()),
+					this.evalNameAfterUsage(name, uc.getElseUsage())); 
 		}
 		else if (usage instanceof NameUsageLoopChoice) {
 			NameUsageLoopChoice loopChoice = (NameUsageLoopChoice)usage;
 			
-			IAbstractString baseString = evalNameAfterUsage(loopChoice.getBaseUsage());
-			return new RecursiveStringChoice(baseString, null); // null means outermost string TODO too ugly
+			IAbstractString baseString = evalNameAfterUsage(name, loopChoice.getBaseUsage());
+			return new RecursiveStringChoice(baseString, loopChoice.getLoopUsage().getASTNode()); // null means outermost string TODO too ugly
 			/*
 			if (loopChoice.getLoopUsage() == this.startingPlace) {
 				IAbstractString baseString = evalNameAfterUsage(loopChoice.getBaseUsage());

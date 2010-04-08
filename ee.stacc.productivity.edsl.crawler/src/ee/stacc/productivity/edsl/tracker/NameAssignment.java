@@ -1,5 +1,6 @@
 package ee.stacc.productivity.edsl.tracker;
 
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.Name;
@@ -13,6 +14,10 @@ public class NameAssignment extends NameUsage {
 		this.operator = operator;
 		this.leftHandSide = leftHandSide;
 		this.rightHandSide = expr;
+	}
+	
+	public ASTNode getASTNode() {
+		return leftHandSide.getParent();
 	}
 	
 	public Expression getRightHandSide() {

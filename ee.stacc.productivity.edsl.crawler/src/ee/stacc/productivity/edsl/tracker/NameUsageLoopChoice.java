@@ -1,12 +1,16 @@
 package ee.stacc.productivity.edsl.tracker;
 
+import org.eclipse.jdt.core.dom.ASTNode;
+
 public class NameUsageLoopChoice extends NameUsage {
 	private NameUsage startUsage;
 	private NameUsage loopUsage;
+	private ASTNode node;
 	
-	public NameUsageLoopChoice(NameUsage startUsage, NameUsage loopUsage) {
+	public NameUsageLoopChoice(ASTNode node, NameUsage startUsage, NameUsage loopUsage) {
 		this.startUsage = startUsage;
 		this.loopUsage = loopUsage;
+		this.node = node;
 	}
 
 	public NameUsage getBaseUsage() {
@@ -15,6 +19,10 @@ public class NameUsageLoopChoice extends NameUsage {
 	
 	public NameUsage getLoopUsage() {
 		return loopUsage;
+	}
+	
+	public ASTNode getASTNode() {
+		return node;
 	}
 	
 }

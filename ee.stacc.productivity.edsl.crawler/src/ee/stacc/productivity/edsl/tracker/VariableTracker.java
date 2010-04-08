@@ -80,6 +80,9 @@ public class VariableTracker {
 	    else if (scope instanceof VariableDeclarationStatement) {
 	    	return getLastReachingModInVDeclStmt(var, target, (VariableDeclarationStatement)scope);
 	    }
+	    else if (scope instanceof VariableDeclaration) {
+	    	return getLastReachingModInVDecl(var, target, (VariableDeclaration)scope);
+	    }
 		else if (scope instanceof IfStatement) {
 			return getLastReachingModInIf(var, target, (IfStatement)scope);
 		}
@@ -107,7 +110,7 @@ public class VariableTracker {
 				return null;
 			}
 		}
-		else if (isLoopStatement(scope)) {
+		else if (ASTUtil.isLoopStatement(scope)) {
 			return getLastReachingModInLoop(var, target, (Statement)scope);
 		}
 		else {
@@ -170,12 +173,12 @@ public class VariableTracker {
 
 	private static NameUsage getLastReachingModInLoop(IVariableBinding var,
 			ASTNode target, Statement loop) {
-		if (target == getLoopBody(loop)) {
+		if (target == ASTUtil.getLoopBody(loop)) {
 			// FIXME check also loop header
 			return null;
 		}
 		else {
-			return getLastModIn(var, getLoopBody(loop));
+			return getLastModIn(var, ASTUtil.getLoopBody(loop));
 		}
 	}
 
@@ -195,11 +198,15 @@ public class VariableTracker {
 			
 			NameUsage usage = getLastModIn(var, stmt);
 			if (usage != null) {
+				// if target is loop then moving out of loop??
+				
+				// stmt is loop then found last usage in loop
+				
 				// FIXME won't work in all cases
 				// should create new Tracker at loop entry
 				// and another in loop exit ???
-				if (isLoopStatement(target)) {
-					return new NameUsageLoopChoice(usage, getLastModIn(var, getLoopBody(target)));
+				if (ASTUtil.isLoopStatement(target)) {
+					return new NameUsageLoopChoice(target, usage, getLastModIn(var, ASTUtil.getLoopBody(target)));
 				}
 				else {
 					return usage;
@@ -214,12 +221,17 @@ public class VariableTracker {
 	private static NameUsage getLastReachingModInInv(IVariableBinding var,
 			ASTNode target, MethodInvocation inv) {
 		
+		// TODO first check quickly, if var is there ??
+		
 		if (target == null) { // check the effect of method call
 			Expression exp = inv.getExpression();
 			if (exp instanceof Name	&& ASTUtil.sameBinding(exp, var)) {
 				return new NameMethodCall(inv, (Name)exp);
 			}
-			// TODO check also for var in argument positions
+			// TODO check also for presence of var in argument positions
+			// at the moment only these expressions count that return the pointer to the var
+			// ie. Name, CastExpression, Assignment
+			
 			
 			throw new UnsupportedStringOpEx("Unknown effect of method call ("
 					+ inv +	") to var (" + var.getName() + ")");
@@ -300,7 +312,7 @@ public class VariableTracker {
 				return null;
 			}
 			else {
-				return new NameUsageChoice(thenUsage, elseUsage);
+				return new NameUsageChoice(ifStmt, thenUsage, elseUsage);
 			}
 		}
 		else {
@@ -308,31 +320,6 @@ public class VariableTracker {
 			// FIXME following is more correct
 			//assert target == ifStmt.getThenStatement() || target == ifStmt.getElseStatement();
 			//return getPrevReachingModIn(var, null, ifStmt.getExpression());
-		}
-	}
-	
-	private static boolean isLoopStatement(ASTNode node) {
-		return node instanceof WhileStatement
-			|| node instanceof ForStatement
-			|| node instanceof EnhancedForStatement
-			|| node instanceof DoStatement; 
-	}
-	
-	private static Statement getLoopBody(ASTNode loop) {
-		if (loop instanceof ForStatement) {
-			return ((ForStatement)loop).getBody();
-		}
-		else if (loop instanceof EnhancedForStatement) {
-			return ((EnhancedForStatement)loop).getBody();
-		}
-		else if (loop instanceof WhileStatement) {
-			return ((WhileStatement)loop).getBody();
-		}
-		else if (loop instanceof DoStatement) {
-			return ((DoStatement)loop).getBody();
-		}
-		else {
-			throw new IllegalArgumentException();
 		}
 	}
 	

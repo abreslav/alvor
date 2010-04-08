@@ -1,5 +1,6 @@
 package ee.stacc.productivity.edsl.tracker;
 
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 
@@ -20,4 +21,8 @@ public class NameMethodCall extends NameUsage {
 		return object;
 	}
 
+	public ASTNode getASTNode() {
+		return inv;
+	}
+	
 }
