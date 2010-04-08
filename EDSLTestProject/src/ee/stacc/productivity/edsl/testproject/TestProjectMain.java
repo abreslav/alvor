@@ -80,13 +80,17 @@ public class TestProjectMain {
 		
 		// choice of different fields of same type 
 		String addrField = "address";
-		if (someCondition()) 
+		if (someCondition()) {
 			addrField = "address2";
+		}
 		
+		addrField = "loll";
 		
-		String sql = ("select id, name, " + addrField) + " dt_fld from customers";
+		String sql = "select id, name, " + addrField + " dt_fld from customers";
 		sql += " order by " + addrField;
 		
+		sql = "a";
+		sql += "b";
 		
 		PreparedStatement stmt = conn.prepareStatement(sql);
 		stmt.getMetaData();
@@ -163,5 +167,48 @@ public class TestProjectMain {
 			System.out.println (rset.getString(1));   // Print col 1
 		stmt.close();
 
+	}
+	
+	String appendAA(String s) {
+		return s + "AA";
+	}
+	
+	void testNew(String arg) {
+		String u = "a" + "b" + "c";
+		String str = "aaa"; //, x = "oo";
+		u = "uu";
+		
+		if (someCond()) {
+			str = "true";
+		} /*else {
+			str = u;
+		}*/
+		
+		str += "bb";
+		str += "cc";
+		
+		while (someCond()) {
+			str += "x";
+		}
+		
+		str += arg;
+		
+		str = "OO";
+		str = appendAA(str);
+		
+		System.out.println(str);
+	}
+	
+	
+	void SB() {
+		StringBuilder sb = new StringBuilder("obaa");
+		
+		sb.append("tere");
+		
+		System.out.print(sb);
+	}
+	
+	boolean someCond() {
+		return true;
 	}
 }
