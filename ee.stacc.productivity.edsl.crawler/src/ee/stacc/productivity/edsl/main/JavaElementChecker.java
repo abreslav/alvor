@@ -14,6 +14,7 @@ import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.crawler.AbstractStringEvaluator;
+import ee.stacc.productivity.edsl.crawler.NewASE;
 import ee.stacc.productivity.edsl.crawler.NodeRequest;
 import ee.stacc.productivity.edsl.crawler.NodeSearchEngine;
 import ee.stacc.productivity.edsl.crawler.UnsupportedNodeDescriptor;
@@ -48,7 +49,8 @@ public class JavaElementChecker {
 			throw new IllegalArgumentException("No hotspots found");
 		}
 		NodeSearchEngine.clearCache();
-		return AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(requests, scope, 0);
+//		return AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(requests, scope, 0);
+		return NewASE.evaluateMethodArgumentAtCallSites(requests, scope, 0);
 	}
 
 	public void processHotspots(

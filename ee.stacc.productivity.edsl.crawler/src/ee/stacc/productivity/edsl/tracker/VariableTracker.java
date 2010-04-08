@@ -3,11 +3,14 @@ package ee.stacc.productivity.edsl.tracker;
 import java.lang.reflect.Modifier;
 
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ArrayAccess;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CastExpression;
+import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
+import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -17,11 +20,14 @@ import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import ee.stacc.productivity.edsl.cache.UnsupportedStringOpEx;
 import ee.stacc.productivity.edsl.crawler.ASTUtil;
+import ee.stacc.productivity.edsl.crawler.NodeSearchEngine;
 
 /*
  * getLastReachingModIn* methods stay in given scope
@@ -31,9 +37,6 @@ import ee.stacc.productivity.edsl.crawler.ASTUtil;
 public class VariableTracker {
 	public static NameUsage getLastMod(Name name) {
 		IVariableBinding var = (IVariableBinding)name.resolveBinding();
-		if (var.isField() && (var.getModifiers() & Modifier.FINAL) == 0) {
-			throw new UnsupportedStringOpEx("Non-final fields are not supported");
-		}
 		return getLastReachingMod(var, name);
 	}
 	
@@ -45,6 +48,9 @@ public class VariableTracker {
 	 */
 	public static NameUsage getLastReachingMod(IVariableBinding var, ASTNode target) {
 		assert target != null;
+		if (var.isField()) {
+			return getFieldDefinition(var);
+		}
 		
 		ASTNode parent = target.getParent();
 		NameUsage usage = getLastReachingModIn(var, target, parent);
@@ -56,8 +62,17 @@ public class VariableTracker {
 		}
 	}
 	
+	
 	public static NameUsage getLastModIn(IVariableBinding var, ASTNode scope) {
+		if (var.isField()) {
+			return getFieldDefinition(var);
+		}
 		return getLastReachingModIn(var, null, scope);
+	}
+	
+	private static NameUsage getFieldDefinition(IVariableBinding var) {
+		// for now, (final)fields should be handled by client 
+		throw new UnsupportedStringOpEx("Fields are not supported in tracker");
 	}
 	
 	private static NameUsage getLastReachingModIn(IVariableBinding var, ASTNode target, ASTNode scope) {
@@ -82,6 +97,14 @@ public class VariableTracker {
 		else if (scope instanceof MethodDeclaration) {
 			return getLastReachingModInMethodDecl(var, target, (MethodDeclaration)scope);
 		}
+		else if (scope instanceof ClassInstanceCreation) { // constructor call
+			// FIXME possible to modify smth in arguments (or expression?)
+			return null;
+		}
+		else if (scope instanceof ArrayAccess) {
+			// FIXME possible to modify smth in index or array expression
+			return null;
+		}
 		else if (scope instanceof Block) {
 			return getLastReachingModInBlock(var, target, (Block)scope);
 		}
@@ -90,6 +113,9 @@ public class VariableTracker {
 		}
 		else if (scope instanceof ReturnStatement) {
 			return getLastReachingModInReturn(var, target, (ReturnStatement)scope);
+		}
+		else if (scope instanceof TryStatement) {
+			return getLastReachingModInTry(var, target, (TryStatement)scope);
 		}
 		else if (scope instanceof ExpressionStatement) {
 			if (target == null) {
@@ -105,6 +131,18 @@ public class VariableTracker {
 		}
 		else {
 			throw new UnsupportedStringOpEx("getLastReachingModIn " + scope.getClass());
+		}
+	}
+
+	private static NameUsage getLastReachingModInTry(IVariableBinding var,
+			ASTNode target, TryStatement tryStmt) {
+		if (target == null) {
+			// TODO should check also catches and finally
+			return getLastModIn(var, tryStmt.getBody());
+		}
+		else {
+			assert (target == tryStmt.getBody());
+			return null;
 		}
 	}
 
@@ -126,12 +164,22 @@ public class VariableTracker {
 			return getLastModIn(var, decl.getBody());
 		}
 		else {
-			assert var.isParameter();
 			assert target == decl.getBody();
-			int idx = ASTUtil.getParamIndex0(decl, var);
-			if (idx == -1) {
-				throw new IllegalStateException("getLastReachingModInMethodDecl, idx < 0");
+			if (!var.isParameter()) {
+				throw new UnsupportedStringOpEx("Non-parameter var ("
+						+ var+ ") asked from MethodDeclaration ("
+						+ decl.getName().getFullyQualifiedName() + ")"); 
 			}
+			
+			int idx = ASTUtil.getParamIndex0(decl, var);
+			assert(idx != -1);
+			/*
+			if (idx == -1) {
+				throw new UnsupportedStringOpEx("Parameter ("
+						+ var+ ") not found in ("
+						+ decl.getName().getFullyQualifiedName() + ")"); 
+			}
+			*/
 			return new NameInParameter(decl, idx);
 		}
 	}
@@ -173,7 +221,8 @@ public class VariableTracker {
 			return null;
 		}
 		else {
-			return getLastModIn(var, ASTUtil.getLoopBody(loop));
+			NameUsage usage = getLastModIn(var, ASTUtil.getLoopBody(loop));
+			return usage;
 		}
 	}
 
@@ -222,10 +271,11 @@ public class VariableTracker {
 		if (target == null) { // check the effect of evaluating the method call
 			// TODO if name is at more than 1 position, then this means trouble (because of aliasing)
 			
-			// check expression position			
+			// check in expression position
+			// NB! this is relevant place for sb.append(...).append(...)
 			Expression exp = inv.getExpression();
-			if (exp instanceof Name	&& ASTUtil.sameBinding(exp, var)) {
-				return new NameMethodCall(inv, (Name)exp);
+			if (exp != null && ASTUtil.varIsUsedIn(var, exp)) {
+				return new NameInMethodCallExpression(inv, exp);
 			}
 			
 			// TODO sameBinding and returnsVarPointer are same things actually
@@ -256,7 +306,7 @@ public class VariableTracker {
 			}
 		}
 		
-		// FIXME ignoring expressions for now
+		// FIXME ignoring possible modifications in expression for now
 		return null;
 	}
 	
@@ -285,9 +335,9 @@ public class VariableTracker {
 		}
 		
 		// left hand side gets evaluated before rhs
-		if (target == null || target == ass.getRightHandSide()) {
-			return getLastModIn(var, ass.getLeftHandSide());
-		}
+//		if (target == null || target == ass.getRightHandSide()) {
+//			return getLastModIn(var, ass.getLeftHandSide());
+//		}
 		
 		return null; 
 	}
@@ -321,22 +371,26 @@ public class VariableTracker {
 			NameUsage elseUsage = null;
 			if (ifStmt.getElseStatement() != null) {
 				elseUsage = getLastModIn(var, ifStmt.getElseStatement());
-			}	
-			else if (thenUsage != null) { 
-				// need also something for else, go find it before if statement
-				elseUsage = getLastReachingMod(var, ifStmt);
 			}
 			
 			if (thenUsage == null && elseUsage == null) {
 				return null;
 			}
-			else {
-				return new NameUsageChoice(ifStmt, thenUsage, elseUsage);
+			// if one of branches is missing then get it before if
+			else if (thenUsage == null) {
+				thenUsage = getLastReachingMod(var, ifStmt);
 			}
+			else if (elseUsage == null) {
+				elseUsage = getLastReachingMod(var, ifStmt);
+			}
+			
+			assert thenUsage != null;
+			assert elseUsage != null;
+			return new NameUsageChoice(ifStmt, thenUsage, elseUsage);
 		}
 		else {
 			return null;
-			// FIXME following is more correct
+			// FIXME check also inside header
 			//assert target == ifStmt.getThenStatement() || target == ifStmt.getElseStatement();
 			//return getPrevReachingModIn(var, null, ifStmt.getExpression());
 		}

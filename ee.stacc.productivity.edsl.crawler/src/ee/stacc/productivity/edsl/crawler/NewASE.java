@@ -1,6 +1,9 @@
 package ee.stacc.productivity.edsl.crawler;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jdt.core.IJavaElement;
@@ -11,6 +14,7 @@ import org.eclipse.jdt.core.dom.CharacterLiteral;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -23,10 +27,17 @@ import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.TagElement;
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
+import ee.stacc.productivity.edsl.cache.CacheService;
 import ee.stacc.productivity.edsl.cache.UnsupportedStringOpEx;
+import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
+import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
+import ee.stacc.productivity.edsl.common.logging.ILog;
+import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.string.AbstractStringCollection;
 import ee.stacc.productivity.edsl.string.IAbstractString;
+import ee.stacc.productivity.edsl.string.IPosition;
 import ee.stacc.productivity.edsl.string.StringCharacterSet;
 import ee.stacc.productivity.edsl.string.StringChoice;
 import ee.stacc.productivity.edsl.string.StringConstant;
@@ -38,7 +49,7 @@ import ee.stacc.productivity.edsl.string.util.ArgumentApplier;
 import ee.stacc.productivity.edsl.tracker.NameAssignment;
 import ee.stacc.productivity.edsl.tracker.NameInArgument;
 import ee.stacc.productivity.edsl.tracker.NameInParameter;
-import ee.stacc.productivity.edsl.tracker.NameMethodCall;
+import ee.stacc.productivity.edsl.tracker.NameInMethodCallExpression;
 import ee.stacc.productivity.edsl.tracker.NameUsage;
 import ee.stacc.productivity.edsl.tracker.NameUsageChoice;
 import ee.stacc.productivity.edsl.tracker.NameUsageLoopChoice;
@@ -53,30 +64,92 @@ public class NewASE {
 	private boolean supportInvocations = true;
 	
 	private int level;
-	private MethodInvocation invocationContext;
-	private IJavaElement scope;
+	private IJavaElement[] scope;
+	private boolean templateConstructionMode;
 	
-	private NameUsage startingPlace;
-	private Statement mainBlock;
 	private static final String RESULT_FOR_SQL_CHECKER = "@ResultForSQLChecker";
+	private static final ILog LOG = Logs.getLog(NewASE.class);
+
 	
-	private NewASE(int level, MethodInvocation invocationContext, IJavaElement scope) {
+	private NewASE(int level, IJavaElement[] scope, boolean templateConstructionMode) {
 		
 		if (level > maxLevel) {
 			throw new UnsupportedStringOpEx("Analysis level (" + level + ") too deep");
 		}
 		
 		this.level = level;
-		this.invocationContext = invocationContext;
 		this.scope = scope;
+		this.templateConstructionMode = templateConstructionMode;
 	}
 	
 	public static IAbstractString evaluateExpression(Expression node) {
 		NewASE evaluator = 
-			new NewASE(0, null, ASTUtil.getNodeProject(node));
+			new NewASE(0, new IJavaElement[] {ASTUtil.getNodeProject(node)}, false);
 		return evaluator.eval(node);
 	}
 	
+	public static List<INodeDescriptor> evaluateMethodArgumentAtCallSites
+	(Collection<NodeRequest> requests,
+			IJavaElement[] scope, int level) {
+		String levelPrefix = "";
+		for (int i = 0; i < level; i++) {
+			levelPrefix += "    ";
+		}
+
+/*
+		LOG.message(levelPrefix + "###########################################");
+		LOG.message(levelPrefix + "searching: ");
+		for (NodeRequest nodeRequest : requests) {
+			LOG.message(nodeRequest);
+		}
+*/
+		System.out.println(levelPrefix + "###########################################");
+		System.out.println(levelPrefix + "searching: ");
+		for (NodeRequest nodeRequest : requests) {
+			System.out.println(levelPrefix + "NR: " + nodeRequest);
+		}
+
+		
+		// find value from all call-sites
+		Collection<IPosition> argumentPositions = NodeSearchEngine.findArgumentNodes
+		(scope, requests);
+
+		List<INodeDescriptor> result = new ArrayList<INodeDescriptor>();
+		for (IPosition sr: argumentPositions) {
+
+			try {
+				IAbstractString abstractString = CacheService.getCacheService().getAbstractString(sr);
+
+				if (abstractString == null) {
+					System.out.println(levelPrefix + "EVALUATING file: " 
+							+ sr.getPath() + ", line: "
+							+ PositionUtil.getLineNumber(sr));
+					
+					Expression arg = (Expression) NodeSearchEngine.getASTNode(sr);
+					NewASE evaluator = new NewASE(level, scope, false);
+					
+					abstractString = evaluator.eval(arg);
+				}
+				result.add(new StringNodeDescriptor(sr, abstractString));
+
+			} catch (UnsupportedStringOpEx e) {
+				/*
+				LOG.message(levelPrefix + "UNSUPPORTED: " + e.getMessage());
+				LOG.message(levelPrefix + "    file: " + sr.getPath() + ", line: "
+				+ sr.getLineNumber()
+				);
+				*/ 
+				System.out.println(levelPrefix + "UNSUPPORTED: " + e.getMessage());
+				System.out.println(levelPrefix + "    file: " + sr.getPath() + ", line: "
+						+ PositionUtil.getLineNumber(sr));
+				result.add(new UnsupportedNodeDescriptor(sr, 
+						"Unsupported SQL construction: " + e.getMessage() + " at " + PositionUtil.getLineString(sr)));
+			}
+
+		}
+		return result;
+	}
+
 	private IAbstractString eval(Expression node) {
 		
 		ITypeBinding type = node.resolveTypeBinding();
@@ -124,7 +197,28 @@ public class NewASE {
 	}
 	
 	private IAbstractString evalName(Name name) {
-		return evalNameBefore(name, name); 
+		IVariableBinding var = (IVariableBinding)name.resolveBinding();
+		
+		if (var.isField()) {
+			return evalField(var);
+		}
+		else {
+			return evalNameBefore(name, name);
+		}
+	}
+
+	private IAbstractString evalField(IVariableBinding var) {
+		assert var.isField();
+		
+		if ((var.getModifiers() & Modifier.FINAL) == 0) {
+			throw new UnsupportedStringOpEx("Non-final fields are not supported");
+		}
+		VariableDeclarationFragment frag = NodeSearchEngine.findFieldDeclarationFragment(
+					scope, 
+					var.getDeclaringClass().getErasure().getQualifiedName() 
+					+ "." + var.getName());
+
+		return eval(frag.getInitializer());
 	}
 
 	private IAbstractString evalNameBefore(Name name, ASTNode target) {
@@ -173,7 +267,8 @@ public class NewASE {
 			throw new UnsupportedStringOpEx("Method call");
 		}
 
-		List<MethodDeclaration> decls = NodeSearchEngine.findMethodDeclarations(new IJavaElement[] {scope}, inv);
+		List<MethodDeclaration> decls = 
+			NodeSearchEngine.findMethodDeclarations(scope, inv);
 		
 		if (decls.size() == 0) {
 			throw new UnsupportedStringOpEx("Possible problem, no declarations found for: " + inv.toString());
@@ -237,10 +332,12 @@ public class NewASE {
 		decl.accept(visitor);
 		
 		// get choice out of different return expressions
+		// Need new evaluator because mode changes to template construction
+		NewASE evaluator = new NewASE(level+1, scope, true);
 		
 		List<IAbstractString> options = new ArrayList<IAbstractString>();
 		for (ReturnStatement ret: returnStmts) {
-			options.add(eval(ret.getExpression()));
+			options.add(evaluator.eval(ret.getExpression()));
 		}
 		return new StringChoice(PositionUtil.getPosition(decl), options);
 	}
@@ -254,8 +351,9 @@ public class NewASE {
 		NameUsage lastMod = VariableTracker.getLastModIn(
 				(IVariableBinding)paramName.resolveBinding(), decl);
 
-		// lastMod may be NameInParameter, then StringParameter is returned
-		return evalNameAfterUsage(paramName, lastMod);
+		// need new evaluator because mode changes to template construction
+		NewASE evaluator = new NewASE(level+1, scope, true);
+		return evaluator.evalNameAfterUsage(paramName, lastMod);
 	}
 
 	private IAbstractString getMethodReturnValueFromJavadoc(MethodDeclaration decl) {
@@ -375,7 +473,8 @@ public class NewASE {
 		// alternatively, resolve recursion
 		
 		if (ASTUtil.inALoopSeparatingFrom(usage.getASTNode(), name)) {
-			return new NamedString(usage.getASTNode(), evalNameAfterUsageWithoutLoopCheck(name, usage));
+			throw new UnsupportedStringOpEx("modifications in loop not supported");
+//			return new NamedString(usage.getASTNode(), evalNameAfterUsageWithoutLoopCheck(name, usage));
 		}
 		else {
 			return evalNameAfterUsageWithoutLoopCheck(name, usage);
@@ -400,88 +499,131 @@ public class NewASE {
 		// can use this evaluator
 		if (usage instanceof NameUsageChoice) {
 			NameUsageChoice uc = (NameUsageChoice)usage;
-			/*
-			List<IAbstractString> stringChoices = new ArrayList<IAbstractString>();
-			for (NameUsage usageItem : ((NameUsageChoice)usage).getChoices()) {
-				stringChoices.add(this.evalNameAfterUsage(usageItem));
-			}
-			*/
 			return new StringChoice(this.evalNameAfterUsage(name, uc.getThenUsage()),
 					this.evalNameAfterUsage(name, uc.getElseUsage())); 
 		}
 		else if (usage instanceof NameUsageLoopChoice) {
-			NameUsageLoopChoice loopChoice = (NameUsageLoopChoice)usage;
-			assert loopChoice.getBaseUsage() != null;
-			assert loopChoice.getLoopUsage() != null;
-			
-			IAbstractString baseString = evalNameAfterUsage(name, loopChoice.getBaseUsage());
-			return new RecursiveStringChoice(baseString, loopChoice.getLoopUsage().getASTNode()); // null means outermost string TODO too ugly
-			/*
-			if (loopChoice.getLoopUsage() == this.startingPlace) {
-				IAbstractString baseString = evalNameAfterUsage(loopChoice.getBaseUsage());
-				return new RecursiveStringChoice(baseString, null); // null means outermost string TODO too ugly
-			}
-			else {
-				throw new UnsupportedStringOpEx("NameUsageLoopChoice weird case");
-			}
-			*/
+			return evalNameInLoopChoice(name, (NameUsageLoopChoice)usage);
 		}
 		else if (usage instanceof NameAssignment) {
-			NameAssignment ass = (NameAssignment)usage;
-			if (ass.getOperator() == Assignment.Operator.ASSIGN) {
-				return eval(ass.getRightHandSide());
-			}
-			else if (ass.getOperator() == Assignment.Operator.PLUS_ASSIGN) {
-				return new StringSequence(eval(ass.getName()),
-						eval(ass.getRightHandSide()));
-			}
-			else {
-				throw new UnsupportedStringOpEx("Unknown assignment operator: " + ass.getOperator());
-			}
+			return evalNameAssignment(name, (NameAssignment)usage);
 		}
 		else if (usage instanceof NameInParameter) {
-			return new StringParameter(((NameInParameter)usage).getIndex());
+			return evalNameInParameter((NameInParameter)usage);
 		}
 		else if (usage instanceof NameInArgument) {
-			if (isString(name.resolveTypeBinding())) {
-				// this usage doesn't affect it, keep looking
-				return evalNameBefore(name, usage.getASTNode());
-			}
-			else {
-				assert isStringBuilderOrBuffer(name.resolveTypeBinding());
-				NameInArgument argUsage = (NameInArgument)usage;
-				System.out.println("ARG USAGE: " +argUsage);
-				return evalInvocationArgOut(argUsage.getInv(), argUsage.getIndex()); 
-			}
+			return evalNameInArgument(name, (NameInArgument)usage);
 		}
-		else if (usage instanceof NameMethodCall) {
-			if (isString(name.resolveTypeBinding())) {
-				// this usage doesn't affect it, keep looking
-				return evalNameBefore(name, usage.getASTNode());
-			}
-			else {
-				assert isStringBuilderOrBuffer(name.resolveTypeBinding());
-				NameMethodCall call = (NameMethodCall)usage;
-				MethodInvocation inv = call.getInv();
-				if (inv.getName().getIdentifier().equals("append")) {
-					return new StringSequence(
-							PositionUtil.getPosition(inv),
-							eval(inv.getExpression()),
-							eval((Expression)inv.arguments().get(0)));
-				}
-				else if (inv.getName().getIdentifier().equals("toString")) {
-					return eval(inv.getExpression());
-				}
-				else {
-					throw new UnsupportedStringOpEx("Unknown method called on StringBuilder: " 
-							+ inv.getName());
-				}
-			}
+		else if (usage instanceof NameInMethodCallExpression) {
+			return evalNameInCallExpression(name, (NameInMethodCallExpression)usage);
 		}
 		else {
 			throw new UnsupportedStringOpEx("Unsupported NameUsage: " + usage.getClass());
 		}
 	}
+
+	private IAbstractString evalNameInCallExpression(Name name, 
+			NameInMethodCallExpression usage) {
+		if (isString(name.resolveTypeBinding())) {
+			// this usage doesn't affect it
+			return evalNameBefore(name, usage.getASTNode());
+		}
+		
+		else {
+			assert isStringBuilderOrBuffer(name.resolveTypeBinding());
+			MethodInvocation inv = usage.getInv();
+			if (inv.getName().getIdentifier().equals("append")) {
+				return new StringSequence(
+						PositionUtil.getPosition(inv),
+						eval(inv.getExpression()),
+						eval((Expression)inv.arguments().get(0)));
+			}
+			else if (inv.getName().getIdentifier().equals("toString")) {
+				return eval(inv.getExpression());
+			}
+			else {
+				throw new UnsupportedStringOpEx("Unknown method called on StringBuilder: " 
+						+ inv.getName());
+			}
+		}
+	}
+
+	private IAbstractString evalNameAssignment(Name name, NameAssignment usage) {
+		if (usage.getOperator() == Assignment.Operator.ASSIGN) {
+			return eval(usage.getRightHandSide());
+		}
+		else if (usage.getOperator() == Assignment.Operator.PLUS_ASSIGN) {
+			return new StringSequence(eval(usage.getName()),
+					eval(usage.getRightHandSide()));
+		}
+		else {
+			throw new UnsupportedStringOpEx("Unknown assignment operator: " + usage.getOperator());
+		}
+	}
+
+	private IAbstractString evalNameInArgument(Name name, NameInArgument usage) {
+		if (isString(name.resolveTypeBinding())) {
+			// this usage doesn't affect it, keep looking
+			return evalNameBefore(name, usage.getASTNode());
+		}
+		else {
+			assert isStringBuilderOrBuffer(name.resolveTypeBinding());
+			return evalInvocationArgOut(usage.getInv(), usage.getIndex()); 
+		}
+	}
+
+	private IAbstractString evalNameInLoopChoice(Name name, NameUsageLoopChoice usage) {
+		assert usage.getBaseUsage() != null;
+		assert usage.getLoopUsage() != null;
+		
+		IAbstractString baseString = evalNameAfterUsage(name, usage.getBaseUsage());
+		return new RecursiveStringChoice(baseString, usage.getLoopUsage().getASTNode()); // null means outermost string TODO too ugly
+		/*
+		if (loopChoice.getLoopUsage() == this.startingPlace) {
+			IAbstractString baseString = evalNameAfterUsage(loopChoice.getBaseUsage());
+			return new RecursiveStringChoice(baseString, null); // null means outermost string TODO too ugly
+		}
+		else {
+			throw new UnsupportedStringOpEx("NameUsageLoopChoice weird case");
+		}
+		*/
+	}
+
+	private IAbstractString evalNameInParameter(NameInParameter usage) {
+		if (this.templateConstructionMode) {
+			return new StringParameter(usage.getIndex());
+		}
+		else {
+			MethodDeclaration method = usage.getMethodDecl();
+			List<INodeDescriptor> descList = evaluateMethodArgumentAtCallSites(
+					Collections.singleton(
+							new NodeRequest(
+									ASTUtil.getMethodClassName(method), 
+									method.getName().toString(),
+									usage.getIndex()+1)), 
+					scope, // FIXME should be widened to ... ? 
+					level+1);
+			
+			List<IAbstractString> choices = new ArrayList<IAbstractString>();
+			
+			for (INodeDescriptor choiceDesc: descList) {
+				if (choiceDesc instanceof IStringNodeDescriptor) {
+					choices.add(((IStringNodeDescriptor)choiceDesc).getAbstractValue());
+				}
+				else {
+					// FIXME what about the rest ???
+				}
+			}
+			if (choices.size() == 0) {
+				throw new UnsupportedStringOpEx("Possible problem, no callsites found for: "
+						+ method.getName());
+			}
+			return new StringChoice(PositionUtil.getPosition(
+					(ASTNode)method.parameters().get(usage.getIndex())),
+					choices);
+		}
+	}
+
 	
 
 }

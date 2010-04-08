@@ -70,7 +70,7 @@ public class AbstractStringEvaluator {
 	}
 	
 	private AbstractStringEvaluator(int level, MethodInvocation invocationContext,
-			IJavaElement[] scope2) {
+			IJavaElement[] scope) {
 		
 		if (level > maxLevel) {
 			throw new UnsupportedStringOpEx("Analysis level (" + level + ") too deep");
@@ -78,7 +78,7 @@ public class AbstractStringEvaluator {
 		
 		this.level = level;
 		this.invocationContext = invocationContext;
-		this.scope = scope2;
+		this.scope = scope;
 	}
 	
 	private IAbstractString eval(Expression node) {
@@ -647,7 +647,7 @@ public class AbstractStringEvaluator {
 					throw new UnsupportedStringOpEx("eval Parameter");
 				}
 				MethodDeclaration method = ASTUtil.getContainingMethodDeclaration(stmt);
-				int paramIndex = ASTUtil.getParamIndex0(method, var)+1;
+				int paramIndexPlus1 = ASTUtil.getParamIndex0(method, var)+1;
 				
 				if (this.invocationContext != null) {
 					// TODO: check that invocation context matches
@@ -655,7 +655,7 @@ public class AbstractStringEvaluator {
 						new AbstractStringEvaluator(level+1, null, scope);
 					
 					return nextLevelEvaluator.eval
-						((Expression)this.invocationContext.arguments().get(paramIndex-1));
+						((Expression)this.invocationContext.arguments().get(paramIndexPlus1-1));
 				}
 				else {
 					List<INodeDescriptor> descList = 
@@ -664,7 +664,7 @@ public class AbstractStringEvaluator {
 										new NodeRequest(
 												ASTUtil.getMethodClassName(method), 
 												method.getName().toString(),
-												paramIndex)), 
+												paramIndexPlus1)), 
 							this.scope, this.level + 1);
 					
 					List<IAbstractString> choices = new ArrayList<IAbstractString>();

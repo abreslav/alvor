@@ -1,28 +1,25 @@
 package ee.stacc.productivity.edsl.tracker;
 
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 
-public class NameMethodCall extends NameUsage {
+public class NameInMethodCallExpression extends NameUsage {
 	private MethodInvocation inv;
-	private Name object;
+	private Expression expression;
 	
-	public NameMethodCall(MethodInvocation inv, Name object) {
+	public NameInMethodCallExpression(MethodInvocation inv, Expression expression) {
 		this.inv = inv;
-		this.object = object;
+		this.expression = expression;
 	}
 
 	public MethodInvocation getInv() {
 		return inv;
 	}
 	
-	public Name getObject() {
-		return object;
-	}
-
 	public ASTNode getASTNode() {
-		return inv;
+		return expression;
 	}
 	
 }
