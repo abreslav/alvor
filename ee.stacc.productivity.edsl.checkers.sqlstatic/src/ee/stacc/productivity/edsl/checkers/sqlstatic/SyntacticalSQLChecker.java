@@ -31,6 +31,10 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 			final ISQLErrorHandler errorHandler, Map<String, Object> options) {
 		for (final IStringNodeDescriptor descriptor : descriptors) {
 			IAbstractString abstractString = descriptor.getAbstractValue();
+			if (!hasAcceptableSize(abstractString)) {
+				errorHandler.handleSQLWarning("Abstract string is too big", abstractString.getPosition());
+				continue;
+			}
 			try {
 				State automaton = StringToAutomatonConverter.INSTANCE.convert(abstractString, new IInputItemFactory() {
 					
@@ -39,7 +43,6 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 							int character) {
 						IPosition position = set.getPosition();
 						return new PositionedCharacter(character, position, 0, position.getLength());
-//						throw new IllegalArgumentException("Character sets are not supported");
 					}
 					
 					@Override
@@ -69,16 +72,18 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 						errorHandler.handleSQLError("SQL syntax error. Most likely, unfinished query", descriptor.getPosition());
 					}
 				});
-			}
-			catch (IllegalArgumentException e) {
+			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
-			}
-			catch (MalformedStringLiteralException e) {
+			} catch (MalformedStringLiteralException e) {
 				errorHandler.handleSQLError("Malformed literal: " + e.getMessage(), descriptor.getPosition());
 			}
 		}
 	}
 	
+	private boolean hasAcceptableSize(IAbstractString abstractString) {
+		return AbstractStringSizeCounter.size(abstractString) <= 1000000;
+	}
+
 	private static Collection<IPosition> getMarkerPositions(ISequence<IAbstractInputItem> text) {
 		if (text.isEmpty()) {
 			return Collections.emptySet();

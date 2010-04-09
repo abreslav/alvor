@@ -612,10 +612,7 @@ public class AbstractStringEvaluator {
 		for (IPosition sr: argumentPositions) {
 
 				try {
-					System.out.println(sr + " line: " + PositionUtil.getLineNumber(sr));
-
 					IAbstractString abstractString = CacheService.getCacheService().getAbstractString(sr);
-					
 					
 					if (abstractString == null) {
 						Expression arg = (Expression) NodeSearchEngine.getASTNode(sr);
