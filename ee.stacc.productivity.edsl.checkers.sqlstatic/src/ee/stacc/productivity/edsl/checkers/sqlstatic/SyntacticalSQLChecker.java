@@ -37,7 +37,9 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 					@Override
 					public IAbstractInputItem createInputItem(StringCharacterSet set,
 							int character) {
-						throw new IllegalArgumentException("Character sets are not supported");
+						IPosition position = set.getPosition();
+						return new PositionedCharacter(character, position, 0, position.getLength());
+//						throw new IllegalArgumentException("Character sets are not supported");
 					}
 					
 					@Override

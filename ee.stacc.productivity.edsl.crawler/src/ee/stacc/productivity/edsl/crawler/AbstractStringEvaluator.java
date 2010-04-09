@@ -245,7 +245,7 @@ public class AbstractStringEvaluator {
 				return rhs;
 			}
 			else if (ass.getOperator() == Assignment.Operator.PLUS_ASSIGN) {
-				return new StringSequence(PositionUtil.getPosition(name), evalVarBefore(name, stmt), rhs);
+				return new StringSequence(PositionUtil.getPosition(ass), evalVarBefore(name, stmt), rhs);
 			}
 			else {
 				throw new UnsupportedStringOpEx("getVarValAfterAss: unknown operator");
@@ -612,7 +612,10 @@ public class AbstractStringEvaluator {
 		for (IPosition sr: argumentPositions) {
 
 				try {
+					System.out.println(sr + " line: " + PositionUtil.getLineNumber(sr));
+
 					IAbstractString abstractString = CacheService.getCacheService().getAbstractString(sr);
+					
 					
 					if (abstractString == null) {
 						Expression arg = (Expression) NodeSearchEngine.getASTNode(sr);

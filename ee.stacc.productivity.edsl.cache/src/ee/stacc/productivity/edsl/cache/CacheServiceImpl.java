@@ -152,6 +152,8 @@ public final class CacheServiceImpl implements ICacheService {
 			
 		} catch (SQLException e) {
 			LOG.exception(e);
+		} catch (StackOverflowError e) {
+			throw new RuntimeException("SOE");
 		}
 	}
 
@@ -169,6 +171,8 @@ public final class CacheServiceImpl implements ICacheService {
 			
 		} catch (SQLException e) {
 			LOG.exception(e);
+		} catch (StackOverflowError e) {
+			throw new RuntimeException("SOE");
 		}
 	}	
 	
@@ -477,8 +481,11 @@ public final class CacheServiceImpl implements ICacheService {
 		try {
 			return runStringConstruction(queries.getAbstractStringQuery(position), position);
 		} catch (SQLException e) {
-			e.printStackTrace();
+//			e.printStackTrace();
+			System.err.println(e.getMessage());
 			return null;
+		} catch (StackOverflowError e) {
+			throw new RuntimeException("SOE");
 		}
 	}
 
@@ -511,6 +518,7 @@ public final class CacheServiceImpl implements ICacheService {
 		case StringTypes.CONSTANT:
 			return getStringConstant(a, position); 
 		case StringTypes.CHAR_SET:
+			System.err.println("CS!!!");
 			return getStringCharacterSet(a, position); 
 //			throw new UnsupportedStringOpEx("CACHE: Char sets are not supported yet");
 //			throw new IllegalArgumentException("Char sets are not yet supported");

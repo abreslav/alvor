@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.internal.resources.Resource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.equinox.app.IApplication;
@@ -56,7 +57,9 @@ public class EDSLApplication implements IApplication {
 		
 		log = Logs.getLog(EDSLApplication.class);
 		log.message("Projects found:");
+		
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		root.refreshLocal(Resource.DEPTH_INFINITE, null);
 		IJavaModel javaModel = JavaCore.create(root);
 		IJavaProject[] projects = javaModel.getJavaProjects();
 		
@@ -102,8 +105,8 @@ public class EDSLApplication implements IApplication {
 //						}
 //						log.format("Average time: %f", (totalTime + 0.0) / count);
 						
-						checkHotspots(hotspots, projectChecker, options);
-						checkHotspots(hotspots, projectChecker, options);
+//						checkHotspots(hotspots, projectChecker, options);
+//						checkHotspots(hotspots, projectChecker, options);
 						checkHotspots(hotspots, projectChecker, options);
 					}
 				}
