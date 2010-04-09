@@ -281,7 +281,12 @@ public class AbstractStringEvaluator {
 			return evalVarAfterIf(name, (IfStatement)stmt);
 		}
 		else if (stmt instanceof Block) {
-			return evalVarAfter(name, ASTUtil.getLastStmt((Block)stmt));
+			Block block = (Block)stmt;
+			if (block.statements().isEmpty()) {
+				Statement prevStmt = ASTUtil.getPrevStmt(stmt);
+				return evalVarAfter(name, prevStmt);
+			}
+			return evalVarAfter(name, ASTUtil.getLastStmt(block));
 		}
 		else if (stmt instanceof ReturnStatement) {
 			return evalVarBefore(name, stmt);

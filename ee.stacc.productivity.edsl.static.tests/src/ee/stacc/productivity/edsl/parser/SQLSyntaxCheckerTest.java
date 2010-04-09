@@ -28,6 +28,7 @@ public class SQLSyntaxCheckerTest {
 		List<Object[]> result = new ArrayList<Object[]>();
 /*
 */		
+		addFromFile("data/sql_sub_all_selects.txt", true, result);
 		addFromFile("data/compiere_ok.txt", true, result);
 		addFromFile("data/compiere_fail.txt", false, result);
 		addFromFile("data/earved_sqls.txt", true, result);
