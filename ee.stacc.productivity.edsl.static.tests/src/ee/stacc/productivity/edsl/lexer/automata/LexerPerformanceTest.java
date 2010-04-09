@@ -1,6 +1,7 @@
 package ee.stacc.productivity.edsl.lexer.automata;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.Map.Entry;
 
 import org.junit.Test;
 
+import ee.stacc.productivity.edsl.checkers.sqlstatic.SyntacticalSQLChecker;
 import ee.stacc.productivity.edsl.lexer.sql.SQLLexer;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.IAbstractStringVisitor;
@@ -98,7 +100,10 @@ public class LexerPerformanceTest {
 
 	@Test
 	public void testBig() throws Exception {
-		final List<IAbstractString> strings = AbstractStringParser.parseFile("data/big.txt");
+		List<IAbstractString> strings = AbstractStringParser.parseFile("data/big.txt");
+		assertFalse(SyntacticalSQLChecker.hasAcceptableSize(strings.get(0)));
+		strings = AbstractStringParser.parseFile("data/new_big.txt");
+		assertFalse(SyntacticalSQLChecker.hasAcceptableSize(strings.get(0)));
 //		IAbstractString str = strings.get(0);
 //		System.out.println("Parsed. Size: " + size(str));
 //		IAbstractString opt = optimize(str);

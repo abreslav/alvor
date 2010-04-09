@@ -1,6 +1,7 @@
 package ee.stacc.productivity.edsl.parser;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -12,6 +13,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import ee.stacc.productivity.edsl.checkers.sqlstatic.AbstractStringSizeCounter;
+import ee.stacc.productivity.edsl.checkers.sqlstatic.SyntacticalSQLChecker;
 import ee.stacc.productivity.edsl.sqlparser.SQLSyntaxChecker;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.parser.AbstractStringParser;
@@ -25,13 +28,15 @@ public class SQLSyntaxCheckerTest {
 		List<Object[]> result = new ArrayList<Object[]>();
 /*
 */		
+		addFromFile("data/compiere_ok.txt", true, result);
+		addFromFile("data/compiere_fail.txt", false, result);
 		addFromFile("data/earved_sqls.txt", true, result);
 		addFromFile("data/earved_escape.txt", true, result);
 		addFromFile("data/earved_basic.txt", true, result);
 		addFromFile("data/earved_bugs.txt", false, result);
 		addFromFile("data/expect_fail.txt", false, result);
 		
-		System.out.println(result.size());
+//		System.out.println(result.size());
 		
 		return result;
 	}
@@ -55,6 +60,7 @@ public class SQLSyntaxCheckerTest {
 
 	@Test
 	public void testSQL() throws Exception {
+		assertTrue("String is too big: " + AbstractStringSizeCounter.size(abstractString), SyntacticalSQLChecker.hasAcceptableSize(abstractString));
 		List<String> errors = SQLSyntaxChecker.INSTANCE.check(abstractString);
 		assertEquals(errors + "   " + abstractString.toString(), expected, errors.isEmpty());
 	}

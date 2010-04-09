@@ -22,10 +22,14 @@ Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
 
 <YYINITIAL> {
   "DISTINCT" {/*DISTINCT*/}
+  "BETWEEN" {/*BETWEEN*/}
   "VALUES" {/*VALUES*/}
   "SELECT" {/*SELECT*/}
   "INSERT" {/*INSERT*/}
   "ESCAPE" {/*ESCAPE*/}
+  "UPDATE" {/*UPDATE*/}
+  "EXISTS" {/*EXISTS*/}
+  "HAVING" {/*HAVING*/}
   "WHERE" {/*WHERE*/}
   "TABLE" {/*TABLE*/}
   "ORDER" {/*ORDER*/}
@@ -49,6 +53,7 @@ Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
   "END" {/*END*/}
   "ASC" {/*ASC*/}
   "XOR" {/*XOR*/}
+  "FOR" {/*FOR*/}
   "NOT" {/*NOT*/}
   "OR" {/*OR*/}
   "ON" {/*ON*/}

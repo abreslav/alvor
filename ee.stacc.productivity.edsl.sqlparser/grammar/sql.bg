@@ -80,6 +80,11 @@ import java.io.IOException;
 %token CONCAT
 %token TABLE
 %token LIKE
+%token FOR
+%token UPDATE
+%token EXISTS
+%token BETWEEN
+%token HAVING
 
 //%left AS
 %left OR XOR
@@ -91,13 +96,29 @@ import java.io.IOException;
 
 %%
 select 
-	: basicSelect where orderBy
+	: basicSelect where orderBy groupBy forUpdate 
 	;
 basicSelect
 	: SELECT optDist whatToSelect FROM tableList
 	;
 where
 	: WHERE whereCond
+	| /*empty*/
+	;
+forUpdate
+	: FOR UPDATE
+	| /*empty*/
+	;
+groupBy
+	: GROUP BY identList having
+	| /*empty*/
+	;
+identList
+	: ident
+	| ident ',' identList
+	;
+having 
+	: HAVING condition
 	| /*empty*/
 	;
 orderBy
@@ -181,7 +202,9 @@ condition
 	| simpleExpr inExpr '(' simExList ')'
 	| simpleExpr inExpr '(' select ')'
 	| simpleExpr IS optNot NULL
-	| simpleExpr LIKE simpleExpr escape 
+	| simpleExpr LIKE simpleExpr escape
+	| EXISTS '(' select ')' 
+	| simpleExpr optNot BETWEEN simpleExpr AND simpleExpr
 	;
 comparison 
 	: simpleExpr '=' simpleExpr 

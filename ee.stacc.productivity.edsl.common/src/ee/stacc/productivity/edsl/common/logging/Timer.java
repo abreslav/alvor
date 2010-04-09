@@ -2,13 +2,24 @@ package ee.stacc.productivity.edsl.common.logging;
 
 public class Timer {
 
+	private final ILog log;
 	private long time;
 	private String message;
 	
 	public Timer() {
+		this(PrintStreamLog.SYSTEM_OUT);
 	}
 
 	public Timer(String message) {
+		this(PrintStreamLog.SYSTEM_OUT, message);
+	}
+	
+	public Timer(ILog log) {
+		this.log = log;
+	}
+	
+	public Timer(ILog log, String message) {
+		this(log);
 		start(message);
 	}
 	
@@ -19,7 +30,7 @@ public class Timer {
 	
 	public void printTime() {
 		long t = System.nanoTime() - time;
-		System.out.println(message + ": " + (t / 1000000000.0));
+		log.message(message + ": " + (t / 1000000000.0));
 	}
 	
 	public void printTimeAndStart(String message) {

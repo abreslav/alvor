@@ -26,6 +26,8 @@ import ee.stacc.productivity.edsl.string.StringConstant;
 
 public class SyntacticalSQLChecker implements IAbstractStringChecker {
 
+	private static int SIZE_THRESHOLD = 50000;
+	
 	@Override
 	public void checkAbstractStrings(List<IStringNodeDescriptor> descriptors,
 			final ISQLErrorHandler errorHandler, Map<String, Object> options) {
@@ -80,8 +82,8 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 		}
 	}
 	
-	private boolean hasAcceptableSize(IAbstractString abstractString) {
-		return AbstractStringSizeCounter.size(abstractString) <= 1000000;
+	public static boolean hasAcceptableSize(IAbstractString abstractString) {
+		return AbstractStringSizeCounter.size(abstractString) <= SIZE_THRESHOLD;
 	}
 
 	private static Collection<IPosition> getMarkerPositions(ISequence<IAbstractInputItem> text) {
