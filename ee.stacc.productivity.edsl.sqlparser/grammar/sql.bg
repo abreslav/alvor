@@ -87,6 +87,9 @@ import java.io.IOException;
 %token HAVING
 %token OUTERJ
 %token UNION
+%token DELETE
+%token SET
+%token COMMIT
 
 //%left AS
 %left OR XOR
@@ -94,10 +97,46 @@ import java.io.IOException;
 %right NOT
 %left UNION
 %left '=' NE LE GE '>' '<'
+%left LIKE
 %left '-' '+'  
 %left '/' '*' CONCAT OUTERJ
 
 %%
+query
+	: bracketedSelect
+	| delete
+	| insert
+	| update
+	| COMMIT
+	;
+update
+	: UPDATE alias SET assignList where
+	;
+assignList
+	: assign
+	| assign ',' assignList
+	;
+assign
+	: ident '=' simpleExpr
+	;
+delete
+	: DELETE optFrom alias where
+	;	
+optFrom
+	: FROM
+	| /*empty*/
+	;
+insert
+	: INSERT INTO alias optIdList VALUES identRest
+	;
+optIdList
+	: /*empty*/
+	| '(' idList ')'
+	;
+idList
+	: ID
+	| ID ',' idList
+	;
 bracketedSelect
 	: select
 	| '(' select ')'

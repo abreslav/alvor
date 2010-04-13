@@ -25,11 +25,13 @@ Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
   "BETWEEN" {/*BETWEEN*/}
   "VALUES" {/*VALUES*/}
   "SELECT" {/*SELECT*/}
+  "DELETE" {/*DELETE*/}
   "INSERT" {/*INSERT*/}
   "ESCAPE" {/*ESCAPE*/}
   "UPDATE" {/*UPDATE*/}
   "EXISTS" {/*EXISTS*/}
   "HAVING" {/*HAVING*/}
+  "COMMIT" {/*COMMIT*/}
   "WHERE" {/*WHERE*/}
   "TABLE" {/*TABLE*/}
   "ORDER" {/*ORDER*/}
@@ -51,6 +53,7 @@ Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
   "FULL" {/*FULL*/}
   "INTO" {/*INTO*/}
   "AND" {/*AND*/}
+  "SET" {/*SET*/}
   "END" {/*END*/}
   "ASC" {/*ASC*/}
   "XOR" {/*XOR*/}
