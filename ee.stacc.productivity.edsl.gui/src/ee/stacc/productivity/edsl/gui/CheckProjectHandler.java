@@ -24,14 +24,25 @@ import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
+import ee.stacc.productivity.edsl.crawler.UnsupportedNodeDescriptor;
 import ee.stacc.productivity.edsl.main.JavaElementChecker;
 import ee.stacc.productivity.edsl.main.OptionLoader;
+import ee.stacc.productivity.edsl.string.IAbstractString;
+import ee.stacc.productivity.edsl.string.IAbstractStringVisitor;
 import ee.stacc.productivity.edsl.string.IPosition;
+import ee.stacc.productivity.edsl.string.StringCharacterSet;
+import ee.stacc.productivity.edsl.string.StringChoice;
+import ee.stacc.productivity.edsl.string.StringConstant;
+import ee.stacc.productivity.edsl.string.StringParameter;
+import ee.stacc.productivity.edsl.string.StringRepetition;
+import ee.stacc.productivity.edsl.string.StringSequence;
 
 public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHandler {
 	public static final String ERROR_MARKER_ID = "ee.stacc.productivity.edsl.gui.sqlerror";
 	public static final String WARNING_MARKER_ID = "ee.stacc.productivity.edsl.gui.sqlwarning";
 	public static final String HOTSPOT_MARKER_ID = "ee.stacc.productivity.edsl.gui.sqlhotspot";
+	public static final String UNSUPPORTED_MARKER_ID = "ee.stacc.productivity.edsl.gui.unsupported";
+	public static final String STRING_MARKER_ID = "ee.stacc.productivity.edsl.gui.sqlstring";
 
 	private static final ILog LOG = Logs.getLog(CheckProjectHandler.class);
 	
@@ -99,6 +110,8 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 				element.getResource().deleteMarkers(ERROR_MARKER_ID, true, IResource.DEPTH_INFINITE);
 				element.getResource().deleteMarkers(WARNING_MARKER_ID, true, IResource.DEPTH_INFINITE);
 				element.getResource().deleteMarkers(HOTSPOT_MARKER_ID, true, IResource.DEPTH_INFINITE);
+				element.getResource().deleteMarkers(UNSUPPORTED_MARKER_ID, true, IResource.DEPTH_INFINITE);
+				element.getResource().deleteMarkers(STRING_MARKER_ID, true, IResource.DEPTH_INFINITE);
 			}
 		} catch (Exception e) {
 			LOG.exception(e);
@@ -111,7 +124,7 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 		int charEnd = charStart + pos.getLength();
 		
 		LOG.message("creating marker: " + message + ", file=" + file
-				+ ", charStart=" + charStart + ", charEnd=" + charEnd);
+				+ ", charStart=" + charStart + ", charEnd=" + charEnd + ", type=" + markerType);
 		
 		Map<String, Comparable<?>> map = new HashMap<String, Comparable<?>>();
 		MarkerUtilities.setMessage(map, message);
@@ -134,13 +147,76 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 
 	private void markHotspots(List<INodeDescriptor> hotspots) {
 		for (INodeDescriptor hotspot : hotspots) {
+			String message;
+			String markerId;
+			if (hotspot instanceof IStringNodeDescriptor) {
+				IStringNodeDescriptor snd = (IStringNodeDescriptor) hotspot;
+				IAbstractString abstractValue = snd.getAbstractValue();
+				message = "Abstract string: " + abstractValue;
+				markerId = HOTSPOT_MARKER_ID;
+				markConstants(abstractValue);
+			} else if (hotspot instanceof UnsupportedNodeDescriptor) {
+				UnsupportedNodeDescriptor und = (UnsupportedNodeDescriptor) hotspot;
+				message = "Unsupported construction: " + und.getProblemMessage();
+				markerId = UNSUPPORTED_MARKER_ID;
+			} else {
+				throw new IllegalArgumentException(hotspot + "");
+			}
 			createMarker(
-					(hotspot instanceof IStringNodeDescriptor) ?
-							("Abstract string: " + ((IStringNodeDescriptor)hotspot).getAbstractValue())
-							: "Unsupported construction", 
-					HOTSPOT_MARKER_ID, 
+					message, 
+					markerId, 
 					hotspot.getPosition());
 		}		
+	}
+
+	private void markConstants(IAbstractString abstractValue) {
+		IAbstractStringVisitor<Void, Void> visitor = new IAbstractStringVisitor<Void, Void>() {
+
+			@Override
+			public Void visitStringCharacterSet(
+					StringCharacterSet characterSet, Void data) {
+				createMarker("", STRING_MARKER_ID, characterSet.getPosition());
+				return null;
+			}
+
+			@Override
+			public Void visitStringChoice(StringChoice stringChoice, Void data) {
+				for (IAbstractString s : stringChoice.getItems()) {
+					s.accept(this, null);
+				}
+				return null;
+			}
+
+			@Override
+			public Void visitStringConstant(StringConstant stringConstant,
+					Void data) {
+				createMarker("", STRING_MARKER_ID, stringConstant.getPosition());
+				return null;
+			}
+
+			@Override
+			public Void visitStringParameter(StringParameter stringParameter,
+					Void data) {
+				return null;
+			}
+
+			@Override
+			public Void visitStringRepetition(
+					StringRepetition stringRepetition, Void data) {
+				stringRepetition.getBody().accept(this, null);
+				return null;
+			}
+
+			@Override
+			public Void visitStringSequence(StringSequence stringSequence,
+					Void data) {
+				for (IAbstractString s : stringSequence.getItems()) {
+					s.accept(this, null);
+				}
+				return null;
+			}
+		};
+		abstractValue.accept(visitor, null);
 	}
 
 	@Override

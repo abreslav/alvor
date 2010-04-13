@@ -52,6 +52,7 @@
          </command>
       </menuContribution>
    </extension>
+   
    <extension
          point="org.eclipse.core.expressions.definitions">
       <definition
@@ -82,6 +83,10 @@
              super="org.eclipse.ui.workbench.texteditor.info"
              markerType="ee.stacc.productivity.edsl.gui.sqlhotspot">
          </type>
+         <type
+               markerType="ee.stacc.productivity.edsl.gui.sqlstring"
+               name="sqlstring">
+         </type>
    </extension>
 
    <extension
@@ -98,11 +103,80 @@
             presentationLayer="4"
             highlightPreferenceValue="true"
             label="sqlhotspot"
-            colorPreferenceValue="51,204,255"
+            colorPreferenceValue="255,240,200"
             verticalRulerPreferenceValue="true"
             overviewRulerPreferenceValue="true"
             textStylePreferenceKey="highlight.text.style" >
         </specification >
+         <specification
+               annotationType="unsupported"
+               colorPreferenceKey="highlight.color-2"
+               colorPreferenceValue="255,120,120"
+               highlightPreferenceKey="highlight.background"
+               highlightPreferenceValue="true"
+               label="unsupported"
+               overviewRulerPreferenceKey="highlight.rulers.overview"
+               overviewRulerPreferenceValue="true"
+               presentationLayer="4"
+               textPreferenceKey="highlight.text"
+               textPreferenceValue="true"
+               textStylePreferenceKey="highlight.text.style"
+               textStylePreferenceValue="BOX"
+               verticalRulerPreferenceKey="highlight.rulers.vertical"
+               verticalRulerPreferenceValue="true">
+         </specification>
+    </extension>
+   
+   <extension
+         id="sqlstring"
+         name="SQL string marker"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+      <persistent value="true"/>
+    </extension>
+    
+
+
+   <extension
+         id="unsupported"
+         name="SQL unsupported marker"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+      <persistent value="true"/>
+    </extension>
+    
+	<extension 
+         point="org.eclipse.ui.editors.annotationTypes">
+         <type
+             name="unsupported"
+             super="org.eclipse.ui.workbench.texteditor.info"
+             markerType="ee.stacc.productivity.edsl.gui.unsupported">
+         </type>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.editors.markerAnnotationSpecification">
+         <specification
+               annotationType="sqlstring"
+               colorPreferenceKey="highlight.color-1"
+               colorPreferenceValue="255,240,200"
+               highlightPreferenceKey="highlight.background"
+               highlightPreferenceValue="true"
+               label="sqlstring"
+               overviewRulerPreferenceKey="highlight.rulers.overview-1"
+               overviewRulerPreferenceValue="false"
+               presentationLayer="0"
+               textPreferenceKey="highlight.text"
+               textPreferenceValue="true"
+               textStylePreferenceKey="highlight.text.style"
+               textStylePreferenceValue="BOX"
+               verticalRulerPreferenceKey="highlight.rulers.vertical-1"
+               verticalRulerPreferenceValue="false">
+         </specification>
     </extension>
 
 </plugin>
