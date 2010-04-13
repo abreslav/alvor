@@ -37,6 +37,8 @@ public class SQLSyntaxCheckerTest {
 		addFromFile("data/earved_basic.txt", true, result);
 		addFromFile("data/earved_bugs.txt", false, result);
 		addFromFile("data/expect_fail.txt", false, result);
+//		addFromFile("data/big.txt", false, result);
+//		addFromFile("data/new_big.txt", false, result);
 		
 //		System.out.println(result.size());
 		
@@ -62,7 +64,13 @@ public class SQLSyntaxCheckerTest {
 
 	@Test
 	public void testSQL() throws Exception {
-		IAbstractString optimized = abstractString;//AbstractStringOptimizer.optimize(abstractString);
+		IAbstractString optimized = abstractString;
+		int size = AbstractStringSizeCounter.size(optimized);
+		optimized = AbstractStringOptimizer.optimize(abstractString);
+		size = size - AbstractStringSizeCounter.size(optimized);
+		if (size > 0) {
+//			System.out.println(size);
+		}
 		assertTrue("String is too big: " + AbstractStringSizeCounter.size(optimized), SyntacticalSQLChecker.hasAcceptableSize(optimized));
 		List<String> errors = SQLSyntaxChecker.INSTANCE.check(optimized);
 		assertEquals(errors + "   " + optimized.toString(), expected, errors.isEmpty());

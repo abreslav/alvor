@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -101,9 +102,15 @@ public class LexerPerformanceTest {
 	@Test
 	public void testBig() throws Exception {
 		List<IAbstractString> strings = AbstractStringParser.parseFile("data/big.txt");
-		assertFalse(SyntacticalSQLChecker.hasAcceptableSize(strings.get(0)));
+		IAbstractString big = strings.get(0);
+		assertFalse(SyntacticalSQLChecker.hasAcceptableSize(big));
+//		System.out.println(AbstractStringSizeCounter.size(big));
+//		System.out.println(AbstractStringSizeCounter.size(AbstractStringOptimizer.optimize(big)));
 		strings = AbstractStringParser.parseFile("data/new_big.txt");
-		assertFalse(SyntacticalSQLChecker.hasAcceptableSize(strings.get(0)));
+		IAbstractString big_new = strings.get(0);
+		assertFalse(SyntacticalSQLChecker.hasAcceptableSize(big_new));
+//		System.out.println(AbstractStringSizeCounter.size(big_new));
+//		System.out.println(AbstractStringSizeCounter.size(AbstractStringOptimizer.optimize(big_new)));
 //		IAbstractString str = strings.get(0);
 //		System.out.println("Parsed. Size: " + size(str));
 //		IAbstractString opt = optimize(str);
