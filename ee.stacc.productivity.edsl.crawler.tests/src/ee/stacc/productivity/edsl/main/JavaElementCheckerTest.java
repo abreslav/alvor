@@ -30,6 +30,8 @@ import ee.stacc.productivity.edsl.crawler.UnsupportedNodeDescriptor;
 public class JavaElementCheckerTest {
 	JavaElementChecker checker = new JavaElementChecker();
 	IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+	private static final String TEST_FOLDER = 
+		"C:/edslws/ee.stacc.productivity.edsl.crawler.tests/tests";
 	
 	public JavaElementCheckerTest()  {
 		
@@ -62,20 +64,23 @@ public class JavaElementCheckerTest {
 		
 		IJavaProject javaProject = (IJavaProject)project.getNature(JavaCore.NATURE_ID);
 		
+		String id = projectName + "_" + packageFragmentRoot;
+		
 		if (packageFragmentRoot.isEmpty()) {
-			testJavaElementAbstractStrings(javaProject);
+			testJavaElementAbstractStrings(javaProject, id);
 		}
 		else {
 			testJavaElementAbstractStrings(javaProject.findPackageFragmentRoot
-					(javaProject.getPath().append(packageFragmentRoot)));
+					(javaProject.getPath().append(packageFragmentRoot)), id);
 		}
 	}
 	
-	private void testJavaElementAbstractStrings(IJavaElement element) throws IOException {
+	private void testJavaElementAbstractStrings(IJavaElement element, String id) throws IOException {
 		Map<String, Object> options = OptionLoader.getElementSqlCheckerProperties(element);
 		List<INodeDescriptor> hotspots = checker.findHotspots(new IJavaElement[] {element}, options);
 		
-		File outputFile = element.getResource().getLocation().append("FoundAbstractStrings.txt").toFile();
+		String filePrefix = TEST_FOLDER + "/" + id;
+		File outputFile = new File(filePrefix + "_found.txt");
 		if (outputFile.exists()) {
 			outputFile.delete();
 		}
@@ -105,8 +110,7 @@ public class JavaElementCheckerTest {
 			output.println(s);
 		}
 		
-		File expectedFile = element.getResource().getLocation()
-			.append("ExpectedAbstractStrings.txt").toFile();
+		File expectedFile = new File(filePrefix + "_expected.txt");
 		
 		assertTrue("Expected abstract strings != found abstract strings: " + expectedFile.getParent(), 
 					filesAreEqual(outputFile, expectedFile));
