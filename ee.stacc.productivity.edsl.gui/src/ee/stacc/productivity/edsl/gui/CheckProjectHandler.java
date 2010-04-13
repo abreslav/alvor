@@ -11,7 +11,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jface.viewers.ISelection;
@@ -41,8 +40,18 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		LOG.message("CheckProjectHandler.execute");
-		IJavaElement selectedJavaElement = getSelectedJavaElement();
-		performCheck(selectedJavaElement, new IJavaElement[] {selectedJavaElement});
+//		IJavaElement selectedJavaElement = getSelectedJavaElement();
+		List<Object> selectedJavaElements = getSelectedJavaElements();
+		for (Object object : selectedJavaElements) {
+			if (object instanceof IJavaElement) {
+				IJavaElement element = (IJavaElement) object;
+				try {
+					performCheck(element, new IJavaElement[] {element});
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
 		return null; // Must be null
 	}
 
@@ -67,18 +76,19 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 	/*
 	 * @return an IJavaElement currently selected in the workbench
 	 */
-	private IJavaElement getSelectedJavaElement() {
+	private List<Object> getSelectedJavaElements() {
 		ISelection selection = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService().getSelection();
 		if (selection instanceof StructuredSelection) {
 			StructuredSelection structSel = (StructuredSelection) selection;
-			Object firstElement = structSel.getFirstElement();
-			if (firstElement instanceof IJavaElement) {
-				return (IJavaElement) firstElement;
-			} else if (firstElement instanceof IAdaptable) {
-				IAdaptable adaptable = (IAdaptable) firstElement;
-				Object adapter = adaptable.getAdapter(IJavaElement.class);
-				return (IJavaElement) adapter;
-			}
+			return structSel.toList();
+//			Object firstElement = structSel.getFirstElement();
+//			if (firstElement instanceof IJavaElement) {
+//				return (IJavaElement) firstElement;
+//			} else if (firstElement instanceof IAdaptable) {
+//				IAdaptable adaptable = (IAdaptable) firstElement;
+//				Object adapter = adaptable.getAdapter(IJavaElement.class);
+//				return (IJavaElement) adapter;
+//			}
 		}
 		throw new IllegalStateException("No Java element selected");
 	}

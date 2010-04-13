@@ -37,6 +37,7 @@ Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
   "RIGHT" {/*RIGHT*/}
   "INNER" {/*INNER*/}
   "OUTER" {/*OUTER*/}
+  "UNION" {/*UNION*/}
   "FROM" {/*FROM*/}
   "WHEN" {/*WHEN*/}
   "THEN" {/*THEN*/}
@@ -61,6 +62,7 @@ Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
   "AS" {/*AS*/}
   "IN" {/*IN*/}
   "IS" {/*IS*/}
+  "(+)" {/*OUTERJ*/}
   "<>" {/*NE*/}
   "<=" {/*LE*/}
   ">=" {/*GE*/}

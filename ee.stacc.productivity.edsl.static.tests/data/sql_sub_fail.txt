@@ -1,0 +1,2 @@
+"select 1 from DWH_PARTY_STATS where WHERE PROCESSED = 'N'"
+"" "SELECT bcc.value_code real_value"  "     , bcc.description description "  "FROM BCC_DOMAIN_VALUES bcc "  "WHERE bcc.doma_type_code = 'SMSH'"  "  AND NVL(bcc.arhive, '*') <> 'Y'"  "  AND bcc.numeric_value = 1"  "ORDER BY value_code" 

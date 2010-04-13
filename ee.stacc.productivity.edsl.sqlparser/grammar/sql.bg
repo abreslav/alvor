@@ -85,18 +85,22 @@ import java.io.IOException;
 %token EXISTS
 %token BETWEEN
 %token HAVING
+%token OUTERJ
+%token UNION
 
 //%left AS
 %left OR XOR
 %left AND
 %right NOT
+%left UNION
 %left '=' NE LE GE '>' '<'
 %left '-' '+'  
-%left '/' '*' CONCAT
+%left '/' '*' CONCAT OUTERJ
 
 %%
 select 
 	: basicSelect where orderBy groupBy forUpdate 
+	| select UNION select
 	;
 basicSelect
 	: SELECT optDist whatToSelect FROM tableList
@@ -189,6 +193,7 @@ tableExpr
 ident 
 	: ID 
 	| ID '.' ID
+	| ID '.' ID '.' ID
 	;
 whereCond
 	: condition;
@@ -227,6 +232,8 @@ optNot
 	;
 simpleExpr
 	: NUMBER
+	| simpleExpr OUTERJ
+	| '-' simpleExpr
 	| CASE whenList else END
 	| STRING_SQ
 	| ident identRest
