@@ -26,7 +26,7 @@ import ee.stacc.productivity.edsl.string.StringConstant;
 
 public class SyntacticalSQLChecker implements IAbstractStringChecker {
 
-	private static int SIZE_THRESHOLD = 20000;
+	private static int SIZE_THRESHOLD = 25000;
 	
 	@Override
 	public void checkAbstractStrings(List<IStringNodeDescriptor> descriptors,

@@ -47,7 +47,7 @@
             locationURI="popup:org.eclipse.jdt.ui.PackageExplorer?after=additions">
          <command
                commandId="ee.stacc.eclipsesql.plugin.CheckProject"
-               label="##### Check SQL in active Project ######"
+               label="##### Check SQL in selected elements ######"
                style="push">
          </command>
       </menuContribution>
@@ -98,7 +98,7 @@
             presentationLayer="4"
             highlightPreferenceValue="true"
             label="sqlhotspot"
-            colorPreferenceValue="128,255,0"
+            colorPreferenceValue="51,204,255"
             verticalRulerPreferenceValue="true"
             overviewRulerPreferenceValue="true"
             textStylePreferenceKey="highlight.text.style" >

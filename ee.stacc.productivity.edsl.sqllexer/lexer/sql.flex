@@ -21,6 +21,7 @@ Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
 %% 
 
 <YYINITIAL> {
+  "PARTITION" {/*PARTITION*/}
   "DISTINCT" {/*DISTINCT*/}
   "BETWEEN" {/*BETWEEN*/}
   "VALUES" {/*VALUES*/}
@@ -41,9 +42,11 @@ Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
   "OUTER" {/*OUTER*/}
   "UNION" {/*UNION*/}
   "FROM" {/*FROM*/}
+  "OVER" {/*OVER*/}
   "WHEN" {/*WHEN*/}
   "THEN" {/*THEN*/}
   "CASE" {/*CASE*/}
+  "CAST" {/*CAST*/}
   "ELSE" {/*ELSE*/}
   "DESC" {/*DESC*/}
   "LIKE" {/*LIKE*/}

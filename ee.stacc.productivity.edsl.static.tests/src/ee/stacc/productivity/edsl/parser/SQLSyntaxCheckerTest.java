@@ -29,14 +29,14 @@ public class SQLSyntaxCheckerTest {
 /*
 */		
 		addFromFile("data/sql_sub_all_ok.txt", true, result);
-		addFromFile("data/sql_sub_fail.txt", true, result);
-//		addFromFile("data/compiere_ok.txt", true, result);
-//		addFromFile("data/compiere_fail.txt", false, result);
-//		addFromFile("data/earved_sqls.txt", true, result);
-//		addFromFile("data/earved_escape.txt", true, result);
-//		addFromFile("data/earved_basic.txt", true, result);
-//		addFromFile("data/earved_bugs.txt", false, result);
-//		addFromFile("data/expect_fail.txt", false, result);
+		addFromFile("data/sql_sub_fail.txt", false, result);
+		addFromFile("data/compiere_ok.txt", true, result);
+		addFromFile("data/compiere_fail.txt", false, result);
+		addFromFile("data/earved_sqls.txt", true, result);
+		addFromFile("data/earved_escape.txt", true, result);
+		addFromFile("data/earved_basic.txt", true, result);
+		addFromFile("data/earved_bugs.txt", false, result);
+		addFromFile("data/expect_fail.txt", false, result);
 		
 //		System.out.println(result.size());
 		

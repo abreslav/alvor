@@ -33,7 +33,7 @@ import java.io.IOException;
 }
 %define parser_class_name "SQLParser"
 
-%token VALUES
+%token VALUES PARTITION OVER
 %token ESCAPE
 %token SELECT
 %token INSERT
@@ -89,9 +89,10 @@ import java.io.IOException;
 %token UNION
 %token DELETE
 %token SET
-%token COMMIT
+%token COMMIT CAST
 
 //%left AS
+%left OVER
 %left OR XOR
 %left AND
 %right NOT
@@ -286,12 +287,18 @@ simpleExpr
 	| simpleExpr '*' simpleExpr
 	| simpleExpr '/' simpleExpr
 	| simpleExpr CONCAT simpleExpr
+	| simpleExpr OVER partition
+	| CAST '(' simpleExpr AS ID optSize ')'
 	| '(' select ')'
 	| ID '.' '*'
 	| '*'
 	| '?'
 	| NULL
 	;	
+optSize
+	: /*empty*/
+	| '(' NUMBER ')'
+	;
 identRest
 	: '(' simExList ')'
 	| /*empty*/
@@ -311,4 +318,7 @@ simExList
 	: /*empty*/
 	| simpleExpr
 	| simpleExpr ',' simExList
+	;
+partition
+	: '(' PARTITION BY ident orderBy ')'
 	;
