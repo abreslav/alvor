@@ -331,7 +331,7 @@ public class VariableTracker {
 		
 		if (target == null 
 				&& ASTUtil.sameBinding(ass.getLeftHandSide(), var)) {
-			return new NameAssignment(ass.getLeftHandSide(), ass.getOperator(), ass.getRightHandSide());
+			return new NameAssignment(ass);
 		}
 		
 		// left hand side gets evaluated before rhs
@@ -344,8 +344,24 @@ public class VariableTracker {
 
 	private static NameUsage getLastReachingModInVDeclStmt(IVariableBinding var, 
 			ASTNode target, VariableDeclarationStatement vDeclStmt) {
-		assert vDeclStmt.fragments().size() == 1; // FIXME
-		return getLastReachingModInVDecl(var, target, (VariableDeclaration)vDeclStmt.fragments().get(0));
+		
+		int fragIdx; 
+		if (target == null) { // all fragments are of interest
+			fragIdx = vDeclStmt.fragments().size()-1;
+		}
+		else { // interested in preceding fragments (if any)
+			fragIdx = vDeclStmt.fragments().indexOf(target)-1;
+		}
+		for (int i = fragIdx; i >= 0; i--) {
+			NameUsage usage = getLastModIn(var, 
+					(VariableDeclarationFragment)vDeclStmt.fragments().get(i));
+			if (usage != null) {
+				return usage;
+			}
+		}
+		
+		return null;
+//		return getLastReachingModInVDecl(var, target, (VariableDeclaration)vDeclStmt.fragments().get(0));
 	}
 	
 	private static NameUsage getLastReachingModInVDecl(IVariableBinding var,
@@ -356,8 +372,7 @@ public class VariableTracker {
 		}
 		
 		if (ASTUtil.sameBinding(decl.getName(), var)) {
-			return new NameAssignment(decl.getName(), Assignment.Operator.ASSIGN,
-						decl.getInitializer());
+			return new NameAssignment(decl);
 		}
 		else {
 			return null;

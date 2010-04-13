@@ -21,7 +21,7 @@ public class NameUsageLoopChoice extends NameUsage {
 		return loopUsage;
 	}
 	
-	public ASTNode getASTNode() {
+	public ASTNode getNode() {
 		return node;
 	}
 	

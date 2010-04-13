@@ -4,32 +4,39 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.VariableDeclaration;
+import org.eclipse.jdt.core.dom.Assignment.Operator;
 
 public class NameAssignment extends NameUsage {
 	private Assignment.Operator operator;
-	private Expression rightHandSide;
 	private Expression leftHandSide;
+	private Expression rightHandSide;
+	private ASTNode node;
 	
-	public NameAssignment(Expression leftHandSide, Assignment.Operator operator, Expression expr) {
-		this.operator = operator;
-		this.leftHandSide = leftHandSide;
-		this.rightHandSide = expr;
+	public NameAssignment(Assignment assignment) {
+		this.node = assignment;
+		this.operator = assignment.getOperator();
+		this.leftHandSide = assignment.getLeftHandSide();
+		this.rightHandSide = assignment.getRightHandSide();
 	}
 	
-	public ASTNode getASTNode() {
-		return leftHandSide.getParent();
+	public NameAssignment(VariableDeclaration decl) {
+		this.node = decl;
+		this.operator = Assignment.Operator.ASSIGN;
+		this.rightHandSide = decl.getInitializer();
+		this.leftHandSide = decl.getName();
 	}
 	
-	public Expression getRightHandSide() {
-		return rightHandSide;
-	}
-	
-	public Expression getLeftHandSide() {
-		return leftHandSide;
+	public ASTNode getNode() {
+		return node;
 	}
 	
 	public Name getName() {
 		return (Name)leftHandSide; 
+	}
+	
+	public Expression getRightHandSide() {
+		return rightHandSide;
 	}
 	
 	public Assignment.Operator getOperator() {

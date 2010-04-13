@@ -18,7 +18,7 @@ public class NameInMethodCallExpression extends NameUsage {
 		return inv;
 	}
 	
-	public ASTNode getASTNode() {
+	public ASTNode getNode() {
 		return expression;
 	}
 	

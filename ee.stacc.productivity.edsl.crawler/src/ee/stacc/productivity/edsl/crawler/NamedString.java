@@ -3,14 +3,16 @@ package ee.stacc.productivity.edsl.crawler;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.IAbstractStringVisitor;
 import ee.stacc.productivity.edsl.string.IPosition;
+import ee.stacc.productivity.edsl.string.PositionedString;
 
-public class NamedString implements IAbstractString {
+public class NamedString extends PositionedString {
 
 	private Object key;
 	private IAbstractString body;
 	
 	
-	public NamedString(Object key, IAbstractString body) {
+	public NamedString(IPosition pos, Object key, IAbstractString body) {
+		super(pos);
 		this.key = key;
 		this.body = body;
 	}

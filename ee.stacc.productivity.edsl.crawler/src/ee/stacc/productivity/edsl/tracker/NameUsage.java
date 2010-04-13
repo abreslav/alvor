@@ -5,7 +5,7 @@ import org.eclipse.jdt.core.dom.ASTNode;
 abstract public class NameUsage {
 	private ASTNode node;
 	
-	abstract public ASTNode getASTNode();
+	abstract public ASTNode getNode();
 	
 }
 

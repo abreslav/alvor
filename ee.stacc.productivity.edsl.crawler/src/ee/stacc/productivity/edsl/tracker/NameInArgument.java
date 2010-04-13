@@ -20,7 +20,7 @@ public class NameInArgument extends NameUsage {
 		return index;
 	}
 	
-	public ASTNode getASTNode() {
+	public ASTNode getNode() {
 		return inv;
 	}
 	

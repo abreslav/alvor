@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
@@ -620,7 +621,13 @@ public class AbstractStringEvaluator {
 					IAbstractString abstractString = CacheService.getCacheService().getAbstractString(sr);
 					
 					if (abstractString == null) {
-						Expression arg = (Expression) NodeSearchEngine.getASTNode(sr);
+						LOG.message(levelPrefix + "    file: " + sr.getPath() + ", line: "
+								+ PositionUtil.getLineNumber(sr));
+						LOG.message("*SR: " + sr);
+						ASTNode node = NodeSearchEngine.getASTNode(sr);
+						LOG.message("*NODE: " + node);
+						
+						Expression arg = (Expression)node;// NodeSearchEngine.getASTNode(sr);
 						AbstractStringEvaluator evaluator = 
 							new AbstractStringEvaluator(level, null, scope);
 						abstractString = evaluator.eval(arg);

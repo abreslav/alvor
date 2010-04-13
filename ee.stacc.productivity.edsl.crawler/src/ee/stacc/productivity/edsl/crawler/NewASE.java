@@ -59,7 +59,7 @@ import ee.stacc.productivity.edsl.tracker.VariableTracker;
 // TODO test Expression.resolveConstantExpressionValue
 
 public class NewASE {
-	private int maxLevel = 2;
+	private int maxLevel = 3;
 	private boolean supportParameters = true;
 	private boolean supportInvocations = true;
 	
@@ -96,19 +96,18 @@ public class NewASE {
 			levelPrefix += "    ";
 		}
 
-/*
 		LOG.message(levelPrefix + "###########################################");
 		LOG.message(levelPrefix + "searching: ");
 		for (NodeRequest nodeRequest : requests) {
 			LOG.message(nodeRequest);
 		}
-*/
+/*
 		System.out.println(levelPrefix + "###########################################");
 		System.out.println(levelPrefix + "searching: ");
 		for (NodeRequest nodeRequest : requests) {
 			System.out.println(levelPrefix + "NR: " + nodeRequest);
 		}
-
+*/
 		
 		// find value from all call-sites
 		Collection<IPosition> argumentPositions = NodeSearchEngine.findArgumentNodes
@@ -144,13 +143,37 @@ public class NewASE {
 						+ PositionUtil.getLineNumber(sr));
 				result.add(new UnsupportedNodeDescriptor(sr, 
 						"Unsupported SQL construction: " + e.getMessage() + " at " + PositionUtil.getLineString(sr)));
-			}
+			} /* catch (Throwable e) {
+				System.err.println(levelPrefix + "ERROR: " + e.getMessage());
+				System.err.println(levelPrefix + "    file: " + sr.getPath() + ", line: "
+						+ PositionUtil.getLineNumber(sr));
+				result.add(new UnsupportedNodeDescriptor(sr, 
+						"ERROR when analyzing SQL construction: " + e.getMessage() + " at " + PositionUtil.getLineString(sr)));
+			} */
 
 		}
 		return result;
 	}
 
+
 	private IAbstractString eval(Expression node) {
+		IAbstractString result = CacheService.getCacheService().getAbstractString(PositionUtil.getPosition(node));
+		if (result == null) {
+			try {
+				result = doEval(node);
+				assert result.getPosition() != null;
+				CacheService.getCacheService().addAbstractString(PositionUtil.getPosition(node), result);
+			} catch (UnsupportedStringOpEx e) {
+				CacheService.getCacheService().addUnsupported(PositionUtil.getPosition(node), e.getMessage());
+				throw e;
+			}
+		}
+		return result;
+	}
+	
+	
+	
+	private IAbstractString doEval(Expression node) {
 		
 		ITypeBinding type = node.resolveTypeBinding();
 		assert type != null;
@@ -160,15 +183,13 @@ public class NewASE {
 		}
 		else if (node instanceof StringLiteral) {
 			StringLiteral stringLiteral = (StringLiteral)node;
-			StringConstant stringConstant = new StringConstant(PositionUtil.getPosition(node), 
+			return new StringConstant(PositionUtil.getPosition(node), 
 					stringLiteral.getLiteralValue(), stringLiteral.getEscapedValue());
-			return stringConstant;
 		}
 		else if (node instanceof CharacterLiteral) {
 			CharacterLiteral characterLiteral = (CharacterLiteral)node;
-			StringConstant stringConstant = new StringConstant(PositionUtil.getPosition(node), 
+			return new StringConstant(PositionUtil.getPosition(node), 
 					String.valueOf(characterLiteral.charValue()), characterLiteral.getEscapedValue());
-			return stringConstant;
 		}
 		else if (node instanceof Name) {
 			return evalName((Name)node);
@@ -271,43 +292,44 @@ public class NewASE {
 			NodeSearchEngine.findMethodDeclarations(scope, inv);
 		
 		if (decls.size() == 0) {
-			throw new UnsupportedStringOpEx("Possible problem, no declarations found for: " + inv.toString());
+			throw new UnsupportedStringOpEx("No declarations found for: " + inv.toString());
 		}
-		else {
-			// evaluate argumets
-			List<IAbstractString> arguments = new ArrayList<IAbstractString>();
-			for (Object item : inv.arguments()) {
-				Expression arg = (Expression)item;
-				ITypeBinding typ = arg.resolveTypeBinding();
-				if (isString(typ) || isStringBuilderOrBuffer(typ)) {
-					arguments.add(eval(arg));
-				}
-				else {
-					arguments.add(null);
-				}
-			}
-			
-			// evaluate method bodies and apply arguments
-			List<IAbstractString> choices = new ArrayList<IAbstractString>();
-			for (MethodDeclaration decl: decls) {
-				IAbstractString methodString;
-				if (argumentIndex == -1) {
-					methodString = getMethodReturnTemplate(decl);
-				}
-				else {
-					methodString = getMethodArgOutTemplate(decl, argumentIndex);
-				}
-				System.out.println("METHOD STRING: " + methodString);
-				choices.add(ArgumentApplier.applyArguments(methodString, arguments));
-			}
-			
-			// return single result or list
-			if (choices.size() == 1) {
-				return choices.get(0);
+		
+		NewASE argEvaluator = new NewASE(this.level+1, this.scope, this.templateConstructionMode);
+		
+		// evaluate argumets
+		List<IAbstractString> arguments = new ArrayList<IAbstractString>();
+		for (Object item : inv.arguments()) {
+			Expression arg = (Expression)item;
+			ITypeBinding typ = arg.resolveTypeBinding();
+			if (isString(typ) || isStringBuilderOrBuffer(typ)) {
+				arguments.add(argEvaluator.eval(arg));
 			}
 			else {
-				return new StringChoice(PositionUtil.getPosition(inv), choices);
+				arguments.add(null);
 			}
+		}
+		
+		// evaluate method bodies and apply arguments
+		List<IAbstractString> choices = new ArrayList<IAbstractString>();
+		for (MethodDeclaration decl: decls) {
+			IAbstractString methodString;
+			if (argumentIndex == -1) {
+				methodString = getMethodReturnTemplate(decl);
+			}
+			else {
+				methodString = getMethodArgOutTemplate(decl, argumentIndex);
+			}
+			System.out.println("METHOD STRING for " + decl.getName().getFullyQualifiedName() + ": " + methodString);
+			choices.add(ArgumentApplier.applyArguments(methodString, arguments));
+		}
+		
+		// return single result or list
+		if (choices.size() == 1) {
+			return choices.get(0);
+		}
+		else {
+			return new StringChoice(PositionUtil.getPosition(inv), choices);
 		}
 	}
 
@@ -388,9 +410,7 @@ public class NewASE {
 				return eval(arg);
 			}
 			else if (arg.resolveTypeBinding().getName().equals("int")) {
-				StringConstant stringConstant = new StringConstant(PositionUtil.getPosition(node), 
-						"", "");
-				return stringConstant;
+				return new StringConstant(PositionUtil.getPosition(node), "", "\"\"");
 			}
 			else { // CharSequence
 				throw new UnsupportedStringOpEx("Unknown StringBuilder/Buffer constructor: " 
@@ -399,9 +419,7 @@ public class NewASE {
 		}
 		else {
 			assert node.arguments().size() == 0;
-			StringConstant stringConstant = new StringConstant(PositionUtil.getPosition(node), 
-					"", "");
-			return stringConstant;
+			return new StringConstant(PositionUtil.getPosition(node), "", "\"\"");
 		}
 	}
 
@@ -472,7 +490,7 @@ public class NewASE {
 		// wrap result into loop-wrapper
 		// alternatively, resolve recursion
 		
-		if (ASTUtil.inALoopSeparatingFrom(usage.getASTNode(), name)) {
+		if (ASTUtil.inALoopSeparatingFrom(usage.getNode(), name)) {
 			throw new UnsupportedStringOpEx("modifications in loop not supported");
 //			return new NamedString(usage.getASTNode(), evalNameAfterUsageWithoutLoopCheck(name, usage));
 		}
@@ -499,7 +517,9 @@ public class NewASE {
 		// can use this evaluator
 		if (usage instanceof NameUsageChoice) {
 			NameUsageChoice uc = (NameUsageChoice)usage;
-			return new StringChoice(this.evalNameAfterUsage(name, uc.getThenUsage()),
+			return new StringChoice(
+					PositionUtil.getPosition(uc.getNode()),
+					this.evalNameAfterUsage(name, uc.getThenUsage()),
 					this.evalNameAfterUsage(name, uc.getElseUsage())); 
 		}
 		else if (usage instanceof NameUsageLoopChoice) {
@@ -526,7 +546,7 @@ public class NewASE {
 			NameInMethodCallExpression usage) {
 		if (isString(name.resolveTypeBinding())) {
 			// this usage doesn't affect it
-			return evalNameBefore(name, usage.getASTNode());
+			return evalNameBefore(name, usage.getNode());
 		}
 		
 		else {
@@ -553,7 +573,9 @@ public class NewASE {
 			return eval(usage.getRightHandSide());
 		}
 		else if (usage.getOperator() == Assignment.Operator.PLUS_ASSIGN) {
-			return new StringSequence(eval(usage.getName()),
+			return new StringSequence(
+					PositionUtil.getPosition(usage.getNode()),
+					eval(usage.getName()),
 					eval(usage.getRightHandSide()));
 		}
 		else {
@@ -564,7 +586,7 @@ public class NewASE {
 	private IAbstractString evalNameInArgument(Name name, NameInArgument usage) {
 		if (isString(name.resolveTypeBinding())) {
 			// this usage doesn't affect it, keep looking
-			return evalNameBefore(name, usage.getASTNode());
+			return evalNameBefore(name, usage.getNode());
 		}
 		else {
 			assert isStringBuilderOrBuffer(name.resolveTypeBinding());
@@ -577,7 +599,10 @@ public class NewASE {
 		assert usage.getLoopUsage() != null;
 		
 		IAbstractString baseString = evalNameAfterUsage(name, usage.getBaseUsage());
-		return new RecursiveStringChoice(baseString, usage.getLoopUsage().getASTNode()); // null means outermost string TODO too ugly
+		return new RecursiveStringChoice(
+				PositionUtil.getPosition(usage.getNode()),
+				baseString, 
+				usage.getLoopUsage().getNode()); // null means outermost string TODO too ugly
 		/*
 		if (loopChoice.getLoopUsage() == this.startingPlace) {
 			IAbstractString baseString = evalNameAfterUsage(loopChoice.getBaseUsage());
@@ -591,7 +616,9 @@ public class NewASE {
 
 	private IAbstractString evalNameInParameter(NameInParameter usage) {
 		if (this.templateConstructionMode) {
-			return new StringParameter(usage.getIndex());
+			return new StringParameter(
+					PositionUtil.getPosition(usage.getNode()),
+					usage.getIndex());
 		}
 		else {
 			MethodDeclaration method = usage.getMethodDecl();
@@ -618,7 +645,8 @@ public class NewASE {
 				throw new UnsupportedStringOpEx("Possible problem, no callsites found for: "
 						+ method.getName());
 			}
-			return new StringChoice(PositionUtil.getPosition(
+			return new StringChoice(
+					PositionUtil.getPosition(
 					(ASTNode)method.parameters().get(usage.getIndex())),
 					choices);
 		}

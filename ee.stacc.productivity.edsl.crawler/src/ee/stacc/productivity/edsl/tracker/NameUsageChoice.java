@@ -23,7 +23,7 @@ public class NameUsageChoice extends NameUsage {
 		return thenUsage;
 	}
 	
-	public ASTNode getASTNode() {
+	public ASTNode getNode() {
 		return node;
 	}
 	
