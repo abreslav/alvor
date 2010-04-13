@@ -62,9 +62,10 @@ public class SQLSyntaxCheckerTest {
 
 	@Test
 	public void testSQL() throws Exception {
-		assertTrue("String is too big: " + AbstractStringSizeCounter.size(abstractString), SyntacticalSQLChecker.hasAcceptableSize(abstractString));
-		List<String> errors = SQLSyntaxChecker.INSTANCE.check(abstractString);
-		assertEquals(errors + "   " + abstractString.toString(), expected, errors.isEmpty());
+		IAbstractString optimized = abstractString;//AbstractStringOptimizer.optimize(abstractString);
+		assertTrue("String is too big: " + AbstractStringSizeCounter.size(optimized), SyntacticalSQLChecker.hasAcceptableSize(optimized));
+		List<String> errors = SQLSyntaxChecker.INSTANCE.check(optimized);
+		assertEquals(errors + "   " + optimized.toString(), expected, errors.isEmpty());
 	}
 	
 //	@Test
