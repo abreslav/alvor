@@ -144,7 +144,7 @@ public class JavaStringLexer {
 			}
 		}
 		if (state != LexerState.OK) {
-			throw new MalformedStringLiteralException("[Internal] Unfinished literal");
+			throw new MalformedStringLiteralException("[Internal] Unfinished literal [" + escapedValue + "], state = " + state);
 		}
 		assert currentResultPosition == result.length;
 	}

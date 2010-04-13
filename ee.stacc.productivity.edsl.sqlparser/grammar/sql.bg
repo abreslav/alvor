@@ -98,6 +98,10 @@ import java.io.IOException;
 %left '/' '*' CONCAT OUTERJ
 
 %%
+bracketedSelect
+	: select
+	| '(' select ')'
+	;
 select 
 	: basicSelect where orderBy groupBy forUpdate 
 	| select UNION select
@@ -265,6 +269,7 @@ else
 	| /*empty*/
 	;
 simExList
-	: simpleExpr
+	: /*empty*/
+	| simpleExpr
 	| simpleExpr ',' simExList
 	;

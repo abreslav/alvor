@@ -145,7 +145,7 @@ public class AbstractStringEvaluator {
 				}
 				else if (arg.resolveTypeBinding().getName().equals("int")) {
 					StringConstant stringConstant = new StringConstant(PositionUtil.getPosition(node), 
-							"", "");
+							"", "\"\"");
 					return stringConstant;
 				}
 				else { // CharSequence
@@ -156,7 +156,7 @@ public class AbstractStringEvaluator {
 			else {
 				assert cic.arguments().size() == 0;
 				StringConstant stringConstant = new StringConstant(PositionUtil.getPosition(node), 
-						"", "");
+						"", "\"\"");
 				return stringConstant;
 			}
 		}
