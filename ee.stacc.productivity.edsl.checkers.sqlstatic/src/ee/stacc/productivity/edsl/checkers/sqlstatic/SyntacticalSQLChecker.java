@@ -9,6 +9,8 @@ import java.util.Map;
 import ee.stacc.productivity.edsl.checkers.IAbstractStringChecker;
 import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
+import ee.stacc.productivity.edsl.common.logging.ILog;
+import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
 import ee.stacc.productivity.edsl.lexer.alphabet.ISequence;
 import ee.stacc.productivity.edsl.lexer.alphabet.Token;
@@ -27,6 +29,8 @@ import ee.stacc.productivity.edsl.string.StringConstant;
 public class SyntacticalSQLChecker implements IAbstractStringChecker {
 
 	private static int SIZE_THRESHOLD = 25000;
+	private static final ILog LOG = Logs.getLog(SyntacticalSQLChecker.class);
+	
 	
 	@Override
 	public void checkAbstractStrings(List<IStringNodeDescriptor> descriptors,
@@ -77,7 +81,8 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 			} catch (MalformedStringLiteralException e) {
 				errorHandler.handleSQLError("Malformed literal: " + e.getMessage(), descriptor.getPosition());
 			} catch (Throwable e) {
-				errorHandler.handleSQLError("Internal error: " + e.toString(), abstractString.getPosition());
+				LOG.exception(e);
+				errorHandler.handleSQLError("Static checker internal error: " + e.toString(), abstractString.getPosition());
 			}
 		}
 	}
