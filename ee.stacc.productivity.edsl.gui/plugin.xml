@@ -40,6 +40,13 @@
             id="ee.stacc.eclipsesql.plugin.CheckProject"
             name="Check SQL in project">
       </command>
+      <command
+            categoryId="org.eclipse.jdt.ui.category.source"
+            defaultHandler="ee.stacc.productivity.edsl.gui.ClearCacheHandler"
+            description="Clears cache for the selected project"
+            id="ee.stacc.productivity.edsl.gui.clearCache"
+            name="Clear project cache">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -48,6 +55,11 @@
          <command
                commandId="ee.stacc.eclipsesql.plugin.CheckProject"
                label="##### Check SQL in selected elements ######"
+               style="push">
+         </command>
+         <command
+               commandId="ee.stacc.productivity.edsl.gui.clearCache"
+               label="##### Clear Cache ######"
                style="push">
          </command>
       </menuContribution>

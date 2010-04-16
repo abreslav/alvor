@@ -20,7 +20,8 @@ Require-Bundle: org.eclipse.ui,
  ee.stacc.productivity.edsl.model;bundle-version="1.0.0",
  ee.stacc.productivity.edsl.checkers;bundle-version="1.0.0",
  ee.stacc.productivity.edsl.crawler;bundle-version="1.0.0",
- ee.stacc.productivity.edsl.common;bundle-version="1.0.0"
+ ee.stacc.productivity.edsl.common;bundle-version="1.0.0",
+ ee.stacc.productivity.edsl.cache;bundle-version="1.0.0"
 Bundle-Activator: ee.stacc.productivity.edsl.gui.Activator
 Bundle-ActivationPolicy: lazy
 Export-Package: ee.stacc.productivity.edsl.gui

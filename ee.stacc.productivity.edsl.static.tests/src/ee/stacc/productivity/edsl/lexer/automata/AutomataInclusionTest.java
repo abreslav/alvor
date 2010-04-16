@@ -2,7 +2,6 @@ package ee.stacc.productivity.edsl.lexer.automata;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.HashSet;
