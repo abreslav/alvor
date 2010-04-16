@@ -6,8 +6,10 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Annotation;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
+import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.CharacterLiteral;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.ContinueStatement;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
@@ -183,6 +185,8 @@ public class ASTUtil {
 			}
 		}
 		
+		// FIXME: need checks for expression type here
+		
 		return true;
 		
 		
@@ -294,7 +298,7 @@ public class ASTUtil {
 	}
 	
 	/*
-	 * Return true if a is in a loop and b is not in this loop
+	 * Return true if a is in a loop and b is not in this loop (body)
 	 */
 	public static boolean inALoopSeparatingFrom(ASTNode nodeA, ASTNode nodeB) {
 		assert nodeA != null;
@@ -361,6 +365,8 @@ public class ASTUtil {
 			|| node instanceof CharacterLiteral
 			|| node instanceof TypeLiteral
 			|| node instanceof Annotation
-			|| node instanceof ThisExpression;
+			|| node instanceof ThisExpression
+			|| node instanceof BreakStatement
+			|| node instanceof ContinueStatement;
 	}
 }

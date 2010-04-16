@@ -18,8 +18,10 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
+import org.eclipse.jdt.core.dom.PostfixExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.ThrowStatement;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
@@ -75,6 +77,9 @@ public class VariableTracker {
 		throw new UnsupportedStringOpEx("Fields are not supported in tracker");
 	}
 	
+	/*
+	 * target should be one of scope-s children
+	 */
 	private static NameUsage getLastReachingModIn(IVariableBinding var, ASTNode target, ASTNode scope) {
 		if (ASTUtil.isSimpleNode(scope)) {
 			return null;			
@@ -97,6 +102,9 @@ public class VariableTracker {
 		else if (scope instanceof MethodDeclaration) {
 			return getLastReachingModInMethodDecl(var, target, (MethodDeclaration)scope);
 		}
+		else if (scope instanceof PostfixExpression) {
+			return getLastReachingModInPostfixExp(var, target, (PostfixExpression)scope);
+		}
 		else if (scope instanceof ClassInstanceCreation) { // constructor call
 			// FIXME possible to modify smth in arguments (or expression?)
 			return null;
@@ -117,6 +125,21 @@ public class VariableTracker {
 		else if (scope instanceof TryStatement) {
 			return getLastReachingModInTry(var, target, (TryStatement)scope);
 		}
+		else if (scope instanceof ThrowStatement) {
+			return getLastReachingModInThrow(var, target, (ThrowStatement)scope);
+		}
+		else if (scope instanceof CastExpression) {
+			return null; // FIXME
+		}
+		else if (scope instanceof ParenthesizedExpression) {
+			if (target == null) {
+				return getLastReachingModIn(var, target, 
+						((ParenthesizedExpression)scope).getExpression());
+			}
+			else {
+				return null;
+			}
+		}
 		else if (scope instanceof ExpressionStatement) {
 			if (target == null) {
 				return getLastModIn(var, ((ExpressionStatement)scope).getExpression());
@@ -132,6 +155,25 @@ public class VariableTracker {
 		else {
 			throw new UnsupportedStringOpEx("getLastReachingModIn " + scope.getClass());
 		}
+	}
+
+	private static NameUsage getLastReachingModInThrow(IVariableBinding var,
+			ASTNode target, ThrowStatement stmt) {
+		if (target == null) {
+			return getLastModIn(var, stmt.getExpression());
+		}
+		return null;
+	}
+
+	private static NameUsage getLastReachingModInPostfixExp(
+			IVariableBinding var, ASTNode target, PostfixExpression postfix) {
+		// ++ or --
+		if (target == null) {
+			if (ASTUtil.sameBinding(postfix.getOperand(), var)) {
+				throw new UnsupportedStringOpEx("Postfix operand");
+			}
+		}
+		return getLastReachingModIn(var, target, postfix.getOperand());
 	}
 
 	private static NameUsage getLastReachingModInTry(IVariableBinding var,

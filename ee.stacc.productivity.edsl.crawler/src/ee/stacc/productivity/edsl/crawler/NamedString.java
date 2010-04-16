@@ -32,11 +32,6 @@ public class NamedString extends PositionedString {
 	}
 
 	@Override
-	public IPosition getPosition() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public boolean isEmpty() {
 		throw new UnsupportedOperationException();
 	}

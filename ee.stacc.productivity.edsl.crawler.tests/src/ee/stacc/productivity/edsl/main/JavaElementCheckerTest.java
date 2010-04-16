@@ -7,8 +7,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -37,21 +35,21 @@ public class JavaElementCheckerTest {
 		
 	}
 	
-	@Test
-	public void testEDSLTestProjectStrings() throws IOException, CoreException {
-		testJavaElementAbstractStrings("EDSLTestProject", "");
-	}
+//	@Test
+//	public void testEDSLTestProjectStrings() throws IOException, CoreException {
+//		testJavaElementAbstractStrings("EDSLTestProject", "");
+//	}
 	
 	@Test
 	public void testEArvedStrings() throws IOException, CoreException {
 		testJavaElementAbstractStrings("earved", "src");
 	}
 	
-	/*@Test
-	public void testCompiereString() throws IOException, CoreException {
-		testJavaElementAbstractStrings("compiere", "");
-	}
-	*/
+//	@Test
+//	public void testCompiereString() throws IOException, CoreException {
+//		testJavaElementAbstractStrings("compiere", "");
+//	}
+	
 	
 	private void testJavaElementAbstractStrings(String projectName, 
 			String packageFragmentRoot) throws IOException, CoreException {

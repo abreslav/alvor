@@ -62,6 +62,7 @@ public class NewASE {
 	private int maxLevel = 3;
 	private boolean supportParameters = true;
 	private boolean supportInvocations = true;
+	private static boolean useCache = false;
 	
 	private int level;
 	private IJavaElement[] scope;
@@ -72,11 +73,9 @@ public class NewASE {
 
 	
 	private NewASE(int level, IJavaElement[] scope, boolean templateConstructionMode) {
-		
 		if (level > maxLevel) {
 			throw new UnsupportedStringOpEx("Analysis level (" + level + ") too deep");
 		}
-		
 		this.level = level;
 		this.scope = scope;
 		this.templateConstructionMode = templateConstructionMode;
@@ -89,82 +88,80 @@ public class NewASE {
 	}
 	
 	public static List<INodeDescriptor> evaluateMethodArgumentAtCallSites
-	(Collection<NodeRequest> requests,
-			IJavaElement[] scope, int level) {
+			(Collection<NodeRequest> requests, IJavaElement[] scope, int level) {
+		
+		LOG.message(levelPrefix(level) + "SEARCHING: ------------------------");
+		for (NodeRequest nodeRequest : requests) {
+			LOG.message(levelPrefix(level) + nodeRequest);
+		}
+		
+		Collection<IPosition> argumentPositions = NodeSearchEngine.findArgumentNodes(scope, requests);
+		NewASE evaluator = new NewASE(level, scope, false);
+		List<INodeDescriptor> result = new ArrayList<INodeDescriptor>();
+		for (IPosition pos: argumentPositions) {
+			result.add(evaluator.evaluateNodeAtPosition(pos));
+		}
+		return result;
+	}
+	
+	private static String levelPrefix(int level) {
 		String levelPrefix = "";
 		for (int i = 0; i < level; i++) {
 			levelPrefix += "    ";
 		}
-
-		LOG.message(levelPrefix + "###########################################");
-		LOG.message(levelPrefix + "searching: ");
-		for (NodeRequest nodeRequest : requests) {
-			LOG.message(nodeRequest);
-		}
-/*
-		System.out.println(levelPrefix + "###########################################");
-		System.out.println(levelPrefix + "searching: ");
-		for (NodeRequest nodeRequest : requests) {
-			System.out.println(levelPrefix + "NR: " + nodeRequest);
-		}
-*/
-		
-		// find value from all call-sites
-		Collection<IPosition> argumentPositions = NodeSearchEngine.findArgumentNodes
-		(scope, requests);
-
-		List<INodeDescriptor> result = new ArrayList<INodeDescriptor>();
-		for (IPosition sr: argumentPositions) {
-
-			try {
-				IAbstractString abstractString = CacheService.getCacheService().getAbstractString(sr);
-
-				if (abstractString == null) {
-					System.out.println(levelPrefix + "EVALUATING file: " 
-							+ sr.getPath() + ", line: "
-							+ PositionUtil.getLineNumber(sr));
-					
-					Expression arg = (Expression) NodeSearchEngine.getASTNode(sr);
-					NewASE evaluator = new NewASE(level, scope, false);
-					
-					abstractString = evaluator.eval(arg);
-				}
-				result.add(new StringNodeDescriptor(sr, abstractString));
-
-			} catch (UnsupportedStringOpEx e) {
-				/*
-				LOG.message(levelPrefix + "UNSUPPORTED: " + e.getMessage());
-				LOG.message(levelPrefix + "    file: " + sr.getPath() + ", line: "
-				+ sr.getLineNumber()
-				);
-				*/ 
-				System.out.println(levelPrefix + "UNSUPPORTED: " + e.getMessage());
-				System.out.println(levelPrefix + "    file: " + sr.getPath() + ", line: "
-						+ PositionUtil.getLineNumber(sr));
-				result.add(new UnsupportedNodeDescriptor(sr, 
-						"Unsupported SQL construction: " + e.getMessage() + " at " + PositionUtil.getLineString(sr)));
-			} /* catch (Throwable e) {
-				System.err.println(levelPrefix + "ERROR: " + e.getMessage());
-				System.err.println(levelPrefix + "    file: " + sr.getPath() + ", line: "
-						+ PositionUtil.getLineNumber(sr));
-				result.add(new UnsupportedNodeDescriptor(sr, 
-						"ERROR when analyzing SQL construction: " + e.getMessage() + " at " + PositionUtil.getLineString(sr)));
-			} */
-
-		}
-		return result;
+		return levelPrefix;
 	}
 
+	private INodeDescriptor evaluateNodeAtPosition(IPosition pos) {
+		try {
+			IAbstractString abstractString = null;
+			if (useCache) {
+				abstractString = CacheService.getCacheService().getAbstractString(pos);
+			}
+
+			if (abstractString == null) {
+				LOG.message(levelPrefix(level) + "EVALUATING file: " 
+						+ pos.getPath() + ", line: "
+						+ PositionUtil.getLineNumber(pos));
+				
+				Expression arg = (Expression) NodeSearchEngine.getASTNode(pos);
+				abstractString = eval(arg);
+			}
+			return new StringNodeDescriptor(pos, abstractString);
+		} 
+		catch (UnsupportedStringOpEx e) {
+			LOG.message(levelPrefix(level) + "UNSUPPORTED: " + e.getMessage());
+			LOG.message(levelPrefix(level) + "    file: " + pos.getPath() + ", line: "
+					+ PositionUtil.getLineNumber(pos));
+			return new UnsupportedNodeDescriptor(pos, 
+					"Unsupported SQL construction: " + e.getMessage() + " at " 
+					+ PositionUtil.getLineString(pos));
+		} 
+
+		catch (Throwable e) {
+			LOG.error(levelPrefix(level) + "ERROR: " + e.getMessage());
+			LOG.error(levelPrefix(level) + "    file: " + pos.getPath() + ", line: " + PositionUtil.getLineNumber(pos));
+			return new UnsupportedNodeDescriptor(pos, "ERROR when analyzing SQL construction: " + e.getMessage() + " at " + PositionUtil.getLineString(pos));
+		}
+		
+	}
 
 	private IAbstractString eval(Expression node) {
-		IAbstractString result = CacheService.getCacheService().getAbstractString(PositionUtil.getPosition(node));
+		IAbstractString result = null;
+		if (useCache) {
+			result = CacheService.getCacheService().getAbstractString(PositionUtil.getPosition(node));
+		}
 		if (result == null) {
 			try {
 				result = doEval(node);
 				assert result.getPosition() != null;
-				CacheService.getCacheService().addAbstractString(PositionUtil.getPosition(node), result);
+				if (useCache) {
+					CacheService.getCacheService().addAbstractString(PositionUtil.getPosition(node), result);
+				}
 			} catch (UnsupportedStringOpEx e) {
-				CacheService.getCacheService().addUnsupported(PositionUtil.getPosition(node), e.getMessage());
+				if (useCache) {
+					CacheService.getCacheService().addUnsupported(PositionUtil.getPosition(node), e.getMessage());
+				}
 				throw e;
 			}
 		}
@@ -250,7 +247,7 @@ public class NewASE {
 
 	private IAbstractString evalInvocationResult(MethodInvocation inv) {
 		if (inv.getExpression() != null
-				&& isStringBuilderOrBuffer(inv.getExpression().resolveTypeBinding())) {
+				&& isStringOrStringBuilderOrBuffer(inv.getExpression().resolveTypeBinding())) {
 			if (inv.getName().getIdentifier().equals("toString")) {
 				return eval(inv.getExpression());
 			}
@@ -261,7 +258,7 @@ public class NewASE {
 						eval((Expression)inv.arguments().get(0)));
 			}
 			else {
-				throw new UnsupportedStringOpEx("StringBuilder/Buffer, method=" 
+				throw new UnsupportedStringOpEx("String/Builder/Buffer, method=" 
 						+ inv.getName().getIdentifier(),
 						PositionUtil.getPosition(inv)); 
 			}
@@ -439,6 +436,10 @@ public class NewASE {
 		}
 	}
 	
+	private static boolean isStringOrStringBuilderOrBuffer(ITypeBinding typeBinding) {
+		return isString(typeBinding) || isStringBuilderOrBuffer(typeBinding);
+	}
+	
 	private static boolean isStringBuilderOrBuffer(ITypeBinding typeBinding) {
 		return typeBinding.getQualifiedName().equals("java.lang.StringBuffer")
 		|| typeBinding.getQualifiedName().equals("java.lang.StringBuilder");
@@ -492,7 +493,12 @@ public class NewASE {
 		
 		if (ASTUtil.inALoopSeparatingFrom(usage.getNode(), name)) {
 			throw new UnsupportedStringOpEx("modifications in loop not supported");
-//			return new NamedString(usage.getASTNode(), evalNameAfterUsageWithoutLoopCheck(name, usage));
+			/*
+			return new NamedString(
+					PositionUtil.getPosition(usage.getNode()),
+					usage.getNode(),
+					evalNameAfterUsageWithoutLoopCheck(name, usage));
+			*/
 		}
 		else {
 			return evalNameAfterUsageWithoutLoopCheck(name, usage);
@@ -516,11 +522,7 @@ public class NewASE {
 		
 		// can use this evaluator
 		if (usage instanceof NameUsageChoice) {
-			NameUsageChoice uc = (NameUsageChoice)usage;
-			return new StringChoice(
-					PositionUtil.getPosition(uc.getNode()),
-					this.evalNameAfterUsage(name, uc.getThenUsage()),
-					this.evalNameAfterUsage(name, uc.getElseUsage())); 
+			return evalNameInChoice(name, (NameUsageChoice)usage);
 		}
 		else if (usage instanceof NameUsageLoopChoice) {
 			return evalNameInLoopChoice(name, (NameUsageLoopChoice)usage);
@@ -540,6 +542,31 @@ public class NewASE {
 		else {
 			throw new UnsupportedStringOpEx("Unsupported NameUsage: " + usage.getClass());
 		}
+	}
+
+	private IAbstractString evalNameInChoice(Name name, NameUsageChoice usage) {
+		NameUsageChoice uc = (NameUsageChoice)usage;
+		IAbstractString thenStr = this.evalNameAfterUsage(name, uc.getThenUsage()); 
+		IAbstractString elseStr = this.evalNameAfterUsage(name, uc.getElseUsage());
+		return optimizeChoice(
+				PositionUtil.getPosition(uc.getNode()),
+				thenStr,
+				elseStr);
+	}
+	
+	// If possible, replaces Choice(Seq(a,b),Seq(a,c)) with Seq(a, Choice(b,c))
+	private IAbstractString optimizeChoice(IPosition pos, IAbstractString thenStr, IAbstractString elseStr) {
+		/*
+		if ((thenStr instanceof StringSequence) && (elseStr instanceof StringSequence)) {
+			StringSequence thenSeq = (StringSequence)thenStr;
+			StringSequence elseSeq = (StringSequence)elseStr;
+			if (thenSeq.getItems().get(0).toString().equals(
+					elseSeq.getItems().get(0).toString())) {
+				return new String
+			}
+		}
+		*/
+		return new StringChoice(pos, thenStr, elseStr);
 	}
 
 	private IAbstractString evalNameInCallExpression(Name name, 
