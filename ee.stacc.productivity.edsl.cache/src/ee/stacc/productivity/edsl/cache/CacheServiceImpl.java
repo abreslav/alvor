@@ -572,10 +572,10 @@ public final class CacheServiceImpl implements ICacheService {
 	private List<IAbstractString> getCollectionContents(int collectionId) throws SQLException {
 		PreparedStatement preparedStatement = connection.prepareStatement(
 				"SELECT AbstractStrings.id AS stringId, type, a, b, name, start, length FROM CollectionContents " +
-				"	LEFT JOIN AbstractStrings ON (item = AbstractStrings.id)" +
-				"	LEFT JOIN SourceRanges ON (sourceRange = SourceRanges.id)" +
-				"	LEFT JOIN Files ON (SourceRanges.file = Files.id)" +
-				"WHERE collection = ?" +
+				"	LEFT JOIN AbstractStrings ON (item = AbstractStrings.id) " +
+				"	LEFT JOIN SourceRanges ON (sourceRange = SourceRanges.id) " +
+				"	LEFT JOIN Files ON (SourceRanges.file = Files.id) " +
+				"WHERE collection = ? " +
 				"ORDER BY CollectionContents.index ASC"
 		);
 		preparedStatement.setInt(1, collectionId);
