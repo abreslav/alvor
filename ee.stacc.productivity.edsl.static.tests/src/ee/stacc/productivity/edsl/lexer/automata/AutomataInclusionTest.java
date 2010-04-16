@@ -254,10 +254,16 @@ public class AutomataInclusionTest {
 
 	@Test
 	public void testLoops() throws Exception {
-		fail("Loops are not supported");
+//		fail("Loops are not supported");
 		
 		String abstractString;
 		String[] expected;
+
+		abstractString = "([1234567890])+";
+		expected = new String[] {
+				"NUMBER",	
+		};
+		checkAbstractStringTransduction(AbstractStringParser.parseOneFromString(abstractString), expected);
 
 		abstractString = "\"SELECT \" ([a1])+ \" FROM\"";
 		expected = new String[] {

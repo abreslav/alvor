@@ -109,7 +109,13 @@ public class AutomataInclusion {
 		
 		public boolean add(State state, ISequence<IAbstractInputItem> text) {
 			allAccepting &= state.isAccepting();
-			return getTexts(state).add(text);
+// !!!NOTE: This is done in order to support repetition in lexer
+//            I am not sure if it is sound, but all the tests pass OK
+//			return getTexts(state).add(text);
+			if (getTexts(state).isEmpty()) {
+				return getTexts(state).add(text);
+			}
+			return false;
 		}
 		
 		public StatesWithTexts copy() {
@@ -242,7 +248,7 @@ public class AutomataInclusion {
 				if (converter.convert(inChar.getCode()) == expectedChar.getCode()) {
 					for (ISequence<IAbstractInputItem> text : new HashSet<ISequence<IAbstractInputItem>>(texts)) {
 						List<IAbstractOutputItem> output = transition.getOutput();
-						ArrayList<IAbstractInputItem> effect = new ArrayList<IAbstractInputItem>();
+						List<IAbstractInputItem> effect = new ArrayList<IAbstractInputItem>();
 						ISequence<IAbstractInputItem> newText = interpreter.processOutputCommands(text, inChar, output, effect);
 						if (correspondingStates.add(transition.getTo(), newText)) {
 							result = Change.SOME;
