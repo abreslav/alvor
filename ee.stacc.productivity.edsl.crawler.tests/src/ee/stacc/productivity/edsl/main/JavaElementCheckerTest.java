@@ -45,10 +45,10 @@ public class JavaElementCheckerTest {
 		testJavaElementAbstractStrings("earved", "src");
 	}
 	
-//	@Test
-//	public void testCompiereString() throws IOException, CoreException {
-//		testJavaElementAbstractStrings("compiere", "");
-//	}
+	@Test
+	public void testSqlBusStrings() throws IOException, CoreException {
+		testJavaElementAbstractStrings("sql_bus", "");
+	}
 	
 	
 	private void testJavaElementAbstractStrings(String projectName, 
