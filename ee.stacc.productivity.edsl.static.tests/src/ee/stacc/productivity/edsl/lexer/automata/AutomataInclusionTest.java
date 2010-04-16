@@ -273,6 +273,25 @@ public class AutomataInclusionTest {
 		};
 		checkAbstractStringTransduction(AbstractStringParser.parseOneFromString(abstractString), expected);
 
+		abstractString = "\"SELECT \" \"?\" {(\",\" \"?\")+, } \" FROM\"";
+		expected = new String[] {
+				"SELECT ? FROM",	
+				"SELECT ? , ? FROM",	
+		};
+		checkAbstractStringTransduction(AbstractStringParser.parseOneFromString(abstractString), expected);
+		
+		abstractString = "\"SELECT \" (\"?\" {\",\", })+ \" FROM\"";
+		expected = new String[] {
+				"SELECT ? FROM",	
+				"SELECT ? , ? FROM",	
+				"SELECT ? , FROM",	
+				"SELECT ? ? , FROM",	
+				"SELECT ? ? , ? FROM",	
+				"SELECT ? , ? ? FROM",	
+				"SELECT ? ? FROM",	
+		};
+		checkAbstractStringTransduction(AbstractStringParser.parseOneFromString(abstractString), expected);
+		
 		
 		abstractString = "\"SELECT \" ([a.])+ \" FROM\"";
 		expected = new String[] {
