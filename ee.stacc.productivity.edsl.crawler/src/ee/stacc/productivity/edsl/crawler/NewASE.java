@@ -62,7 +62,7 @@ public class NewASE {
 	private int maxLevel = 3;
 	private boolean supportParameters = true;
 	private boolean supportInvocations = true;
-	private static boolean useCache = false;
+	private static boolean useCache = true;
 	
 	private int level;
 	private IJavaElement[] scope;
