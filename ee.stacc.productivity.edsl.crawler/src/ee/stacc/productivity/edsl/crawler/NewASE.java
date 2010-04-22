@@ -60,7 +60,7 @@ import ee.stacc.productivity.edsl.tracker.VariableTracker;
 
 public class NewASE {
 	private int maxLevel = 3;
-	private boolean supportParameters = true;
+	private boolean supportLoops = false;
 	private boolean supportInvocations = true;
 	private static boolean useCache = true;
 	
@@ -449,40 +449,6 @@ public class NewASE {
 		return typeBinding.getQualifiedName().equals("java.lang.String");
 	}
 	
-	IAbstractString widenToRegular(IAbstractString str) {
-		if (hasRecursiveChoice(str)) {
-			throw new UnsupportedStringOpEx("RecursiveChoice");
-		} else {
-			// first see if there are some null-s
-			// replace them with str
-			return str;
-		}
-	}
-	
-	boolean hasRecursiveChoice(IAbstractString str) {
-		if (str instanceof StringConstant) {
-			return false;
-		}
-		else if (str instanceof StringCharacterSet) {
-			return false;
-		}
-		else if (str instanceof StringParameter) {
-			return false;
-		}
-		else if (str instanceof StringRepetition) {
-			return hasRecursiveChoice(((StringRepetition)str).getBody());
-		}
-		else if (str instanceof AbstractStringCollection) {
-			for (IAbstractString as : ((AbstractStringCollection)str).getItems()) {
-				if (hasRecursiveChoice(as)) {
-					return true;
-				}
-			}
-			return false;
-		}
-		throw new IllegalArgumentException();
-	}
-	
 	private IAbstractString evalNameAfterUsage(Name name, NameUsage usage) {
 		assert usage != null;
 		
@@ -492,13 +458,19 @@ public class NewASE {
 		// alternatively, resolve recursion
 		
 		if (ASTUtil.inALoopSeparatingFrom(usage.getNode(), name)) {
-			throw new UnsupportedStringOpEx("modifications in loop not supported");
-			/*
-			return new NamedString(
-					PositionUtil.getPosition(usage.getNode()),
-					usage.getNode(),
-					evalNameAfterUsageWithoutLoopCheck(name, usage));
-			*/
+			if (supportLoops) {
+				NamedString named = new NamedString(
+						PositionUtil.getPosition(usage.getNode()),
+						usage.getNode(),
+						evalNameAfterUsageWithoutLoopCheck(name, usage));
+				//System.out.println("BEFORE WIDENING: " + named);
+				IAbstractString widened = StringConverter.widenToRegular(named);
+				//System.out.println("AFTER WIDENING: " + widened);
+				return widened;
+			} 
+			else {
+				throw new UnsupportedStringOpEx("modifications in loop not supported");
+			}
 		}
 		else {
 			return evalNameAfterUsageWithoutLoopCheck(name, usage);
