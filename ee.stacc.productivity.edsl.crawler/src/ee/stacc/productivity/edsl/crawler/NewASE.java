@@ -35,6 +35,7 @@ import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
+import ee.stacc.productivity.edsl.conntracker.ConnectionTracker;
 import ee.stacc.productivity.edsl.string.AbstractStringCollection;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.IPosition;
@@ -594,6 +595,10 @@ public class NewASE {
 	}
 
 	private IAbstractString evalNameInLoopChoice(Name name, NameUsageLoopChoice usage) {
+		if (!supportLoops) {
+			throw new UnsupportedStringOpEx("evalNameInLoopChoice");
+		}
+		
 		assert usage.getBaseUsage() != null;
 		assert usage.getLoopUsage() != null;
 		

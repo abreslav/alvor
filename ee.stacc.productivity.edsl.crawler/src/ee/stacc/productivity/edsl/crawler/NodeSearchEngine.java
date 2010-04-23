@@ -267,7 +267,7 @@ public class NodeSearchEngine {
 		return result.get(0);
 	}
 	
-	/*package*/ static ASTNode getASTNode(IPosition position) {
+	/*package*/ public static ASTNode getASTNode(IPosition position) {
 		IFile file = PositionUtil.getFile(position);
 		ICompilationUnit cUnit = JavaCore.createCompilationUnitFrom(file);
 		int start = position.getStart();

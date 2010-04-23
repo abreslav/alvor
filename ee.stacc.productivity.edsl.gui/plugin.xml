@@ -13,6 +13,16 @@
                label="Show abstract value">
          </action>
       </viewerContribution>
+      <viewerContribution
+            id="ee.stacc.productivity.edsl.gui.ShowConnSourceContribution"
+            targetID="#CompilationUnitEditorContext">
+         <action
+               class="ee.stacc.productivity.edsl.gui.ConnectionSourceFinder"
+               id="ee.stacc.eclipsesql.ShowConnSource"
+               label="Show connection source"
+               menubarPath="ContextMenu">
+         </action>
+      </viewerContribution>
    </extension>
    <extension
          id="sqlerror"

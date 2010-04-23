@@ -1,6 +1,7 @@
 package ee.stacc.productivity.edsl.crawler;
 
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
+import ee.stacc.productivity.edsl.conntracker.ConnectionDescriptor;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.IPosition;
 

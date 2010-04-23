@@ -2,6 +2,7 @@ package ee.stacc.productivity.edsl.main;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -13,7 +14,10 @@ import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
+import ee.stacc.productivity.edsl.conntracker.ConnectionDescriptor;
+import ee.stacc.productivity.edsl.conntracker.ConnectionTracker;
 import ee.stacc.productivity.edsl.crawler.AbstractStringEvaluator;
+import ee.stacc.productivity.edsl.crawler.StringNodeDescriptor;
 import ee.stacc.productivity.edsl.crawler.NewASE;
 import ee.stacc.productivity.edsl.crawler.NodeRequest;
 import ee.stacc.productivity.edsl.crawler.NodeSearchEngine;
@@ -59,10 +63,19 @@ public class JavaElementChecker {
 		List<IAbstractStringChecker> checkers, 
 		Map<String, Object> options) {
 		
+		Map<String, Integer> connMap = new Hashtable<String, Integer>();
+		
 		List<IStringNodeDescriptor> validHotspots = new ArrayList<IStringNodeDescriptor>();
 		for (INodeDescriptor hotspot : hotspots) {
 			if (hotspot instanceof IStringNodeDescriptor) {
 				validHotspots.add((IStringNodeDescriptor) hotspot);
+				
+				// collect connection info
+				ConnectionDescriptor connDesc = 
+					ConnectionTracker.getConnectionDescriptorForHotspot(hotspot.getPosition());
+				String exp = connDesc.getExpression();
+				Integer prevCount = connMap.get(exp);
+				connMap.put(exp, prevCount == null ? 1 : prevCount + 1);
 			}
 			else if (hotspot instanceof UnsupportedNodeDescriptor) {
 				errorHandler.handleSQLWarning(((UnsupportedNodeDescriptor)hotspot).getProblemMessage(),
@@ -71,6 +84,11 @@ public class JavaElementChecker {
 		}
 		checkValidHotspots(validHotspots, errorHandler, checkers, options);
 		
+		
+		LOG.message("CONNECTION DESCRIPTORSsss");
+		for (Map.Entry<String, Integer> entry : connMap.entrySet()) {
+			LOG.message("COUNT: " + entry.getValue() + ", EXP: " + entry.getKey());
+		}
 	}
 
 	private void checkValidHotspots(
