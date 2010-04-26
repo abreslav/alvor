@@ -30,6 +30,10 @@ public class SQLStringAnalyzer {
 			return;
 		}
 		PreparedStatement stmt = conn.prepareStatement(sql);
-		stmt.getMetaData();
+		try {
+			stmt.getMetaData();
+		} finally {
+			stmt.close();
+		}
 	}
 }
