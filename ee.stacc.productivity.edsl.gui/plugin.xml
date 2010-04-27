@@ -57,6 +57,13 @@
             id="ee.stacc.productivity.edsl.gui.clearCache"
             name="Clear project cache">
       </command>
+      <command
+            categoryId="org.eclipse.jdt.ui.category.source"
+            defaultHandler="ee.stacc.productivity.edsl.gui.CheckResultSetsHandler"
+            description="Checks ResultSet-s"
+            id="ee.stacc.productivity.edsl.gui.checkResultSets"
+            name="Check ResultSet-s">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -70,6 +77,11 @@
          <command
                commandId="ee.stacc.productivity.edsl.gui.clearCache"
                label="##### Clear Cache ######"
+               style="push">
+         </command>
+         <command
+               commandId="ee.stacc.productivity.edsl.gui.checkResultSets"
+               label="##### Check ResultSet&apos;s #####"
                style="push">
          </command>
       </menuContribution>

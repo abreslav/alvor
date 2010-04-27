@@ -221,13 +221,7 @@ public class NodeSearchEngine {
 				IJavaSearchConstants.DECLARATIONS, 
 				SearchPattern.R_EXACT_MATCH);
 		
-		Set<IJavaProject> projects = new HashSet<IJavaProject>();
-		for (IJavaElement element : searchScope) {
-			projects.add(element.getJavaProject());
-		}
-		
-		IJavaSearchScope scope = SearchEngine.createJavaSearchScope(
-				projects.toArray(new IJavaElement[projects.size()]), IJavaSearchScope.SOURCES);		
+		IJavaSearchScope scope = elementsToProjectSearchScope(searchScope);		
 		
 		SearchRequestor requestor = new SearchRequestor() {
 			public void acceptSearchMatch(SearchMatch match) {
@@ -241,6 +235,41 @@ public class NodeSearchEngine {
 		
 		executeSearch(pattern, requestor, scope);
 		return result;
+	}
+	
+	static public List<String> findMethodInvocations(IJavaElement[] searchScope, 
+			final String signature) {
+		
+		final List<String> result = new ArrayList<String>();
+		
+		SearchPattern pattern = SearchPattern.createPattern(
+				signature, 
+				IJavaSearchConstants.METHOD, 
+				IJavaSearchConstants.REFERENCES, 
+				SearchPattern.R_EXACT_MATCH
+				);
+		
+		
+		SearchRequestor requestor = new SearchRequestor() {
+			public void acceptSearchMatch(SearchMatch match) {
+				ASTNode node = getASTNode(match);
+				result.add(node.toString());
+				//result.add(PositionUtil.getPosition(node));
+			}
+		};
+		
+		executeSearch(pattern, requestor, elementsToProjectSearchScope(searchScope));
+		return result;
+	}
+	
+	private static IJavaSearchScope elementsToProjectSearchScope(IJavaElement[] elements) {
+		Set<IJavaProject> projects = new HashSet<IJavaProject>();
+		for (IJavaElement element : elements) {
+			projects.add(element.getJavaProject());
+		}
+		
+		return SearchEngine.createJavaSearchScope(
+				projects.toArray(new IJavaElement[projects.size()]), IJavaSearchScope.SOURCES);		
 	}
 	
 	public static VariableDeclarationFragment findFieldDeclarationFragment
@@ -279,6 +308,8 @@ public class NodeSearchEngine {
 		return getASTNode(cUnit, start, length);
 	}
 
+	
+	
 	private static ICompilationUnit getCompilationUnit(SearchMatch match) {
 		if (match.getElement() instanceof IMember) {
 			return ((IMember)match.getElement()).getCompilationUnit();
@@ -298,6 +329,8 @@ public class NodeSearchEngine {
 		}
 		return getASTNode(cUnit, start, length);
 	}
+	
+	
 
 	private static ASTNode getASTNode(ICompilationUnit cUnit, int start, int length) {
 		assert cUnit != null;

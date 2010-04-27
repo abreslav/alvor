@@ -13,9 +13,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
 import ee.stacc.productivity.edsl.checkers.AbstractStringCheckerManager;
@@ -51,16 +48,12 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		LOG.message("CheckProjectHandler.execute");
-//		IJavaElement selectedJavaElement = getSelectedJavaElement();
-		List<Object> selectedJavaElements = getSelectedJavaElements();
-		for (Object object : selectedJavaElements) {
-			if (object instanceof IJavaElement) {
-				IJavaElement element = (IJavaElement) object;
-				try {
-					performCheck(element, new IJavaElement[] {element});
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+		List<IJavaElement> selectedJavaElements = GuiUtil.getSelectedJavaElements();
+		for (IJavaElement element : selectedJavaElements) {
+			try {
+				performCheck(element, new IJavaElement[] {element});
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 		return null; // Must be null
@@ -84,26 +77,6 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 		}
 	}
 	
-	/*
-	 * @return an IJavaElement currently selected in the workbench
-	 */
-	private List<Object> getSelectedJavaElements() {
-		ISelection selection = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService().getSelection();
-		if (selection instanceof StructuredSelection) {
-			StructuredSelection structSel = (StructuredSelection) selection;
-			return structSel.toList();
-//			Object firstElement = structSel.getFirstElement();
-//			if (firstElement instanceof IJavaElement) {
-//				return (IJavaElement) firstElement;
-//			} else if (firstElement instanceof IAdaptable) {
-//				IAdaptable adaptable = (IAdaptable) firstElement;
-//				Object adapter = adaptable.getAdapter(IJavaElement.class);
-//				return (IJavaElement) adapter;
-//			}
-		}
-		throw new IllegalStateException("No Java element selected");
-	}
-
 	private void cleanMarkers(IJavaElement[] scope) {
 		try {
 			for (IJavaElement element : scope) {
