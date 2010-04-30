@@ -212,5 +212,11 @@
                verticalRulerPreferenceValue="false">
          </specification>
     </extension>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="ee.stacc.productivity.edsl.gui.EdslGuiStartup">
+      </startup>
+   </extension>
 
 </plugin>

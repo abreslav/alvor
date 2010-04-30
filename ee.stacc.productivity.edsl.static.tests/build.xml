@@ -32,6 +32,15 @@
 			<arg value="--debug"/>
 			<arg value="grammar/binexp.bg"/>
 		</exec>	
+		<exec executable="bison" dir="${basedir}">
+			<arg value="--xml=grammar/sql.xml"/>
+			<arg value="--report=state,lookahead,itemset"/>
+			<arg value="--report-file=grammar/sql.report"/>
+			<arg value="--output=grammar/SQLParser.java"/>
+			<arg value="--language=Java"/>
+			<arg value="--debug"/>
+			<arg value="grammar/openlink.bg"/>
+		</exec>	
 	</target>
 
 </project>
