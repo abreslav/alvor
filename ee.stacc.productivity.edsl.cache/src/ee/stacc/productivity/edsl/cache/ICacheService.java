@@ -29,10 +29,19 @@ public interface ICacheService {
 	 */
 	IAbstractString getAbstractString(IPosition position);
 
+	/**
+	 * Returns the outermost abstract string containing the given offset
+	 * @param fileString
+	 * @param offset
+	 * @return null if nothing found, an abstract string otherwise
+	 */
+	IAbstractString getContainingAbstractString(String fileString, int offset);
+
 	void addAbstractString(IPosition position, IAbstractString result);
 	void addUnsupported(IPosition position, String message);
 
 	IScopedCache<IHotspotPattern, IPosition> getHotspotCache();
 	IScopedCache<String, IAbstractString> getMethodReturnValueCache();
+
 	
 }

@@ -15,7 +15,6 @@ import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
 import ee.stacc.productivity.edsl.lexer.alphabet.ISequence;
 import ee.stacc.productivity.edsl.lexer.alphabet.Token;
 import ee.stacc.productivity.edsl.lexer.alphabet.ISequence.IFoldFunction;
-import ee.stacc.productivity.edsl.lexer.automata.IInputItemFactory;
 import ee.stacc.productivity.edsl.lexer.automata.State;
 import ee.stacc.productivity.edsl.lexer.automata.StringToAutomatonConverter;
 import ee.stacc.productivity.edsl.sqlparser.IParseErrorHandler;
@@ -23,14 +22,11 @@ import ee.stacc.productivity.edsl.sqlparser.SQLSyntaxChecker;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.IPosition;
 import ee.stacc.productivity.edsl.string.Position;
-import ee.stacc.productivity.edsl.string.StringCharacterSet;
-import ee.stacc.productivity.edsl.string.StringConstant;
 
 public class SyntacticalSQLChecker implements IAbstractStringChecker {
 
 	private static int SIZE_THRESHOLD = 25000;
 	private static final ILog LOG = Logs.getLog(SyntacticalSQLChecker.class);
-	
 	
 	@Override
 	public void checkAbstractStrings(List<IStringNodeDescriptor> descriptors,
@@ -42,26 +38,7 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 				continue;
 			}
 			try {
-				State automaton = StringToAutomatonConverter.INSTANCE.convert(abstractString, new IInputItemFactory() {
-					
-					@Override
-					public IAbstractInputItem createInputItem(StringCharacterSet set,
-							int character) {
-						IPosition position = set.getPosition();
-						return new PositionedCharacter(character, position, 0, position.getLength());
-					}
-					
-					@Override
-					public IAbstractInputItem[] createInputItems(StringConstant constant) {
-						IAbstractInputItem[] result = new IAbstractInputItem[constant.getConstant().length()];
-	
-						String escapedValue = constant.getEscapedValue();
-	
-						JavaStringLexer.tokenizeJavaString(escapedValue, result, constant.getPosition());
-						return result;
-					}
-	
-				});
+				State automaton = createPositionedAutomaton(abstractString);
 				
 				SQLSyntaxChecker.INSTANCE.checkAutomaton(automaton, new IParseErrorHandler() {
 					
@@ -85,6 +62,10 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 				errorHandler.handleSQLError("Static checker internal error: " + e.toString(), abstractString.getPosition());
 			}
 		}
+	}
+
+	public static State createPositionedAutomaton(IAbstractString abstractString) {
+		return StringToAutomatonConverter.INSTANCE.convert(abstractString, PositionedCharacter.FACTORY);
 	}
 	
 	public static boolean hasAcceptableSize(IAbstractString abstractString) {

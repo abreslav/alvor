@@ -4,10 +4,34 @@
 package ee.stacc.productivity.edsl.checkers.sqlstatic;
 
 import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
+import ee.stacc.productivity.edsl.lexer.automata.IInputItemFactory;
 import ee.stacc.productivity.edsl.string.IPosition;
+import ee.stacc.productivity.edsl.string.StringCharacterSet;
+import ee.stacc.productivity.edsl.string.StringConstant;
 
 public final class PositionedCharacter implements IAbstractInputItem {
 	
+	public static final IInputItemFactory FACTORY = new IInputItemFactory() {
+		
+		@Override
+		public IAbstractInputItem createInputItem(StringCharacterSet set,
+				int character) {
+			IPosition position = set.getPosition();
+			return new PositionedCharacter(character, position, 0, position.getLength());
+		}
+		
+		@Override
+		public IAbstractInputItem[] createInputItems(StringConstant constant) {
+			IAbstractInputItem[] result = new IAbstractInputItem[constant.getConstant().length()];
+
+			String escapedValue = constant.getEscapedValue();
+
+			JavaStringLexer.tokenizeJavaString(escapedValue, result, constant.getPosition());
+			return result;
+		}
+
+	};
+
 	private final int code;
 	private final IPosition stringPosition;
 	private final int indexInString;

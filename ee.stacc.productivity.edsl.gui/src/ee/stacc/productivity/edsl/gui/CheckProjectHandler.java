@@ -91,19 +91,8 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 		}
 	}
 	
-	private void createMarker(String message, String markerType, IPosition pos) {
-		IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(Path.fromPortableString(pos.getPath()));
-		int charStart = pos.getStart();
-		int charEnd = charStart + pos.getLength();
-		
-		LOG.message("creating marker: " + message + ", file=" + file
-				+ ", charStart=" + charStart + ", charEnd=" + charEnd + ", type=" + markerType);
-		
+	private static void createMarker(String message, String markerType, IPosition pos) {
 		Map<String, Comparable<?>> map = new HashMap<String, Comparable<?>>();
-		MarkerUtilities.setMessage(map, message);
-		map.put(IMarker.LOCATION, file.getFullPath().toString());
-		map.put(IMarker.CHAR_START, charStart);
-		map.put(IMarker.CHAR_END, charEnd);
 	
 		if (!HOTSPOT_MARKER_ID.equals(markerType)) {
 			int severity = markerType.equals(WARNING_MARKER_ID) ? 
@@ -111,6 +100,26 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 			map.put(IMarker.SEVERITY, new Integer(severity));
 		}
 		
+		createMarker(message, markerType, pos, map);
+	}
+
+	public static void createMarker(String message, String markerType,
+			IPosition pos, Map<String, Comparable<?>> map) {
+		if (map == null) {
+			map = new HashMap<String, Comparable<?>>();
+		}
+		
+		IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(Path.fromPortableString(pos.getPath()));
+		int charStart = pos.getStart();
+		int charEnd = charStart + pos.getLength();
+
+		LOG.message("creating marker: " + message + ", file=" + file
+				+ ", charStart=" + charStart + ", charEnd=" + charEnd + ", type=" + markerType);
+		
+		MarkerUtilities.setMessage(map, message);
+		MarkerUtilities.setCharStart(map, charStart);
+		MarkerUtilities.setCharEnd(map, charEnd);
+		map.put(IMarker.LOCATION, file.getFullPath().toString());
 		try {
 			MarkerUtilities.createMarker(file, map, markerType);
 		} catch (Exception e) {

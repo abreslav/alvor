@@ -3,6 +3,7 @@
  */
 package ee.stacc.productivity.edsl.cache;
 
+import java.nio.channels.IllegalSelectorException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -42,6 +43,7 @@ public final class CacheServiceImpl implements ICacheService {
 	}
 	
 	private final static ILog LOG = Logs.getLog(ICacheService.class);
+	private static final Integer MANY_PARENTS = -1;
 
 	private class DBQueries {
 		private final PreparedStatement queryGetAbstractString;
@@ -419,10 +421,7 @@ public final class CacheServiceImpl implements ICacheService {
 	}
 
 	private int createFile(String path) throws SQLException {
-		PreparedStatement preparedQuery = connection.prepareStatement(
-				"SELECT id FROM Files WHERE name = ?"
-		);
-		preparedQuery.setString(1, path);
+		PreparedStatement preparedQuery = getFileStatement(path);
 
 		PreparedStatement preparedInsert = connection.prepareStatement(
 				"INSERT INTO Files(name) VALUES (?)",
@@ -431,6 +430,14 @@ public final class CacheServiceImpl implements ICacheService {
 		preparedInsert.setString(1, path);
 
 		return insertIfNotYet(preparedQuery, preparedInsert);
+	}
+
+	private PreparedStatement getFileStatement(String path) throws SQLException {
+		PreparedStatement preparedQuery = connection.prepareStatement(
+				"SELECT id FROM Files WHERE name = ?"
+		);
+		preparedQuery.setString(1, path);
+		return preparedQuery;
 	}
 
 	private int insertIfNotYet(PreparedStatement preparedQuery,
@@ -458,16 +465,32 @@ public final class CacheServiceImpl implements ICacheService {
 		throw new IllegalStateException();
 	}
 
-	private Integer getAbstractStringIdByPosition(IPosition position) throws SQLException {
+	private int getAbstractStringIdByPosition(IPosition position) throws SQLException {
 		PreparedStatement preparedStatement = queries.getAbstractStringQuery(position);
+		String columnLabel = "stringId";
+		return getNonNullValue(preparedStatement, columnLabel);
+	}
+
+	private Integer getNonNullValue(PreparedStatement preparedStatement,
+			String columnLabel) throws SQLException {
 		ResultSet res = preparedStatement.executeQuery();
 		if (!res.next()) {
 			return null;
 		}
 		
-		return notNull(res, res.getInt("stringId"));
+		return notNull(res, res.getInt(columnLabel));
 	}
 
+	private Integer getMaybeNullValue(PreparedStatement preparedStatement,
+			String columnLabel) throws SQLException {
+		ResultSet res = preparedStatement.executeQuery();
+		if (!res.next()) {
+			return null;
+		}
+		
+		return mayBeNull(res, res.getInt(columnLabel));
+	}
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -490,8 +513,8 @@ public final class CacheServiceImpl implements ICacheService {
 	}
 
 	private IAbstractString runStringConstruction(
-			PreparedStatement prepareStatement, IPosition position) throws SQLException {
-		ResultSet res = prepareStatement.executeQuery();
+			PreparedStatement preparedStatement, IPosition position) throws SQLException {
+		ResultSet res = preparedStatement.executeQuery();
 		if (!res.next()) {
 			return null;
 		}
@@ -948,7 +971,133 @@ public final class CacheServiceImpl implements ICacheService {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	@Override
+	public IAbstractString getContainingAbstractString(String path,
+			int offset) {
+		try {
+			PreparedStatement preparedStatement = connection.prepareStatement(
+					"	SELECT MAX(start) AS ms, MIN(length) AS ml  " +
+					"		FROM SourceRanges " +
+					"		WHERE start = (" +
+					"			SELECT MAX(start) " +
+					"				FROM SourceRanges " +
+					"					LEFT JOIN Files ON (file = Files.id)" +
+					"				WHERE (start < ?) AND (? - start <= length) AND (name = ?)" +
+					"		)" +
+					""
+			);
+			preparedStatement.setInt(1, offset);
+			preparedStatement.setInt(2, offset);
+			preparedStatement.setString(3, path);
+			
+			ResultSet res = preparedStatement.executeQuery();
+			if (!res.next()) {
+				return null;
+			}
+			
+			Integer start = mayBeNull(res, res.getInt("ms"));
+			if (start == null) {
+				return null;
+			}
+			
+			Integer length = mayBeNull(res, res.getInt("ml"));
+			if (length == null) {
+				return null;
+			}
+
+			int id = getAbstractStringIdByPosition(new Position(path, start, length));
+			
+			return findOutermostAbstractString(id);
+		} catch (SQLException e) {
+			LOG.exception(e);
+			throw new RethrowException(e);
+		}
+	}
 	
+	private IAbstractString findOutermostAbstractString(int id) throws SQLException {
+		while (true) {
+			Integer parent = getParent(id);
+			System.out.println(parent);
+			if (parent == null) {
+				return getAbstractStringById(id);
+			}
+			if (parent == MANY_PARENTS) {
+				return null;
+			}
+//			System.out.println(getAbstractStringById(parent));
+//			System.out.println("is a parent for");
+//			System.out.println(getAbstractStringById(id));
+			if (id == parent) {
+				throw new IllegalStateException();
+			}
+			id = parent;
+		}
+	}
+	
+	private Integer getParent(int id) throws SQLException {
+		// look in CollectionContents
+		//		find parent strings
+		//			if many, fail MANY_PARENTS
+
+		PreparedStatement preparedStatement = connection.prepareStatement(
+				"SELECT collection FROM CollectionContents WHERE item = ?"
+		);
+		preparedStatement.setInt(1, id);
+		ResultSet res = preparedStatement.executeQuery();
+		Integer result = null;
+		if (res.next()) {
+			result = notNull(res, res.getInt("collection"));
+			if (res.next()) {
+//				System.out.println("dup: " + getAbstractStringById(result));
+//				System.out.println(getAbstractStringById(notNull(res, res.getInt("collection"))));
+				return MANY_PARENTS;
+			}
+		}
+		
+		// for types 0 1 4 6 look in AbstractStrings
+		//		find parent strings
+		//			if many, fail MANY_PARENTS
+		preparedStatement = connection.prepareStatement(
+				"SELECT id, type FROM AbstractStrings WHERE (a = ?) AND (type IN (0, 1, 4, 5, 6))"
+		);
+		preparedStatement.setInt(1, id);
+		res = preparedStatement.executeQuery();
+		Integer psr = null;
+		while (res.next()) {
+			boolean parentlessSame = isParentlessSame(res);
+			if (result != null && !parentlessSame) {
+//				System.out.println("dup: " + getAbstractStringById(result));
+//				System.out.println(getAbstractStringById(notNull(res, res.getInt("id"))));
+				return MANY_PARENTS;
+			}
+			if (parentlessSame) {
+				psr = result;
+			} else {
+				result = notNull(res, res.getInt("id"));
+			}
+		}
+		if (result == null) {
+			result = psr;
+		}
+
+		return result;
+	}
+
+	private boolean isParentlessSame(ResultSet res) throws SQLException {
+		int type = notNull(res, res.getInt("type"));
+		boolean parentlessSame = false;
+		if (type == StringTypes.SAME_AS) {
+			int sameId = notNull(res, res.getInt("id"));
+			parentlessSame = getParent(sameId) == null;
+		}
+		return parentlessSame;
+	}
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	public void dumpLog() {
 		try {
 			PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM Log");
@@ -961,18 +1110,14 @@ public final class CacheServiceImpl implements ICacheService {
 			}
 			connection.prepareStatement("DELETE FROM Log").execute();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	
-	
+		
 	@SuppressWarnings("serial")
 	private class RethrowException extends RuntimeException {
 
