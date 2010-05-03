@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -24,6 +25,8 @@ import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.crawler.PositionUtil;
 import ee.stacc.productivity.edsl.crawler.UnsupportedNodeDescriptor;
+import ee.stacc.productivity.edsl.string.IAbstractString;
+import ee.stacc.productivity.edsl.string.samplegen.SampleGenerator;
 
 public class JavaElementCheckerTest {
 	JavaElementChecker checker = new JavaElementChecker();
@@ -78,40 +81,57 @@ public class JavaElementCheckerTest {
 		List<INodeDescriptor> hotspots = checker.findHotspots(new IJavaElement[] {element}, options);
 		
 		String filePrefix = TEST_FOLDER + "/" + id;
-		File outputFile = new File(filePrefix + "_found.txt");
-		if (outputFile.exists()) {
-			outputFile.delete();
+		File abstractOutputFile = new File(filePrefix + "_found.txt");
+		if (abstractOutputFile.exists()) {
+			abstractOutputFile.delete();
 		}
 		
-		List<String> lines = new ArrayList<String>();
+		File concreteOutputFile = new File(filePrefix + "_found_concrete.txt");
+		if (concreteOutputFile.exists()) {
+			concreteOutputFile.delete();
+		}
+		
+		
+		List<String> abstractLines = new ArrayList<String>();
+		List<String> concreteLines = new ArrayList<String>();
 		
 		for (INodeDescriptor desc : hotspots) {
 			String start = PositionUtil.getLineString(desc.getPosition()) + ", ";
 			
 			if (desc instanceof IStringNodeDescriptor) {
-				lines.add(start + 
-						((IStringNodeDescriptor)desc).getAbstractValue().toString());
+				IAbstractString aStr = ((IStringNodeDescriptor)desc).getAbstractValue(); 
+				abstractLines.add(start + aStr.toString());
+				concreteLines.addAll(SampleGenerator.getConcreteStrings(aStr));
 			}
 			else if (desc instanceof UnsupportedNodeDescriptor) {
-				lines.add(start + "unsupported: " 
+				abstractLines.add(start + "unsupported: " 
 						+ ((UnsupportedNodeDescriptor)desc).getProblemMessage());
 			}
 			else {
-				lines.add("???");
+				abstractLines.add("???");
 			}
 		}
 		
 		//Collections.sort(lines);
-		PrintStream output = new PrintStream(outputFile);
-		
-		for (String s : lines) {
-			output.println(s);
+		PrintStream abstractOutput = new PrintStream(abstractOutputFile);
+		for (String s : abstractLines) {
+			abstractOutput.println(s);
 		}
 		
-		File expectedFile = new File(filePrefix + "_expected.txt");
+		Collections.sort(concreteLines);
+		PrintStream concreteOutput = new PrintStream(concreteOutputFile);
+		for (String s : concreteLines) {
+			concreteOutput.println(s);
+		}
 		
-		assertTrue("Expected abstract strings != found abstract strings: " + expectedFile.getParent(), 
-					filesAreEqual(outputFile, expectedFile));
+		
+		File expectedAbstractFile = new File(filePrefix + "_expected.txt");
+		assertTrue("Expected abstract strings != found abstract strings: " + id, 
+					filesAreEqual(abstractOutputFile, expectedAbstractFile));
+
+		File expectedConcreteFile = new File(filePrefix + "_expected_concrete.txt");
+		assertTrue("Expected concrete strings != found concrete strings: " + id, 
+					filesAreEqual(concreteOutputFile, expectedConcreteFile));
 
 	}
 	
