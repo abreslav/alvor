@@ -125,13 +125,14 @@ public class JavaElementCheckerTest {
 		}
 		
 		
-		File expectedAbstractFile = new File(filePrefix + "_expected.txt");
-		assertTrue("Expected abstract strings != found abstract strings: " + id, 
-					filesAreEqual(abstractOutputFile, expectedAbstractFile));
 
 		File expectedConcreteFile = new File(filePrefix + "_expected_concrete.txt");
 		assertTrue("Expected concrete strings != found concrete strings: " + id, 
 					filesAreEqual(concreteOutputFile, expectedConcreteFile));
+		
+		File expectedAbstractFile = new File(filePrefix + "_expected.txt");
+		assertTrue("Expected abstract strings != found abstract strings: " + id, 
+					filesAreEqual(abstractOutputFile, expectedAbstractFile));
 
 	}
 	
