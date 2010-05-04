@@ -193,9 +193,11 @@ public class NewASE {
 			return evalName((Name)node);
 		}
 		else if (node instanceof ConditionalExpression) {
-			return new StringChoice(PositionUtil.getPosition(node),
-					eval(((ConditionalExpression)node).getThenExpression()),
-					eval(((ConditionalExpression)node).getElseExpression()));
+			return StringConverter.optimizeChoice(
+					new StringChoice(PositionUtil.getPosition(node),
+							eval(((ConditionalExpression)node).getThenExpression()),
+							eval(((ConditionalExpression)node).getElseExpression()))
+					);
 		}
 		else if (node instanceof ParenthesizedExpression) {
 			return eval(((ParenthesizedExpression)node).getExpression());
@@ -521,27 +523,11 @@ public class NewASE {
 		NameUsageChoice uc = (NameUsageChoice)usage;
 		IAbstractString thenStr = this.evalNameAfterUsage(name, uc.getThenUsage()); 
 		IAbstractString elseStr = this.evalNameAfterUsage(name, uc.getElseUsage());
-		return optimizeChoice(
-				PositionUtil.getPosition(uc.getNode()),
-				thenStr,
-				elseStr);
+		return StringConverter.optimizeChoice(
+				new StringChoice(PositionUtil.getPosition(uc.getNode()),
+						thenStr, elseStr));
 	}
 	
-	// If possible, replaces Choice(Seq(a,b),Seq(a,c)) with Seq(a, Choice(b,c))
-	private IAbstractString optimizeChoice(IPosition pos, IAbstractString thenStr, IAbstractString elseStr) {
-		/*
-		if ((thenStr instanceof StringSequence) && (elseStr instanceof StringSequence)) {
-			StringSequence thenSeq = (StringSequence)thenStr;
-			StringSequence elseSeq = (StringSequence)elseStr;
-			if (thenSeq.getItems().get(0).toString().equals(
-					elseSeq.getItems().get(0).toString())) {
-				return new String
-			}
-		}
-		*/
-		return new StringChoice(pos, thenStr, elseStr);
-	}
-
 	private IAbstractString evalNameInCallExpression(Name name, 
 			NameInMethodCallExpression usage) {
 		if (isString(name.resolveTypeBinding())) {
@@ -606,7 +592,7 @@ public class NewASE {
 		return new RecursiveStringChoice(
 				PositionUtil.getPosition(usage.getNode()),
 				baseString, 
-				usage.getLoopUsage().getNode()); // null means outermost string TODO too ugly
+				usage.getLoopUsage().getNode()); // null means outermost string. TODO too ugly
 		/*
 		if (loopChoice.getLoopUsage() == this.startingPlace) {
 			IAbstractString baseString = evalNameAfterUsage(loopChoice.getBaseUsage());

@@ -19,6 +19,7 @@ public class StringConverter {
 	public static IAbstractString widenToRegular(IAbstractString str) {
 		return widenFlatToRegular(flattenStringCollections(str));
 	}
+	
 	private static IAbstractString widenFlatToRegular(IAbstractString str) {
 		if (str instanceof NamedString) {
 			NamedString namedStr = (NamedString)str;
@@ -31,8 +32,8 @@ public class StringConverter {
 			else if (namedStr.getBody() instanceof StringSequence) {
 				StringSequence strSeq = (StringSequence)namedStr.getBody();
 				
-				if (strSeq.getItems().get(0) instanceof RecursiveStringChoice) {
-					RecursiveStringChoice recChoice = (RecursiveStringChoice)strSeq.getItems().get(0);
+				if (strSeq.get(0) instanceof RecursiveStringChoice) {
+					RecursiveStringChoice recChoice = (RecursiveStringChoice)strSeq.get(0);
 					if (recChoice.getRecKey() == namedStr.getKey()) {
 						
 						// return Seq[BaseCase, Repetition(TailOfStrSeq)]
@@ -143,6 +144,10 @@ public class StringConverter {
 		}
 	}
 	
+	/**
+	 * Transforms sequence of sequences to a flat sequence 
+	 * and same for choices 
+	 */
 	public static IAbstractString flattenStringCollections(IAbstractString str) {
 		if (str instanceof StringSequence) {
 			List<IAbstractString> items = ((StringSequence)str).getItems();
@@ -192,6 +197,126 @@ public class StringConverter {
 		}
 		else {
 			return str;
+		}
+	}
+	
+	/**
+	 * Optimizes choice of sequences that have same head
+	 * eg. transforms (a + b | a + c) into a + (b | c)
+	 * 
+	 * NB! it's nonrecursive - optimizes only outermost Choice
+	 * 
+	 * 3 schemes are considered separately
+	 *    (a + b | a) 				-> a + (b | _)
+	 *    (a | a + b) 				-> a + (b | _)          
+	 *    (a + b | a + c | ...) 	-> a + (b | c | ...)
+	 */
+	public static IAbstractString optimizeChoice(StringChoice str) {
+		if (str.getItems().size() < 2) {
+			return str;
+		}
+		
+		if (str.getItems().size() == 2) {
+			// first assume 2nd item is also prefix for 1st
+			IAbstractString commonHead = str.get(1);
+			IAbstractString containingStr = str.get(0);
+			IAbstractString tail = getTailIfHasHead(containingStr, commonHead);
+			
+			if (tail == null) {
+				// try other way around
+				commonHead = str.get(0);
+				containingStr = str.get(1);
+				tail = getTailIfHasHead(containingStr, commonHead);
+			}
+			
+			// if either way succeeded then construct sequence of choice
+			if (tail != null) {
+				return new StringSequence(
+						containingStr.getPosition(), 
+						commonHead, 
+						new StringChoice(
+								str.getPosition(), 
+								tail, 
+								// FIXME this position is not good
+								new StringConstant(str.getPosition(), "", "\"\"")));
+			}
+			else {
+				return str;
+			}
+		}
+		else {
+			return str;
+		}
+		/*
+		 * TODO following needs some checking
+		else if (str.get(0) instanceof StringSequence) {
+			StringSequence seq0 = (StringSequence)str.get(0);
+			if (seq0.getItems().isEmpty()) {
+				return str;
+			}
+			
+			IAbstractString head0 = seq0.get(0);
+			List<IAbstractString> tails = new ArrayList<IAbstractString>();
+			
+			for (IAbstractString item : str.getItems()) {
+				if (item instanceof StringSequence) {
+					StringSequence seqN = (StringSequence)item;
+					if (seqN.getItems().isEmpty()) {
+						return str;
+					}
+					IAbstractString headN = seqN.get(0);
+					if (assumeSharedStrings && headN == head0
+						// FIXME: following is not quite correct 
+						|| !assumeSharedStrings && headN.toString().equals(str.toString())) {
+						if (seqN.getItems().size() == 1) {
+							tails.add(new StringConstant(seqN.getPosition(), "", "\"\""));
+						}
+						else if (seqN.getItems().size() == 2) {
+							tails.add(seqN.get(1));
+						}
+						else if (seqN.getItems().size() > 2) {
+							tails.add(new StringSequence
+									(seqN.getItems().subList(1, seqN.getItems().size())));
+						}
+					}
+				}
+				else {
+					// found nonsuitable item
+					return str;
+				}
+			}
+		}
+		*/
+	}
+	
+	private static IAbstractString getTailIfHasHead(IAbstractString str, 
+			IAbstractString head) {
+		if (str instanceof StringSequence) {
+			StringSequence seq = (StringSequence)str;
+			if (seq.getItems().isEmpty()) {
+				return null;
+			}
+			
+			if (// TODO should test equality properly
+					seq.get(0).toString().equals(head.toString())) {
+				
+				if (seq.getItems().size() == 1) {
+					// that would be weird case, but anyway...
+					return new StringConstant(seq.getPosition(), "", "\"\"");
+				}
+				else if (seq.getItems().size() == 2) {
+					return seq.get(1);
+				}
+				else {
+					return new StringSequence(seq.getItems().subList(1, seq.getItems().size()));
+				}
+			}
+			else {
+				return null;
+			}
+		}
+		else {
+			return null;
 		}
 	}
 }
