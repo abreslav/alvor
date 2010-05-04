@@ -19,7 +19,6 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ForStatement;
-import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -521,26 +520,6 @@ public class AbstractStringEvaluator {
 		}
 	}
 	
-	private String getErasedSignature(IMethodBinding m) {
-		String paramString;
-		ITypeBinding[] parameterTypes = m.getParameterTypes();
-		if (parameterTypes.length == 1) {
-			paramString = parameterTypes[0].getQualifiedName();
-		} else if (parameterTypes.length > 0) {
-			StringBuilder params = new StringBuilder();
-			for (ITypeBinding t : parameterTypes) {
-				params.append(t.getQualifiedName()).append(" ");
-			}
-			paramString = params.toString();
-		} else {
-			paramString = "";
-		}
-		return m.getDeclaringClass().getQualifiedName()
-			+ "." + m.getName()
-			+ "(" + paramString + ")"
-			;
-	}
-
 	private IAbstractString getMethodReturnValue(MethodDeclaration decl) {
 		
 		// if it has @ResultForSQLChecker in JAVADOC then return this

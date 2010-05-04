@@ -1,10 +1,6 @@
 package ee.stacc.productivity.edsl.conntracker;
 
-import java.io.ObjectInputStream.GetField;
-import java.rmi.activation.UnknownObjectException;
-
 import org.eclipse.jdt.core.dom.Assignment;
-import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;

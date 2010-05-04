@@ -15,6 +15,7 @@ import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IBinding;
+import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -369,4 +370,25 @@ public class ASTUtil {
 			|| node instanceof BreakStatement
 			|| node instanceof ContinueStatement;
 	}
+	
+	public static  String getErasedSignature(IMethodBinding m) {
+		String paramString;
+		ITypeBinding[] parameterTypes = m.getParameterTypes();
+		if (parameterTypes.length == 1) {
+			paramString = parameterTypes[0].getQualifiedName();
+		} else if (parameterTypes.length > 0) {
+			StringBuilder params = new StringBuilder();
+			for (ITypeBinding t : parameterTypes) {
+				params.append(t.getQualifiedName()).append(" ");
+			}
+			paramString = params.toString();
+		} else {
+			paramString = "";
+		}
+		return m.getDeclaringClass().getQualifiedName()
+			+ "." + m.getName()
+			+ "(" + paramString + ")"
+			;
+	}
+
 }
