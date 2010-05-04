@@ -31,6 +31,10 @@ public abstract class AbstractStringCollection extends PositionedString {
 		return Collections.unmodifiableList(items);
 	}
 	
+	public IAbstractString get(int index) {
+		return this.getItems().get(index);
+	}
+	
 	public boolean isEmpty() {
 		for (IAbstractString s : items) {
 			if (!s.isEmpty()) {
