@@ -7,7 +7,6 @@ import static ee.stacc.productivity.edsl.sqllexer.SQLLexerData.STATE_COUNT;
 import static ee.stacc.productivity.edsl.sqllexer.SQLLexerData.TRANSITIONS;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -77,10 +76,9 @@ public class SQLLexer {
 						} else {
 							actionList.add(PushInput.INSTANCE);
 						}
-						Transition transition = new Transition(from, states[toIndex], 
+						Transition.create(from, states[toIndex], 
 									SimpleCharacter.create(Integer.valueOf(cc)), 
 									actionList);
-						from.getOutgoingTransitions().add(transition);
 					}
 				}
 				if (isAccepting(fromIndex)) {
@@ -88,11 +86,11 @@ public class SQLLexer {
 				}
 			}
 
-			initialState.getOutgoingTransitions().add(new Transition(
+			Transition.create(
 					initialState, EOFState, 
 					IAbstractInputItem.EOF, 
 					Collections.singletonList(Yield.create(-1))
-			));
+			);
 			
 			// Make it circular
 			// Imagine an \eps-transition into initialState from every accepting state
@@ -100,10 +98,9 @@ public class SQLLexer {
 			// for others they produce some output
 			// eliminating these imaginary transitions gives us an automaton which recognizes 
 			// a token stream
-			Collection<Transition> initialTransitions = initialState.getOutgoingTransitions();
+			Iterable<Transition> initialTransitions = initialState.getOutgoingTransitions();
 			for (Integer stateIndex : acceptingStatesIndices) {
 				State state = states[stateIndex];
-				Collection<Transition> outgoingTransitions = state.getOutgoingTransitions();
 				for (Transition transition : initialTransitions) {
 					State to = transition.getTo();
 					IAbstractInputItem inChar = transition.getInChar();
@@ -111,7 +108,7 @@ public class SQLLexer {
 					List<IAbstractOutputItem> resultingOutStr = isImmediatelyGenerating(stateIndex) 
 						? initialOutStr 
 						: prepend(Yield.create(ACTIONS[stateIndex]), initialOutStr);
-					outgoingTransitions.add(new Transition(state, to, inChar, resultingOutStr));
+					Transition.create(state, to, inChar, resultingOutStr);
 				}
 			}
 			

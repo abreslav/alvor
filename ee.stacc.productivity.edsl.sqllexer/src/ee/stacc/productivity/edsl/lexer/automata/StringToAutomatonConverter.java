@@ -1,6 +1,5 @@
 package ee.stacc.productivity.edsl.lexer.automata;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,9 +11,9 @@ import ee.stacc.productivity.edsl.string.IAbstractStringVisitor;
 import ee.stacc.productivity.edsl.string.StringCharacterSet;
 import ee.stacc.productivity.edsl.string.StringChoice;
 import ee.stacc.productivity.edsl.string.StringConstant;
+import ee.stacc.productivity.edsl.string.StringParameter;
 import ee.stacc.productivity.edsl.string.StringRepetition;
 import ee.stacc.productivity.edsl.string.StringSequence;
-import ee.stacc.productivity.edsl.string.StringParameter;
 
 public class StringToAutomatonConverter {
 
@@ -103,7 +102,7 @@ public class StringToAutomatonConverter {
 			IAbstractString body = stringRepetition.getBody();
 			State fake = new State("fake", false);
 			Set<State> finalStates = convert(body, fake);
-			Collection<Transition> initialTransitions = fake.getOutgoingTransitions();
+			Iterable<Transition> initialTransitions = fake.getOutgoingTransitions();
 			for (Transition initialTransition : initialTransitions) {
 				copyTransition(initial, initialTransition);
 			}
@@ -144,8 +143,6 @@ public class StringToAutomatonConverter {
 	
 	private static Transition createTransition(State initial, State fin,
 			IAbstractInputItem inChar) {
-		Transition transition = new Transition(initial, fin, inChar, Collections.singletonList(Yield.create(inChar.getCode())));
-		initial.getOutgoingTransitions().add(transition);
-		return transition;
+		return Transition.create(initial, fin, inChar, Collections.singletonList(Yield.create(inChar.getCode())));
 	}
 }

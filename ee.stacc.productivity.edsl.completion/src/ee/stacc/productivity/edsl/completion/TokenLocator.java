@@ -1,5 +1,6 @@
 package ee.stacc.productivity.edsl.completion;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -23,7 +24,6 @@ import ee.stacc.productivity.edsl.string.AbstractStringCollection;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.IAbstractStringVisitor;
 import ee.stacc.productivity.edsl.string.IPosition;
-import ee.stacc.productivity.edsl.string.Position;
 import ee.stacc.productivity.edsl.string.StringCharacterSet;
 import ee.stacc.productivity.edsl.string.StringChoice;
 import ee.stacc.productivity.edsl.string.StringConstant;
@@ -63,22 +63,31 @@ public class TokenLocator {
 
 		SearchState closest = findCurrentToken(transduction, currentLiteral, offset);
 		if (closest.token == null) {
-			return null;
+			return Collections.emptyList();
 		}
 		
 		if (closest.inside) {
 			return PositionedCharacterUtil.getMarkerPositions(closest.token.getText());
 		}
 		
-		Collection<Token> precedingTokens = getPrecedingTokens(closest.transition);
-		
-		return Collections.<IPosition>singleton(currentLiteral.getPosition());
+		Collection<IPosition> positions = new ArrayList<IPosition>(); 
+		for (Token token : getPrecedingTokens(closest.transition)) {
+			System.out.println(token);
+			positions.addAll(PositionedCharacterUtil.getMarkerPositions(token.getText()));
+		}
+		return positions;
+//		return Collections.<IPosition>singleton(currentLiteral.getPosition());
 	}
 
 
 	private Collection<Token> getPrecedingTokens(Transition transition) {
-		// TODO Auto-generated method stub
-		return null;
+		Collection<Token> result = new ArrayList<Token>();
+		Iterable<Transition> incomingTransitions = transition.getFrom().getIncomingTransitions();
+		for (Transition prev : incomingTransitions) {
+			Token prevToken = (Token) prev.getInChar();
+			result.add(prevToken);
+		}
+		return result;
 	}
 
 

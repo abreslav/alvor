@@ -1,6 +1,5 @@
 package ee.stacc.productivity.edsl.lexer.automata;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -57,16 +56,15 @@ public class EmptyTransitionEliminator {
 			for (State state : reachableByEmpty) {
 				for (Transition oldTransition : state.getOutgoingTransitions()) {
 					if (!emptinessExpert.isEmpty(oldTransition)) {
-						newState.getOutgoingTransitions().add(
-								new Transition(
-										newState, 
-										getNewState(
-												newStates, 
-												oldTransition.getTo(), 
-												accepting),
-												oldTransition.getInChar(),
-												oldTransition.getOutput()
-								));
+							Transition.create(
+									newState, 
+									getNewState(
+											newStates, 
+											oldTransition.getTo(), 
+											accepting),
+									oldTransition.getInChar(),
+									oldTransition.getOutput()
+							);
 					}
 				}
 			}
@@ -95,8 +93,7 @@ public class EmptyTransitionEliminator {
 		
 		visited.add(start);
 		
-		Collection<Transition> outgoingTransitions = start.getOutgoingTransitions();
-		for (Transition transition : outgoingTransitions) {
+		for (Transition transition : start.getOutgoingTransitions()) {
 			dfs(transition.getTo(), visited);
 		}
 	}
@@ -107,9 +104,8 @@ public class EmptyTransitionEliminator {
 			return state.isAccepting();
 		}
 		visited.add(state);
-		Collection<Transition> outgoingTransitions = state.getOutgoingTransitions();
 		boolean result = state.isAccepting();
-		for (Transition transition : outgoingTransitions) {
+		for (Transition transition : state.getOutgoingTransitions()) {
 			if (emptinessExpert.isEmpty(transition)) {
 				if (close(transition.getTo(), rep, visited, emptinessExpert)) {
 					result = true;

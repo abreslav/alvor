@@ -92,12 +92,10 @@ public class AutomataDeterminator {
 				Set<State> targetOldStates = trEntry.getValue();
 				State targetNewState = visited.get(targetOldStates);
 				
-				Transition transition = new Transition(
+				Transition.create(
 						newState, 
 						targetNewState, 
 						SimpleCharacter.create(integer));
-//						(int) integer);
-				newState.getOutgoingTransitions().add(transition);
 			}
 		}
 	}
@@ -184,12 +182,12 @@ public class AutomataDeterminator {
 		Set<Integer> usedIns = new HashSet<Integer>();
 		for (State state : states) {
 			usedIns.clear();
-			Iterator<Transition> iterator = state.getOutgoingTransitions().iterator();
+			Iterator<Transition> iterator = state.getOutgoingTransitionsNonConcurrent().iterator();
 			while (iterator.hasNext()) {
 				Transition transition = iterator.next();
 				int inChar = transition.getInChar().getCode();
 				if (usedIns.contains(inChar)) {
-					iterator.remove();
+					transition.remove();
 				} else {
 					usedIns.add(inChar);
 				}

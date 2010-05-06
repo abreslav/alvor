@@ -1,6 +1,5 @@
 package ee.stacc.productivity.edsl.lexer.automata;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -83,14 +82,10 @@ public class AutomataUtils {
 		for (int i = 0; i < string.length(); i++) {
 			char charAt = string.charAt(i);
 			State state = new State("" + charAt, false);
-			current.getOutgoingTransitions().add(
-					new Transition(current, state, SimpleCharacter.create(charAt))	
-			);
+			Transition.create(current, state, SimpleCharacter.create(charAt));	
 			current = state;
 		}
-		current.getOutgoingTransitions().add(
-				new Transition(current, new State("EOF", true), IAbstractInputItem.EOF)	
-		);
+		Transition.create(current, new State("EOF", true), IAbstractInputItem.EOF);	
 		
 	}
 	
@@ -137,7 +132,7 @@ public class AutomataUtils {
 			}
 			stringBuilder
 				.append(renderer.render(state));
-			if (!state.getOutgoingTransitions().isEmpty()) {
+			if (state.hasOutgoingTransitions()) {
 				stringBuilder.append(" -> ");
 			}
 			for (Transition transition : state.getOutgoingTransitions()) {
@@ -212,7 +207,7 @@ public class AutomataUtils {
 	
 	public static void generate(State state, IInputToString toStr, IOutput output) {
 		Set<Transition> visitedTransitions = new HashSet<Transition>();
-		Collection<Transition> outgoingTransitions = state.getOutgoingTransitions();
+		Iterable<Transition> outgoingTransitions = state.getOutgoingTransitions();
 		for (Transition transition : outgoingTransitions) {
 			doGenerate(transition, "", toStr, visitedTransitions, output);
 		}

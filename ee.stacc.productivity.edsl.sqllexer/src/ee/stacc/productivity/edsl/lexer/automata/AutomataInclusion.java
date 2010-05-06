@@ -1,7 +1,6 @@
 package ee.stacc.productivity.edsl.lexer.automata;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -86,9 +85,8 @@ public class AutomataInclusion {
 	}
 
 	private void createTransition(State from, State to, IAbstractInputItem c) {
-		Transition transition = new Transition(from, to, c);
+		Transition.create(from, to, c);
 //		println("    newTransition: " + transition);
-		from.getOutgoingTransitions().add(transition);
 	}
 
 	private State getNewState(Map<State, State> oldToNewStates, State oldState) {
@@ -194,8 +192,7 @@ public class AutomataInclusion {
 				}
 			}
 			
-			Collection<Transition> transitions = current.getOutgoingTransitions();
-			for (Transition transition : transitions) {
+			for (Transition transition : current.getOutgoingTransitions()) {
 				Change status = transitionFunction(setForCurrent.copy(), error, transition);
 				switch (status) {
 				case NONE:
@@ -237,12 +234,11 @@ public class AutomataInclusion {
 			}
 			
 			Change result = Change.NONE;
-			Collection<Transition> transitions = state.getOutgoingTransitions();
 			Set<List<IAbstractInputItem>> correspondingTransitions = getSet(transitionMap, underlyingTransition);
 			
 			IAbstractInputItem inChar = underlyingTransition.getInChar();
 			boolean anyTransition = false;
-			for (Transition transition : transitions) {
+			for (Transition transition : state.getOutgoingTransitions()) {
 				IAbstractInputItem expectedChar = transition.getInChar();
 				
 				if (converter.convert(inChar.getCode()) == expectedChar.getCode()) {

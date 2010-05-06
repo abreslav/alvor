@@ -9,13 +9,29 @@ import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractOutputItem;
 
 
 public class Transition {
+
+	public static Transition create(State from, State to, IAbstractInputItem inChar,
+			List<? extends IAbstractOutputItem> output) {
+		return new Transition(from, to, inChar, output);
+	}
+	
+	public static Transition create(State from, State to, IAbstractInputItem inChar) {
+		return new Transition(from, to, inChar);
+	}
+	
 	private final State from;
 	private final State to;
 	private final IAbstractInputItem inChar; 
 	private final boolean empty; 
 	private final List<IAbstractOutputItem> output; 
 	
-	public Transition(State from, State to, IAbstractInputItem inChar,
+	/**
+	 * This automatically puts the created transition into 
+	 * 		from.getOutgoingTransitions() 
+	 * 		and 
+	 * 		to.getIncomingTransitions() 
+	 */
+	private Transition(State from, State to, IAbstractInputItem inChar,
 			List<? extends IAbstractOutputItem> output) {
 		if (output == null) {
 			throw new IllegalArgumentException();
@@ -25,10 +41,17 @@ public class Transition {
 		this.empty = inChar == null;
 		this.inChar = empty ? null : inChar;
 		this.output = Collections.unmodifiableList(new ArrayList<IAbstractOutputItem>(output));
+		from.addOutgoing(this);
+		to.addIncoming(this);
 	}
 
-	public Transition(State from, State to, IAbstractInputItem inChar) {
+	private Transition(State from, State to, IAbstractInputItem inChar) {
 		this(from, to, inChar, Collections.<IAbstractOutputItem>emptyList());
+	}
+	
+	public void remove() {
+		from.removeOutgoing(this);
+		to.removeIncoming(this);
 	}
 	
 	public boolean isEmpty() {

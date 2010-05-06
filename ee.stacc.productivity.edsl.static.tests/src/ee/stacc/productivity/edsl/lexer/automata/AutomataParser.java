@@ -40,8 +40,7 @@ public class AutomataParser {
 						out.add(new SimpleOutput(outStr.charAt(i)));
 					}
 				}
-				Transition transition = new Transition(from, to, SimpleCharacter.create(c), out);
-				from.getOutgoingTransitions().add(transition);
+				Transition.create(from, to, SimpleCharacter.create(c), out);
 			}
 		}
 		return initialState;
