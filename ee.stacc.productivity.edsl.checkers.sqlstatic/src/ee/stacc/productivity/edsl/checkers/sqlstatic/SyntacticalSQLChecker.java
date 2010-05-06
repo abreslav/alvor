@@ -11,7 +11,6 @@ import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
 import ee.stacc.productivity.edsl.lexer.alphabet.Token;
-import ee.stacc.productivity.edsl.lexer.alphabet.ISequence.IFoldFunction;
 import ee.stacc.productivity.edsl.lexer.automata.State;
 import ee.stacc.productivity.edsl.sqlparser.IParseErrorHandler;
 import ee.stacc.productivity.edsl.sqlparser.SQLSyntaxChecker;
@@ -41,7 +40,7 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 					public void unexpectedItem(IAbstractInputItem item) {
 						Collection<IPosition> markerPositions = PositionedCharacterUtil.getMarkerPositions(((Token) item).getText());
 						for (IPosition pos : markerPositions) {
-							errorHandler.handleSQLError("Unexpected token: " + render(item), pos);
+							errorHandler.handleSQLError("Unexpected token: " + PositionedCharacterUtil.render(item), pos);
 						}
 					}
 
@@ -61,21 +60,5 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 
 	public static boolean hasAcceptableSize(IAbstractString abstractString) {
 		return AbstractStringSizeCounter.size(abstractString) <= SIZE_THRESHOLD;
-	}
-
-	private String render(IAbstractInputItem item) {
-		if (item instanceof Token) {
-			Token token = (Token) item;
-			StringBuilder text = token.getText().fold(new StringBuilder(), new IFoldFunction<StringBuilder, IAbstractInputItem>() {
-				
-				@Override
-				public StringBuilder body(StringBuilder init, IAbstractInputItem arg,
-						boolean last) {
-					return init.append((char) arg.getCode());
-				}
-			});
-			return text.toString();
-		}
-		return item.toString();
 	}
 }

@@ -79,7 +79,7 @@ public class SQLSyntaxChecker {
 			
 			@Override
 			public boolean isEmpty(Transition transition) {
-				return transition.isEmpty() || SQLLexer.getTokenName(transition.getInChar().getCode()).length() == 0;
+				return transition.isEmpty() || SQLLexer.isWhitespace(transition.getInChar().getCode());
 			}
 		});
 //		transduction = AutomataDeterminator.determinate(transduction);

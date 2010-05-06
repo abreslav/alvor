@@ -38,6 +38,14 @@ public class SQLLexer {
 
 	public static final State SQL_TRANSDUCER = new AutomataConverter().convert();
 
+	public static boolean isWhitespace(int code) {
+		return getTokenName(code).length() == 0;	
+	}
+	
+	public static boolean isIdentifier(int code) {
+		return "ID".equals(getTokenName(code));	
+	}
+	
 	public static String getTokenName(int c) {
 		if (c == -1) {
 			return "EOF";
@@ -139,4 +147,5 @@ public class SQLLexer {
 		String textToStr = SequenceUtil.toString(text);
 		return tokenName + "[" + textToStr + "]";
 	}
+
 }

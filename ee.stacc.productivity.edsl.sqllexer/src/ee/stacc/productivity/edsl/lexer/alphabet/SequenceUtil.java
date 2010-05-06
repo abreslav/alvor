@@ -16,4 +16,5 @@ public class SequenceUtil {
 	public static <E> String toString(ISequence<E> seq) {
 		return seq.fold(new StringBuilder(), TO_STRING).toString();
 	}
+	
 }

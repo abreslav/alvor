@@ -7,6 +7,7 @@ import java.util.List;
 
 import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
 import ee.stacc.productivity.edsl.lexer.alphabet.ISequence;
+import ee.stacc.productivity.edsl.lexer.alphabet.Token;
 import ee.stacc.productivity.edsl.lexer.alphabet.ISequence.IFoldFunction;
 import ee.stacc.productivity.edsl.lexer.automata.State;
 import ee.stacc.productivity.edsl.lexer.automata.StringToAutomatonConverter;
@@ -68,6 +69,22 @@ public class PositionedCharacterUtil {
 					stringPosition.getStart() + charStart, 
 					charLength));
 		}
+	}
+
+	public static String render(IAbstractInputItem item) {
+		if (item instanceof Token) {
+			Token token = (Token) item;
+			StringBuilder text = token.getText().fold(new StringBuilder(), new IFoldFunction<StringBuilder, IAbstractInputItem>() {
+				
+				@Override
+				public StringBuilder body(StringBuilder init, IAbstractInputItem arg,
+						boolean last) {
+					return init.append((char) arg.getCode());
+				}
+			});
+			return text.toString();
+		}
+		return item.toString();
 	}
 	
 	
