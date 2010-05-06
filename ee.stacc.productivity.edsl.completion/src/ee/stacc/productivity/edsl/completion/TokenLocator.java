@@ -57,49 +57,49 @@ public class TokenLocator {
 			@Override
 			public boolean isEmpty(Transition transition) {
 				return transition.isEmpty();
-				// || SQLLexer.getTokenName(transition.getInChar().getCode()).length() == 0;
 			}
 		});
 
-		SearchState closest = findCurrentToken(transduction, currentLiteral, offset);
-		if (closest.token == null) {
-			return Collections.emptyList();
-		}
-		
-		if (closest.inside) {
-			return PositionedCharacterUtil.getMarkerPositions(closest.token.getText());
-		}
+		SearchState closest = findCurrentTokens(transduction, currentLiteral, offset);
+//		if (closest.transition == null) {
+//			return Collections.emptyList();
+//		}
+//		
+//		if (closest.transitionsOn) {
+//			Token token = (Token) closest.transition.getInChar();
+//			return PositionedCharacterUtil.getMarkerPositions(token.getText());
+//		}
 		
 		Collection<IPosition> positions = new ArrayList<IPosition>(); 
-		for (Token token : getPrecedingTokens(closest.transition)) {
-			System.out.println(token);
+		for (Transition transition : closest.transitionsAfter) {
+			Token token = (Token) transition.getInChar();
+//			System.out.println(token);
 			positions.addAll(PositionedCharacterUtil.getMarkerPositions(token.getText()));
 		}
 		return positions;
-//		return Collections.<IPosition>singleton(currentLiteral.getPosition());
 	}
 
 
-	private Collection<Token> getPrecedingTokens(Transition transition) {
+	private Collection<Token> getPrecedingTokens(Collection<Transition> transitions) {
 		Collection<Token> result = new ArrayList<Token>();
-		Iterable<Transition> incomingTransitions = transition.getFrom().getIncomingTransitions();
-		for (Transition prev : incomingTransitions) {
-			Token prevToken = (Token) prev.getInChar();
-			result.add(prevToken);
+		for (Transition transition : transitions) {
+			Iterable<Transition> incomingTransitions = transition.getFrom().getIncomingTransitions();
+			for (Transition prev : incomingTransitions) {
+				Token prevToken = (Token) prev.getInChar();
+				result.add(prevToken);
+			}
 		}
 		return result;
 	}
 
 
 	private final class SearchState {
-		private Token token;
-		private int charOffset;
-//		private int charLength;
-		private boolean inside;
-		private Transition transition;
+		private Collection<Transition> transitionsOn = new ArrayList<Transition>();
+		private Collection<Transition> transitionsBefore = new ArrayList<Transition>();
+		private Collection<Transition> transitionsAfter = new ArrayList<Transition>();
 	}
-
-	private SearchState findCurrentToken(State state, final IAbstractString currentLiteral, final int offset) {
+	
+	private SearchState findCurrentTokens(State state, final IAbstractString currentLiteral, final int offset) {
 
 		final SearchState closest = new SearchState();
 		
@@ -111,32 +111,18 @@ public class TokenLocator {
 			State s = queue.poll();
 			for (final Transition transition : s.getOutgoingTransitions()) {
 				final Token token = (Token) transition.getInChar();
-				final boolean[] first = new boolean[] {true};
-				token.getText().fold(null, new IFoldFunction<Void, IAbstractInputItem>() {
-
-					@Override
-					public Void body(Void init, IAbstractInputItem arg,	boolean last) {
-						PositionedCharacter c = (PositionedCharacter) arg;
-						IPosition stringPos = c.getStringPosition();
-						if (stringPos.equals(currentLiteral.getPosition())) {
-							int strStart = stringPos.getStart();
-							int offs = strStart + c.getIndexInString();
-							int len = c.getLengthInSource();
-							if (offset < offs + len) {
-								if (closest.token == null
-										|| offs < closest.charOffset) {
-									closest.token = token;
-									closest.transition = transition;
-									closest.charOffset = offs;
-//									closest.charLength = len;
-									closest.inside = !first[0];
-								}
-							}
-						}
-						first[0] = false;
-						return null;
+				ChunkPosition chunkPosition = getChunkPositionFromLiteral(currentLiteral, token);
+				if (chunkPosition != null) {
+					if (chunkPosition.tokenInside(offset)) {
+						closest.transitionsOn.add(transition);
+					} 
+					if (chunkPosition.tokenLeftSide(offset)) {
+						closest.transitionsAfter.add(transition);
 					}
-				});
+					if (chunkPosition.tokenRightSide(offset)) {
+						closest.transitionsBefore.add(transition);
+					}
+				}
 				State to = transition.getTo();
 				if (!visited.contains(to)) {
 					queue.offer(to);
@@ -146,6 +132,71 @@ public class TokenLocator {
 			
 		}
 		return closest;
+	}
+
+	private final class ChunkPosition {
+		private int start;
+		private int length;
+		private boolean leftInTheMiddle; // left side of the chunk is in the middle of the token
+		private boolean rightInTheMiddle; // right side of the chunk is in the middle of the token 
+		
+		private int processed;
+		private Integer firstIndex;
+		
+		public boolean tokenInside(int offset) {
+			return start < offset && offset < start + length
+				|| leftInTheMiddle && leftSide(offset)
+				|| rightInTheMiddle && rightSide(offset);
+		}
+
+		public boolean tokenLeftSide(int offset) {
+			return !leftInTheMiddle && leftSide(offset);
+		}
+		
+		public boolean tokenRightSide(int offset) {
+			return !rightInTheMiddle && rightSide(offset);
+		}
+		
+		private boolean rightSide(int offset) {
+			return offset == start + length;
+		}
+		
+		private boolean leftSide(int offset) {
+			return offset == start;
+		}
+	}
+
+	private ChunkPosition getChunkPositionFromLiteral(
+			final IAbstractString currentLiteral, final Token token) {
+		ChunkPosition tokenPosition = token.getText().fold(new ChunkPosition(), new IFoldFunction<ChunkPosition, IAbstractInputItem>() {
+
+			@Override
+			public ChunkPosition body(ChunkPosition position, IAbstractInputItem arg, boolean last) {
+				PositionedCharacter c = (PositionedCharacter) arg;
+				IPosition stringPos = c.getStringPosition();
+				if (stringPos.equals(currentLiteral.getPosition())) {
+					int strStart = stringPos.getStart();
+					int offs = strStart + c.getIndexInString();
+					int len = c.getLengthInSource();
+					if (position.firstIndex == null) {
+						position.firstIndex = position.processed;
+						position.start = offs;
+						position.length = len;
+						position.leftInTheMiddle = position.firstIndex > 0;
+					} else {
+						position.length += len;
+					}
+				} else {
+					if (last && position.firstIndex != null) {
+						 // Last index is less than the size, because we are in this branch
+						position.rightInTheMiddle = true;
+					}
+				}
+				position.processed++;
+				return position;
+			}
+		});
+		return tokenPosition;
 	}
 	
 	private IAbstractString findContainingLiteral(

@@ -983,7 +983,10 @@ public final class CacheServiceImpl implements ICacheService {
 				return null;
 			}
 
-			int id = getAbstractStringIdByPosition(new Position(path, start, length));
+			Integer id = getAbstractStringIdByPosition(new Position(path, start, length));
+			if (id == null) {
+				return null;
+			}
 			
 			return findOutermostAbstractString(id);
 		} catch (SQLException e) {
@@ -995,7 +998,7 @@ public final class CacheServiceImpl implements ICacheService {
 	private IAbstractString findOutermostAbstractString(int id) throws SQLException {
 		while (true) {
 			Integer parent = getParent(id);
-			System.out.println(parent);
+//			System.out.println(parent);
 			if (parent == null) {
 				return getAbstractStringById(id);
 			}
