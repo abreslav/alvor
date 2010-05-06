@@ -3,7 +3,6 @@
  */
 package ee.stacc.productivity.edsl.cache;
 
-import java.nio.channels.IllegalSelectorException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -465,38 +464,16 @@ public final class CacheServiceImpl implements ICacheService {
 		throw new IllegalStateException();
 	}
 
-	private int getAbstractStringIdByPosition(IPosition position) throws SQLException {
+	private Integer getAbstractStringIdByPosition(IPosition position) throws SQLException {
 		PreparedStatement preparedStatement = queries.getAbstractStringQuery(position);
-		String columnLabel = "stringId";
-		return getNonNullValue(preparedStatement, columnLabel);
-	}
-
-	private Integer getNonNullValue(PreparedStatement preparedStatement,
-			String columnLabel) throws SQLException {
 		ResultSet res = preparedStatement.executeQuery();
 		if (!res.next()) {
 			return null;
 		}
 		
-		return notNull(res, res.getInt(columnLabel));
+		return notNull(res, res.getInt("stringId"));
 	}
 
-	private Integer getMaybeNullValue(PreparedStatement preparedStatement,
-			String columnLabel) throws SQLException {
-		ResultSet res = preparedStatement.executeQuery();
-		if (!res.next()) {
-			return null;
-		}
-		
-		return mayBeNull(res, res.getInt(columnLabel));
-	}
-	
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	
 	@Override
 	public IAbstractString getAbstractString(IPosition position) {
 		if (nocache)

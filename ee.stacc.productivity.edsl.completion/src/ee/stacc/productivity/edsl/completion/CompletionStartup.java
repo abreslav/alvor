@@ -1,5 +1,7 @@
 package ee.stacc.productivity.edsl.completion;
 
+import java.util.Collection;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -55,8 +57,8 @@ public class CompletionStartup implements IStartup {
 
 						String fileString = PositionUtil.getFileString(file);
 						
-						IPosition position = TokenLocator.INSTANCE.locateToken(fileString, offset);
-						if (position != null) {
+						Collection<IPosition> positions = TokenLocator.INSTANCE.locateToken(fileString, offset);
+						for (IPosition position : positions) {
 							CheckProjectHandler.createMarker("asdas", TOKEN_MARKER_ID, position, null);
 						}
 						return;
