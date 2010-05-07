@@ -720,7 +720,7 @@ public final class CacheServiceImpl implements ICacheService {
 		}
 
 		@Override
-		public Map<String, Integer> getCahcedScope(IHotspotPattern pattern) {
+		public Map<String, Integer> getCachedScope(IHotspotPattern pattern) {
 			if (nocache) 
 				return Collections.emptyMap();
 			try {
@@ -805,7 +805,7 @@ public final class CacheServiceImpl implements ICacheService {
 			}
 			
 			@Override
-			public Map<String, Integer> getCahcedScope(String key) {
+			public Map<String, Integer> getCachedScope(String key) {
 				// TODO Auto-generated method stub
 				return null;
 			}

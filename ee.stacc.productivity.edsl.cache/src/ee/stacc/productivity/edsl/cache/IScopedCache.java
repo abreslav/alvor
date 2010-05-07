@@ -18,7 +18,7 @@ public interface IScopedCache<K, V> {
 	 * @param pattern
 	 * @return map [fileName -> fileId]
 	 */
-	Map<String, Integer> getCahcedScope(K key);
+	Map<String, Integer> getCachedScope(K key);
 	void add(K key, V value);
 	void getCachedResultsInScope(Set<Integer> scope, K key, Collection<? super V> values);
 	void markScopeAsCached(K key, Set<String> scope);
