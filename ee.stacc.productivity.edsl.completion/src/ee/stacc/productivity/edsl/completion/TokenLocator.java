@@ -59,13 +59,31 @@ public class TokenLocator {
 	}
 	
 	public Collection<IPosition> locateToken(String filePath, int offset) {
+		CompletionContext result = findCompletionContext(filePath, offset);
+		if (result == null) {
+			return Collections.emptyList();
+		}
+		
+		Collection<String> incompleteIdsToTheLeft = result.getIncompleteIdsToTheLeft().values();
+		for (String string : incompleteIdsToTheLeft) {
+			System.out.println(string);
+		}
+		
+		ArrayList<Transition> list = new ArrayList<Transition>(result.getCompleteTokensToTheLeft());
+		list.addAll(result.getIncompleteIdsToTheLeft().keySet());
+		
+		return getPositions(list);
+	}
+
+
+	public CompletionContext findCompletionContext(String filePath, int offset) {
 		IAbstractString abstractString = CacheService.getCacheService().getContainingAbstractString(filePath, offset);
 		if (abstractString == null) {
-			return Collections.emptyList();
+			return null;
 		}
 		IAbstractString currentLiteral = findContainingLiteral(abstractString, filePath, offset);
 		if (currentLiteral == null) {
-			return Collections.emptyList();
+			return null;
 		}
 		State automaton = PositionedCharacterUtil.createPositionedAutomaton(abstractString);
 		State sqlTransducer = SQLLexer.SQL_TRANSDUCER;
@@ -78,13 +96,13 @@ public class TokenLocator {
 
 		SearchResult closest = findCurrentTokens(transduction, currentLiteral, offset);
 
-		CompletionContext result = new CompletionContext(automaton);
+		CompletionContext result = new CompletionContext(transduction);
 		for (Transition transition : closest.transitionsOn) {
 			Token token = getToken(transition);
 			int code = token.getCode();
 			if (SQLLexer.isIdentifier(code)) {
 				 // inside identifier
-				result.getIncompleteIdsToTheLeft().put(transition, getTextPortion(getToken(transition), filePath, offset));
+				result.getIncompleteIdsToTheLeft().put(transition, getTextPortion(getToken(transition), currentLiteral, offset));
 			} else if (SQLLexer.isWhitespace(code)) {
 				 // inside whitespace
 				Collection<Transition> precedingTransitions = getPrecedingTransitions(transition);
@@ -99,15 +117,6 @@ public class TokenLocator {
 			} else {
 				// inside some other token
 				// TODO: Handle keywords here?
-//				Collection<Transition> precedingTransitions = getPrecedingTransitions(transition);
-//				for (Transition prev : precedingTransitions) {
-//					Token prevToken = getToken(prev);
-//					if (SQLLexer.isWhitespace(prevToken.getCode())) {
-//						result.getCompleteTokensToTheLeft().addAll(getPrecedingTransitions(prev));
-//					} else {
-//						result.getCompleteTokensToTheLeft().add(prev);
-//					}
-//				}
 			}
 		}
 		if (closest.transitionsOn.isEmpty()) {
@@ -127,21 +136,17 @@ public class TokenLocator {
 				}
 			}
 		}
-		
-		Collection<String> incompleteIdsToTheLeft = result.getIncompleteIdsToTheLeft().values();
-		for (String string : incompleteIdsToTheLeft) {
-			System.out.println(string);
-		}
-		
-		ArrayList<Transition> list = new ArrayList<Transition>(result.getCompleteTokensToTheLeft());
-		list.addAll(result.getIncompleteIdsToTheLeft().keySet());
-		
-		return getPositions(list);
+		return result;
 	}
 
-
-	private String getTextPortion(Token token, final String filePath, final int offset) {
+	private String getTextPortion(Token token, final IAbstractString currentLiteral, final int offset) {
+		// If we have been inside the currentLiteral and left it, we should not add more characters
+		// This is needed for the case, where the cursor stands at the end of the literal: "abc|" + "cde"
+		final boolean[] beenInCurrentLiteral = new boolean[] {false};
+		// When we reach the current offset or leave the current literal, 
+		// this flag is set, and we do not add more characters
 		final boolean[] stop = new boolean[] {false};
+		final IPosition currentLiteralPosition = currentLiteral.getPosition();
 		return token.getText().fold(new StringBuilder(), new IFoldFunction<StringBuilder, IAbstractInputItem>() {
 
 			@Override
@@ -152,12 +157,18 @@ public class TokenLocator {
 				}
 				PositionedCharacter c = (PositionedCharacter) arg;
 				IPosition stringPosition = c.getStringPosition();
-				if (stringPosition.getPath().equals(filePath)) {
+				if (stringPosition.equals(currentLiteralPosition)) {
 					// TODO: This does not take into account characters with 
 					// source length > 1 (e.g. \u0020), but these are quite unlikely 
 					// to appear inside an identifier :)
 					int cStart = stringPosition.getStart() + c.getIndexInString();
 					if (cStart == offset) {
+						stop[0] = true;
+						return init;
+					}
+					beenInCurrentLiteral[0] = true;
+				} else { 
+					if (beenInCurrentLiteral[0]) {
 						stop[0] = true;
 						return init;
 					}
@@ -180,7 +191,7 @@ public class TokenLocator {
 	}
 
 
-	private Token getToken(Transition transition) {
+	public static Token getToken(Transition transition) {
 		Token token = (Token) transition.getInChar();
 		return token;
 	}
