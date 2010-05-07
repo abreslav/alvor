@@ -99,15 +99,15 @@ public class TokenLocator {
 			} else {
 				// inside some other token
 				// TODO: Handle keywords here?
-				Collection<Transition> precedingTransitions = getPrecedingTransitions(transition);
-				for (Transition prev : precedingTransitions) {
-					Token prevToken = getToken(prev);
-					if (SQLLexer.isWhitespace(prevToken.getCode())) {
-						result.getCompleteTokensToTheLeft().addAll(getPrecedingTransitions(prev));
-					} else {
-						result.getCompleteTokensToTheLeft().add(prev);
-					}
-				}
+//				Collection<Transition> precedingTransitions = getPrecedingTransitions(transition);
+//				for (Transition prev : precedingTransitions) {
+//					Token prevToken = getToken(prev);
+//					if (SQLLexer.isWhitespace(prevToken.getCode())) {
+//						result.getCompleteTokensToTheLeft().addAll(getPrecedingTransitions(prev));
+//					} else {
+//						result.getCompleteTokensToTheLeft().add(prev);
+//					}
+//				}
 			}
 		}
 		if (closest.transitionsOn.isEmpty()) {
@@ -133,7 +133,10 @@ public class TokenLocator {
 			System.out.println(string);
 		}
 		
-		return getPositions(result.getIncompleteIdsToTheLeft().keySet());
+		ArrayList<Transition> list = new ArrayList<Transition>(result.getCompleteTokensToTheLeft());
+		list.addAll(result.getIncompleteIdsToTheLeft().keySet());
+		
+		return getPositions(list);
 	}
 
 

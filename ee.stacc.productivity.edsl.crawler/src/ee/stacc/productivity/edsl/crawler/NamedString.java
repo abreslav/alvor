@@ -28,6 +28,11 @@ public class NamedString extends PositionedString {
 	@Override
 	public <R, D> R accept(
 			IAbstractStringVisitor<? extends R, ? super D> visitor, D data) {
+		if (visitor instanceof IAbstractStringVisitorExtended<?, ?>) {
+			@SuppressWarnings("unchecked")
+			IAbstractStringVisitorExtended<R, D> visitorEx = (IAbstractStringVisitorExtended<R, D>) visitor;
+			return visitorEx.visitNamedString(this, data);			
+		}
 		throw new UnsupportedOperationException();
 	}
 

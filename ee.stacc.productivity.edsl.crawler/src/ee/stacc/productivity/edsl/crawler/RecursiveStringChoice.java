@@ -26,6 +26,11 @@ public class RecursiveStringChoice extends PositionedString {
 	@Override
 	public <R, D> R accept(
 			IAbstractStringVisitor<? extends R, ? super D> visitor, D data) {
+		if (visitor instanceof IAbstractStringVisitorExtended<?, ?>) {
+			@SuppressWarnings("unchecked")
+			IAbstractStringVisitorExtended<R, D> visitorEx = (IAbstractStringVisitorExtended<R, D>) visitor;
+			return visitorEx.visitRecursiveStringChoice(this, data);			
+		}
 		throw new UnsupportedOperationException();
 	}
 

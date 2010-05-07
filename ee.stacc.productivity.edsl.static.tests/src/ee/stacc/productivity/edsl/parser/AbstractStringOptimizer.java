@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import ee.stacc.productivity.edsl.string.AbstractStringCollection;
+import ee.stacc.productivity.edsl.string.AbstractStringEqualsVisitor;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.IAbstractStringVisitor;
 import ee.stacc.productivity.edsl.string.IPosition;
@@ -17,106 +18,12 @@ import ee.stacc.productivity.edsl.string.StringSequence;
 
 public class AbstractStringOptimizer {
 
-	private static IAbstractStringVisitor<Boolean, IAbstractString> EQUALS_VISITOR = new IAbstractStringVisitor<Boolean, IAbstractString>() {
-		
-		@Override
-		public Boolean visitStringCharacterSet(
-				StringCharacterSet me, IAbstractString data) {
-			if (data instanceof StringCharacterSet) {
-				StringCharacterSet other = (StringCharacterSet) data;
-				return areEqual(me.getContents(), other.getContents())
-				&& positionEquals(me, other);
-			}
-			return false;
-		}
-		
-		@Override
-		public Boolean visitStringChoice(StringChoice me,
-				IAbstractString data) {
-			if (data instanceof StringChoice) {
-				StringChoice other = (StringChoice) data;
-				return positionEquals(me, other)
-					&& contentEquals(me.getItems(), other.getItems());
-			}
-			return false;
-		}
-
-		@Override
-		public Boolean visitStringConstant(StringConstant me,
-				IAbstractString data) {
-			if (data instanceof StringConstant) {
-				StringConstant other = (StringConstant) data;
-				return positionEquals(me, other)
-					&& areEqual(me.getEscapedValue(), other.getEscapedValue());
-			}
-			return false;
-		}
-		
-		@Override
-		public Boolean visitStringParameter(
-				StringParameter me, IAbstractString data) {
-			throw new UnsupportedOperationException();
-		}
-		
-		@Override
-		public Boolean visitStringRepetition(
-				StringRepetition me, IAbstractString data) {
-			if (data instanceof StringRepetition) {
-				StringRepetition other = (StringRepetition) data;
-				return positionEquals(me, other)
-					&& abstractStringEquals(me.getBody(), other.getBody());
-			}
-			return false;
-		}
-		
-		@Override
-		public Boolean visitStringSequence(StringSequence me,
-				IAbstractString data) {
-			if (data instanceof StringSequence) {
-				StringSequence other = (StringSequence) data;
-				return positionEquals(me, other)
-					&& contentEquals(me.getItems(), other.getItems());
-			}
-			return false;
-		}
-	};
-
+	private static IAbstractStringVisitor<Boolean, IAbstractString> EQUALS_VISITOR = new AbstractStringEqualsVisitor();
 	
-	private static boolean contentEquals(List<IAbstractString> a,
-			List<IAbstractString> b) {
-		if (a.size() != b.size()) {
-			return false;
-		}
-		Iterator<IAbstractString> ai = a.iterator();
-		Iterator<IAbstractString> bi = b.iterator();
-		for (;ai.hasNext();) {
-			IAbstractString as = ai.next();
-			IAbstractString bs = bi.next();
-			if (!abstractStringEquals(as, bs)) {
-				return false;
-			}
-		}
-		return true;
-	}
-
 	public static boolean abstractStringEquals(IAbstractString a, IAbstractString b) {
 		return a.accept(EQUALS_VISITOR, b);
 	}
 	
-	private static <T> boolean areEqual(T a, T b) {
-		if (a == b) {
-			return true;
-		}
-		if (a != null) {
-			return a.equals(b);
-		}
-		return false;
-	}
-	
-	private static boolean positionEquals(IAbstractString a, IAbstractString b) {
-		return areEqual(a.getPosition(), b.getPosition());
-	}
-
 	private static IAbstractStringVisitor<IAbstractString, Void> OPTIMIZE_VISITOR = new IAbstractStringVisitor<IAbstractString, Void>() {
 		
 		@Override
