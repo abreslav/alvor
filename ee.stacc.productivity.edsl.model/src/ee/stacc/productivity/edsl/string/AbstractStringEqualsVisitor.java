@@ -58,7 +58,7 @@ public class AbstractStringEqualsVisitor implements
 		return false;
 	}
 
-	private boolean abstractStringEquals(IAbstractString a, IAbstractString b) {
+	protected boolean abstractStringEquals(IAbstractString a, IAbstractString b) {
 		return a.accept(this, b);
 	}
 
@@ -100,7 +100,7 @@ public class AbstractStringEqualsVisitor implements
 		return false;
 	}
 	
-	private static boolean positionEquals(IAbstractString a, IAbstractString b) {
+	protected static boolean positionEquals(IAbstractString a, IAbstractString b) {
 		return areEqual(a.getPosition(), b.getPosition());
 	}
 
