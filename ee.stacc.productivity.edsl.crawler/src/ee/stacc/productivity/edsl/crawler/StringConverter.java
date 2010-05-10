@@ -6,6 +6,7 @@ import java.util.List;
 import ee.stacc.productivity.edsl.cache.UnsupportedStringOpEx;
 import ee.stacc.productivity.edsl.string.AbstractStringCollection;
 import ee.stacc.productivity.edsl.string.IAbstractString;
+import ee.stacc.productivity.edsl.string.IAbstractStringVisitor;
 import ee.stacc.productivity.edsl.string.StringCharacterSet;
 import ee.stacc.productivity.edsl.string.StringChoice;
 import ee.stacc.productivity.edsl.string.StringConstant;
@@ -14,6 +15,7 @@ import ee.stacc.productivity.edsl.string.StringRepetition;
 import ee.stacc.productivity.edsl.string.StringSequence;
 
 public class StringConverter {
+	private static IAbstractStringVisitor<Boolean, IAbstractString> EQUALS_VISITOR_EX = new AbstractStringEqualsVisitorExtended();
 	
 	public static IAbstractString widenToRegular(IAbstractString str) {
 		return widenFlatToRegular(flattenStringCollections(str));
@@ -296,8 +298,7 @@ public class StringConverter {
 				return null;
 			}
 			
-			if (// TODO should test equality properly
-					seq.get(0).toString().equals(head.toString())) {
+			if (seq.get(0).accept(EQUALS_VISITOR_EX, head)) {
 				
 				if (seq.getItems().size() == 1) {
 					// that would be weird case, but anyway...

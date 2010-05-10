@@ -30,7 +30,7 @@ public class ASTTransformer {
 	// need to provide some link for original resource
 	// TODO: encode also source position difference (code moved from javadoc to body)
 	// TODO check if javadoc is still there in copy
-	newCUnit.setProperty(ASTUtil.ORIGINAL_I_COMPILATION_UNIT, iCUnit);
+//	newCUnit.setProperty(ASTUtil.ORIGINAL_I_COMPILATION_UNIT, iCUnit);
 	
 	NodeFinder nf = new NodeFinder(newCUnit, node.getStartPosition(), replacement.length());
 	ASTNode resultNode = nf.getCoveredNode();

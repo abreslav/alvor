@@ -53,8 +53,8 @@ public class JavaElementChecker {
 			throw new IllegalArgumentException("No hotspots found");
 		}
 		NodeSearchEngine.clearCache();
-		return AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(requests, scope, 0);
-//		return NewASE.evaluateMethodArgumentAtCallSites(requests, scope, 0);
+//		return AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(requests, scope, 0);
+		return NewASE.evaluateMethodArgumentAtCallSites(requests, scope, 0);
 	}
 
 	public void processHotspots(

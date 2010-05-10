@@ -42,8 +42,6 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 import ee.stacc.productivity.edsl.cache.UnsupportedStringOpEx;
 
 public class ASTUtil {
-	public static final String ORIGINAL_I_COMPILATION_UNIT = "OriginalICompilationUnit";
-
 	public static TypeDeclaration getContainingTypeDeclaration(ASTNode node) {
 		ASTNode result = node;
 		while (result != null && ! (result instanceof TypeDeclaration)) {

@@ -51,17 +51,22 @@ import ee.stacc.productivity.edsl.tracker.NameUsageLoopChoice;
 import ee.stacc.productivity.edsl.tracker.VariableTracker;
 
 
+
 // TODO test Expression.resolveConstantExpressionValue
 
+/**
+ * evaluateExpression is static counterpart for eval
+ * eval is doEval plus cache handling
+ */
 public class NewASE {
 	private int maxLevel = 3;
 	private boolean supportLoops = false;
 	private boolean supportInvocations = true;
-	private static boolean useCache = true;
+	private static boolean useCache = false;
 	
 	private int level;
 	private IJavaElement[] scope;
-	private boolean templateConstructionMode;
+	private boolean templateConstructionMode; // means: don't evaluate parameters, leave them as StringParameter-s 
 	
 	private static final String RESULT_FOR_SQL_CHECKER = "@ResultForSQLChecker";
 	private static final ILog LOG = Logs.getLog(NewASE.class);
@@ -76,89 +81,76 @@ public class NewASE {
 		this.templateConstructionMode = templateConstructionMode;
 	}
 	
+	/*
+	 * Used for debugging
+	 */
 	public static IAbstractString evaluateExpression(Expression node) {
-		NewASE evaluator = 
-			new NewASE(0, new IJavaElement[] {ASTUtil.getNodeProject(node)}, false);
+		NewASE evaluator = new NewASE(0, new IJavaElement[] {ASTUtil.getNodeProject(node)}, false);
 		return evaluator.eval(node);
 	}
 	
 	public static List<INodeDescriptor> evaluateMethodArgumentAtCallSites
 			(Collection<NodeRequest> requests, IJavaElement[] scope, int level) {
 		
-		LOG.message(levelPrefix(level) + "SEARCHING: ------------------------");
+		logMessage("SEARCHING", level, null);
 		for (NodeRequest nodeRequest : requests) {
-			LOG.message(levelPrefix(level) + nodeRequest);
+			logMessage(nodeRequest, level, null);
 		}
 		
 		Collection<IPosition> argumentPositions = NodeSearchEngine.findArgumentNodes(scope, requests);
 		NewASE evaluator = new NewASE(level, scope, false);
 		List<INodeDescriptor> result = new ArrayList<INodeDescriptor>();
 		for (IPosition pos: argumentPositions) {
-			result.add(evaluator.evaluateNodeAtPosition(pos));
+			try {
+				result.add(new StringNodeDescriptor(pos, evaluator.eval(pos)));
+			} 
+			catch (UnsupportedStringOpEx e) {
+				result.add(new UnsupportedNodeDescriptor(pos, "Unsupported SQL construction: " 
+						+ e.getMessage() + " at " + PositionUtil.getLineString(pos)));
+			} 
 		}
 		return result;
 	}
 	
-	private static String levelPrefix(int level) {
-		String levelPrefix = "";
-		for (int i = 0; i < level; i++) {
-			levelPrefix += "    ";
+	private IAbstractString eval(IPosition pos) {
+		IAbstractString abstractString = null;
+		if (useCache) {
+			abstractString = CacheService.getCacheService().getAbstractString(pos);
 		}
-		return levelPrefix;
-	}
 
-	private INodeDescriptor evaluateNodeAtPosition(IPosition pos) {
-		try {
-			IAbstractString abstractString = null;
-			if (useCache) {
-				abstractString = CacheService.getCacheService().getAbstractString(pos);
-			}
-
-			if (abstractString == null) {
-				LOG.message(levelPrefix(level) + "EVALUATING file: " 
-						+ pos.getPath() + ", line: "
-						+ PositionUtil.getLineNumber(pos));
-				
-				Expression arg = (Expression) NodeSearchEngine.getASTNode(pos);
-				abstractString = eval(arg);
-			}
-			return new StringNodeDescriptor(pos, abstractString);
-		} 
-		catch (UnsupportedStringOpEx e) {
-			LOG.message(levelPrefix(level) + "UNSUPPORTED: " + e.getMessage());
-			LOG.message(levelPrefix(level) + "    file: " + pos.getPath() + ", line: "
-					+ PositionUtil.getLineNumber(pos));
-			return new UnsupportedNodeDescriptor(pos, 
-					"Unsupported SQL construction: " + e.getMessage() + " at " 
-					+ PositionUtil.getLineString(pos));
-		} 
-
-		catch (Throwable e) {
-			LOG.error(levelPrefix(level) + "ERROR: " + e.getMessage());
-			LOG.error(levelPrefix(level) + "    file: " + pos.getPath() + ", line: " + PositionUtil.getLineNumber(pos));
-			return new UnsupportedNodeDescriptor(pos, "ERROR when analyzing SQL construction: " + e.getMessage() + " at " + PositionUtil.getLineString(pos));
+		if (abstractString == null) {
+			Expression arg = (Expression) NodeSearchEngine.getASTNode(pos);
+			abstractString = eval(arg);
 		}
 		
+		return abstractString;
 	}
-
 	private IAbstractString eval(Expression node) {
 		IAbstractString result = null;
 		if (useCache) {
+			// may throw UnsupportedStringOpEx instead returning
 			result = CacheService.getCacheService().getAbstractString(PositionUtil.getPosition(node));
 		}
 		if (result == null) {
 			try {
+				logMessage("EVALUATING", level, node);
 				result = doEval(node);
 				assert result.getPosition() != null;
 				if (useCache) {
 					CacheService.getCacheService().addAbstractString(PositionUtil.getPosition(node), result);
 				}
-			} catch (UnsupportedStringOpEx e) {
+			} 
+			catch (UnsupportedStringOpEx e) {
+				logMessage("UNSUPPORTED: " + e.getMessage(), level, node);
 				if (useCache) {
 					CacheService.getCacheService().addUnsupported(PositionUtil.getPosition(node), e.getMessage());
 				}
 				throw e;
 			}
+//			catch (Throwable e) {
+//				logMessage("ERROR: " + e.getMessage(), node);
+//				throw new UnsupportedStringOpEx("ERROR: " + e.getMessage());
+//			}
 		}
 		return result;
 	}
@@ -635,7 +627,18 @@ public class NewASE {
 					choices);
 		}
 	}
-
 	
-
+	private static void logMessage(Object msg, int level, ASTNode node) {
+		String finalMsg = "";
+		for (int i = 0; i < level; i++) {
+			finalMsg += "    ";
+		}
+		
+		finalMsg += msg;
+		if (node != null) {
+			finalMsg += ", file: " + PositionUtil.getFileString(node) 
+					+ ", line: " + PositionUtil.getLineNumber(node); 
+		}
+		LOG.message(finalMsg);
+	}
 }

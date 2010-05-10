@@ -13,7 +13,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
@@ -26,16 +25,6 @@ public class PositionUtil {
 	public static IFile getFile(ASTNode node) {
 		try {
 			ICompilationUnit unit = ASTUtil.getICompilationUnit(node);
-			if (unit == null) {
-				// probably node is from a patched unit, try to recover ICompilationUnit
-				CompilationUnit cUnit = ASTUtil.getCompilationUnit(node);
-				if (cUnit.getProperty(ASTUtil.ORIGINAL_I_COMPILATION_UNIT) != null) {
-					unit = (ICompilationUnit)cUnit.getProperty(ASTUtil.ORIGINAL_I_COMPILATION_UNIT);
-				}
-				else {
-					throw new IllegalStateException("Can't getFile for node");
-				}
-			}
 			IFile correspondingResource = (IFile) unit.getCorrespondingResource();
 			return correspondingResource;
 		} catch (JavaModelException e) {
@@ -59,6 +48,10 @@ public class PositionUtil {
 
 	public static IFile getFile(IPosition position) {
 		return ResourcesPlugin.getWorkspace().getRoot().getFile(Path.fromPortableString(position.getPath()));
+	}
+	
+	public static int getLineNumber(ASTNode node) {
+		return getLineNumber(getPosition(node));
 	}
 	
 	public static int getLineNumber(IPosition position) {

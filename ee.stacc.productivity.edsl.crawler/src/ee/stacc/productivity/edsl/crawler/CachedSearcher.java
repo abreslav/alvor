@@ -17,7 +17,7 @@ public abstract class CachedSearcher<K, V> {
 	public void performCachedSearch(final List<IFile> allFilesInScope, IScopedCache<? super K, V> scopedCache,
 			K key, final List<? super V> values) {
 
-		Map<String, Integer> cachedScope = scopedCache.getCahcedScope(key);
+		Map<String, Integer> cachedScope = scopedCache.getCachedScope(key);
 		List<IJavaElement> scopeToSearchIn = new ArrayList<IJavaElement>();
 		Set<String> scopeToSearchInAsStrings = new HashSet<String>();
 		Set<Integer> scopeToGetFromCache = new HashSet<Integer>();
