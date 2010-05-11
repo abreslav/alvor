@@ -8,7 +8,9 @@ import static ee.stacc.productivity.edsl.sqllexer.SQLLexerData.TRANSITIONS;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
 import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractOutputItem;
@@ -37,7 +39,22 @@ public class SQLLexer {
 	};
 
 	public static final State SQL_TRANSDUCER = new AutomataConverter().convert();
-
+	private static final Map<String, Integer> TOKEN_NAME_TO_CODE = new HashMap<String, Integer>();
+	static {
+		TOKEN_NAME_TO_CODE.put("EOF", -1);
+		for (int i = 0; i < SQLLexerData.TOKENS.length; i++) {
+			TOKEN_NAME_TO_CODE.put(SQLLexerData.TOKENS[i], i);
+		}
+	}
+	
+	public static int getCodeByName(String name) {
+		Integer code = TOKEN_NAME_TO_CODE.get(name);
+		if (code == null) {
+			throw new IllegalArgumentException("Unknown token type: " + name);
+		}
+		return code;
+	}
+	
 	public static boolean isWhitespace(int code) {
 		return getTokenName(code).length() == 0;	
 	}

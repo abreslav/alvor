@@ -5,7 +5,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -32,6 +34,11 @@ import ee.stacc.productivity.edsl.string.StringParameter;
 import ee.stacc.productivity.edsl.string.StringRepetition;
 import ee.stacc.productivity.edsl.string.StringSequence;
 
+/**
+ * 
+ * @author abreslav
+ *
+ */
 public class TokenLocator {
 
 	public static final TokenLocator INSTANCE = new TokenLocator();
@@ -58,19 +65,29 @@ public class TokenLocator {
 		}
 	}
 	
+	private TokenLocator() {}
+	
+	/**
+	 * This method is used for debugging purposes only
+	 */
 	public Collection<IPosition> locateToken(String filePath, int offset) {
 		CompletionContext result = findCompletionContext(filePath, offset);
 		if (result == null) {
 			return Collections.emptyList();
 		}
 		
-		Collection<String> incompleteIdsToTheLeft = result.getIncompleteIdsToTheLeft().values();
-		for (String string : incompleteIdsToTheLeft) {
-			System.out.println(string);
-		}
+		AutomataUtils.printSQLInputAutomaton(result.getAutomaton());
 		
-		ArrayList<Transition> list = new ArrayList<Transition>(result.getCompleteTokensToTheLeft());
+		List<Transition> list = new ArrayList<Transition>(result.getCompleteTokensToTheLeft());
 		list.addAll(result.getIncompleteIdsToTheLeft().keySet());
+		
+		for (Iterator<Transition> iterator = list.iterator(); iterator.hasNext();) {
+			Transition transition = iterator.next();
+			if (!ContextRecognizer.INSTANCE.isBetween(transition, SQLLexer.getCodeByName("SELECT"), SQLLexer.getCodeByName("FROM"))) {
+				System.out.println(transition.getInChar());
+				iterator.remove();
+			}
+		}
 		
 		return getPositions(list);
 	}
