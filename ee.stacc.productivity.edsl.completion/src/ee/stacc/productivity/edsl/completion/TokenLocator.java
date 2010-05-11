@@ -20,6 +20,7 @@ import ee.stacc.productivity.edsl.lexer.alphabet.Token;
 import ee.stacc.productivity.edsl.lexer.alphabet.ISequence.IFoldFunction;
 import ee.stacc.productivity.edsl.lexer.automata.AutomataInclusion;
 import ee.stacc.productivity.edsl.lexer.automata.EmptyTransitionEliminator;
+import ee.stacc.productivity.edsl.lexer.automata.IncomingTransitionsInitializer;
 import ee.stacc.productivity.edsl.lexer.automata.State;
 import ee.stacc.productivity.edsl.lexer.automata.Transition;
 import ee.stacc.productivity.edsl.lexer.sql.SQLLexer;
@@ -71,20 +72,19 @@ public class TokenLocator {
 	 * This method is used for debugging purposes only
 	 */
 	public Collection<IPosition> locateToken(String filePath, int offset) {
-		CompletionContext result = findCompletionContext(filePath, offset);
-		if (result == null) {
+		CompletionContext completionContext = findCompletionContext(filePath, offset);
+		if (completionContext == null) {
 			return Collections.emptyList();
 		}
 		
-		AutomataUtils.printSQLInputAutomaton(result.getAutomaton());
+		IncomingTransitionsInitializer.initializeIncomingTransitions(completionContext.getAutomaton());
 		
-		List<Transition> list = new ArrayList<Transition>(result.getCompleteTokensToTheLeft());
-		list.addAll(result.getIncompleteIdsToTheLeft().keySet());
+		List<Transition> list = new ArrayList<Transition>(completionContext.getCompleteTokensToTheLeft());
+		list.addAll(completionContext.getIncompleteIdsToTheLeft().keySet());
 		
 		for (Iterator<Transition> iterator = list.iterator(); iterator.hasNext();) {
 			Transition transition = iterator.next();
 			if (!ContextRecognizer.INSTANCE.isBetween(transition, SQLLexer.getCodeByName("SELECT"), SQLLexer.getCodeByName("FROM"))) {
-				System.out.println(transition.getInChar());
 				iterator.remove();
 			}
 		}

@@ -44,7 +44,9 @@ public class EDSLCompletionProposalComputer implements IJavaCompletionProposalCo
 
 		int invocationOffset = context.getInvocationOffset();
 		try {
-			CompletionContext completionContext = TokenLocator.INSTANCE.findCompletionContext(PositionUtil.getFileString(jContext.getCompilationUnit().getCorrespondingResource()), invocationOffset);
+			String fileString = PositionUtil.getFileString(jContext.getCompilationUnit().getCorrespondingResource());
+			CompletionContext completionContext = TokenLocator.INSTANCE.findCompletionContext(
+					fileString, invocationOffset);
 			
 			if (completionContext == null) {
 				errorMessage = "No SQL tokens under cursor";
@@ -64,22 +66,15 @@ public class EDSLCompletionProposalComputer implements IJavaCompletionProposalCo
 						result.add(new SimpleCompletionProposal(invocationOffset, 0, id.substring(length), id));
 						proposed.add(id);
 					}
-				}
-				
+				}	
 			}
-			
-			
+						
 			return result;
 		} catch (JavaModelException e) {
 			LOG.exception(e);
 			errorMessage = e.getClass().getCanonicalName() + ":" + e.getMessage();
 			return Collections.emptyList();
 		}
-		
-//		Arrays.asList(
-//				new SimpleCompletionProposal(invocationOffset, 0, "asdasd"),
-//				new SimpleCompletionProposal(invocationOffset, 0, "asdasd1")
-//		);
 	}
 
 	private Set<String> getAllIds(State state, Set<String> result) {

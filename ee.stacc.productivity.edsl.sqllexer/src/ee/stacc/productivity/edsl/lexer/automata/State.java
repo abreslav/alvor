@@ -12,9 +12,10 @@ public class State {
 	private final String name;
 	private final boolean accepting;
 	private final Collection<Transition> outgoingTransitions = new LinkedHashSet<Transition>();
-	private final Collection<Transition> incomingTransitions = new LinkedHashSet<Transition>();
 	private final Iterable<Transition> outgoingTransitionsRO = Collections.unmodifiableCollection(outgoingTransitions);
-	private final Iterable<Transition> incomingTransitionsRO = Collections.unmodifiableCollection(incomingTransitions);
+
+	private Collection<Transition> incomingTransitions;
+	private Iterable<Transition> incomingTransitionsRO;
 
 	public State(String name, boolean accepting) {
 		this.name = name;
@@ -24,17 +25,29 @@ public class State {
 	public String getName() {
 		return name;
 	}
+	
+	/*package*/ void initializeIncomingTransitions() {
+		if (incomingTransitions != null) {
+			return;
+		}
+		incomingTransitions = new LinkedHashSet<Transition>();
+		incomingTransitionsRO = Collections.unmodifiableCollection(incomingTransitions);
+	}
 
 	/*package*/ void addIncoming(Transition transition) {
-		incomingTransitions.add(transition);
+		if (incomingTransitions != null) {
+			incomingTransitions.add(transition);
+		}
+	}
+	
+	/*package*/ void removeIncoming(Transition transition) {
+		if (incomingTransitions != null) {
+			incomingTransitions.remove(transition);
+		}
 	}
 	
 	/*package*/ void addOutgoing(Transition transition) {
 		outgoingTransitions.add(transition);
-	}
-	
-	/*package*/ void removeIncoming(Transition transition) {
-		incomingTransitions.remove(transition);
 	}
 	
 	/*package*/ void removeOutgoing(Transition transition) {
@@ -56,6 +69,9 @@ public class State {
 	 * To remove a transition, call its own method
 	 */
 	public Iterable<Transition> getIncomingTransitions() {
+		if (incomingTransitions == null) {
+			throw new IllegalStateException("Incoming transitions are not intialized");
+		}
 		return incomingTransitionsRO;
 	}
 	
