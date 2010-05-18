@@ -2,7 +2,6 @@ package ee.stacc.productivity.edsl.crawler;
 
 import ee.stacc.productivity.edsl.string.AbstractStringEqualsVisitor;
 import ee.stacc.productivity.edsl.string.IAbstractString;
-import ee.stacc.productivity.edsl.string.StringCharacterSet;
 
 public class AbstractStringEqualsVisitorExtended extends AbstractStringEqualsVisitor implements IAbstractStringVisitorExtended<Boolean, IAbstractString> {
 

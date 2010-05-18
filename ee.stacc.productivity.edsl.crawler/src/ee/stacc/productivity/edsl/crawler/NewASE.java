@@ -28,6 +28,8 @@ import org.eclipse.jdt.core.dom.TagElement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 import ee.stacc.productivity.edsl.cache.CacheService;
+import ee.stacc.productivity.edsl.cache.IScopedCache;
+import ee.stacc.productivity.edsl.cache.MethodInvocationDescriptor;
 import ee.stacc.productivity.edsl.cache.UnsupportedStringOpEx;
 import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
@@ -62,7 +64,7 @@ public class NewASE {
 	private int maxLevel = 3;
 	private boolean supportLoops = false;
 	private boolean supportInvocations = true;
-	private static boolean useCache = false;
+	private boolean optimizeChoice = true;
 	
 	private int level;
 	private IJavaElement[] scope;
@@ -114,7 +116,7 @@ public class NewASE {
 	
 	private IAbstractString eval(IPosition pos) {
 		IAbstractString abstractString = null;
-		if (useCache) {
+		if (shouldUseCache()) {
 			abstractString = CacheService.getCacheService().getAbstractString(pos);
 		}
 
@@ -127,7 +129,7 @@ public class NewASE {
 	}
 	private IAbstractString eval(Expression node) {
 		IAbstractString result = null;
-		if (useCache) {
+		if (shouldUseCache()) {
 			// may throw UnsupportedStringOpEx instead returning
 			result = CacheService.getCacheService().getAbstractString(PositionUtil.getPosition(node));
 		}
@@ -136,13 +138,13 @@ public class NewASE {
 				logMessage("EVALUATING", level, node);
 				result = doEval(node);
 				assert result.getPosition() != null;
-				if (useCache) {
+				if (shouldUseCache()) {
 					CacheService.getCacheService().addAbstractString(PositionUtil.getPosition(node), result);
 				}
 			} 
 			catch (UnsupportedStringOpEx e) {
 				logMessage("UNSUPPORTED: " + e.getMessage(), level, node);
-				if (useCache) {
+				if (shouldUseCache()) {
 					CacheService.getCacheService().addUnsupported(PositionUtil.getPosition(node), e.getMessage());
 				}
 				throw e;
@@ -155,6 +157,9 @@ public class NewASE {
 		return result;
 	}
 	
+	private boolean shouldUseCache() {
+		return !this.templateConstructionMode;
+	}
 	
 	
 	private IAbstractString doEval(Expression node) {
@@ -176,14 +181,21 @@ public class NewASE {
 					String.valueOf(characterLiteral.charValue()), characterLiteral.getEscapedValue());
 		}
 		else if (node instanceof Name) {
+			if (!isStringOrStringBuilderOrBuffer(type)) {
+				throw new UnsupportedStringOpEx("Unsupported type: " + type.getQualifiedName());
+			}
 			return evalName((Name)node);
 		}
 		else if (node instanceof ConditionalExpression) {
-			return StringConverter.optimizeChoice(
-					new StringChoice(PositionUtil.getPosition(node),
-							eval(((ConditionalExpression)node).getThenExpression()),
-							eval(((ConditionalExpression)node).getElseExpression()))
-					);
+			StringChoice choice = new StringChoice(PositionUtil.getPosition(node),
+					eval(((ConditionalExpression)node).getThenExpression()),
+					eval(((ConditionalExpression)node).getElseExpression()));
+
+			if (optimizeChoice) {
+				return StringConverter.optimizeChoice(choice);
+			} else {
+				return choice;
+			}
 		}
 		else if (node instanceof ParenthesizedExpression) {
 			return eval(((ParenthesizedExpression)node).getExpression());
@@ -268,7 +280,7 @@ public class NewASE {
 	 * @param argumentIndex -1 means return value
 	 * @return
 	 */
-	private IAbstractString evalInvocationResultOrArgOut(MethodInvocation inv,
+	private IAbstractString evalInvocationResultOrArgOut_old(MethodInvocation inv,
 			int argumentIndex) {
 		if (! supportInvocations) {
 			throw new UnsupportedStringOpEx("Method call");
@@ -319,7 +331,63 @@ public class NewASE {
 		}
 	}
 
-	IAbstractString getMethodReturnTemplate(MethodDeclaration decl) {
+	private IAbstractString evalInvocationResultOrArgOut(MethodInvocation inv,
+			int argumentIndex) {
+		if (! supportInvocations) {
+			throw new UnsupportedStringOpEx("Method call");
+		}
+
+		System.err.println("evalInvocationResultOrArgOut: " + inv.resolveMethodBinding()
+				+ ":" + argumentIndex);
+		
+		MethodTemplateSearcher templateSearcher = new MethodTemplateSearcher(this);
+		List<IAbstractString> templates = 
+			templateSearcher.findMethodTemplates(scope, inv, argumentIndex);
+		
+		if (templates.size() == 0) {
+			throw new UnsupportedStringOpEx("No declarations found for: " + inv.toString());
+		}
+		
+		NewASE argEvaluator = new NewASE(this.level+1, this.scope, this.templateConstructionMode);
+		
+		// evaluate argumets
+		List<IAbstractString> arguments = new ArrayList<IAbstractString>();
+		for (Object item : inv.arguments()) {
+			Expression arg = (Expression)item;
+			ITypeBinding typ = arg.resolveTypeBinding();
+			if (isString(typ) || isStringBuilderOrBuffer(typ)) {
+				arguments.add(argEvaluator.eval(arg));
+			}
+			else {
+				arguments.add(null);
+			}
+		}
+		
+		// apply arguments to each template
+		List<IAbstractString> choices = new ArrayList<IAbstractString>();
+		for (IAbstractString template: templates) {
+			System.out.println("METHOD STRING for " + inv.getName().getFullyQualifiedName() + ": " + template);
+			choices.add(ArgumentApplier.applyArguments(template, arguments));
+		}
+		
+		if (choices.size() == 1) {
+			return choices.get(0);
+		}
+		else {
+			return new StringChoice(PositionUtil.getPosition(inv), choices);
+		}
+	}
+
+	public IAbstractString getMethodTemplate(MethodDeclaration decl, int argIndex) {
+		if (argIndex == -1) {
+			return getMethodReturnTemplate(decl);
+		}
+		else {
+			return getMethodArgOutTemplate(decl, argIndex);
+		}
+	}
+	
+	private IAbstractString getMethodReturnTemplate(MethodDeclaration decl) {
 		// if it has @ResultForSQLChecker in JAVADOC then return this
 		IAbstractString javadocResult = getMethodReturnValueFromJavadoc(decl);
 		if (javadocResult != null) {
@@ -347,9 +415,14 @@ public class NewASE {
 		for (ReturnStatement ret: returnStmts) {
 			options.add(evaluator.eval(ret.getExpression()));
 		}
-		return new StringChoice(PositionUtil.getPosition(decl), options);
+		if (options.size() == 1) {
+			return options.get(0);
+		}
+		else {
+			return new StringChoice(PositionUtil.getPosition(decl), options);
+		}
 	}
-
+	
 	private IAbstractString getMethodArgOutTemplate(MethodDeclaration decl,
 			int argumentIndex) {
 		// TODO: at first look for javadoc annotation for this arg
@@ -388,7 +461,10 @@ public class NewASE {
 	}
 	
 	private IAbstractString evalClassInstanceCreation(ClassInstanceCreation node) {
-		assert (isStringBuilderOrBuffer(node.resolveTypeBinding()));
+		if (!isStringBuilderOrBuffer(node.resolveTypeBinding())) {
+			throw new UnsupportedStringOpEx("Unsupported type in class instance creation: "
+					+ node.resolveTypeBinding().getQualifiedName());
+		}
 		if (node.arguments().size() == 1) {
 			Expression arg = (Expression)node.arguments().get(0);
 			// string initializer
@@ -440,6 +516,7 @@ public class NewASE {
 	
 	private IAbstractString evalNameAfterUsage(Name name, NameUsage usage) {
 		assert usage != null;
+		assert usage.getNode() != null;
 		
 		
 		// if usage in loop and name outside the loop then
@@ -509,9 +586,14 @@ public class NewASE {
 		NameUsageChoice uc = (NameUsageChoice)usage;
 		IAbstractString thenStr = this.evalNameAfterUsage(name, uc.getThenUsage()); 
 		IAbstractString elseStr = this.evalNameAfterUsage(name, uc.getElseUsage());
-		return StringConverter.optimizeChoice(
-				new StringChoice(PositionUtil.getPosition(uc.getNode()),
-						thenStr, elseStr));
+		StringChoice result = new StringChoice(PositionUtil.getPosition(uc.getNode()),
+				thenStr, elseStr); 
+		
+		if (optimizeChoice) {
+			return StringConverter.optimizeChoice(result);
+		} else {
+			return result;
+		}
 	}
 	
 	private IAbstractString evalNameInCallExpression(Name name, 
@@ -561,6 +643,9 @@ public class NewASE {
 			return evalNameBefore(name, usage.getNode());
 		}
 		else {
+			if (!isStringBuilderOrBuffer(name.resolveTypeBinding())) {
+				System.out.println(name.resolveTypeBinding());
+			}
 			assert isStringBuilderOrBuffer(name.resolveTypeBinding());
 			return evalInvocationArgOut(usage.getInv(), usage.getIndex()); 
 		}

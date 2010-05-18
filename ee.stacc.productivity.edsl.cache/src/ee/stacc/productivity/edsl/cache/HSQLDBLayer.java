@@ -1,5 +1,6 @@
 package ee.stacc.productivity.edsl.cache;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -13,7 +14,15 @@ public abstract class HSQLDBLayer implements IDBLayer {
 	public Connection connect() throws SQLException, ClassNotFoundException {
 		if (connection == null) {
 			Class.forName("org.hsqldb.jdbc.JDBCDriver");
-			connection = DriverManager.getConnection("jdbc:hsqldb:file:" + getPath() + ";shutdown=true", "SA", "");
+			
+			String url = "jdbc:hsqldb:file:" + getPath() + ";shutdown=true";
+			
+			// if db is locked, then should connect in server mode (~ debugging mode) 
+			if (new File(getPath() + ".lck").exists()) {
+				url = "jdbc:hsqldb:hsql://localhost/xdb;shutdown=true";
+			}
+			connection = DriverManager.getConnection(url, "SA", "");
+			
 			ResultSet res = connection.getMetaData().getTables(null, null, "FILES", null);
 			if (!res.next()) {
 				CreateDBHSQL.runScript(connection);
@@ -22,6 +31,7 @@ public abstract class HSQLDBLayer implements IDBLayer {
 		return connection;
 	}
 
+	
 	protected abstract String getPath();
 
 	@Override

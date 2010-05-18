@@ -38,8 +38,11 @@ import org.eclipse.jdt.core.search.SearchRequestor;
 
 import ee.stacc.productivity.edsl.cache.CacheService;
 import ee.stacc.productivity.edsl.cache.ICacheService;
+import ee.stacc.productivity.edsl.cache.MethodInvocationDescriptor;
+import ee.stacc.productivity.edsl.cache.UnsupportedStringOpEx;
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
+import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.IPosition;
 
 /**
@@ -50,15 +53,15 @@ import ee.stacc.productivity.edsl.string.IPosition;
 public class NodeSearchEngine {
 	private static final ILog LOG = Logs.getLog(NodeSearchEngine.class);
 	
-	private static final CachedSearcher<NodeRequest, IPosition> ARGUMENT_NODES_SEARCHER = new CachedSearcher<NodeRequest, IPosition>() {
+	private static final CachedSearcher<NodeRequest, IPosition> ARGUMENT_NODES_SEARCHER = 
+			new CachedSearcher<NodeRequest, IPosition>() {
 
 		@Override
 		protected void performSearchInScope(List<IJavaElement> scopeToSearchIn,
 				NodeRequest key, List<? super IPosition> values) {
-			NodeSearchEngine.performSearchInScope(key, scopeToSearchIn, values);
+			NodeSearchEngine.performArgumentSearchInScope(key, scopeToSearchIn, values);
 			
 		}
-
 	};
 	
 	private static Map<ICompilationUnit, ASTNode> astCache = 
@@ -99,7 +102,9 @@ public class NodeSearchEngine {
 				if (resource.isPhantom() || resource.isHidden() || resource.isTeamPrivateMember()) {
 					return false;
 				}
-				if (resource.getType() == IResource.FILE) {
+				if (resource.getType() == IResource.FILE
+						// TODO check this
+						&& "java".equals(resource.getFileExtension())) {
 					allFilesInScope.add((IFile) resource);
 				}
 				return true;
@@ -118,7 +123,7 @@ public class NodeSearchEngine {
 		return allFilesInScope;
 	}
 
-	private static void performSearchInScope(
+	private static void performArgumentSearchInScope(
 			final NodeRequest nodeRequest, List<IJavaElement> scopeToSearchIn,
 			final List<? super IPosition> result) {
 		SearchPattern pattern = SearchPattern.createPattern(nodeRequest.getPatternString(), 
@@ -221,11 +226,13 @@ public class NodeSearchEngine {
 				IJavaSearchConstants.DECLARATIONS, 
 				SearchPattern.R_EXACT_MATCH);
 		
-		IJavaSearchScope scope = elementsToProjectSearchScope(searchScope);		
+//		IJavaSearchScope scope = elementsToProjectSearchScope(searchScope);		
+		IJavaSearchScope scope = SearchEngine.createJavaSearchScope(
+				searchScope, IJavaSearchScope.SOURCES);		
 		
 		SearchRequestor requestor = new SearchRequestor() {
 			public void acceptSearchMatch(SearchMatch match) {
-				ASTNode node = getASTNode(match); // gives SimpleName (IIRC)
+				ASTNode node = getASTNode(match); // gives SimpleName 
 				MethodDeclaration decl = (MethodDeclaration)node.getParent();
 				if (ASTUtil.invocationMayUseDeclaration(inv, decl)) {
 					result.add(decl);
@@ -292,7 +299,10 @@ public class NodeSearchEngine {
 		
 		executeSearch(pattern, requestor, scope);
 		
-		assert (result.size() == 1);
+		if (result.size() != 1) {
+			throw new UnsupportedStringOpEx("findFieldDeclarationFragment: " +
+					" name=" + qualifiedName + ", result.size=" + result.size());
+		}
 		return result.get(0);
 	}
 	

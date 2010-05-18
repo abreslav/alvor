@@ -1,7 +1,5 @@
 package ee.stacc.productivity.edsl.tracker;
 
-import java.lang.reflect.Modifier;
-
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ArrayAccess;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -10,7 +8,6 @@ import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
-import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -29,7 +26,6 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import ee.stacc.productivity.edsl.cache.UnsupportedStringOpEx;
 import ee.stacc.productivity.edsl.crawler.ASTUtil;
-import ee.stacc.productivity.edsl.crawler.NodeSearchEngine;
 
 /*
  * getLastReachingModIn* methods stay in given scope

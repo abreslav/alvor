@@ -21,6 +21,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.junit.Test;
 
+import ee.stacc.productivity.edsl.cache.CacheService;
 import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.crawler.PositionUtil;
@@ -56,6 +57,9 @@ public class JavaElementCheckerTest {
 	
 	private void testJavaElementAbstractStrings(String projectName, 
 			String packageFragmentRoot) throws IOException, CoreException {
+		
+		// clear cache
+		CacheService.getCacheService().clearAll();
 		
 		IProject project = root.getProject(projectName);
 		

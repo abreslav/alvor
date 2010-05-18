@@ -39,6 +39,7 @@ public final class CacheServiceImpl implements ICacheService {
 		int REPETITION = 4;
 		int SAME_AS = 5;
 		int UNSUPPORTED = 6;
+		int PARAMETER = 7;
 	}
 	
 	private final static ILog LOG = Logs.getLog(ICacheService.class);
@@ -47,6 +48,7 @@ public final class CacheServiceImpl implements ICacheService {
 	private class DBQueries {
 		private final PreparedStatement queryGetAbstractString;
 		private final PreparedStatement queryGetMethod;
+		private final PreparedStatement queryGetSignature;
 		private final PreparedStatement queryRemoveFile;
 		
 		public DBQueries() throws SQLException {
@@ -59,6 +61,10 @@ public final class CacheServiceImpl implements ICacheService {
 	        
 	        queryGetMethod = connection.prepareStatement(
 	        		"SELECT id FROM Methods WHERE (class = ?) AND (name = ?)"
+	        );
+
+	        queryGetSignature = connection.prepareStatement(
+	        		"SELECT id FROM Signatures WHERE signature = ?"
 	        );
 
 	        queryRemoveFile = connection.prepareStatement(
@@ -87,6 +93,12 @@ public final class CacheServiceImpl implements ICacheService {
 			return queryGetMethod;
 		}
 		
+		public PreparedStatement getSignatureQuery(String signature) throws SQLException {
+			queryGetSignature.setString(1, signature);
+
+			return queryGetSignature;
+		}
+		
 		public PreparedStatement getRemoveFileQuery(String path) throws SQLException {
 			queryRemoveFile.setString(1, path);
 			
@@ -108,8 +120,9 @@ public final class CacheServiceImpl implements ICacheService {
 	private final DBQueries queries;
 	private final Connection connection;
 	private final IScopedCache<IHotspotPattern, IPosition> usageCache = new UsageCache();	
+	private final IScopedCache<MethodInvocationDescriptor, IAbstractString> methodTemplateCache = new MethodTemplateCache();	
 
-	boolean nocache = false;
+	boolean nocache = true;
 	
 	public CacheServiceImpl(IDBLayer dbLayer) {
 		this.dbLayer = dbLayer; 
@@ -228,10 +241,10 @@ public final class CacheServiceImpl implements ICacheService {
 			}
 
 			@Override
-			public Integer visitStringChoice(StringChoice stringChoise,
+			public Integer visitStringChoice(StringChoice stringChoice,
 					Void data) {
 				try {
-					return createStringChoice(stringChoise);
+					return createStringChoice(stringChoice);
 				} catch (SQLException e) {
 					throw new RethrowException(e);
 				}
@@ -266,8 +279,13 @@ public final class CacheServiceImpl implements ICacheService {
 			@Override
 			public Integer visitStringParameter(
 					StringParameter stringParameter, Void data) {
-				throw new IllegalArgumentException();
+				try {
+					return createStringParameter(stringParameter);
+				} catch (SQLException e) {
+					throw new RethrowException(e);
+				}
 			}
+
 
 		};
 		try {
@@ -275,6 +293,20 @@ public final class CacheServiceImpl implements ICacheService {
 		} catch (RethrowException e) {
 			throw e.getCause();
 		}
+	}
+	
+	private Integer createStringParameter(StringParameter stringParameter) throws SQLException {
+		int rangeId = createSourceRange(stringParameter.getPosition());
+		
+		PreparedStatement preparedStatement = connection.prepareStatement(
+				"INSERT INTO AbstractStrings(type, a, sourceRange) VALUES (?, ?, ?)",
+				Statement.RETURN_GENERATED_KEYS
+		);
+		preparedStatement.setInt(1, StringTypes.PARAMETER);
+		preparedStatement.setInt(2, stringParameter.getIndex());
+		preparedStatement.setInt(3, rangeId);
+		
+		return insertAndGetId(preparedStatement);
 	}
 	
 	private Integer createStringCharacterSet(
@@ -287,7 +319,7 @@ public final class CacheServiceImpl implements ICacheService {
 		int constantId = createCharacterSetEntry(characterSet);
 		
 		PreparedStatement preparedStatement = connection.prepareStatement(
-				"INSERT INTO AbstractStrings(type, a, sourceRange) VALUES (0, ?, ?)",
+				"INSERT INTO AbstractStrings(type, a, sourceRange) VALUES (1, ?, ?)",
 				Statement.RETURN_GENERATED_KEYS
 		);
 		preparedStatement.setInt(1, constantId);
@@ -485,7 +517,7 @@ public final class CacheServiceImpl implements ICacheService {
 			System.err.println(e.getMessage());
 			return null;
 		} catch (StackOverflowError e) {
-			throw new RuntimeException("SOE");
+			throw new RuntimeException("SOE: " + position.getPath() + ":" + position.getStart());
 		}
 	}
 
@@ -651,6 +683,129 @@ public final class CacheServiceImpl implements ICacheService {
 		return usageCache;
 	}
 
+	
+	private final class MethodTemplateCache implements IScopedCache<MethodInvocationDescriptor, IAbstractString> {
+		
+		@Override
+		public void add(MethodInvocationDescriptor desc, IAbstractString str) {
+			if (nocache) 
+				return;
+			try {
+				int stringId = createAbstractStringRecords(str, str.getPosition());
+				String signature = desc.getSignature();
+				int signatureId = createSignature(desc.getSignature());
+				
+				PreparedStatement insert = connection.prepareStatement(
+						"INSERT INTO MethodImplementations(signature, abstractstring) VALUES (?, ?)"
+				);
+				insert.setInt(1, signatureId);
+				insert.setInt(2, stringId);
+				
+				insert.executeUpdate();
+			} catch (SQLException e) {
+				LOG.exception(e);
+				throw new RethrowException(e);
+			}
+		}
+		
+		private int createSignature(String signature) throws SQLException {
+			PreparedStatement query = queries.getSignatureQuery(signature);
+			PreparedStatement insert = connection.prepareStatement(
+					"INSERT INTO Signatures(signature) VALUES (?)",
+					Statement.RETURN_GENERATED_KEYS
+			);
+			insert.setString(1, signature);
+			return insertIfNotYet(query, insert);
+		}
+		
+		@Override
+		public void getCachedResultsInScope(Set<Integer> scope, MethodInvocationDescriptor desc,
+				Collection<? super IAbstractString> values) {
+			if (nocache) 
+				return;
+			try {
+				PreparedStatement stmt = connection.prepareStatement(
+						"SELECT a.id as stringId, a.type, a.a, a.b, name, start, length " +
+						"   FROM Signatures s" +
+						"   JOIN MethodImplementations mi ON (mi.signature = s.id) " +
+						"   JOIN AbstractStrings a        ON (a.id = mi.abstractString) " +
+						"	LEFT JOIN SourceRanges sr     ON (sr.id = a.sourceRange) " +
+						"	LEFT JOIN Files f             ON (f.id = sr.file) " +
+						"WHERE s.signature = ?"
+				);
+				stmt.setString(1, desc.getSignature());
+				ResultSet res = stmt.executeQuery();
+				
+				while (res.next()) {
+					values.add(runStringConstruction(stmt, null));
+				}
+			} catch (SQLException e) {
+				LOG.exception(e);
+				throw new RethrowException(e);
+			}
+		}
+		
+		@Override
+		public Map<String, Integer> getCachedScope(MethodInvocationDescriptor desc) {
+			if (nocache) 
+				return Collections.emptyMap();
+			try {
+				PreparedStatement query = connection.prepareStatement(
+						"SELECT f.name, f.id AS fileId " +
+						"   FROM Signatures s" +
+						"   JOIN MethodImplementationScope mis ON (mis.signature = s.id)" +
+						"	JOIN Files f ON (f.id = mis.file)" +
+						" WHERE (s.signature = ?)"
+				);
+				query.setString(1, desc.getSignature());
+				ResultSet res = query.executeQuery();
+				
+				Map<String, Integer> result = new HashMap<String, Integer>();
+				
+				while (res.next()) {
+					result.put(
+						notNull(res, res.getString("name")), 
+						notNull(res, res.getInt("fileId")));
+				}
+				
+				return result;
+			} catch (SQLException e) {
+				LOG.exception(e);
+				throw new RethrowException(e);
+			}
+		}
+		
+		@Override
+		public void markScopeAsCached(MethodInvocationDescriptor desc, Set<String> scope) {
+			if (nocache) 
+				return;
+			try {
+				PreparedStatement query = queries.getSignatureQuery(desc.getSignature());
+				ResultSet res = query.executeQuery();
+				if (!res.next()) {
+					LOG.error("Signature not found " + desc.getSignature());
+					return;
+				}
+				
+				int signatureId = notNull(res, res.getInt("id"));
+
+				PreparedStatement insert = connection.prepareStatement(
+						"INSERT INTO MethodImplementationScope(signature, file) VALUES (?, ?)"
+				);
+				for (String name : scope) {
+					insert.setInt(1, signatureId);
+					insert.setInt(2, createFile(name));
+					insert.addBatch();
+				}
+				insert.executeBatch();
+			} catch (SQLException e) {
+				LOG.exception(e);
+				throw new RethrowException(e);
+			}
+		}
+	}
+
+	
 	private final class UsageCache implements IScopedCache<IHotspotPattern, IPosition> {
 
 		@Override
@@ -788,34 +943,8 @@ public final class CacheServiceImpl implements ICacheService {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@Override
-	public IScopedCache<String, IAbstractString> getMethodReturnValueCache() {
-		return new IScopedCache<String, IAbstractString>() {
-			
-			@Override
-			public void add(String key, IAbstractString value) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void getCachedResultsInScope(Set<Integer> scope, String key,
-					Collection<? super IAbstractString> values) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public Map<String, Integer> getCachedScope(String key) {
-				// TODO Auto-generated method stub
-				return null;
-			}
-			
-			@Override
-			public void markScopeAsCached(String key, Set<String> scope) {
-				// TODO Auto-generated method stub
-				
-			}
-		};
+	public IScopedCache<MethodInvocationDescriptor, IAbstractString> getMethodTemplateCache() {
+		return methodTemplateCache;
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

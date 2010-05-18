@@ -1,7 +1,5 @@
 package ee.stacc.productivity.edsl.tracker;
 
-import java.util.List;
-
 import org.eclipse.jdt.core.dom.ASTNode;
 
 public class NameUsageChoice extends NameUsage {

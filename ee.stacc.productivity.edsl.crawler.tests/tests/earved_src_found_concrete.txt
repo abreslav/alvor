@@ -1,3 +1,25 @@
+DELETE FROM BANK_ACCOUNT WHERE ID = ?
+DELETE FROM VAT_CODES WHERE ID = ?
+DELETE FROM VAT_CODE_PERSON WHERE ID = ?
+DELETE FROM account_card WHERE id = ?
+DELETE FROM account_req_dimension WHERE ref_account_card = ?
+DELETE FROM additional_services WHERE id = ?
+DELETE FROM address WHERE id = ?
+DELETE FROM attachment WHERE id=?
+DELETE FROM campaign_code WHERE id = ?
+DELETE FROM dimension_data WHERE id = ?
+DELETE FROM dimension_data WHERE ref_dimensions = ?
+DELETE FROM notifications WHERE id = ?
+DELETE FROM pricelist_campaign_code WHERE ref_pricelist = ?
+DELETE FROM pricelist_campaign_code WHERE ref_pricelist=? AND ref_campaign_code=?
+INSERT INTO B_CARD_QUERIES (ID, QUERY_DATE, QUERY_RESULT, REF_PERSON) VALUES (SEQ_B_CARD_QUERIES.NEXTVAL, SYSDATE, ?, ?) 
+INSERT INTO INTEGRATION_ERROR(id, ref_integration_item, error_type, error, ref_dom_integration_error) VALUES (seq_integration_error.nextval,?,?,?,?)
+INSERT INTO INTEGRATION_ITEM(id, type, ref_upload, status, invoice_number, is_sent) VALUES (?,?,?,?,?,?)
+INSERT INTO INTEGRATION_ITEM_CONTENT(id, ref_integration_item, content) VALUES (seq_integration_item_content.nextval,?,?)
+INSERT INTO UPLOAD(id, ref_person, ref_represented, upload_type, ref_dom_upload_status, file_name, ref_id, invoice_status_after_upload, system_id, content) VALUES (seq_upload.nextval,?,?,?,?,?,?,?,?,?)
+INSERT INTO campaign_code_person (id, ref_person, ref_campaign_code, date_activated) VALUES (seq_campaign_code_person.nextval, ?, ?, sysdate)
+INSERT INTO pricelist_campaign_code (id, ref_pricelist, ref_campaign_code) VALUES (seq_pricelist_campaign_code.nextval, ?, ?)
+INSERT INTO upload_processing_error(id, ref_upload, error) VALUES (seq_upload_processing_error.nextval,?,?)
 SELECT  dim.id,  dim.dimension_name, account_dimension_id(dim.id, ?) AS account_req_dimension_id FROM dimensions dim WHERE dim.ref_person = ?
 SELECT  id, name, given_name, is_juridical_person, code, vat_number, reminder_email, reminder_phone, invoice_notice_email, invoice_notice_phone, ref_invoice_layout, contact_email, information_content, default_email_text, default_due_date, invoice_number_prefix, next_invoice_number, fine_rate_per_day, number_retries, invoice_reference, password, erp_access, phone_number, url, ACCOUNTING_OPPOSITE_ACCOUNT, invoice_additional_field_name, CONFIRM_DEADLINE_DAYS, CONFIRM_DEADLINE_NOTICE FROM person WHERE code = ?
 SELECT  id, name, given_name, is_juridical_person, code, vat_number, reminder_email, reminder_phone, invoice_notice_email, invoice_notice_phone, ref_invoice_layout, contact_email, information_content, default_email_text, default_due_date, invoice_number_prefix, next_invoice_number, fine_rate_per_day, number_retries, invoice_reference, password, erp_access, phone_number, url, ACCOUNTING_OPPOSITE_ACCOUNT, invoice_additional_field_name, CONFIRM_DEADLINE_DAYS, CONFIRM_DEADLINE_NOTICE FROM person WHERE id = ?
@@ -157,6 +179,179 @@ SELECT seq_integration_item.nextval FROM dual
 SELECT upper(account_code) FROM account_card WHERE ref_person = ? and upper(account_code) in  (?, ?, ?)
 SELECT vc.id, vc.rate, vcp.erp_code FROM vat_code_person vcp INNER JOIN vat_codes vc on (vcp.ref_vat_codes = vc.id and vc.is_deleted = 0) WHERE vcp.ref_person = ?
 SELECT vc.rate, vcp.erp_code FROM vat_code_person vcp INNER JOIN vat_codes vc on (vcp.ref_vat_codes = vc.id and vc.is_deleted = 0) WHERE vcp.ref_person = ?
+UPDATE REPRESENTATION_RIGHT SET ref_person_representative=?, from_date=?, until_date=?, email=?, position=? WHERE id=?
+UPDATE REPRESENTATION_ROLE SET ref_role=?, from_date=?, until_date=? WHERE id=?
+UPDATE UPLOAD set ref_dom_upload_status = ? WHERE id = ?
+UPDATE account_card SET account_code=?, account_name=?, account_explanation=? WHERE id=?
+UPDATE additional_services SET name = ?, price = ?,  amount = ?, total = ?, vat = ?, invoicing_date = ? WHERE id = ? 
+UPDATE attachment SET page_count = :pageCount WHERE id = :id
+UPDATE attachment SET ref_invoice = ? WHERE ref_upload = ? AND erp_invoiceid_attr = ?
+UPDATE deputy SET until_date = SYSTIMESTAMP WHERE id = ?
+UPDATE dimension_data SET code = ?, name = ?  WHERE id = ?
+UPDATE dimensions SET dimension_name=?, is_main=? WHERE id = ?
+UPDATE dimensions SET is_main=? WHERE id = ?
+UPDATE elektronpost_export ex    SET ex.attempts = ex.attempts+1,       ex.error_log= ex.error_log || ? WHERE id = ?
+UPDATE elektronpost_export ex    SET ex.transfered=:transfered,        ex.ftp_session_id = :ftpSessionId  WHERE ex.id=:id
+UPDATE invoice SET last_status_change=last_status_change + INTERVAL '1' SECOND WHERE  buy_invoice = 1 AND ref_person_code_buy = ?   AND last_status_change = ?   AND id >= ?
+UPDATE invoice SET last_status_change=last_status_change + INTERVAL '1' SECOND WHERE  buy_invoice = 1 AND ref_person_code_buy = ?   AND last_status_change_sale = ?   AND id >= ?
+UPDATE invoice SET last_status_change=last_status_change + INTERVAL '1' SECOND WHERE  buy_invoice = 1 AND ref_person_code_buy = ?   AND sent_to_erp = ?   AND id >= ?
+UPDATE invoice SET last_status_change=last_status_change + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND last_status_change = ?   AND id >= ?
+UPDATE invoice SET last_status_change=last_status_change + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND last_status_change_sale = ?   AND id >= ?
+UPDATE invoice SET last_status_change=last_status_change + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND sent_to_erp = ?   AND id >= ?
+UPDATE invoice SET last_status_change=last_status_change_sale + INTERVAL '1' SECOND WHERE  buy_invoice = 1 AND ref_person_code_buy = ?   AND last_status_change = ?   AND id >= ?
+UPDATE invoice SET last_status_change=last_status_change_sale + INTERVAL '1' SECOND WHERE  buy_invoice = 1 AND ref_person_code_buy = ?   AND last_status_change_sale = ?   AND id >= ?
+UPDATE invoice SET last_status_change=last_status_change_sale + INTERVAL '1' SECOND WHERE  buy_invoice = 1 AND ref_person_code_buy = ?   AND sent_to_erp = ?   AND id >= ?
+UPDATE invoice SET last_status_change=last_status_change_sale + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND last_status_change = ?   AND id >= ?
+UPDATE invoice SET last_status_change=last_status_change_sale + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND last_status_change_sale = ?   AND id >= ?
+UPDATE invoice SET last_status_change=last_status_change_sale + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND sent_to_erp = ?   AND id >= ?
+UPDATE invoice SET last_status_change=sent_to_erp + INTERVAL '1' SECOND WHERE  buy_invoice = 1 AND ref_person_code_buy = ?   AND last_status_change = ?   AND id >= ?
+UPDATE invoice SET last_status_change=sent_to_erp + INTERVAL '1' SECOND WHERE  buy_invoice = 1 AND ref_person_code_buy = ?   AND last_status_change_sale = ?   AND id >= ?
+UPDATE invoice SET last_status_change=sent_to_erp + INTERVAL '1' SECOND WHERE  buy_invoice = 1 AND ref_person_code_buy = ?   AND sent_to_erp = ?   AND id >= ?
+UPDATE invoice SET last_status_change=sent_to_erp + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND last_status_change = ?   AND id >= ?
+UPDATE invoice SET last_status_change=sent_to_erp + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND last_status_change_sale = ?   AND id >= ?
+UPDATE invoice SET last_status_change=sent_to_erp + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND sent_to_erp = ?   AND id >= ?
+UPDATE invoice SET last_status_change_sale=last_status_change + INTERVAL '1' SECOND WHERE  buy_invoice = 1 AND ref_person_code_buy = ?   AND last_status_change = ?   AND id >= ?
+UPDATE invoice SET last_status_change_sale=last_status_change + INTERVAL '1' SECOND WHERE  buy_invoice = 1 AND ref_person_code_buy = ?   AND last_status_change_sale = ?   AND id >= ?
+UPDATE invoice SET last_status_change_sale=last_status_change + INTERVAL '1' SECOND WHERE  buy_invoice = 1 AND ref_person_code_buy = ?   AND sent_to_erp = ?   AND id >= ?
+UPDATE invoice SET last_status_change_sale=last_status_change + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND last_status_change = ?   AND id >= ?
+UPDATE invoice SET last_status_change_sale=last_status_change + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND last_status_change_sale = ?   AND id >= ?
+UPDATE invoice SET last_status_change_sale=last_status_change + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND sent_to_erp = ?   AND id >= ?
+UPDATE invoice SET last_status_change_sale=last_status_change_sale + INTERVAL '1' SECOND WHERE  buy_invoice = 1 AND ref_person_code_buy = ?   AND last_status_change = ?   AND id >= ?
+UPDATE invoice SET last_status_change_sale=last_status_change_sale + INTERVAL '1' SECOND WHERE  buy_invoice = 1 AND ref_person_code_buy = ?   AND last_status_change_sale = ?   AND id >= ?
+UPDATE invoice SET last_status_change_sale=last_status_change_sale + INTERVAL '1' SECOND WHERE  buy_invoice = 1 AND ref_person_code_buy = ?   AND sent_to_erp = ?   AND id >= ?
+UPDATE invoice SET last_status_change_sale=last_status_change_sale + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND last_status_change = ?   AND id >= ?
+UPDATE invoice SET last_status_change_sale=last_status_change_sale + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND last_status_change_sale = ?   AND id >= ?
+UPDATE invoice SET last_status_change_sale=last_status_change_sale + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND sent_to_erp = ?   AND id >= ?
+UPDATE invoice SET last_status_change_sale=sent_to_erp + INTERVAL '1' SECOND WHERE  buy_invoice = 1 AND ref_person_code_buy = ?   AND last_status_change = ?   AND id >= ?
+UPDATE invoice SET last_status_change_sale=sent_to_erp + INTERVAL '1' SECOND WHERE  buy_invoice = 1 AND ref_person_code_buy = ?   AND last_status_change_sale = ?   AND id >= ?
+UPDATE invoice SET last_status_change_sale=sent_to_erp + INTERVAL '1' SECOND WHERE  buy_invoice = 1 AND ref_person_code_buy = ?   AND sent_to_erp = ?   AND id >= ?
+UPDATE invoice SET last_status_change_sale=sent_to_erp + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND last_status_change = ?   AND id >= ?
+UPDATE invoice SET last_status_change_sale=sent_to_erp + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND last_status_change_sale = ?   AND id >= ?
+UPDATE invoice SET last_status_change_sale=sent_to_erp + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND sent_to_erp = ?   AND id >= ?
+UPDATE invoice SET sent_to_erp=last_status_change + INTERVAL '1' SECOND WHERE  buy_invoice = 1 AND ref_person_code_buy = ?   AND last_status_change = ?   AND id >= ?
+UPDATE invoice SET sent_to_erp=last_status_change + INTERVAL '1' SECOND WHERE  buy_invoice = 1 AND ref_person_code_buy = ?   AND last_status_change_sale = ?   AND id >= ?
+UPDATE invoice SET sent_to_erp=last_status_change + INTERVAL '1' SECOND WHERE  buy_invoice = 1 AND ref_person_code_buy = ?   AND sent_to_erp = ?   AND id >= ?
+UPDATE invoice SET sent_to_erp=last_status_change + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND last_status_change = ?   AND id >= ?
+UPDATE invoice SET sent_to_erp=last_status_change + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND last_status_change_sale = ?   AND id >= ?
+UPDATE invoice SET sent_to_erp=last_status_change + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND sent_to_erp = ?   AND id >= ?
+UPDATE invoice SET sent_to_erp=last_status_change_sale + INTERVAL '1' SECOND WHERE  buy_invoice = 1 AND ref_person_code_buy = ?   AND last_status_change = ?   AND id >= ?
+UPDATE invoice SET sent_to_erp=last_status_change_sale + INTERVAL '1' SECOND WHERE  buy_invoice = 1 AND ref_person_code_buy = ?   AND last_status_change_sale = ?   AND id >= ?
+UPDATE invoice SET sent_to_erp=last_status_change_sale + INTERVAL '1' SECOND WHERE  buy_invoice = 1 AND ref_person_code_buy = ?   AND sent_to_erp = ?   AND id >= ?
+UPDATE invoice SET sent_to_erp=last_status_change_sale + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND last_status_change = ?   AND id >= ?
+UPDATE invoice SET sent_to_erp=last_status_change_sale + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND last_status_change_sale = ?   AND id >= ?
+UPDATE invoice SET sent_to_erp=last_status_change_sale + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND sent_to_erp = ?   AND id >= ?
+UPDATE invoice SET sent_to_erp=sent_to_erp + INTERVAL '1' SECOND WHERE  buy_invoice = 1 AND ref_person_code_buy = ?   AND last_status_change = ?   AND id >= ?
+UPDATE invoice SET sent_to_erp=sent_to_erp + INTERVAL '1' SECOND WHERE  buy_invoice = 1 AND ref_person_code_buy = ?   AND last_status_change_sale = ?   AND id >= ?
+UPDATE invoice SET sent_to_erp=sent_to_erp + INTERVAL '1' SECOND WHERE  buy_invoice = 1 AND ref_person_code_buy = ?   AND sent_to_erp = ?   AND id >= ?
+UPDATE invoice SET sent_to_erp=sent_to_erp + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND last_status_change = ?   AND id >= ?
+UPDATE invoice SET sent_to_erp=sent_to_erp + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND last_status_change_sale = ?   AND id >= ?
+UPDATE invoice SET sent_to_erp=sent_to_erp + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND sent_to_erp = ?   AND id >= ?
+UPDATE invoice set LAST_EXPORT_BUY= null WHERE id IN  (?, ?, ?)
+UPDATE invoice set LAST_EXPORT_BUY= sysdate WHERE id IN  (?, ?, ?)
+UPDATE invoice set LAST_EXPORT_SALE= null WHERE id IN  (?, ?, ?)
+UPDATE invoice set LAST_EXPORT_SALE= sysdate WHERE id IN  (?, ?, ?)
+UPDATE invoice set SENT_TO_ERP= null  WHERE id IN  (?, ?, ?)
+UPDATE invoice set SENT_TO_ERP= sysdate  WHERE id IN  (?, ?, ?)
+UPDATE invoice_sending_failed SET client_informed = 1 WHERE id IN (?, ?, ?)
+UPDATE invoice_sending_failed SET is_hidden = 1 WHERE id IN (?, ?, ?)
+UPDATE person SET erp_access = 0, modified=sysdate, modified_by=? WHERE id=?
+UPDATE person SET invoice_reference=?, fine_rate_per_day=?, invoice_number_prefix=?, next_invoice_number=?, default_due_date=?, ref_invoice_layout=?, information_content=?, default_email_text=? where id =?
+UPDATE person SET name=?, given_Name=? WHERE id = ?
+UPDATE person SET name=?, given_Name=?, contact_email=? WHERE id = ?
+UPDATE person SET name=?, given_Name=?, contact_email=?, password=?, number_retries=0 WHERE id = ?
+UPDATE person SET number_retries = 0 WHERE code=?
+UPDATE person SET number_retries = number_retries + 1 WHERE code=? and number_retries < 7
+UPDATE person SET reminder_email=?, invoice_notice_email=? WHERE id = ?
+UPDATE person set logo = ? where id = ?
+UPDATE person set name = ?, vat_number = ?, contact_email = ?, phone_number = ?, url = ? where id = ?
+UPDATE person_state SET end_date = ? WHERE id = ?
+UPDATE person_state SET end_date = sysdate WHERE ref_person = ? and (end_date is null or end_date > sysdate)
+UPDATE representation_right SET ref_dom_base=? WHERE id = ?
+UPDATE representation_right rr SET rr.until_date = ? WHERE rr.ref_person_represented = ? 
+UPDATE representation_role  SET until_date = sysdate WHERE id = ? 
+UPDATE representation_role SET ref_role=? WHERE id = ?
+UPDATE upload SET error_count = (SELECT count(*) FROM integration_error ie INNER JOIN integration_item ii ON (ie.ref_integration_item = ii.id) WHERE ii.ref_upload = ?) WHERE id = ?
+UPDATE upload SET ref_dom_upload_status = ? WHERE id = ?
+UPDATE upload SET sent_count = (SELECT count(*) FROM integration_item WHERE ref_upload = ? AND is_sent = 1) WHERE id = ?
+UPDATE upload SET total_count = (SELECT count(*) FROM integration_item WHERE ref_upload = ?) WHERE id = ?
+UPDATE vat_codes SET is_deleted = ? WHERE id = ?
+delete from DIMENSION_DATA_CONNECTIONS where REF_DIMENSION_DATA_FROM = ? or REF_DIMENSION_DATA_TO = ?
+delete from DIMENSION_DATA_CONNECTIONS where REF_DIMENSION_DATA_FROM in  (?, ?, ?) or REF_DIMENSION_DATA_TO in  (?, ?, ?)
+delete from DIMENSION_DATA_CONNECTIONS where id in  (?, ?, ?)
+delete from SERVICES_GOODS_REGISTER where id in  (?, ?, ?)
+delete from SERVICES_GOODS_REGISTER where ref_person = ? 
+delete from account_card where ref_person=?
+delete from account_pattern where id in (?, ?, ?)
+delete from addition where id in (?, ?, ?)
+delete from addition where ref_invoice_item = ?
+delete from addition where ref_invoice_item in (?, ?, ?)
+delete from addition where ref_invoice_item in(select id from invoice_item where invoice_item.ref_invoice=? and invoice_item.is_unified=?)
+delete from archive_document where id = ? 
+delete from bank_export  where ref_invoice in  (?, ?, ?) and bank_code=? and failed_attempts=?
+delete from channel_preference_sender where ref_invoice_channel_preference = ? 
+delete from client_register where id in  (?, ?, ?)
+delete from client_register where ref_person = ? 
+delete from client_register_account where ref_client_register in (select id from client_register where ref_person = ?)
+delete from confirm_log where ref_confirm = ?
+delete from confirm_pattern_confirmer where ref_confirm_pattern = ?
+delete from deputy where id = ?
+delete from dimension_data_conn_import ddci where ddci.ref_person=?
+delete from dimension_data_connections ddc where exists  (select 1 from dimension_data_conn_import ddci          where ddc.ref_dimensions_from =(select id from dimensions d where d.ref_person = ? and d.dimension_name = ddci.dimensions_from_name)            and ddc.ref_dimension_data_from =(select id from dimension_data dd where dd.ref_dimensions = ddc.ref_dimensions_from and dd.code = ddci.dimension_data_from_code))
+delete from dvk_organization
+delete from extension where REF_INVOICE_ITEM_ITEM_RESERVE = ?
+delete from extension where REF_INVOICE_ITEM_ITEM_RESERVE in (?, ?, ?)
+delete from extension where REF_INVOICE_ITEM_ITEM_RESERVE in (select id from invoice_item where ref_invoice = ? and is_unified=?)
+delete from extension where id = ?
+delete from frequent_buy_invoice where id=?
+delete from frequent_buy_invoice where ref_invoice=? and ref_person=?
+delete from frequent_buy_invoice where subject_info=? and seller_reg_number=? and ref_person=?
+delete from inbox where id in  (?, ?, ?)
+delete from inbox_attachment where ref_inbox = ? 
+delete from inbox_attachment where ref_inbox in  (?, ?, ?)
+delete from invoice_automatic where ref_invoice=?
+delete from invoice_channel where id in (?, ?, ?)
+delete from invoice_channel where ref_invoice = ? and ref_invoice_automatic is  not  null 
+delete from invoice_channel where ref_invoice = ? and ref_invoice_automatic is  not  null and id not in  (?, ?, ?)
+delete from invoice_channel where ref_invoice = ? and ref_invoice_automatic is  null 
+delete from invoice_channel where ref_invoice = ? and ref_invoice_automatic is  null and id not in  (?, ?, ?)
+delete from invoice_channel where ref_invoice=? and ref_invoice_automatic is not null
+delete from invoice_channel_additional ica where (select 1 from invoice_channel ic where ic.ref_invoice_channel_additional=ica.id  and rownum=1) is null
+delete from invoice_channel_additional where id =? 
+delete from invoice_channel_additional where id in (select ref_invoice_channel_additional from invoice_channel where ref_invoice=? and ref_invoice_automatic is not null)
+delete from invoice_channel_additional where id in (select ref_invoice_channel_additional where id in  (?, ?, ?))
+delete from invoice_channel_preferences where id = ? 
+delete from invoice_confirm_late where (ref_invoice, ref_confirm) not in  ((?, ?), (?, ?))
+delete from invoice_email_white_list where ref_person=? and email=?
+delete from invoice_emails where id=?
+delete from invoice_item where id = ?
+delete from invoice_item where id in (?, ?, ?)
+delete from invoice_item where ref_invoice=? 
+delete from invoice_item where ref_invoice=?  and is_unified=1
+delete from invoice_party_address where id = ?
+delete from invoice_sum_group where id = ?
+delete from journal_entry where id in  (?, ?, ?)
+delete from journal_entry where ref_invoice_item = ?
+delete from journal_entry where ref_invoice_item in  (?, ?, ?)
+delete from journal_entry where ref_invoice_item in (select id from invoice_item where ref_invoice=? and is_unified=?)
+delete from journal_entry where ref_invoice_item=? and id not in  (?, ?, ?)
+delete from pattern_account where REF_PATTERN_EXTRA in  (?, ?, ?)
+delete from pattern_account where REF_PATTERN_ITEM in  (?, ?, ?)
+delete from pattern_account where ref_account_pattern in  (?, ?, ?)
+delete from pattern_extra where ref_account_pattern in (?, ?, ?)
+delete from pattern_extra where ref_pattern_item in  (?, ?, ?)
+delete from pattern_item where id in  (?, ?, ?)
+delete from pattern_item where ref_account_pattern in (?, ?, ?)
+delete from pattern_journal_entry where id in (select entry.id from pattern_journal_entry entry join pattern_account pa on entry.ref_pattern_account=pa.id where pa.ref_account_pattern in (?, ?, ?))
+delete from pattern_journal_entry where id in (select entry.id from pattern_journal_entry entry join pattern_account pa on entry.ref_pattern_account=pa.id where pa.ref_pattern_extra in  (?, ?, ?))
+delete from pattern_journal_entry where id in (select entry.id from pattern_journal_entry entry join pattern_account pa on entry.ref_pattern_account=pa.id where pa.ref_pattern_item in  (?, ?, ?))
+delete from pricelist where id = ? 
+delete from pricelist_rows where id in  (?, ?, ?)
+delete from pricelist_rows where ref_pricelist = ? 
+insert into BANK_EXPORT (ID, REF_INVOICE, QUEUED, FILE_ID, BANK_CODE, EXPORT_STATE, INVOICE_XML_PART) values (:id, :invoiceId, :queued, :fileId, :bankCode, :exportStateName, :invoiceXmlPart)
+insert into INVOICE_FOR_NOT_CLIENT (ID,SELLER_NAME,BUYER_NAME,BUYER_ADDRESS) values (SEQ_INVOICE_FOR_NOT_CLIENT.nextval, ?, ?, ?)
+insert into account_info(id, ref_invoice_party, account_number, bank_name, iban) select SEQ_ACCOUNT_INFO.nextval, ?, bank_account.account_no, bank_domain.name, iban from bank_account join domain_value bank_domain on bank_domain.value_code = bank_account.ref_dom_bank where ref_person = ?
+insert into attachment (ID, REF_INVOICE, FILE_NAME, DESCRIPTION, REF_ID, FILE_TYPE, REF_UPLOAD, CONTENT, ERP_INVOICEID_ATTR, INVOICE, EXTERNAL, PAGE_COUNT, REF_INBOX, buy_attachment)  (select SEQ_ATTACHMENT.NEXTVAL, ?, FILE_NAME, DESCRIPTION, REF_ID, FILE_TYPE, REF_UPLOAD, CONTENT, ERP_INVOICEID_ATTR, INVOICE, EXTERNAL, PAGE_COUNT, REF_INBOX, buy_attachment from attachment t where t.invoice=0 and t.ref_invoice=?)
+insert into invoice_email_white_list (id, ref_person, email) values (SEQ_INVOICE_EMAIL_WHITE_LIST.nextval, ?,?)
 select  ID, REF_CONFIRM, DESCRIPTION, SUM_BEFORE_VAT, ACCOUNTING_ACCOUNT_CODE, COST_OBJECTIVES from confirm_log where ref_confirm in  (?, ?, ?)
 select  ID, REF_INVOICE, ORDER_NR, REF_PERSON_CONFIRMER, COMMENT_TO_CONFIRMER, SENT_TO_CONFIRM_TIME, REF_DOM_CONFIRM_DECISION, DECISION_COMMENT, DECISION_TIME, CANCELED, PREVIOUS, REF_CONFIRM_PATTERN_CONFIRMER  from confirm where ref_invoice=? and canceled = 0 and REF_DOM_CONFIRM_DECISION in  (?, ?, ?)
 select  ID, REF_INVOICE, ORDER_NR, REF_PERSON_CONFIRMER, PERSON_CONFIRMER_FULL_NAME, COMMENT_TO_CONFIRMER  from confirm_v where id in (select id from confirm where ref_invoice = ? and previous = 1) order by order_nr, id
@@ -464,3 +659,50 @@ select representative_id as id, null as code, person_full_name as name from repr
 select representative_id as id, null as code, person_full_name as name from representatives_deputies_v where represented_id = ? order by UPPER(person_full_name) 
 select representative_id as id, null as code, representative_full_name as name from representative_names_all_v where represented_id = ? order by UPPER(representative_full_name) 
 select representative_id from representative_ids_v where represented_id = ? 
+update account_info set account_number = ? where ref_invoice_party = ?
+update client_register_account cra set cra.last_used=(case when cra.id=? then 1 else 0 end) where ref_client_register in (select id from client_register where ref_person=? and reg_number=?)
+update confirm set REF_DOM_CONFIRM_DECISION=NULL, SENT_TO_CONFIRM_TIME=NULL, DECISION_COMMENT=NULL, DECISION_TIME=NULL where id in  (?, ?, ?)
+update confirm set REF_DOM_CONFIRM_DECISION=NULL, SENT_TO_CONFIRM_TIME=sysdate, DECISION_COMMENT=NULL, DECISION_TIME=NULL where id in  (?, ?, ?)
+update confirm set SENT_TO_CONFIRM_TIME=sysdate where id=? and rownum=1
+update confirm set canceled=1, ref_dom_confirm_decision=?, decision_time=sysdate where id=?
+update confirm set previous=(case when id in  (?, ?, ?) then 1 else 0 end) where ref_invoice=?
+update confirm set ref_dom_confirm_decision=?, decision_comment=? where id=?
+update confirm set ref_dom_confirm_decision=?, decision_time=sysdate, decision_comment=? where id=?
+update confirm_pattern_confirmer set order_no=NULL where REF_CONFIRM_PATTERN=?
+update dimension_data_conn_import ddci set ddci.dimensions_to_name=nvl((SELECT dimension_name FROM (SELECT d.dimension_name,row_number() over(ORDER BY d.id asc) rn FROM dimensions d where d.ref_person=?) WHERE rn=ddci.dimensions_to_name),ddci.dimensions_to_name) where ddci.ref_person=?
+update dimensions set is_main=0 where ref_person=? and is_main=1
+update extension set information_name=?, information_content=? where id=?
+update history set modified = sysdate, modified_by = ? where ref_invoice = ? and ref_dom_invoice_event = ? and ref_dom_invoice_state = ?
+update invoice set ACCOUNTING_TRANSACTION_DATE=? where id=? and accounting_transaction_date is null
+update invoice set IS_AUTOMATIC=? where id=?
+update invoice set buy_invoice = 0 where id = ?
+update invoice set buy_invoice = 0 where id in (?, ?, ?)
+update invoice set is_changed_after_sending=1 where id in  (?, ?, ?)
+update invoice set last_credit_invoice = sysdate where id=?
+update invoice set ref_dom_invoice_state = ? where id = ? 
+update invoice set ref_dom_invoice_state = ? where id in  (?, ?, ?)
+update invoice set ref_dom_invoice_state = ?, ref_dom_invoice_state_sale = ? where id = ? 
+update invoice set ref_dom_invoice_state_sale = ? where id = ? 
+update invoice set ref_dom_invoice_state_sale = ? where id in  (?, ?, ?)
+update invoice set ref_invoice_additional=?, region=?, HAS_BUY_ORDER=?, BUY_ORDER_NUMBER=? where id=?
+update invoice set sale_invoice = 0 where id = ?
+update invoice set sale_invoice = 0 where id in (?, ?, ?)
+update invoice_additional set canceled=1 where id=?
+update invoice_channel set is_sent=1 where id in  (?, ?, ?)
+update invoice_channel_preferences set ref_dom_channel = 'INVOICE_CHANNEL_EMAIL' where id = ? 
+update invoice_channel_preferences set ref_dom_channel = 'INVOICE_CHANNEL_INTERNET_BANK', ref_dom_bank = ?, bank_account = ? where id = ? 
+update invoice_channel_preferences set ref_dom_channel = 'INVOICE_CHANNEL_PORTAL', ref_person_notice = ?, email_notice_active = ?, sms_notice_active = ? where id = ? 
+update invoice_channel_preferences set ref_dom_channel = 'INVOICE_CHANNEL_POST', ref_address = ? where id = ? 
+update invoice_item set ACCOUNTING_ACCOUNT_CODE=?, ACCOUNTING_ACCOUNT_NAME=?, ACCOUNTING_OPPOSITE_ACCOUNT=? where id = ?
+update invoice_item set ACCOUNTING_ACCOUNT_CODE=NULL, ACCOUNTING_ACCOUNT_NAME=NULL, ACCOUNTING_OPPOSITE_ACCOUNT=NULL where id = ?
+update invoice_item set ACCOUNTING_ACCOUNT_CODE=NULL, ACCOUNTING_ACCOUNT_NAME=NULL, ACCOUNTING_OPPOSITE_ACCOUNT=NULL where ref_invoice = ? and is_unified=?
+update invoice_item set accounting_account_code=NULL, accounting_account_name=NULL, ACCOUNTING_OPPOSITE_ACCOUNT=NULL where id IN (?, ?, ?)
+update invoice_item set vat_sum=?, item_total=?, sum_before_vat = ?, invoice_item_group=?, serial_number=?, seller_product_id=?, buyer_product_id=?, taric_code=?, customer_ref=?, ean=?, initial_reading=?, final_reading=? where id=?
+update invoice_sending_failed set is_deleted=1 where id in  (?, ?, ?)
+update invoice_sending_failed set is_deleted=1 where ref_invoice=? and is_deleted=0
+update person set accounting_opposite_account=?, CONFIRM_DEADLINE_DAYS=?, CONFIRM_DEADLINE_NOTICE=? where id=?
+update person set invoice_additional_field_name=? where id=?
+update person set next_invoice_number=? where id=?
+update person set next_invoice_number=next_invoice_number+1 where id=?
+update url set end_time=SYSDATE where ref_invoice=? and REF_REPRESENTATION_RIGHT=? and ref_dom_type=?
+update url set end_time=SYSDATE where ref_invoice=? and ref_dom_type=?

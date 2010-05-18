@@ -233,13 +233,13 @@ public class StringConverter {
 			// if either way succeeded then construct sequence of choice
 			if (tail != null) {
 				return new StringSequence(
-						containingStr.getPosition(), 
+						str.getPosition(), 
 						commonHead, 
 						new StringChoice(
-								str.getPosition(), 
+								containingStr.getPosition(), 
 								tail, 
 								// FIXME this position is not good
-								new StringConstant(str.getPosition(), "", "\"\"")));
+								new StringConstant(PositionUtil.getDummyPosition(), "", "\"\"")));
 			}
 			else {
 				return str;
@@ -308,7 +308,7 @@ public class StringConverter {
 					return seq.get(1);
 				}
 				else {
-					return new StringSequence(seq.getItems().subList(1, seq.getItems().size()));
+					return new StringSequence(seq.getPosition(), seq.getItems().subList(1, seq.getItems().size()));
 				}
 			}
 			else {

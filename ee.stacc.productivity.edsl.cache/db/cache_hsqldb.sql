@@ -103,6 +103,7 @@ CREATE TABLE
 		4 - repetition(a) 
 		5 - sameAs(a)
 		6 - unsupported (a)
+		7 - parameter (a)
 	*/
 	type TINYINT NOT NULL, 
 	a INTEGER DEFAULT NULL,

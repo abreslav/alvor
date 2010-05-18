@@ -105,6 +105,11 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 
 	public static void createMarker(String message, String markerType,
 			IPosition pos, Map<String, Comparable<?>> map) {
+		if (pos.getPath().equals("__dummy__")) {
+			return;
+		}
+		
+		
 		if (map == null) {
 			map = new HashMap<String, Comparable<?>>();
 		}
