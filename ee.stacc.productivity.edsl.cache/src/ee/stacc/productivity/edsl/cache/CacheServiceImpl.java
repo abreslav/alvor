@@ -122,7 +122,11 @@ public final class CacheServiceImpl implements ICacheService {
 	private final IScopedCache<IHotspotPattern, IPosition> usageCache = new UsageCache();	
 	private final IScopedCache<MethodInvocationDescriptor, IAbstractString> methodTemplateCache = new MethodTemplateCache();	
 
-	boolean nocache = true;
+	boolean nocache = false;
+	
+	public void setNocache(boolean value) {
+		nocache = value;
+	}
 	
 	public CacheServiceImpl(IDBLayer dbLayer) {
 		this.dbLayer = dbLayer; 
