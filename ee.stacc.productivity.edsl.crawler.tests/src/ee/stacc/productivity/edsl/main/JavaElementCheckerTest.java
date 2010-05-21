@@ -60,6 +60,7 @@ public class JavaElementCheckerTest {
 		
 		// clear cache
 		CacheService.getCacheService().clearAll();
+		CacheService.getCacheService().setNocache(true);
 		
 		IProject project = root.getProject(projectName);
 		
