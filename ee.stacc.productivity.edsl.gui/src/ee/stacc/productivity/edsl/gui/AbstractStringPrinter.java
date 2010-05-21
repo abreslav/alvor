@@ -13,6 +13,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorPart;
 
+import ee.stacc.productivity.edsl.cache.CacheService;
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.crawler.NewASE;
@@ -57,6 +58,7 @@ public class AbstractStringPrinter implements IEditorActionDelegate{
 			LOG.message("Abstract value is: ");
 			
 			NodeSearchEngine.clearCache();
+			CacheService.getCacheService().clearAll();
 			System.out.println(NewASE.evaluateExpression
 					((Expression)node).toString());
 		} 
