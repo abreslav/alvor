@@ -14,6 +14,7 @@ import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
+import ee.stacc.productivity.edsl.common.logging.Timer;
 import ee.stacc.productivity.edsl.conntracker.ConnectionDescriptor;
 import ee.stacc.productivity.edsl.conntracker.ConnectionTracker;
 import ee.stacc.productivity.edsl.crawler.AbstractStringEvaluator;
@@ -35,6 +36,7 @@ public class JavaElementChecker {
 
 	private static final String HOTSPOTS = "hotspots";
 	private static final ILog LOG = Logs.getLog(JavaElementChecker.class);
+	private Timer timer = new Timer();
 
 	/*
 	 * The map must contain an entry 
@@ -48,13 +50,16 @@ public class JavaElementChecker {
 	 * TODO rename?
 	 */
 	public List<INodeDescriptor> findHotspots(IJavaElement[] scope, Map<String, Object> options) {
+		timer.start("TIMER: string construction");
 		List<NodeRequest> requests = parseNodeRequests(options);
 		if (requests.isEmpty()) {
 			throw new IllegalArgumentException("No hotspots found");
 		}
 		NodeSearchEngine.clearCache();
 //		return AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(requests, scope, 0);
-		return NewASE.evaluateMethodArgumentAtCallSites(requests, scope, 0);
+		List<INodeDescriptor> result = NewASE.evaluateMethodArgumentAtCallSites(requests, scope, 0);
+		timer.printTime();
+		return result;
 	}
 
 	public void processHotspots(
@@ -63,19 +68,20 @@ public class JavaElementChecker {
 		List<IAbstractStringChecker> checkers, 
 		Map<String, Object> options) {
 		
-		Map<String, Integer> connMap = new Hashtable<String, Integer>();
+//		Map<String, Integer> connMap = new Hashtable<String, Integer>();
 		
 		List<IStringNodeDescriptor> validHotspots = new ArrayList<IStringNodeDescriptor>();
 		for (INodeDescriptor hotspot : hotspots) {
 			if (hotspot instanceof IStringNodeDescriptor) {
 				validHotspots.add((IStringNodeDescriptor) hotspot);
 				
-				// collect connection info
-				ConnectionDescriptor connDesc = 
-					ConnectionTracker.getConnectionDescriptorForHotspot(hotspot.getPosition());
-				String exp = connDesc.getExpression();
-				Integer prevCount = connMap.get(exp);
-				connMap.put(exp, prevCount == null ? 1 : prevCount + 1);
+//				// collect connection info
+//				ConnectionDescriptor connDesc = 
+//					ConnectionTracker.getConnectionDescriptorForHotspot(hotspot.getPosition());
+//				
+//				String exp = connDesc.getExpression();
+//				Integer prevCount = connMap.get(exp);
+//				connMap.put(exp, prevCount == null ? 1 : prevCount + 1);
 			}
 			else if (hotspot instanceof UnsupportedNodeDescriptor) {
 				errorHandler.handleSQLWarning(((UnsupportedNodeDescriptor)hotspot).getProblemMessage(),
@@ -85,10 +91,10 @@ public class JavaElementChecker {
 		checkValidHotspots(validHotspots, errorHandler, checkers, options);
 		
 		
-		LOG.message("CONNECTION DESCRIPTORSsss");
-		for (Map.Entry<String, Integer> entry : connMap.entrySet()) {
-			LOG.message("COUNT: " + entry.getValue() + ", EXP: " + entry.getKey());
-		}
+//		LOG.message("CONNECTION DESCRIPTORS");
+//		for (Map.Entry<String, Integer> entry : connMap.entrySet()) {
+//			LOG.message("COUNT: " + entry.getValue() + ", EXP: " + entry.getKey());
+//		}
 	}
 
 	private void checkValidHotspots(
@@ -106,15 +112,17 @@ public class JavaElementChecker {
 		}
 		
 		for (IAbstractStringChecker checker : checkers) {
+			timer.start("TIMER checker=" + checker.getClass().getName());
 			checker.checkAbstractStrings(hotspots, errorHandler, options);
+			timer.printTime();
 		}
 	}
 	
-	public void recheckHotspot(IPosition position, ISQLErrorHandler errorHandler, 
-			List<IAbstractStringChecker> checkers, 
-			Map<String, Object> options) {
-//		AbstractStringEvaluator.evaluateExpression(null)
-	}
+//	public void recheckHotspot(IPosition position, ISQLErrorHandler errorHandler, 
+//			List<IAbstractStringChecker> checkers, 
+//			Map<String, Object> options) {
+////		AbstractStringEvaluator.evaluateExpression(null)
+//	}
 	
 	private List<NodeRequest> parseNodeRequests(Map<String, Object> options) {
 		if (options == null) {

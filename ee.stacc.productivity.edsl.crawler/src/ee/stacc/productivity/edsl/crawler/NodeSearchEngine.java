@@ -208,13 +208,14 @@ public class NodeSearchEngine {
 		final List<MethodDeclaration> result = new ArrayList<MethodDeclaration>();
 		
 		String patternStr = inv.getName().getIdentifier() + "(";
-		for (int i = 0; i < inv.arguments().size(); i++) {
-			// following works only when argument types are exactly same as parameter types 			
-			// patternStr += ((Expression)arg).resolveTypeBinding().getQualifiedName() + ",";
+		IMethodBinding mBind = inv.resolveMethodBinding();
+		for (int i = 0; i < mBind.getParameterTypes().length; i++) {
 			if (i > 0) {
 				patternStr += ',';
 			}
-			patternStr += "?";
+			//patternStr += "?";
+			// with following SearchEngine gives null error 			
+			patternStr += mBind.getParameterTypes()[i].getQualifiedName();
 		}
 		patternStr += ")";
 		
@@ -240,7 +241,12 @@ public class NodeSearchEngine {
 			}
 		};
 		
-		executeSearch(pattern, requestor, scope);
+		try {
+			executeSearch(pattern, requestor, scope);
+		} catch (Exception e) {
+			LOG.error("SEARCH ERROR: " + e.getMessage() + ", pattern=" + patternStr);
+			throw new IllegalStateException(e);
+		}
 		return result;
 	}
 	

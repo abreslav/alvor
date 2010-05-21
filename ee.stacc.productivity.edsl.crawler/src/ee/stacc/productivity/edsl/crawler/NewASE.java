@@ -64,7 +64,7 @@ public class NewASE {
 	private int maxLevel = 3;
 	private boolean supportLoops = false;
 	private boolean supportInvocations = true;
-	private boolean optimizeChoice = true;
+	private boolean optimizeChoice = false;
 	
 	private int level;
 	private IJavaElement[] scope;
@@ -582,10 +582,23 @@ public class NewASE {
 		}
 	}
 
-	private IAbstractString evalNameInChoice(Name name, NameUsageChoice usage) {
-		NameUsageChoice uc = (NameUsageChoice)usage;
-		IAbstractString thenStr = this.evalNameAfterUsage(name, uc.getThenUsage()); 
-		IAbstractString elseStr = this.evalNameAfterUsage(name, uc.getElseUsage());
+	private IAbstractString evalNameInChoice(Name name, NameUsageChoice uc) {
+		IAbstractString thenStr;
+		if (uc.getThenUsage() == null) {
+			thenStr = this.evalNameBefore(name, uc.getNode()); // eval before if statement
+		}
+		else {
+			 thenStr = this.evalNameAfterUsage(name, uc.getThenUsage());
+		}
+		
+		IAbstractString elseStr;
+		if (uc.getElseUsage() == null) {
+			elseStr = this.evalNameBefore(name, uc.getNode()); // eval before if statement
+		}
+		else {
+			elseStr = this.evalNameAfterUsage(name, uc.getElseUsage());
+		}
+		
 		StringChoice result = new StringChoice(PositionUtil.getPosition(uc.getNode()),
 				thenStr, elseStr); 
 		

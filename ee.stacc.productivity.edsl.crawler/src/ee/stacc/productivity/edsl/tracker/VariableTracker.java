@@ -186,7 +186,7 @@ public class VariableTracker {
 
 	private static NameUsage getLastReachingModInReturn(IVariableBinding var,
 			ASTNode target, ReturnStatement ret) {
-		if (target == null) {
+		if (target == null && ret.getExpression() != null) {
 			return getLastReachingMod(var, ret.getExpression());
 		}
 		else {
@@ -287,7 +287,11 @@ public class VariableTracker {
 				// FIXME won't work in all cases
 				// should create new Tracker at loop entry
 				// and another in loop exit ???
-				if (ASTUtil.isLoopStatement(target)) {
+				
+				
+				if (ASTUtil.isLoopStatement(target)) { // moving out of loop
+					assert(ASTUtil.getLoopBody(target) != block);
+//					throw new UnsupportedConstructionException("target is loop");
 					return new NameUsageLoopChoice(target, usage, 
 							getLastModIn(var, ASTUtil.getLoopBody(target)));
 				}
@@ -429,16 +433,8 @@ public class VariableTracker {
 			if (thenUsage == null && elseUsage == null) {
 				return null;
 			}
-			// if one of branches is missing then get it before if
-			else if (thenUsage == null) {
-				thenUsage = getLastReachingMod(var, ifStmt);
-			}
-			else if (elseUsage == null) {
-				elseUsage = getLastReachingMod(var, ifStmt);
-			}
 			
-			assert thenUsage != null;
-			assert elseUsage != null;
+			
 			return new NameUsageChoice(ifStmt, thenUsage, elseUsage);
 		}
 		else {
