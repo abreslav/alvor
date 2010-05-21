@@ -21,6 +21,7 @@ import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
+import ee.stacc.productivity.edsl.common.logging.Timer;
 import ee.stacc.productivity.edsl.crawler.UnsupportedNodeDescriptor;
 import ee.stacc.productivity.edsl.main.JavaElementChecker;
 import ee.stacc.productivity.edsl.main.OptionLoader;
@@ -47,6 +48,8 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 	
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
+		Timer timer = new Timer();
+		timer.start("TIMER: whole process");
 		LOG.message("CheckProjectHandler.execute");
 		List<IJavaElement> selectedJavaElements = GuiUtil.getSelectedJavaElements();
 		for (IJavaElement element : selectedJavaElements) {
@@ -56,6 +59,7 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 				e.printStackTrace();
 			}
 		}
+		timer.printTime();
 		return null; // Must be null
 	}
 
