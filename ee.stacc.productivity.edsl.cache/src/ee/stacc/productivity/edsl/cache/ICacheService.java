@@ -13,6 +13,7 @@ public interface ICacheService {
 	void clearAll();
 	void removeFile(String path);
 	void removeFiles(Set<String> paths);
+	void setNocache(boolean value);
 	
 	/**
 	 * 
