@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -65,7 +66,7 @@ public class NodeSearchEngine {
 	};
 	
 	private static Map<ICompilationUnit, ASTNode> astCache = 
-		new HashMap<ICompilationUnit, ASTNode>();
+		new WeakHashMap<ICompilationUnit, ASTNode>();
 	
 	public static void clearCache() {
 		astCache.clear();

@@ -12,28 +12,49 @@ import java.sql.SQLException;
  * Some DB drivers won't actually parse query at "parseStatement"
  */
 public class SQLStringAnalyzer {
-	Connection conn;
+	private Connection conn = null;
+	private String url;
+	private String username;
+	private String password;
+	private int usageCount=0;
 	
 	public SQLStringAnalyzer(String driverName, String url, String username,
 			String password) {
 		
+		this.url = url;
+		this.username = username;
+		this.password = password;
+		
 		try {
 			Class.forName (driverName);
-			conn = DriverManager.getConnection(url, username, password);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public void validate(String sql) throws SQLException {
-		if (conn == null) {
-			return;
+	private void checkConnect() throws SQLException {
+		// disconnecting is necessary because of "too many open cursors" error
+		if (usageCount % 300 == 0) {
+			if (conn != null) {
+				conn.close();
+			}
+			conn = DriverManager.getConnection(url, username, password);
+			usageCount = 0;
 		}
-		PreparedStatement stmt = conn.prepareStatement(sql);
+	}
+	
+	public void validate(String sql) throws SQLException {
+		checkConnect();
+		
+		PreparedStatement stmt = null;
 		try {
+			usageCount++;
+			stmt = conn.prepareStatement(sql);
 			stmt.getMetaData();
 		} finally {
-			stmt.close();
+			if (stmt != null) {
+				stmt.close();
+			}
 		}
 	}
 }

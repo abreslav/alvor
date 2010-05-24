@@ -107,7 +107,7 @@ public class JavaElementChecker {
 
 		for (INodeDescriptor descriptor : hotspots) {
 			if (descriptor instanceof IStringNodeDescriptor) {
-				LOG.message(((IStringNodeDescriptor)descriptor).getAbstractValue());
+//				LOG.message(((IStringNodeDescriptor)descriptor).getAbstractValue());
 			}
 		}
 		

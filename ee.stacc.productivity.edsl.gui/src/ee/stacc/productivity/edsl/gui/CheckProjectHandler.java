@@ -143,9 +143,9 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 			if (hotspot instanceof IStringNodeDescriptor) {
 				IStringNodeDescriptor snd = (IStringNodeDescriptor) hotspot;
 				IAbstractString abstractValue = snd.getAbstractValue();
-				message = "Abstract string: " + abstractValue;
+				message = "Abstract string: " + AbstractStringOptimizer.optimize(abstractValue);
 				markerId = HOTSPOT_MARKER_ID;
-				markConstants(abstractValue);
+//				markConstants(abstractValue);
 			} else if (hotspot instanceof UnsupportedNodeDescriptor) {
 				UnsupportedNodeDescriptor und = (UnsupportedNodeDescriptor) hotspot;
 				message = "Unsupported construction: " + und.getProblemMessage();

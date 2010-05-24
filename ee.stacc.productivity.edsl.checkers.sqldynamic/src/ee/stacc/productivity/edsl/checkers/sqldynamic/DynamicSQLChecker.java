@@ -1,9 +1,11 @@
 package ee.stacc.productivity.edsl.checkers.sqldynamic;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import ee.stacc.productivity.edsl.checkers.IAbstractStringChecker;
 import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
@@ -36,25 +38,48 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 			totalConcrete += concreteStr.size();
 			
 			int duplicates = 0;
+			
+			// maps error msg to all concrete strings that cause this message
+			Map<String, String> errorMap = new HashMap<String, String>();
+			
 			for (String s: concreteStr) {
-				Integer soFar = concretes.get(s);
+				Integer countSoFar = concretes.get(s);
 				duplicates = 0;
-				if (soFar == null) {
+				if (countSoFar == null) {
 					LOG.message("CON: " + s);
 					try {
 						analyzer.validate(s);
 					} catch (SQLException e) {
 						LOG.message("    ERR: " + e.getMessage());
-						errorHandler.handleSQLError(e.getMessage().trim() + "\nSQL:\n" + s, nodeDesc.getPosition());
+//						errorHandler.handleSQLError(e.getMessage().trim() + "\nSQL:\n" + s, nodeDesc.getPosition());
+						
+						String errStrings = errorMap.get(e.getMessage());
+						if (errStrings == null) {
+							errStrings = s; 
+						} else {
+							errStrings += ";;;\n" + s;
+						}
+						errorMap.put(e.getMessage(), errStrings);
 					}
 					
 					concretes.put(s, 1);
 				}
 				else {
-					concretes.put(s, soFar+1);
+					concretes.put(s, countSoFar+1);
 					duplicates++;
 				}
 			}
+			
+//			System.out.println(errorMap.keySet());
+			
+			for (Entry<String, String> entry : errorMap.entrySet()) {
+				String message = entry.getKey().trim() + "\nSQL: \n" 
+						+ entry.getValue();
+				message = message.substring(0, Math.min(200, message.length()));
+				errorHandler.handleSQLError(message, nodeDesc.getPosition());
+			}
+
+			
 			LOG.message("DUPLICATES: " + duplicates);
 			LOG.message("____________________________________________");
 		}
