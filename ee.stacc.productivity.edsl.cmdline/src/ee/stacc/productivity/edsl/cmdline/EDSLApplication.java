@@ -31,13 +31,18 @@ import ee.stacc.productivity.edsl.string.IPosition;
 public class EDSLApplication implements IApplication {
 
 	private ILog log;
+	private int errorCount = 0;
+	private int warningCount = 0;
+	
 	private final ISQLErrorHandler errorHandler = new ISQLErrorHandler() {
 		
 		@Override
 		public void handleSQLError(
 				String errorMessage,
 				IPosition position) {
+			log.error(CacheService.getCacheService().getContainingAbstractString(position.getPath(), position.getStart()));
 			log.error("ERROR: " + errorMessage);
+			errorCount++;
 		}
 		
 		@Override
@@ -45,6 +50,7 @@ public class EDSLApplication implements IApplication {
 				String message,
 				IPosition position) {
 			log.error("WARNING: " + message);
+			warningCount++;
 		}
 		
 	};
@@ -80,34 +86,11 @@ public class EDSLApplication implements IApplication {
 						Map<String, Object> options = OptionLoader.getElementSqlCheckerProperties(iJavaElement);
 						List<INodeDescriptor> hotspots = findHotspots(sf,
 								projectChecker, options);
-						findHotspots(sf, projectChecker, options);
-//						findHotspots(sf,
-//								projectChecker, Collections.<String, Object>singletonMap("hotspots", ",queryForLong,1"));
-//						findHotspots(sf,
-//								projectChecker, Collections.<String, Object>singletonMap("hotspots", ",queryForInt,1"));
-//						findHotspots(sf,
-//								projectChecker, Collections.<String, Object>singletonMap("hotspots", ",queryForLong,1"));
-//						findHotspots(sf,
-//								projectChecker, Collections.<String, Object>singletonMap("hotspots", ",queryForInt,1"));
-//						findHotspots(sf,
-//								projectChecker, Collections.<String, Object>singletonMap("hotspots", ",queryForObject,1"));
-//						findHotspots(sf,
-//								projectChecker, Collections.<String, Object>singletonMap("hotspots", ",queryForObject,1"));
-//						findHotspots(sf,
-//								projectChecker, Collections.<String, Object>singletonMap("hotspots", ",queryForObject,1;,queryForInt,1;,queryForLong,1;"));
-//						findHotspots(sf,
-//								projectChecker, options);
-//						int count = 5;
-//						long totalTime = 0;
-//						for (int i = 0; i < count; i++) {
-//							hotspots = findHotspots(sf,	projectChecker, options);
-//							totalTime += time;
-//						}
-//						log.format("Average time: %f", (totalTime + 0.0) / count);
+//						findHotspots(sf, projectChecker, options);
 						
 						checkHotspots(hotspots, projectChecker, options);
-						checkHotspots(hotspots, projectChecker, options);
-						checkHotspots(hotspots, projectChecker, options);
+//						checkHotspots(hotspots, projectChecker, options);
+//						checkHotspots(hotspots, projectChecker, options);
 					}
 				}
 			}
@@ -117,6 +100,8 @@ public class EDSLApplication implements IApplication {
 
 	private void checkHotspots(List<INodeDescriptor> hotspots,
 			JavaElementChecker projectChecker, Map<String, Object> options) {
+		errorCount = 0;
+		warningCount = 0;
 		long t = System.currentTimeMillis();
 		projectChecker.processHotspots(hotspots, 
 				errorHandler, 
@@ -124,6 +109,7 @@ public class EDSLApplication implements IApplication {
 				options
 			);
 		log.format("Checker time: %d\n", System.currentTimeMillis() - t);
+		log.format("Errors: %d\nWarnings: %d\n", errorCount, warningCount);
 	}
 
 	long time;

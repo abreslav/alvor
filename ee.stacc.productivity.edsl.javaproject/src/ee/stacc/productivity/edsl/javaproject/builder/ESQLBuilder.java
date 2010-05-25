@@ -21,12 +21,16 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaCore;
 
 import ee.stacc.productivity.edsl.cache.CacheService;
+import ee.stacc.productivity.edsl.common.logging.ILog;
+import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.common.logging.Timer;
 import ee.stacc.productivity.edsl.crawler.PositionUtil;
 import ee.stacc.productivity.edsl.gui.CheckProjectHandler;
 import ee.stacc.productivity.edsl.string.IPosition;
 
 public class ESQLBuilder extends IncrementalProjectBuilder {
+	
+	private static ILog LOG = Logs.getLog(ESQLBuilder.class);
 
 	private class DeltaVisitor implements IResourceDeltaVisitor {
 		private final Collection<IFile> resources = new ArrayList<IFile>();
@@ -72,9 +76,14 @@ public class ESQLBuilder extends IncrementalProjectBuilder {
 	@Override
 	@SuppressWarnings("unchecked")
 	protected IProject[] build(int kind, Map args, IProgressMonitor monitor) throws CoreException {
-		if (kind == FULL_BUILD) {
-			fullBuild(monitor);
-		} else {
+		switch (kind) {
+		case FULL_BUILD:
+			cleanBuild(monitor);
+			break;
+		case CLEAN_BUILD:
+			cleanBuild(monitor);
+			break;
+		default:
 			IResourceDelta delta = getDelta(getProject());
 			if (delta == null) {
 				fullBuild(monitor);
@@ -85,13 +94,23 @@ public class ESQLBuilder extends IncrementalProjectBuilder {
 		return null;
 	}
 
-	protected void fullBuild(final IProgressMonitor monitor) throws CoreException {
+	protected void cleanBuild(final IProgressMonitor monitor) throws CoreException {
+		assert LOG.message("==============================");
+		assert LOG.message("Clean build on " + getProject());
 		clearCache();
 		checkResources(new IJavaElement[] {JavaCore.create(getProject())});
 	}
 
+	protected void fullBuild(final IProgressMonitor monitor) throws CoreException {
+		assert LOG.message("==============================");
+		assert LOG.message("Full build on " + getProject());
+		checkResources(new IJavaElement[] {JavaCore.create(getProject())});
+	}
+	
 	protected void incrementalBuild(IResourceDelta delta,
 			IProgressMonitor monitor) throws CoreException {
+		assert LOG.message("==============================");
+		assert LOG.message("Incremental build on " + getProject());
 		
 		strs.clear();
 		

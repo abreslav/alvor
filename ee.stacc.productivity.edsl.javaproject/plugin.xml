@@ -8,7 +8,8 @@
          point="org.eclipse.core.resources.builders">
       <builder
             callOnEmptyDelta="false"
-            hasNature="true">
+            hasNature="true"
+            isConfigurable="true">
          <run
                class="ee.stacc.productivity.edsl.javaproject.builder.ESQLBuilder">
          </run>

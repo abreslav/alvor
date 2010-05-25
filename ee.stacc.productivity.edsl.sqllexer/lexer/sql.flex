@@ -91,7 +91,7 @@ Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
   {DIGIT}+{ALPHA}({DIGIT}|{ALPHA})* {/*DIGAL_ERR*/}
 //  \"{DQ_STRING_TEXT}\" {/*STRING_DQ*/}
 //  \"{DQ_STRING_TEXT} {/*STRING_DQ_ERR*/} 
-  \'{SQ_STRING_TEXT}\' {/*STRING_SQ*/}
+  N?\'{SQ_STRING_TEXT}\' {/*STRING_SQ*/}
   \'{SQ_STRING_TEXT} {/*STRING_SQ_ERR*/} 
   {DIGIT}+ { /*NUMBER*/ }  
   {Ident} { /*ID*/ }

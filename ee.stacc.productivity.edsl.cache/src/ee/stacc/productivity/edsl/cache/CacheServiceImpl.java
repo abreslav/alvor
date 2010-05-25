@@ -554,7 +554,6 @@ public final class CacheServiceImpl implements ICacheService {
 		case StringTypes.CONSTANT:
 			return getStringConstant(a, position); 
 		case StringTypes.CHAR_SET:
-			System.err.println("CS!!!");
 			return getStringCharacterSet(a, position); 
 //			throw new UnsupportedStringOpEx("CACHE: Char sets are not supported yet");
 //			throw new IllegalArgumentException("Char sets are not yet supported");

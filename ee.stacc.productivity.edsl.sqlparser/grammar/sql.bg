@@ -119,6 +119,7 @@ assignList
 	;
 assign
 	: ident '=' simpleExpr
+	| '(' idList ')' '=' simpleExpr
 	;
 delete
 	: DELETE optFrom alias where
@@ -128,7 +129,11 @@ optFrom
 	| /*empty*/
 	;
 insert
-	: INSERT INTO alias optIdList VALUES identRest
+	: INSERT INTO alias optIdList insertRest
+	;
+insertRest
+	: VALUES identRest
+	| select
 	;
 optIdList
 	: /*empty*/
@@ -143,7 +148,7 @@ bracketedSelect
 	| '(' select ')'
 	;
 select 
-	: basicSelect where orderBy groupBy forUpdate 
+	: basicSelect where byClauses forUpdate 
 	| select UNION select
 	;
 basicSelect
@@ -158,20 +163,33 @@ forUpdate
 	| /*empty*/
 	;
 groupBy
-	: GROUP BY identList having
+	: GROUP BY simExList having
+	// GROUP BY identList having
+	;
+optGroupBy
+	: groupBy 	
 	| /*empty*/
 	;
+/*
 identList
 	: ident
 	| ident ',' identList
-	;
+	;*/
 having 
 	: HAVING condition
 	| /*empty*/
 	;
 orderBy
 	: ORDER BY directionList 
+	;
+optOrderBy
+	: orderBy 
 	| /*empty*/
+	;
+byClauses
+	: orderBy optGroupBy
+	| groupBy optOrderBy
+	| /* empty */
 	;
 directionList
 	: direction
@@ -250,10 +268,16 @@ condition
 	| comparison
 	| simpleExpr inExpr '(' simExList ')'
 	| simpleExpr inExpr '(' select ')'
+	| '(' idList2 ')' inExpr '(' simExList ')'
+	| '(' idList2 ')' inExpr '(' select ')'
 	| simpleExpr IS optNot NULL
-	| simpleExpr LIKE simpleExpr escape
+	| simpleExpr optNot LIKE simpleExpr escape
 	| EXISTS '(' select ')' 
 	| simpleExpr optNot BETWEEN simpleExpr AND simpleExpr
+	;
+idList2
+	: ID ',' ID
+	| ID ',' idList2
 	;
 comparison 
 	: simpleExpr '=' simpleExpr 
