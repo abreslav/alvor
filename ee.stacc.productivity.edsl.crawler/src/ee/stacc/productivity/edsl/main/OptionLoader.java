@@ -32,7 +32,7 @@ public class OptionLoader {
 
 	public static File getElementSqlCheckerPropertiesFile(IJavaProject project) {
 		File propsFile = project.getResource().getLocation().append(
-				"sqlchecker.properites").toFile();
+				"sqlchecker.properties").toFile();
 		return propsFile;
 	}
 
