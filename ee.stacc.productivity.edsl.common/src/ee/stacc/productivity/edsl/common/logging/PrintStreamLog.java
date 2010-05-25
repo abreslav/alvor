@@ -29,14 +29,14 @@ public class PrintStreamLog implements ILog {
 	public boolean format(String format, Object... args) {
 		messageStream.format(format, args);
 		messageStream.flush();
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean message(Object message) {
 		messageStream.println(message);
 		messageStream.flush();
-		return false;
+		return true;
 	}
 	
 	@Override

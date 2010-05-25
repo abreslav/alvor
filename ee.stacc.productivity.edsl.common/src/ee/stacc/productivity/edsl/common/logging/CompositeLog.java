@@ -20,7 +20,7 @@ public class CompositeLog implements ILog {
 		for (ILog log : sublogs) {
 			log.format(format, args);
 		}
-		return false;
+		return true;
 	}
 
 	@Override
@@ -28,7 +28,7 @@ public class CompositeLog implements ILog {
 		for (ILog log : sublogs) {
 			log.message(message);
 		}
-		return false;
+		return true;
 	}
 
 	@Override
