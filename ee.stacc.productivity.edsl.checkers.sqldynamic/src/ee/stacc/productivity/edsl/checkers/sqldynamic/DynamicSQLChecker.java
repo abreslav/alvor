@@ -2,7 +2,6 @@ package ee.stacc.productivity.edsl.checkers.sqldynamic;
 
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -27,7 +26,7 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 				options.get("DBPassword").toString());
 
 		int totalConcrete = 0;
-		Hashtable<String, Integer> concretes = new Hashtable<String, Integer>();
+		Map<String, Integer> concretes = new HashMap<String, Integer>();
 		
 		LOG.message("============================================");
 		
