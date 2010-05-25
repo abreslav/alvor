@@ -92,7 +92,7 @@ public class NodeSearchEngine {
 
 		final List<IPosition> result = new ArrayList<IPosition>();
 		for (NodeRequest nodeRequest : requests) {
-			LOG.message("Request " + nodeRequest);
+			assert LOG.message("Request " + nodeRequest);
 			
 			ARGUMENT_NODES_SEARCHER.performCachedSearch(
 					allFilesInScope, 
@@ -137,7 +137,7 @@ public class NodeSearchEngine {
 		SearchPattern pattern = SearchPattern.createPattern(nodeRequest.getPatternString(), 
 				IJavaSearchConstants.METHOD, IJavaSearchConstants.REFERENCES, 
 				SearchPattern.R_ERASURE_MATCH | SearchPattern.R_CASE_SENSITIVE);
-		LOG.message(pattern);
+		assert LOG.message(pattern);
 				
 		IJavaElement[] elems = scopeToSearchIn.toArray(new IJavaElement[scopeToSearchIn.size()]);
 		IJavaSearchScope scope = SearchEngine.createJavaSearchScope(elems, IJavaSearchScope.SOURCES);
@@ -152,7 +152,7 @@ public class NodeSearchEngine {
 				ASTNode node = getASTNode(match);
 				
 				if (! (node instanceof MethodInvocation)) {
-					System.err.println("Crawler: not MethodInvocation, but: " + node.getClass());
+					LOG.error("Crawler: not MethodInvocation, but: " + node.getClass());
 					return;
 				}
 				
@@ -160,7 +160,7 @@ public class NodeSearchEngine {
 				IMethodBinding methodBinding = invoc.resolveMethodBinding();
 				
 				if (methodBinding == null || methodBinding.getDeclaringClass() == null) {
-					System.err.println("TODO: crawler methodBinding.getDeclaringClass() == null");
+					LOG.error("TODO: crawler methodBinding.getDeclaringClass() == null");
 					return;
 				}
 				
@@ -228,7 +228,7 @@ public class NodeSearchEngine {
 		}
 		patternStr += ")";
 		
-		LOG.message("findMethodDeclarations: " + patternStr);
+		assert LOG.message("findMethodDeclarations: " + patternStr);
 		
 		SearchPattern pattern = SearchPattern.createPattern(
 				patternStr, 

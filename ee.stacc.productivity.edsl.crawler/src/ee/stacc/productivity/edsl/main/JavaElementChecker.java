@@ -2,7 +2,6 @@ package ee.stacc.productivity.edsl.main;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
@@ -15,15 +14,10 @@ import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.common.logging.Timer;
-import ee.stacc.productivity.edsl.conntracker.ConnectionDescriptor;
-import ee.stacc.productivity.edsl.conntracker.ConnectionTracker;
-import ee.stacc.productivity.edsl.crawler.AbstractStringEvaluator;
-import ee.stacc.productivity.edsl.crawler.StringNodeDescriptor;
 import ee.stacc.productivity.edsl.crawler.NewASE;
 import ee.stacc.productivity.edsl.crawler.NodeRequest;
 import ee.stacc.productivity.edsl.crawler.NodeSearchEngine;
 import ee.stacc.productivity.edsl.crawler.UnsupportedNodeDescriptor;
-import ee.stacc.productivity.edsl.string.IPosition;
 
 /**
  * This is main class
@@ -103,7 +97,7 @@ public class JavaElementChecker {
 			List<IAbstractStringChecker> checkers, 
 			Map<String, Object> options) {
 	
-		LOG.message("Abstract strings:");
+		assert LOG.message("Abstract strings:");
 
 		for (INodeDescriptor descriptor : hotspots) {
 			if (descriptor instanceof IStringNodeDescriptor) {
@@ -134,7 +128,7 @@ public class JavaElementChecker {
 		}
 		String allHotspots = option.toString();
 		
-		LOG.message("Hotspots:");
+		assert LOG.message("Hotspots:");
 		List<NodeRequest> requests = new ArrayList<NodeRequest>();
 		for (String hotspot : allHotspots.split(";")) {
 			if (hotspot.length() == 0) {
@@ -142,7 +136,7 @@ public class JavaElementChecker {
 			}
 			String[] split = hotspot.split(",");
 			if (split.length != 3) {
-				LOG.message("Malformed hotspot: " + hotspot);
+				assert LOG.message("Malformed hotspot: " + hotspot);
 				continue;
 			}
 			String className = split[0];
@@ -152,9 +146,9 @@ public class JavaElementChecker {
 				int index = Integer.parseInt(argumentIndex);
 				NodeRequest nodeRequest = new NodeRequest(className, methodName, index);
 				requests.add(nodeRequest);
-				LOG.message(nodeRequest);
+				assert LOG.message(nodeRequest);
 			} catch (NumberFormatException e) {
-				LOG.message("Number format error: " + argumentIndex);
+				assert LOG.message("Number format error: " + argumentIndex);
 			}
 		}
 		return requests;

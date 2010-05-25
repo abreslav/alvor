@@ -4,41 +4,51 @@ import java.io.PrintStream;
 
 public class PrintStreamLog implements ILog {
 
-	public static final ILog SYSTEM_OUT = new PrintStreamLog(System.out);
-	public static final ILog SYSTEM_ERR = new PrintStreamLog(System.err);
+	public static final ILog SYSTEM_OUT = new PrintStreamLog(System.out, System.err);
+	public static final ILog SYSTEM_ERR = new PrintStreamLog(System.err, System.err);
 	
-	private final PrintStream printStream;
+	private final PrintStream messageStream;
+	private final PrintStream errorStream;
 	
-	public PrintStreamLog(PrintStream printStream) {
-		this.printStream = printStream;
+	public PrintStreamLog(PrintStream messageStream, PrintStream errorStream) {
+		this.messageStream = messageStream;
+		this.errorStream = errorStream;
+	}
+	
+	public PrintStreamLog(PrintStream messageStream) {
+		this(messageStream, messageStream);
 	}
 
 	@Override
 	public void exception(Throwable e) {
-		e.printStackTrace(printStream);
-		printStream.flush();
+		e.printStackTrace(errorStream);
+		errorStream.flush();
 	}
 
 	@Override
-	public void format(String format, Object... args) {
-		printStream.format(format, args);
-		printStream.flush();
+	public boolean format(String format, Object... args) {
+		messageStream.format(format, args);
+		messageStream.flush();
+		return false;
 	}
 
 	@Override
-	public void message(Object message) {
-		printStream.println(message);
-		printStream.flush();
+	public boolean message(Object message) {
+		messageStream.println(message);
+		messageStream.flush();
+		return false;
 	}
 	
 	@Override
 	public void error(Object message) {
-		message(message);
+		errorStream.println(message);
+		errorStream.flush();
 	}
 	
 	@Override
 	protected void finalize() throws Throwable {
-		printStream.close();
+		messageStream.close();
+		errorStream.close();
 	}
 
 }

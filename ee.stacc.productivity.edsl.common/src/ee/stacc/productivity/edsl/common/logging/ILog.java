@@ -2,8 +2,16 @@ package ee.stacc.productivity.edsl.common.logging;
 
 public interface ILog {
 
-	void message(Object message);
+	/**
+	 * @return always returns {@code false}
+	 */
+	boolean message(Object message);  // should be put into assert
+	
+	/**
+	 * @return always returns {@code false}
+	 */
+	boolean format(String format, Object... args);
+
 	void error(Object message);
 	void exception(Throwable e);
-	void format(String format, Object... args);
 }

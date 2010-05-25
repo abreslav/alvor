@@ -50,7 +50,7 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		Timer timer = new Timer();
 		timer.start("TIMER: whole process");
-		LOG.message("CheckProjectHandler.execute");
+		assert LOG.message("CheckProjectHandler.execute");
 		List<IJavaElement> selectedJavaElements = GuiUtil.getSelectedJavaElements();
 		for (IJavaElement element : selectedJavaElements) {
 			try {

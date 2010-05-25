@@ -583,10 +583,10 @@ public class AbstractStringEvaluator {
 		}
 
 		
-		LOG.message(levelPrefix + "###########################################");
-		LOG.message(levelPrefix + "searching: ");
+		assert LOG.message(levelPrefix + "###########################################");
+		assert LOG.message(levelPrefix + "searching: ");
 		for (NodeRequest nodeRequest : requests) {
-			LOG.message(nodeRequest);
+			assert LOG.message(nodeRequest);
 		}
 		
 		// find value from all call-sites
@@ -600,11 +600,11 @@ public class AbstractStringEvaluator {
 					IAbstractString abstractString = CacheService.getCacheService().getAbstractString(sr);
 					
 					if (abstractString == null) {
-						LOG.message(levelPrefix + "    file: " + sr.getPath() + ", line: "
+						assert LOG.message(levelPrefix + "    file: " + sr.getPath() + ", line: "
 								+ PositionUtil.getLineNumber(sr));
-						LOG.message("*SR: " + sr);
+						assert LOG.message("*SR: " + sr);
 						ASTNode node = NodeSearchEngine.getASTNode(sr);
-						LOG.message("*NODE: " + node);
+						assert LOG.message("*NODE: " + node);
 						
 						Expression arg = (Expression)node;// NodeSearchEngine.getASTNode(sr);
 						AbstractStringEvaluator evaluator = 
@@ -614,8 +614,8 @@ public class AbstractStringEvaluator {
 					result.add(new StringNodeDescriptor(sr, abstractString));
 					
 				} catch (UnsupportedStringOpEx e) {
-					LOG.message(levelPrefix + "UNSUPPORTED: " + e.getMessage());
-					LOG.message(levelPrefix + "    file: " + sr.getPath() + ", line: " 
+					assert LOG.message(levelPrefix + "UNSUPPORTED: " + e.getMessage());
+					assert LOG.message(levelPrefix + "    file: " + sr.getPath() + ", line: " 
 							/*+ sr.getLineNumber()*/);
 					result.add(new UnsupportedNodeDescriptor(sr, 
 							"Unsupported SQL construction: " + e.getMessage() + " at " + PositionUtil.getLineString(sr)));

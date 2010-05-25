@@ -30,7 +30,7 @@ public class AbstractStringCheckerManager {
 					final Object o = e.createExecutableExtension("class");
 					if (o instanceof IAbstractStringChecker) {
 						checkers.add((IAbstractStringChecker) o);
-						LOG.message(o);
+						assert LOG.message(o);
 					}
 				}
 			} catch (CoreException e) {

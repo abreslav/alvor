@@ -36,12 +36,11 @@ public class CreateDBHSQL {
 				}
 	    	}
 	    }
-	    
 	}
 
 	public static void runScript(Connection conn) {
 		try {
-			LOG.message("DB creation started");
+			assert LOG.message("DB creation started");
 			PreparedStatement commit = conn.prepareStatement("COMMIT");
 			
 			Reader fileReader = new InputStreamReader(CreateDBHSQL.class.getClassLoader().getResourceAsStream("cache_hsqldb.sql"));
@@ -62,7 +61,7 @@ public class CreateDBHSQL {
 				}
 			}
 
-			LOG.message("DB creation done");
+			assert LOG.message("DB creation done");
 	    } catch (SQLException e) {
 	    	LOG.exception(e);
 	    } catch (FileNotFoundException e) {

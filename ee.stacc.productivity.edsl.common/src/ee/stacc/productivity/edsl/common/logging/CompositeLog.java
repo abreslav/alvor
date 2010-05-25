@@ -16,17 +16,19 @@ public class CompositeLog implements ILog {
 	}
 
 	@Override
-	public void format(String format, Object... args) {
+	public boolean format(String format, Object... args) {
 		for (ILog log : sublogs) {
 			log.format(format, args);
 		}
+		return false;
 	}
 
 	@Override
-	public void message(Object message) {
+	public boolean message(Object message) {
 		for (ILog log : sublogs) {
 			log.message(message);
 		}
+		return false;
 	}
 
 	@Override

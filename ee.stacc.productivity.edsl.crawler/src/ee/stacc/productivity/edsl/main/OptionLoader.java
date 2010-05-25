@@ -21,7 +21,7 @@ public class OptionLoader {
 			throws FileNotFoundException, IOException {
 		IJavaProject project = element.getJavaProject();
 		File propsFile = getElementSqlCheckerPropertiesFile(project);
-		LOG.message("PROPS_FILE: " + propsFile);
+		assert LOG.message("PROPS_FILE: " + propsFile);
 		FileInputStream in = new FileInputStream(propsFile);
 		Properties props = new Properties();
 		props.load(in);

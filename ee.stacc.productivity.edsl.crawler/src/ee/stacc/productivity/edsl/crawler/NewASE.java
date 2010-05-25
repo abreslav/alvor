@@ -743,6 +743,6 @@ public class NewASE {
 			finalMsg += ", file: " + PositionUtil.getFileString(node) 
 					+ ", line: " + PositionUtil.getLineNumber(node); 
 		}
-		LOG.message(finalMsg);
+		assert LOG.message(finalMsg);
 	}
 }

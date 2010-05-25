@@ -28,13 +28,17 @@ public class Timer {
 		this.time = System.nanoTime();
 	}
 	
-	public void printTime() {
+	// To put into assert
+	public boolean printTime() {
 		long t = System.nanoTime() - time;
 		log.message(message + ": " + (t / 1000000000.0));
+		return false;
 	}
 	
-	public void printTimeAndStart(String message) {
+	// To put into assert
+	public boolean printTimeAndStart(String message) {
 		printTime();
 		start(message);
+		return false;
 	}
 }

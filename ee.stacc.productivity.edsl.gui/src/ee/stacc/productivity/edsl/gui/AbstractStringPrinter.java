@@ -53,17 +53,17 @@ public class AbstractStringPrinter implements IEditorActionDelegate{
 			LOG.error("ERROR: Did not find node");
 		}
 		else if (node instanceof Expression) {
-			LOG.message("###############################");
-			LOG.message("Selection is : " + node.getClass().getName());
-			LOG.message("Abstract value is: ");
+			assert LOG.message("###############################");
+			assert LOG.message("Selection is : " + node.getClass().getName());
+			assert LOG.message("Abstract value is: ");
 			
 			NodeSearchEngine.clearCache();
 			CacheService.getCacheService().clearAll();
-			System.out.println(NewASE.evaluateExpression
+			assert LOG.message(NewASE.evaluateExpression
 					((Expression)node).toString());
 		} 
 		else {
-			LOG.message("Selection is not expression, but: "
+			assert LOG.message("Selection is not expression, but: "
 					+ node.getClass().getName());
 		}
 	}
