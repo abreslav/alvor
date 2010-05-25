@@ -3,7 +3,6 @@ package ee.stacc.productivity.edsl.crawler;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -11,21 +10,15 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -42,15 +35,12 @@ import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.jdt.core.search.SearchParticipant;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
-import org.eclipse.jdt.internal.core.JavaProject;
 
 import ee.stacc.productivity.edsl.cache.CacheService;
 import ee.stacc.productivity.edsl.cache.ICacheService;
-import ee.stacc.productivity.edsl.cache.MethodInvocationDescriptor;
 import ee.stacc.productivity.edsl.cache.UnsupportedStringOpEx;
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
-import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.IPosition;
 
 /**
@@ -376,11 +366,11 @@ public class NodeSearchEngine {
 			parser.setResolveBindings(true);
 			parser.setSource(cUnit);
 			ast = parser.createAST(null);
-			if (astCache.size() > 200) {
+			if (astCache.size() > 80) {
 				astCache.clear();
 				System.err.println("Cleaning ast cache");
-				System.gc();
-				System.err.println("GC done");
+//				System.gc();
+//				System.err.println("GC done");
 			}
 			astCache.put(cUnit, ast);
 		}
