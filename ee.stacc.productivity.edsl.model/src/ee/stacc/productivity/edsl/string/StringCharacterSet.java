@@ -5,7 +5,7 @@ package ee.stacc.productivity.edsl.string;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 
@@ -19,7 +19,7 @@ public class StringCharacterSet extends PositionedString {
 	
 	public StringCharacterSet(IPosition pos, Collection<Character> set) {
 		super(pos);
-		this.set = new HashSet<Character>(set);
+		this.set = new LinkedHashSet<Character>(set);
 	}
 
 	public StringCharacterSet(String set) {
@@ -28,7 +28,7 @@ public class StringCharacterSet extends PositionedString {
 	
 	public StringCharacterSet(IPosition pos, String set) {
 		super(pos);
-		HashSet<Character> hashSet = new HashSet<Character>();
+		Set<Character> hashSet = new LinkedHashSet<Character>();
 		for (int i = 0; i < set.length(); i++) {
 			hashSet.add(set.charAt(i));
 		}

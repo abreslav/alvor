@@ -47,12 +47,13 @@ public class SampleGenerator {
 			}
 		}
 		else if (aStr instanceof StringRandomInteger) {
-			result.add(((StringRandomInteger)aStr).getExample());
+//			result.add(((StringRandomInteger)aStr).getExample());
+			result.add("666");
 		}
 		else if (aStr instanceof StringCharacterSet) {
 			// FIXME incorrect shortcut solution
 			
-			result.add("555");
+			result.add("666");
 			
 			
 //			StringCharacterSet cs = (StringCharacterSet)aStr;
