@@ -205,10 +205,7 @@ public class NodeSearchEngine {
 	public static List<MethodDeclaration> findMethodDeclarations(IJavaElement[] searchScope, final MethodInvocation inv) {
 		final List<MethodDeclaration> result = new ArrayList<MethodDeclaration>();
 		
-		String patternStr = 
-			// TODO not necessarily sound, need to check this
-			//inv.resolveMethodBinding().getDeclaringClass().getQualifiedName() + "." +
-			inv.getName().getIdentifier() + "(";
+		String patternStr = inv.getName().getIdentifier() + "(";
 		IMethodBinding mBind = inv.resolveMethodBinding();
 		for (int i = 0; i < mBind.getParameterTypes().length; i++) {
 			if (i > 0) {

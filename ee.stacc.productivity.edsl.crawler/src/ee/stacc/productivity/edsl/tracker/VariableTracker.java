@@ -5,7 +5,9 @@ import org.eclipse.jdt.core.dom.ArrayAccess;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CastExpression;
+import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
+import org.eclipse.jdt.core.dom.EmptyStatement;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.IVariableBinding;
@@ -124,6 +126,9 @@ public class VariableTracker {
 		else if (scope instanceof ThrowStatement) {
 			return getLastReachingModInThrow(var, target, (ThrowStatement)scope);
 		}
+		else if (scope instanceof CatchClause) {
+			return getLastReachingModInCatchClause(var, target, (CatchClause)scope);
+		}
 		else if (scope instanceof CastExpression) {
 			return null; // FIXME
 		}
@@ -148,8 +153,23 @@ public class VariableTracker {
 		else if (ASTUtil.isLoopStatement(scope)) {
 			return getLastReachingModInLoop(var, target, (Statement)scope);
 		}
+		else if (scope instanceof EmptyStatement) {
+			return null;
+		}
 		else {
 			throw new UnsupportedStringOpEx("getLastReachingModIn " + scope.getClass());
+		}
+	}
+
+	private static NameUsage getLastReachingModInCatchClause (
+			IVariableBinding var, ASTNode target, CatchClause scope) {
+		if (target == null) {
+			// should check also header ??
+			return getLastModIn(var, scope.getBody());
+		}
+		else {
+			assert (target == scope.getBody());
+			return null;
 		}
 	}
 
@@ -179,7 +199,8 @@ public class VariableTracker {
 			return getLastModIn(var, tryStmt.getBody());
 		}
 		else {
-			assert (target == tryStmt.getBody());
+			//assert (target == tryStmt.getBody());
+			// FIXME assuming no changes in catch and finally clauses
 			return null;
 		}
 	}
@@ -308,7 +329,11 @@ public class VariableTracker {
 	private static NameUsage getLastReachingModInInv(IVariableBinding var,
 			ASTNode target, MethodInvocation inv) {
 		
-		// TODO optimize for immutable types
+		// optimize for immutable types
+		if (ASTUtil.isString(var.getType())) {
+			return null;
+		}
+		
 		
 		if (target == null) { // check the effect of evaluating the method call
 			// TODO if name is at more than 1 position, then this means trouble (because of aliasing)
@@ -320,9 +345,13 @@ public class VariableTracker {
 				return new NameInMethodCallExpression(inv, exp);
 			}
 			
-			// TODO sameBinding and returnsVarPointer are same things actually
 			
 			// check in arguments
+			// special case: StringBuffer methods don't modify their arguments 
+//			if (exp != null && ASTUtil.isStringBuilderOrBuffer(exp.resolveTypeBinding())) {
+//				return null;
+//			}
+			
 			for (int i = 0; i < inv.arguments().size(); i++) {
 				Expression arg = (Expression)inv.arguments().get(i);
 				if (returnsVarPointer(arg, var)) {

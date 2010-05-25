@@ -10,6 +10,8 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
+import org.eclipse.jdt.core.dom.BooleanLiteral;
+import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.CharacterLiteral;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
@@ -20,6 +22,7 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.NullLiteral;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
@@ -167,7 +170,8 @@ public class NewASE {
 		ITypeBinding type = node.resolveTypeBinding();
 		assert type != null;
 		
-		if (type.getName().equals("int")) {
+		if (type.getQualifiedName().equals("int") 
+				|| type.getQualifiedName().equals("java.math.BigDecimal")) {
 			return new StringRandomInteger(PositionUtil.getPosition(node));
 		}
 		else if (node instanceof StringLiteral) {
@@ -180,11 +184,34 @@ public class NewASE {
 			return new StringConstant(PositionUtil.getPosition(node), 
 					String.valueOf(characterLiteral.charValue()), characterLiteral.getEscapedValue());
 		}
+		else if (node instanceof NullLiteral) {
+			return new StringConstant(PositionUtil.getPosition(node),
+					"null", "\"null\"");
+		}
+		else if (node instanceof BooleanLiteral) {
+			BooleanLiteral bl = (BooleanLiteral)node;
+			String bStr;
+			if (bl.booleanValue() == true) {
+				bStr = "true";
+			}
+			else {
+				bStr = "false";
+			}
+			return new StringConstant(PositionUtil.getPosition(node),
+					bStr, "\"" + bStr + "\"");
+		}
 		else if (node instanceof Name) {
-			if (!isStringOrStringBuilderOrBuffer(type)) {
+			if (!ASTUtil.isStringOrStringBuilderOrBuffer(type)) {
 				throw new UnsupportedStringOpEx("Unsupported type: " + type.getQualifiedName());
 			}
 			return evalName((Name)node);
+		}
+		else if (node instanceof CastExpression) {
+			CastExpression cExp = (CastExpression)node;
+			LOG.message("CAST expression: " + cExp + ", cast type=" + cExp.getType()
+					+ ", exp type=" + cExp.getExpression().resolveTypeBinding().getQualifiedName());
+			// try evaluating content
+			return eval(cExp.getExpression());
 		}
 		else if (node instanceof ConditionalExpression) {
 			StringChoice choice = new StringChoice(PositionUtil.getPosition(node),
@@ -248,7 +275,7 @@ public class NewASE {
 
 	private IAbstractString evalInvocationResult(MethodInvocation inv) {
 		if (inv.getExpression() != null
-				&& isStringOrStringBuilderOrBuffer(inv.getExpression().resolveTypeBinding())) {
+				&& ASTUtil.isStringOrStringBuilderOrBuffer(inv.getExpression().resolveTypeBinding())) {
 			if (inv.getName().getIdentifier().equals("toString")) {
 				return eval(inv.getExpression());
 			}
@@ -300,7 +327,7 @@ public class NewASE {
 		for (Object item : inv.arguments()) {
 			Expression arg = (Expression)item;
 			ITypeBinding typ = arg.resolveTypeBinding();
-			if (isString(typ) || isStringBuilderOrBuffer(typ)) {
+			if (ASTUtil.isStringOrStringBuilderOrBuffer(typ)) {
 				arguments.add(argEvaluator.eval(arg));
 			}
 			else {
@@ -358,7 +385,7 @@ public class NewASE {
 		for (Object item : inv.arguments()) {
 			Expression arg = (Expression)item;
 			ITypeBinding typ = arg.resolveTypeBinding();
-			if (isString(typ) || isStringBuilderOrBuffer(typ)) {
+			if (ASTUtil.isStringOrStringBuilderOrBuffer(typ)) {
 				arguments.add(argEvaluator.eval(arg));
 			}
 			else {
@@ -464,7 +491,7 @@ public class NewASE {
 	}
 	
 	private IAbstractString evalClassInstanceCreation(ClassInstanceCreation node) {
-		if (!isStringBuilderOrBuffer(node.resolveTypeBinding())) {
+		if (!ASTUtil.isStringBuilderOrBuffer(node.resolveTypeBinding())) {
 			throw new UnsupportedStringOpEx("Unsupported type in class instance creation: "
 					+ node.resolveTypeBinding().getQualifiedName());
 		}
@@ -502,19 +529,6 @@ public class NewASE {
 			throw new UnsupportedStringOpEx
 				("getValOf( infix op = " + expr.getOperator() + ")");
 		}
-	}
-	
-	private static boolean isStringOrStringBuilderOrBuffer(ITypeBinding typeBinding) {
-		return isString(typeBinding) || isStringBuilderOrBuffer(typeBinding);
-	}
-	
-	private static boolean isStringBuilderOrBuffer(ITypeBinding typeBinding) {
-		return typeBinding.getQualifiedName().equals("java.lang.StringBuffer")
-		|| typeBinding.getQualifiedName().equals("java.lang.StringBuilder");
-	}
-	
-	private static boolean isString(ITypeBinding typeBinding) {
-		return typeBinding.getQualifiedName().equals("java.lang.String");
 	}
 	
 	private IAbstractString evalNameAfterUsage(Name name, NameUsage usage) {
@@ -614,13 +628,13 @@ public class NewASE {
 	
 	private IAbstractString evalNameInCallExpression(Name name, 
 			NameInMethodCallExpression usage) {
-		if (isString(name.resolveTypeBinding())) {
+		if (ASTUtil.isString(name.resolveTypeBinding())) {
 			// this usage doesn't affect it
 			return evalNameBefore(name, usage.getNode());
 		}
 		
 		else {
-			assert isStringBuilderOrBuffer(name.resolveTypeBinding());
+			assert ASTUtil.isStringBuilderOrBuffer(name.resolveTypeBinding());
 			MethodInvocation inv = usage.getInv();
 			if (inv.getName().getIdentifier().equals("append")) {
 				return new StringSequence(
@@ -654,15 +668,15 @@ public class NewASE {
 	}
 
 	private IAbstractString evalNameInArgument(Name name, NameInArgument usage) {
-		if (isString(name.resolveTypeBinding())) {
+		if (ASTUtil.isString(name.resolveTypeBinding())) {
 			// this usage doesn't affect it, keep looking
 			return evalNameBefore(name, usage.getNode());
 		}
 		else {
-			if (!isStringBuilderOrBuffer(name.resolveTypeBinding())) {
+			if (!ASTUtil.isStringBuilderOrBuffer(name.resolveTypeBinding())) {
 				System.out.println(name.resolveTypeBinding());
 			}
-			assert isStringBuilderOrBuffer(name.resolveTypeBinding());
+			assert ASTUtil.isStringBuilderOrBuffer(name.resolveTypeBinding());
 			return evalInvocationArgOut(usage.getInv(), usage.getIndex()); 
 		}
 	}

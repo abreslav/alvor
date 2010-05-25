@@ -94,10 +94,12 @@ public class ASTUtil {
 			}
 			return false;
 		}
-//		else if (expr instanceof ConditionalExpression) {
-//			ConditionalExpression cExp = (ConditionalExpression)expr;
-//			return varIsUsedIn(var, c)
-//		}
+		else if (expr instanceof ConditionalExpression) {
+			ConditionalExpression cExp = (ConditionalExpression)expr;
+			return varIsUsedIn(var, cExp.getExpression())
+				|| varIsUsedIn(var, cExp.getThenExpression())
+				|| varIsUsedIn(var, cExp.getElseExpression());
+		}
 		else if (expr instanceof StringLiteral 
 				|| expr instanceof NumberLiteral
 				|| expr instanceof BooleanLiteral) {
@@ -395,6 +397,19 @@ public class ASTUtil {
 			+ "." + m.getName()
 			+ "(" + paramString + ")"
 			;
+	}
+
+	public static boolean isString(ITypeBinding typeBinding) {
+		return typeBinding.getQualifiedName().equals("java.lang.String");
+	}
+
+	public static boolean isStringBuilderOrBuffer(ITypeBinding typeBinding) {
+		return typeBinding.getQualifiedName().equals("java.lang.StringBuffer")
+		|| typeBinding.getQualifiedName().equals("java.lang.StringBuilder");
+	}
+
+	public static boolean isStringOrStringBuilderOrBuffer(ITypeBinding typeBinding) {
+		return isString(typeBinding) || isStringBuilderOrBuffer(typeBinding);
 	}
 
 }
