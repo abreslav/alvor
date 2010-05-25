@@ -93,7 +93,7 @@ Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
 //  \"{DQ_STRING_TEXT} {/*STRING_DQ_ERR*/} 
   N?\'{SQ_STRING_TEXT}\' {/*STRING_SQ*/}
   \'{SQ_STRING_TEXT} {/*STRING_SQ_ERR*/} 
-  {DIGIT}+ { /*NUMBER*/ }  
+  {DIGIT}+(\.{DIGIT}+)? { /*NUMBER*/ }  
   {Ident} { /*ID*/ }
   
   . {/*UNKNOWN_CHARACTER_ERR*/}

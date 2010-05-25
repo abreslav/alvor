@@ -18,6 +18,7 @@ import ee.stacc.productivity.edsl.checkers.sqlstatic.SyntacticalSQLChecker;
 import ee.stacc.productivity.edsl.sqlparser.SQLSyntaxChecker;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.parser.AbstractStringParser;
+import ee.stacc.productivity.edsl.string.util.AbstractStringOptimizer;
 
 
 @RunWith(Parameterized.class)

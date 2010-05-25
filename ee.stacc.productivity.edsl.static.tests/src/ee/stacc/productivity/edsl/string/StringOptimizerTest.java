@@ -4,8 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import ee.stacc.productivity.edsl.parser.AbstractStringOptimizer;
 import ee.stacc.productivity.edsl.string.parser.AbstractStringParser;
+import ee.stacc.productivity.edsl.string.util.AbstractStringOptimizer;
 
 
 public class StringOptimizerTest {

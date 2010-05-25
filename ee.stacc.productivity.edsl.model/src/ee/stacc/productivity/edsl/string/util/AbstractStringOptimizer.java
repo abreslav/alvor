@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.gui;
+package ee.stacc.productivity.edsl.string.util;
 
 import java.util.ArrayList;
 import java.util.Iterator;

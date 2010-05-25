@@ -17,6 +17,16 @@ public class JavaStringLexer {
 	
 	public static void tokenizeJavaString(String escapedValue,
 			IAbstractInputItem[] result, IPosition stringPosition) {
+		try {
+			performTokinization(escapedValue, result, stringPosition);
+		} catch (MalformedStringLiteralException e) {
+			e.setLiteralPosition(stringPosition);
+			throw e;
+		}
+	}
+
+	private static void performTokinization(String escapedValue,
+			IAbstractInputItem[] result, IPosition stringPosition) {
 		if (escapedValue == null) {
 			throw new MalformedStringLiteralException("[Internal] Escaped value is null");
 		}

@@ -18,7 +18,6 @@ import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.conntracker.ConnectionDescriptor;
 import ee.stacc.productivity.edsl.conntracker.ConnectionTracker;
 import ee.stacc.productivity.edsl.crawler.PositionUtil;
-import ee.stacc.productivity.edsl.string.IPosition;
 
 public class ConnectionSourceFinder implements IEditorActionDelegate {
 	private static final ILog LOG = Logs.getLog(ConnectionSourceFinder.class);

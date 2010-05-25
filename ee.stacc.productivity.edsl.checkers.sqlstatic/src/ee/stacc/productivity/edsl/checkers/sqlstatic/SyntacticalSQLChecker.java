@@ -16,6 +16,7 @@ import ee.stacc.productivity.edsl.sqlparser.IParseErrorHandler;
 import ee.stacc.productivity.edsl.sqlparser.SQLSyntaxChecker;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.IPosition;
+import ee.stacc.productivity.edsl.string.StringChoice;
 
 public class SyntacticalSQLChecker implements IAbstractStringChecker {
 
@@ -28,33 +29,67 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 		for (final IStringNodeDescriptor descriptor : descriptors) {
 			IAbstractString abstractString = descriptor.getAbstractValue();
 			if (!hasAcceptableSize(abstractString)) {
-				errorHandler.handleSQLWarning("Abstract string is too big", abstractString.getPosition());
-				continue;
-			}
-			try {
-				State automaton = PositionedCharacterUtil.createPositionedAutomaton(abstractString);
-				
-				SQLSyntaxChecker.INSTANCE.checkAutomaton(automaton, new IParseErrorHandler() {
-					
-					@Override
-					public void unexpectedItem(IAbstractInputItem item) {
-						Collection<IPosition> markerPositions = PositionedCharacterUtil.getMarkerPositions(((Token) item).getText());
-						for (IPosition pos : markerPositions) {
-							errorHandler.handleSQLError("Unexpected token: " + PositionedCharacterUtil.render(item), pos);
+				if (abstractString instanceof StringChoice) { // This may make things slower, but more precise 
+					StringChoice choice = (StringChoice) abstractString;
+					boolean hasBigSubstrings = false;
+					boolean hasSmallSubstrings = false;
+					for (IAbstractString option : choice.getItems()) {
+						if (!hasAcceptableSize(option)) {
+							hasBigSubstrings = true;
+						} else {
+							try {
+								checkStringOfAppropriateSize(errorHandler, descriptor, option);
+								hasSmallSubstrings = true;
+							} catch (StackOverflowError e) { // TODO: This hack is no good. May be it can be fixed in the FixpointParser   
+								hasBigSubstrings = true;
+							}
 						}
 					}
-
-					@Override
-					public void other() {
-						errorHandler.handleSQLError("SQL syntax error. Most likely, unfinished query", descriptor.getPosition());
+					if (hasBigSubstrings) {
+						errorHandler.handleSQLWarning("Abstract string is too big" + (hasSmallSubstrings ? ". Only some parts checked" : ""), descriptor.getPosition());
 					}
-				});
-			} catch (MalformedStringLiteralException e) {
-				errorHandler.handleSQLError("Malformed literal: " + e.getMessage(), descriptor.getPosition());
-			} catch (Throwable e) {
-				LOG.exception(e);
-				errorHandler.handleSQLError("Static checker internal error: " + e.toString(), abstractString.getPosition());
+				} else {
+					errorHandler.handleSQLWarning("Abstract string is too big", descriptor.getPosition());
+				}
+			} else {
+				checkStringOfAppropriateSize(errorHandler, descriptor, abstractString);
 			}
+		}
+	}
+
+	private void checkStringOfAppropriateSize(
+			final ISQLErrorHandler errorHandler,
+			final IStringNodeDescriptor descriptor,
+			IAbstractString abstractString) {
+		try {
+			State automaton = PositionedCharacterUtil.createPositionedAutomaton(abstractString);
+			
+			SQLSyntaxChecker.INSTANCE.checkAutomaton(automaton, new IParseErrorHandler() {
+				
+				@Override
+				public void unexpectedItem(IAbstractInputItem item) {
+					Collection<IPosition> markerPositions = PositionedCharacterUtil.getMarkerPositions(((Token) item).getText());
+					for (IPosition pos : markerPositions) {
+						errorHandler.handleSQLError("Unexpected token: " + PositionedCharacterUtil.render(item), pos);
+					}
+				}
+
+				@Override
+				public void other() {
+					errorHandler.handleSQLError("SQL syntax error. Most likely, unfinished query", descriptor.getPosition());
+				}
+			});
+		} catch (MalformedStringLiteralException e) {
+			IPosition errorPosition = e.getLiteralPosition();
+			if (errorPosition == null) {
+				errorPosition = descriptor.getPosition(); 
+			}
+			errorHandler.handleSQLError("Malformed literal: " + e.getMessage(), errorPosition);
+		} catch (StackOverflowError e) {  // TODO: This hack is no good (see method above)
+			throw e;
+		} catch (Throwable e) {
+			LOG.exception(e);
+			errorHandler.handleSQLError("Static checker internal error: " + e.toString(), descriptor.getPosition());
 		}
 	}
 

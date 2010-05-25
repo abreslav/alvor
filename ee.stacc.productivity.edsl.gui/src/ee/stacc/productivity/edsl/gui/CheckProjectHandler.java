@@ -34,6 +34,7 @@ import ee.stacc.productivity.edsl.string.StringConstant;
 import ee.stacc.productivity.edsl.string.StringParameter;
 import ee.stacc.productivity.edsl.string.StringRepetition;
 import ee.stacc.productivity.edsl.string.StringSequence;
+import ee.stacc.productivity.edsl.string.util.AbstractStringOptimizer;
 
 public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHandler {
 	public static final String ERROR_MARKER_ID = "ee.stacc.productivity.edsl.gui.sqlerror";
