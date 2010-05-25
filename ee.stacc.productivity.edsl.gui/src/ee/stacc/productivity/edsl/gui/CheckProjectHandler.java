@@ -122,8 +122,8 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 		int charStart = pos.getStart();
 		int charEnd = charStart + pos.getLength();
 
-		LOG.message("creating marker: " + message + ", file=" + file
-				+ ", charStart=" + charStart + ", charEnd=" + charEnd + ", type=" + markerType);
+//		LOG.message("creating marker: " + message + ", file=" + file
+//				+ ", charStart=" + charStart + ", charEnd=" + charEnd + ", type=" + markerType);
 		
 		MarkerUtilities.setMessage(map, message);
 		MarkerUtilities.setCharStart(map, charStart);
