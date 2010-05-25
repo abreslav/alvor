@@ -9,6 +9,7 @@ import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.CharacterLiteral;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.ContinueStatement;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
@@ -93,6 +94,10 @@ public class ASTUtil {
 			}
 			return false;
 		}
+//		else if (expr instanceof ConditionalExpression) {
+//			ConditionalExpression cExp = (ConditionalExpression)expr;
+//			return varIsUsedIn(var, c)
+//		}
 		else if (expr instanceof StringLiteral 
 				|| expr instanceof NumberLiteral
 				|| expr instanceof BooleanLiteral) {
@@ -159,7 +164,10 @@ public class ASTUtil {
 	}
 	
 	public static boolean invocationMayUseDeclaration (MethodInvocation inv, MethodDeclaration decl) {
-		assert inv.getName().getIdentifier().equals(decl.getName().getIdentifier());
+		if (!inv.getName().getIdentifier().equals(decl.getName().getIdentifier())) {
+			throw new IllegalStateException("INV: " + inv.getName().getIdentifier()
+					+ ", DECL: " + decl.getName().getIdentifier());
+		}
 		
 		if (inv.arguments().size() != decl.parameters().size()) {
 			return false;

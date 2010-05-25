@@ -11,15 +11,21 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -36,6 +42,7 @@ import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.jdt.core.search.SearchParticipant;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
+import org.eclipse.jdt.internal.core.JavaProject;
 
 import ee.stacc.productivity.edsl.cache.CacheService;
 import ee.stacc.productivity.edsl.cache.ICacheService;
@@ -208,14 +215,15 @@ public class NodeSearchEngine {
 	public static List<MethodDeclaration> findMethodDeclarations(IJavaElement[] searchScope, final MethodInvocation inv) {
 		final List<MethodDeclaration> result = new ArrayList<MethodDeclaration>();
 		
-		String patternStr = inv.getName().getIdentifier() + "(";
+		String patternStr = 
+			// TODO not necessarily sound, need to check this
+			//inv.resolveMethodBinding().getDeclaringClass().getQualifiedName() + "." +
+			inv.getName().getIdentifier() + "(";
 		IMethodBinding mBind = inv.resolveMethodBinding();
 		for (int i = 0; i < mBind.getParameterTypes().length; i++) {
 			if (i > 0) {
 				patternStr += ',';
 			}
-			//patternStr += "?";
-			// with following SearchEngine gives null error 			
 			patternStr += mBind.getParameterTypes()[i].getQualifiedName();
 		}
 		patternStr += ")";
@@ -226,11 +234,19 @@ public class NodeSearchEngine {
 				patternStr, 
 				IJavaSearchConstants.METHOD, 
 				IJavaSearchConstants.DECLARATIONS, 
-				SearchPattern.R_EXACT_MATCH);
+				SearchPattern.R_EXACT_MATCH | SearchPattern.R_CASE_SENSITIVE);
 		
-//		IJavaSearchScope scope = elementsToProjectSearchScope(searchScope);		
 		IJavaSearchScope scope = SearchEngine.createJavaSearchScope(
-				searchScope, IJavaSearchScope.SOURCES);		
+				searchScope, IJavaSearchScope.SOURCES);
+//		IJavaSearchScope scope = null;
+//		try {
+//			scope = SearchEngine.createHierarchyScope(
+//					(IType)inv.resolveMethodBinding().getDeclaringClass().getJavaElement()
+//			);
+//		} catch (JavaModelException e1) {
+//			e1.printStackTrace();
+//		}
+		
 		
 		SearchRequestor requestor = new SearchRequestor() {
 			public void acceptSearchMatch(SearchMatch match) {
@@ -260,7 +276,7 @@ public class NodeSearchEngine {
 				signature, 
 				IJavaSearchConstants.METHOD, 
 				IJavaSearchConstants.REFERENCES, 
-				SearchPattern.R_EXACT_MATCH
+				SearchPattern.R_EXACT_MATCH  | SearchPattern.R_CASE_SENSITIVE
 				);
 		
 		
@@ -291,7 +307,8 @@ public class NodeSearchEngine {
 		//LOG.message("Searching for: " + qualifiedName);
 		SearchPattern pattern = SearchPattern.createPattern(
 				qualifiedName, IJavaSearchConstants.FIELD, 
-				IJavaSearchConstants.DECLARATIONS, SearchPattern.R_EXACT_MATCH);
+				IJavaSearchConstants.DECLARATIONS, 
+				SearchPattern.R_EXACT_MATCH | SearchPattern.R_CASE_SENSITIVE);
 		
 		IJavaSearchScope scope = SearchEngine.createJavaSearchScope(
 				searchScope, IJavaSearchScope.SOURCES);		
@@ -359,6 +376,12 @@ public class NodeSearchEngine {
 			parser.setResolveBindings(true);
 			parser.setSource(cUnit);
 			ast = parser.createAST(null);
+			if (astCache.size() > 200) {
+				astCache.clear();
+				System.err.println("Cleaning ast cache");
+				System.gc();
+				System.err.println("GC done");
+			}
 			astCache.put(cUnit, ast);
 		}
 		return NodeFinder.perform(ast, start, length);

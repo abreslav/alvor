@@ -64,7 +64,7 @@ public class NewASE {
 	private int maxLevel = 3;
 	private boolean supportLoops = false;
 	private boolean supportInvocations = true;
-	private boolean optimizeChoice = false;
+	private boolean optimizeChoice = true;
 	
 	private int level;
 	private IJavaElement[] scope;
@@ -342,7 +342,10 @@ public class NewASE {
 		
 		MethodTemplateSearcher templateSearcher = new MethodTemplateSearcher(this);
 		List<IAbstractString> templates = 
-			templateSearcher.findMethodTemplates(scope, inv, argumentIndex);
+//			templateSearcher.findMethodTemplates(scope, inv, argumentIndex);
+			templateSearcher.findMethodTemplates(
+					EclipseUtil.scopeToProjectAndRequiredProjectsScope(scope),
+					inv, argumentIndex);
 		
 		if (templates.size() == 0) {
 			throw new UnsupportedStringOpEx("No declarations found for: " + inv.toString());
@@ -702,7 +705,7 @@ public class NewASE {
 									ASTUtil.getMethodClassName(method), 
 									method.getName().toString(),
 									usage.getIndex()+1)), 
-					scope, // FIXME should be widened to ... ? 
+					scope, // FIXME should be widened to all required projects 
 					level+1);
 			
 			List<IAbstractString> choices = new ArrayList<IAbstractString>();
@@ -711,11 +714,14 @@ public class NewASE {
 				if (choiceDesc instanceof IStringNodeDescriptor) {
 					choices.add(((IStringNodeDescriptor)choiceDesc).getAbstractValue());
 				}
+				else if (choiceDesc instanceof UnsupportedNodeDescriptor) {
+					throw new UnsupportedStringOpEx(((UnsupportedNodeDescriptor)choiceDesc).getProblemMessage());
+				}
 				else {
-					// FIXME what about the rest ???
+					throw new IllegalStateException();
 				}
 			}
-			if (choices.size() == 0) {
+			if (descList.size() == 0) {
 				throw new UnsupportedStringOpEx("Possible problem, no callsites found for: "
 						+ method.getName());
 			}
