@@ -15,13 +15,18 @@ public abstract class HSQLDBLayer implements IDBLayer {
 		if (connection == null) {
 			Class.forName("org.hsqldb.jdbc.JDBCDriver");
 			
-			String url = "jdbc:hsqldb:file:" + getPath() + ";shutdown=true";
+			String fileUrl = "jdbc:hsqldb:file:" + getPath() + ";shutdown=true";
+			String url = fileUrl;
 			
 			// if db is locked, then should connect in server mode (~ debugging mode) 
 			if (new File(getPath() + ".lck").exists()) {
 				url = "jdbc:hsqldb:hsql://localhost/xdb;shutdown=true";
 			}
-			connection = DriverManager.getConnection(url, "SA", "");
+			try {
+				connection = DriverManager.getConnection(url, "SA", "");
+			} catch (SQLException e) {
+				connection = DriverManager.getConnection(fileUrl, "SA", "");
+			}
 			
 			ResultSet res = connection.getMetaData().getTables(null, null, "FILES", null);
 			if (!res.next()) {
