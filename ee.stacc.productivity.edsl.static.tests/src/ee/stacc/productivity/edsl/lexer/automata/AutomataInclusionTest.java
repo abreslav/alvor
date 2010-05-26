@@ -311,21 +311,21 @@ public class AutomataInclusionTest {
 		checkAbstractStringTransduction(AbstractStringParser.parseOneFromString(abstractString), expected);
 		
 		
-		abstractString = "\"SELECT \" ([0123456789.])+ \" FROM\"";
+		abstractString = "\"SELECT \" ([0123456789,])+ \" FROM\"";
 		expected = new String[] {
 				"SELECT  NUMBER  FROM  ",
-				"SELECT  NUMBER . NUMBER  FROM  ",
-				"SELECT  NUMBER .  FROM  ",
-				"SELECT  NUMBER . . NUMBER  FROM  ",
-				"SELECT  NUMBER . .  FROM  ",
+				"SELECT  NUMBER , NUMBER  FROM  ",
+				"SELECT  NUMBER ,  FROM  ",
+				"SELECT  NUMBER , , NUMBER  FROM  ",
+				"SELECT  NUMBER , ,  FROM  ",
 				"SELECT   FROM  ",
-				"SELECT  . NUMBER  FROM  ",
-				"SELECT  . NUMBER .  FROM  ",
-				"SELECT  . NUMBER . .  FROM  ",
-				"SELECT  .  FROM  ",
-				"SELECT  . . NUMBER  FROM  ",
-				"SELECT  . . NUMBER .  FROM  ",
-				"SELECT  . .  FROM  ",
+				"SELECT  , NUMBER  FROM  ",
+				"SELECT  , NUMBER ,  FROM  ",
+				"SELECT  , NUMBER , ,  FROM  ",
+				"SELECT  ,  FROM  ",
+				"SELECT  , , NUMBER  FROM  ",
+				"SELECT  , , NUMBER ,  FROM  ",
+				"SELECT  , ,  FROM  ",
 		};
 		checkAbstractStringTransduction(AbstractStringParser.parseOneFromString(abstractString), expected);
 		

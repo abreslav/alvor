@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.equinox.app.IApplication;
