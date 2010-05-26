@@ -52,7 +52,11 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 					errorHandler.handleSQLWarning("Abstract string is too big", descriptor.getPosition());
 				}
 			} else {
-				checkStringOfAppropriateSize(errorHandler, descriptor, abstractString);
+				try {
+					checkStringOfAppropriateSize(errorHandler, descriptor, abstractString);
+				} catch (StackOverflowError e) {
+					errorHandler.handleSQLWarning("Abstract string is too big", descriptor.getPosition());
+				}
 			}
 		}
 	}

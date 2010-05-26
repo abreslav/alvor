@@ -556,16 +556,16 @@ public final class CacheServiceImpl implements ICacheService {
 		case StringTypes.CHAR_SET:
 			return getStringCharacterSet(a, position); 
 //			throw new UnsupportedStringOpEx("CACHE: Char sets are not supported yet");
-//			throw new IllegalArgumentException("Char sets are not yet supported");
 		case StringTypes.SEQUENCE:
 			return new StringSequence(position,	getCollectionContents(id));
 		case StringTypes.CHOICE:
 			return new StringChoice(position, getCollectionContents(id));
 		case StringTypes.REPETITION:
 			throw new UnsupportedStringOpEx("CACHE: Repetition is not supported yet");
-//			throw new IllegalArgumentException("Repetition is not supported yet");
 		case StringTypes.SAME_AS:
 			return getAbstractStringById(a);
+		case StringTypes.PARAMETER:
+			return new StringParameter(position, a);
 		case StringTypes.UNSUPPORTED:
 			throwUnsupportedStringOpEx(position, a);
 		default:
