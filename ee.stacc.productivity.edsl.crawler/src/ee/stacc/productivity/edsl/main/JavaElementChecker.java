@@ -13,6 +13,7 @@ import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
+import ee.stacc.productivity.edsl.common.logging.Measurements;
 import ee.stacc.productivity.edsl.common.logging.Timer;
 import ee.stacc.productivity.edsl.crawler.NewASE;
 import ee.stacc.productivity.edsl.crawler.NodeRequest;
@@ -44,6 +45,7 @@ public class JavaElementChecker {
 	 * TODO rename?
 	 */
 	public List<INodeDescriptor> findHotspots(IJavaElement[] scope, Map<String, Object> options) {
+		Measurements.resetAll();
 		timer.start("TIMER: string construction");
 		List<NodeRequest> requests = parseNodeRequests(options);
 		if (requests.isEmpty()) {
@@ -53,6 +55,10 @@ public class JavaElementChecker {
 //		return AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(requests, scope, 0);
 		List<INodeDescriptor> result = NewASE.evaluateMethodArgumentAtCallSites(requests, scope, 0);
 		timer.printTime();
+		
+		LOG.message(Measurements.parseTimer);
+		LOG.message(Measurements.methodDeclSearchTimer);
+		LOG.message(Measurements.argumentSearchTimer);
 		return result;
 	}
 

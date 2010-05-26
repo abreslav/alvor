@@ -411,5 +411,19 @@ public class ASTUtil {
 	public static boolean isStringOrStringBuilderOrBuffer(ITypeBinding typeBinding) {
 		return isString(typeBinding) || isStringBuilderOrBuffer(typeBinding);
 	}
+	
+	public static String getArgumentTypesString(IMethodBinding binding) {
+		String result = "(";
+		for (int i = 0; i < binding.getParameterTypes().length; i++) {
+			if (i > 0) {
+				result += ',';
+			}
+			//result += binding.getParameterTypes()[i].getQualifiedName();
+			result += binding.getParameterTypes()[i].getName();
+		}
+		result += ")";
+		
+		return result;
+	}
 
 }

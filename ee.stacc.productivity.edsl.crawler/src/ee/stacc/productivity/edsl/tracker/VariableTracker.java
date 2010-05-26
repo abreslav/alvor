@@ -348,9 +348,9 @@ public class VariableTracker {
 			
 			// check in arguments
 			// special case: StringBuffer methods don't modify their arguments 
-//			if (exp != null && ASTUtil.isStringBuilderOrBuffer(exp.resolveTypeBinding())) {
-//				return null;
-//			}
+			if (exp != null && ASTUtil.isStringBuilderOrBuffer(exp.resolveTypeBinding())) {
+				return null;
+			}
 			
 			for (int i = 0; i < inv.arguments().size(); i++) {
 				Expression arg = (Expression)inv.arguments().get(i);

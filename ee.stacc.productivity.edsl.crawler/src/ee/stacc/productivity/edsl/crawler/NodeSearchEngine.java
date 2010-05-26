@@ -41,6 +41,7 @@ import ee.stacc.productivity.edsl.cache.ICacheService;
 import ee.stacc.productivity.edsl.cache.UnsupportedStringOpEx;
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
+import ee.stacc.productivity.edsl.common.logging.Measurements;
 import ee.stacc.productivity.edsl.string.IPosition;
 
 /**
@@ -134,17 +135,9 @@ public class NodeSearchEngine {
 		
 		SearchRequestor requestor = new SearchRequestor() {
 			public void acceptSearchMatch(SearchMatch match) {
-				// TODO: Should not be needed -- we look only for methods
-				if (! (match.getElement() instanceof IMethod)) {
-					return;
-				}
+				assert match.getElement() instanceof IMethod;
 				
 				ASTNode node = getASTNode(match);
-				
-				if (! (node instanceof MethodInvocation)) {
-					LOG.error("Crawler: not MethodInvocation, but: " + node.getClass());
-					return;
-				}
 				
 				MethodInvocation invoc = (MethodInvocation)node;
 				IMethodBinding methodBinding = invoc.resolveMethodBinding();
@@ -154,18 +147,15 @@ public class NodeSearchEngine {
 					return;
 				}
 				
-				// Find a request corresponding to the current match
-				// TODO: Bad assumption: only one argument for each method
-				String signature =
-					methodBinding.getDeclaringClass().getQualifiedName()
-					+ "." + 
-					methodBinding.getMethodDeclaration().getName();
+				String signature = methodBinding.getDeclaringClass().getQualifiedName()
+					+ "." + methodBinding.getMethodDeclaration().getName();
+				
 				if (!nodeRequest.signatureMatches(signature)) {
 					LOG.error("Signature does not match: " + methodBinding);
 					return;
 				}					
 				
-				// TODO overloading may complicate things -- no, patterns support complete signatures
+				// TODO overloading may complicate things 
 				int requestedArgumentIndex = nodeRequest.getArgumentIndex();
 				if (invoc.arguments().size() < requestedArgumentIndex) {
 					LOG.error("can't find required argument (" + requestedArgumentIndex + "), method="
@@ -180,13 +170,16 @@ public class NodeSearchEngine {
 					IPosition position = PositionUtil.getPosition(arg);
 					result.add(position);
 					CacheService.getCacheService().getHotspotCache().add(nodeRequest, position);
-//					CacheService.getCacheService().addHotspot(nodeRequest, position);
 				}
 			}
-
 		};
 		
+		Measurements.argumentSearchTimer.start();
 		executeSearch(pattern, requestor, scope);
+		Measurements.argumentSearchTimer.stop();
+		
+		LOG.message("Searched callsites of '" + nodeRequest.getPatternString() + "', found "
+				+ result.size() + " matches");
 	}
 
 	private static void executeSearch(SearchPattern pattern, SearchRequestor requestor,
@@ -205,15 +198,8 @@ public class NodeSearchEngine {
 	public static List<MethodDeclaration> findMethodDeclarations(IJavaElement[] searchScope, final MethodInvocation inv) {
 		final List<MethodDeclaration> result = new ArrayList<MethodDeclaration>();
 		
-		String patternStr = inv.getName().getIdentifier() + "(";
-		IMethodBinding mBind = inv.resolveMethodBinding();
-		for (int i = 0; i < mBind.getParameterTypes().length; i++) {
-			if (i > 0) {
-				patternStr += ',';
-			}
-			patternStr += mBind.getParameterTypes()[i].getQualifiedName();
-		}
-		patternStr += ")";
+		String patternStr = inv.getName().getIdentifier()
+			+ ASTUtil.getArgumentTypesString(inv.resolveMethodBinding());
 		
 		assert LOG.message("findMethodDeclarations: " + patternStr);
 		
@@ -225,15 +211,6 @@ public class NodeSearchEngine {
 		
 		IJavaSearchScope scope = SearchEngine.createJavaSearchScope(
 				searchScope, IJavaSearchScope.SOURCES);
-//		IJavaSearchScope scope = null;
-//		try {
-//			scope = SearchEngine.createHierarchyScope(
-//					(IType)inv.resolveMethodBinding().getDeclaringClass().getJavaElement()
-//			);
-//		} catch (JavaModelException e1) {
-//			e1.printStackTrace();
-//		}
-		
 		
 		SearchRequestor requestor = new SearchRequestor() {
 			public void acceptSearchMatch(SearchMatch match) {
@@ -308,7 +285,9 @@ public class NodeSearchEngine {
 			}
 		};
 		
+		Measurements.methodDeclSearchTimer.start();
 		executeSearch(pattern, requestor, scope);
+		Measurements.methodDeclSearchTimer.stop();
 		
 		if (result.size() != 1) {
 			throw new UnsupportedStringOpEx("findFieldDeclarationFragment: " +
@@ -358,11 +337,15 @@ public class NodeSearchEngine {
 		
 		ASTNode ast = astCache.get(cUnit);
 		if (ast == null || cUnit.hasResourceChanged()) {
+			
+			Measurements.parseTimer.start();
 			ASTParser parser = ASTParser.newParser(AST.JLS3);
 			parser.setKind(ASTParser.K_COMPILATION_UNIT);
 			parser.setResolveBindings(true);
 			parser.setSource(cUnit);
 			ast = parser.createAST(null);
+			Measurements.parseTimer.stop();
+			
 			if (astCache.size() > 80) {
 				astCache.clear();
 				System.err.println("Cleaning ast cache");

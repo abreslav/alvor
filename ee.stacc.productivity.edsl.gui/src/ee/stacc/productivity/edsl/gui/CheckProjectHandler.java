@@ -22,6 +22,7 @@ import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.common.logging.Timer;
+import ee.stacc.productivity.edsl.crawler.PositionUtil;
 import ee.stacc.productivity.edsl.crawler.UnsupportedNodeDescriptor;
 import ee.stacc.productivity.edsl.main.JavaElementChecker;
 import ee.stacc.productivity.edsl.main.OptionLoader;
@@ -126,7 +127,13 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 //		LOG.message("creating marker: " + message + ", file=" + file
 //				+ ", charStart=" + charStart + ", charEnd=" + charEnd + ", type=" + markerType);
 		
-		MarkerUtilities.setMessage(map, message);
+		String finalMessage = message;
+		if (markerType.equals(WARNING_MARKER_ID)) {
+			finalMessage = "Unsupported SQL construction: " + message 
+				+ " at " + PositionUtil.getLineString(pos);
+		}
+		
+		MarkerUtilities.setMessage(map, finalMessage);
 		MarkerUtilities.setCharStart(map, charStart);
 		MarkerUtilities.setCharEnd(map, charEnd);
 		map.put(IMarker.LOCATION, file.getFullPath().toString());

@@ -16,6 +16,7 @@ import org.eclipse.jdt.core.dom.CharacterLiteral;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -31,8 +32,6 @@ import org.eclipse.jdt.core.dom.TagElement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 import ee.stacc.productivity.edsl.cache.CacheService;
-import ee.stacc.productivity.edsl.cache.IScopedCache;
-import ee.stacc.productivity.edsl.cache.MethodInvocationDescriptor;
 import ee.stacc.productivity.edsl.cache.UnsupportedStringOpEx;
 import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
@@ -64,7 +63,7 @@ import ee.stacc.productivity.edsl.tracker.VariableTracker;
  * eval is doEval plus cache handling
  */
 public class NewASE {
-	private int maxLevel = 3;
+	private int maxLevel = 4;
 	private boolean supportLoops = false;
 	private boolean supportInvocations = true;
 	private boolean optimizeChoice = true;
@@ -95,8 +94,7 @@ public class NewASE {
 	}
 	
 	public static List<INodeDescriptor> evaluateMethodArgumentAtCallSites
-			(Collection<NodeRequest> requests, IJavaElement[] scope, int level) {
-		
+		(Collection<NodeRequest> requests, IJavaElement[] scope, int level) {
 		logMessage("SEARCHING", level, null);
 		for (NodeRequest nodeRequest : requests) {
 			logMessage(nodeRequest, level, null);
@@ -110,8 +108,7 @@ public class NewASE {
 				result.add(new StringNodeDescriptor(pos, evaluator.eval(pos)));
 			} 
 			catch (UnsupportedStringOpEx e) {
-				result.add(new UnsupportedNodeDescriptor(pos, "Unsupported SQL construction: " 
-						+ e.getMessage() + " at " + PositionUtil.getLineString(pos)));
+				result.add(new UnsupportedNodeDescriptor(pos, e.getMessage()));
 			} 
 		}
 		return result;
@@ -170,8 +167,17 @@ public class NewASE {
 		ITypeBinding type = node.resolveTypeBinding();
 		assert type != null;
 		
-		if (type.getQualifiedName().equals("int") 
-				|| type.getQualifiedName().equals("java.math.BigDecimal")) {
+		if (	type.getQualifiedName().equals("int") 
+				|| type.getQualifiedName().equals("byte")
+				|| type.getQualifiedName().equals("long")
+				|| type.getQualifiedName().equals("short")
+				|| type.getQualifiedName().equals("java.lang.Integer")
+				|| type.getQualifiedName().equals("java.lang.Byte")
+				|| type.getQualifiedName().equals("java.lang.Long")
+				|| type.getQualifiedName().equals("java.lang.Short")
+				|| type.getQualifiedName().equals("java.math.BigInteger")
+				|| type.getQualifiedName().equals("java.math.BigDecimal")
+				) {
 			return new StringRandomInteger(PositionUtil.getPosition(node));
 		}
 		else if (node instanceof StringLiteral) {
@@ -284,6 +290,10 @@ public class NewASE {
 						PositionUtil.getPosition(inv), 
 						eval(inv.getExpression()),
 						eval((Expression)inv.arguments().get(0)));
+			}
+			else if (inv.getName().getIdentifier().equals("valueOf")) {
+				assert (ASTUtil.isString(inv.getExpression().resolveTypeBinding()));
+				return eval((Expression)inv.arguments().get(0));
 			}
 			else {
 				throw new UnsupportedStringOpEx("String/Builder/Buffer, method=" 
@@ -713,11 +723,15 @@ public class NewASE {
 		}
 		else {
 			MethodDeclaration method = usage.getMethodDecl();
+			String methodName = method.getName().toString();
+			// TODO: hack, to be cleaned
+			//methodName += ASTUtil.getArgumentTypesString(method.resolveBinding());
+			
 			List<INodeDescriptor> descList = evaluateMethodArgumentAtCallSites(
 					Collections.singleton(
 							new NodeRequest(
 									ASTUtil.getMethodClassName(method), 
-									method.getName().toString(),
+									methodName,
 									usage.getIndex()+1)), 
 					scope, // FIXME should be widened to all required projects 
 					level+1);

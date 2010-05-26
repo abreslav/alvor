@@ -50,7 +50,7 @@ import ee.stacc.productivity.edsl.string.StringConstant;
 import ee.stacc.productivity.edsl.string.StringRandomInteger;
 import ee.stacc.productivity.edsl.string.StringSequence;
 
-
+@Deprecated
 public class AbstractStringEvaluator {
 	private static final String RESULT_FOR_SQL_CHECKER = "@ResultForSQLChecker";
 	private static final String SIMPLIFIED_BODY_FOR_SC = "@SimplifiedBodyForSQLChecker";
@@ -618,7 +618,7 @@ public class AbstractStringEvaluator {
 					assert LOG.message(levelPrefix + "    file: " + sr.getPath() + ", line: " 
 							/*+ sr.getLineNumber()*/);
 					result.add(new UnsupportedNodeDescriptor(sr, 
-							"Unsupported SQL construction: " + e.getMessage() + " at " + PositionUtil.getLineString(sr)));
+							"Un---supported SQL construction: " + e.getMessage() + " at " + PositionUtil.getLineString(sr)));
 				}
 			
 		}
