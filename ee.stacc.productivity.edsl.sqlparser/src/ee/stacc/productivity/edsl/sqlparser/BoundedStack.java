@@ -6,15 +6,14 @@ package ee.stacc.productivity.edsl.sqlparser;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 
-public final class BoundedStack implements IAbstractStack {
+public final class BoundedStack implements IParserStack {
 
-	public static IStackFactory getFactory(final int maxDepth, final IParserState errorState) {
-		return new IStackFactory() {
+	public static IStackFactory<IParserStack> getFactory(final int maxDepth, final IParserState errorState) {
+		return new IStackFactory<IParserStack>() {
 			@Override
-			public IAbstractStack newStack(IParserState state) {
+			public IParserStack newStack(IParserState state) {
 				return new BoundedStack(maxDepth, errorState, state);
 			}
 		};
@@ -35,17 +34,33 @@ public final class BoundedStack implements IAbstractStack {
 	}
 	
 	@Override
-	public Set<IAbstractStack> pop(int count) {
+	public IParserState getErrorOnTop() {
+		IParserState top = top();
+		return top.isError() ? top : null;
+	}
+	
+	@Override
+	public boolean hasErrorOnTop() {
+		return getErrorOnTop() != null;
+	}
+	
+	@Override
+	public boolean topAccepts() {
+		return top() == IParserState.ACCEPT;
+	}
+	
+	@Override
+	public IParserStack pop(int count) {
 //		System.out.println(">>> pop " + count + " from " + this);
 		if (count > stack.size()) {
-			return Collections.<IAbstractStack>singleton(new BoundedStack(maxDepth, errorState, errorState));
+			return new BoundedStack(maxDepth, errorState, errorState);
 		}
 		List<IParserState> newStack = new ArrayList<IParserState>(stack.subList(0, stack.size() - count));
-		return Collections.<IAbstractStack>singleton(new BoundedStack(maxDepth, errorState, newStack));
+		return new BoundedStack(maxDepth, errorState, newStack);
 	}
 
 	@Override
-	public IAbstractStack push(IParserState state) {
+	public IParserStack push(IParserState state) {
 //		System.out.println(">>> push " + state + " into " + this);
 		int start = (stack.size() >= maxDepth) ? 1 : 0;
 		List<IParserState> newStack = new ArrayList<IParserState>(stack.subList(start, stack.size()));

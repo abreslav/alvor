@@ -12,7 +12,7 @@ public class ToStringTest {
 		String string = new StringSequence(
 			new StringConstant("\"asdas"),
 			new StringChoice(
-					new StringCharacterSet("sadf]][]"),
+					new StringCharacterSet("fdsa]][]"),
 					new StringRepetition(new StringConstant(""))
 			)
 		).toString();

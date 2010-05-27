@@ -3,6 +3,9 @@
  */
 package ee.stacc.productivity.edsl.sqlparser;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
 
 public final class ErrorState implements IParserState {
@@ -15,8 +18,8 @@ public final class ErrorState implements IParserState {
 	}
 
 	@Override
-	public IAction getAction(int symbolNumber) {
-		return new AfterErrorAction();
+	public Collection<IAction> getActions(int symbolNumber) {
+		return Collections.<IAction>singleton(new AfterErrorAction());
 	}
 	
 	@Override

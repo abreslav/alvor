@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,12 +14,10 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import ee.stacc.productivity.edsl.sqlparser.BoundedStack;
-import ee.stacc.productivity.edsl.sqlparser.IAbstractStack;
+import ee.stacc.productivity.edsl.sqlparser.IParserStack;
 import ee.stacc.productivity.edsl.sqlparser.IStackFactory;
 import ee.stacc.productivity.edsl.sqlparser.LRParser;
 import ee.stacc.productivity.edsl.sqlparser.Parsers;
-import ee.stacc.productivity.edsl.sqlparser.SimpleLinkedStack;
-import ee.stacc.productivity.edsl.sqlparser.SimpleStack;
 
 @RunWith(Parameterized.class)
 public class LRParsingTest {
@@ -28,16 +25,16 @@ public class LRParsingTest {
 	@Parameters
 	public static Collection<Object[]> parameters() {
 		return Arrays.asList(new Object[][] {
-				{SimpleStack.FACTORY},
-				{SimpleLinkedStack.FACTORY},
-				{SimpleFoldedStack.FACTORY},
+//				{SimpleStack.FACTORY},
+//				{SimpleLinkedStack.FACTORY},
+//				{SimpleFoldedStack.FACTORY},
 				{BoundedStack.getFactory(100, null)},
 		});
 	}
 
-	private final IStackFactory stackFactory;
+	private final IStackFactory<IParserStack> stackFactory;
 	
-	public LRParsingTest(IStackFactory stackFactory) {
+	public LRParsingTest(IStackFactory<IParserStack> stackFactory) {
 		this.stackFactory = stackFactory;
 	}
 
@@ -90,7 +87,7 @@ public class LRParsingTest {
 
 	}
 
-	public static boolean interpret(LRParser parser, IStackFactory factory, String input,
+	public static boolean interpret(LRParser parser, IStackFactory<IParserStack> factory, String input,
 			boolean expected) {
 		input += " $end $end"; 
 		Map<String, Integer> namesToTokenNumbers = parser.getNamesToTokenNumbers();
@@ -109,7 +106,7 @@ public class LRParsingTest {
 		return r;
 	}
 
-	private static boolean followParsingTrace(LRParser parser, IAbstractStack stack, List<String> tokens, String trace, boolean expected, PrintStream out) {
+	private static boolean followParsingTrace(LRParser parser, IParserStack stack, List<String> tokens, String trace, boolean expected, PrintStream out) {
 		trace += stack;
 		if (tokens.isEmpty()) {
 			if ((stack.top().isError()) == expected) {
@@ -123,12 +120,10 @@ public class LRParsingTest {
 				"Tokens: " + tokens;
 		String token = tokens.get(0);
 		Integer tokenNumber = parser.getNamesToTokenNumbers().get(token.trim());
-		Set<IAbstractStack> stacks = parser.processToken(null, tokenNumber, stack);
-		for (IAbstractStack newStack : stacks) {
-			boolean r = followParsingTrace(parser, newStack, tokens.subList(1, tokens.size()), trace + "\n===\n", expected, out);
-			if (r != expected) {
-				return r;
-			}
+		IParserStack newStack = parser.processToken(null, tokenNumber, stack);
+		boolean r = followParsingTrace(parser, newStack, tokens.subList(1, tokens.size()), trace + "\n===\n", expected, out);
+		if (r != expected) {
+			return r;
 		}
 		return expected;
 	}

@@ -222,7 +222,7 @@ expression
 	;
 selectExpressionList
 	: selectExpression
-	| selectExpression ',' selectExpressionList
+	| selectExpressionList ',' selectExpression
 	;
 tableList 
 	: table

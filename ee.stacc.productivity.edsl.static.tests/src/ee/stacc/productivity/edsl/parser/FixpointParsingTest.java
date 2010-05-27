@@ -17,12 +17,11 @@ import ee.stacc.productivity.edsl.lexer.automata.AutomataParser;
 import ee.stacc.productivity.edsl.lexer.automata.IAlphabetConverter;
 import ee.stacc.productivity.edsl.lexer.automata.State;
 import ee.stacc.productivity.edsl.sqlparser.BoundedStack;
+import ee.stacc.productivity.edsl.sqlparser.IParserStack;
 import ee.stacc.productivity.edsl.sqlparser.IStackFactory;
 import ee.stacc.productivity.edsl.sqlparser.LRParser;
+import ee.stacc.productivity.edsl.sqlparser.ParserSimulator;
 import ee.stacc.productivity.edsl.sqlparser.Parsers;
-import ee.stacc.productivity.edsl.sqlparser.SQLSyntaxChecker;
-import ee.stacc.productivity.edsl.sqlparser.SimpleLinkedStack;
-import ee.stacc.productivity.edsl.sqlparser.SimpleStack;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.parser.AbstractStringParser;
 
@@ -32,16 +31,16 @@ public class FixpointParsingTest {
 	@Parameters
 	public static Collection<Object[]> parameters() {
 		return Arrays.asList(new Object[][] {
-				{SimpleStack.FACTORY},
-				{SimpleLinkedStack.FACTORY},
-				{SimpleFoldedStack.FACTORY},
+//				{SimpleStack.FACTORY},
+//				{SimpleLinkedStack.FACTORY},
+//				{SimpleFoldedStack.FACTORY},
 				{BoundedStack.getFactory(100, null)},
 		});
 	}
 
-	private final IStackFactory stackFactory;
+	private final IStackFactory<IParserStack> stackFactory;
 	
-	public FixpointParsingTest(IStackFactory stackFactory) {
+	public FixpointParsingTest(IStackFactory<IParserStack> stackFactory) {
 		this.stackFactory = stackFactory;
 	}
 	
@@ -59,7 +58,8 @@ public class FixpointParsingTest {
 	}
 
 	private boolean doParse(final LRParser parser, State initial) {
-		return SQLSyntaxChecker.INSTANCE.parseAutomaton(initial, new IAlphabetConverter() {
+//		return SQLSyntaxChecker.INSTANCE.parseAutomaton(initial, new IAlphabetConverter() {
+		return ParserSimulator.LALR_INSTANCE.parseAutomaton(initial, new IAlphabetConverter() {
 			
 			@Override
 			public int convert(int c) {
@@ -78,7 +78,7 @@ public class FixpointParsingTest {
 				}
 				throw new IllegalStateException("Unknown token: " + c);
 			}
-		}, stackFactory);
+		});//, stackFactory);
 	}
 	
 	@Test
@@ -155,29 +155,33 @@ public class FixpointParsingTest {
 	
 	@Test
 	public void testLoops() throws Exception {
-		if (stackFactory == SimpleStack.FACTORY) {
-			return;
-		}
 		
 		String abstractString;
 
 		abstractString = "\"SELECT asd\" (\", dsd \")+ \"FROM asd, sdf\"";
 		assertTrue(parseAbstractString(abstractString));
-		
-		
+				
 		abstractString = "\"SELECT asd\" (\", dsd \")+ \"IN FROM asd, sdf\"";
+		assertFalse(parseAbstractString(abstractString));
+		
+		abstractString = "\"SELECT asd\" (\", dsd \")+ \", FROM asd, sdf\"";
+		assertFalse(parseAbstractString(abstractString));
+		
+		abstractString = "\"SELECT asd\" (\", , dsd \")+ \" FROM asd, sdf\"";
 		assertFalse(parseAbstractString(abstractString));
 		
 	}
 	
 	private void assertParses(String abstractString) {
 		IAbstractString as = AbstractStringParser.parseOneFromString(abstractString);
-		List<String> errors = SQLSyntaxChecker.INSTANCE.checkAbstractString(as, stackFactory);
+//		List<String> errors = SQLSyntaxChecker.INSTANCE.checkAbstractString(as, stackFactory);
+		List<String> errors = ParserSimulator.LALR_INSTANCE.checkAbstractString(as);//, stackFactory);
 		assertTrue(errors.toString(), errors.isEmpty());
 	}
 
 	private boolean parseAbstractString(String abstractString) {
 		IAbstractString as = AbstractStringParser.parseOneFromString(abstractString);
-		return SQLSyntaxChecker.INSTANCE.checkAbstractString(as, stackFactory).isEmpty();
+//		return SQLSyntaxChecker.INSTANCE.checkAbstractString(as, stackFactory).isEmpty();
+		return ParserSimulator.LALR_INSTANCE.checkAbstractString(as).isEmpty();//, stackFactory).isEmpty();
 	}
 }

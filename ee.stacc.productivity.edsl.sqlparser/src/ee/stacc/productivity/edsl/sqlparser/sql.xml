@@ -403,9 +403,9 @@
       <rule number="57" usefulness="useful">
         <lhs>selectExpressionList</lhs>
         <rhs>
-          <symbol>selectExpression</symbol>
-          <symbol>','</symbol>
           <symbol>selectExpressionList</symbol>
+          <symbol>','</symbol>
+          <symbol>selectExpression</symbol>
         </rhs>
       </rule>
       <rule number="58" usefulness="useful">
@@ -2307,16 +2307,15 @@
         <item rule-number="56" point="1">
           <lookaheads>
             <symbol>FROM</symbol>
+            <symbol>','</symbol>
           </lookaheads>
         </item>
-        <item rule-number="57" point="1"/>
       </itemset>
       <actions>
         <transitions>
           <transition type="shift" symbol="AS" state="82"/>
           <transition type="shift" symbol="ID" state="83"/>
-          <transition type="shift" symbol="','" state="84"/>
-          <transition type="goto" symbol="id" state="85"/>
+          <transition type="goto" symbol="id" state="84"/>
         </transitions>
         <errors/>
         <reductions>
@@ -2342,10 +2341,17 @@
 
     <state number="45">
       <itemset>
-        <item rule-number="49" point="1"/>
+        <item rule-number="49" point="1">
+          <lookaheads>
+            <symbol>FROM</symbol>
+          </lookaheads>
+        </item>
+        <item rule-number="57" point="1"/>
       </itemset>
       <actions>
-        <transitions/>
+        <transitions>
+          <transition type="shift" symbol="','" state="85"/>
+        </transitions>
         <errors/>
         <reductions>
           <reduction symbol="$default" rule="49" enabled="true"/>
@@ -3545,13 +3551,25 @@
 
     <state number="84">
       <itemset>
+        <item rule-number="52" point="2"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="52" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="85">
+      <itemset>
         <item rule-number="50" point="0"/>
         <item rule-number="51" point="0"/>
         <item rule-number="52" point="0"/>
         <item rule-number="54" point="0"/>
         <item rule-number="55" point="0"/>
-        <item rule-number="56" point="0"/>
-        <item rule-number="57" point="0"/>
         <item rule-number="57" point="2"/>
         <item rule-number="74" point="0"/>
         <item rule-number="75" point="0"/>
@@ -3610,9 +3628,8 @@
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="40"/>
           <transition type="shift" symbol="'?'" state="41"/>
-          <transition type="goto" symbol="selectExpression" state="43"/>
+          <transition type="goto" symbol="selectExpression" state="143"/>
           <transition type="goto" symbol="expression" state="44"/>
-          <transition type="goto" symbol="selectExpressionList" state="143"/>
           <transition type="goto" symbol="ident" state="46"/>
           <transition type="goto" symbol="condition" state="47"/>
           <transition type="goto" symbol="comparison" state="48"/>
@@ -3620,20 +3637,6 @@
         </transitions>
         <errors/>
         <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="85">
-      <itemset>
-        <item rule-number="52" point="2"/>
-      </itemset>
-      <actions>
-        <transitions/>
-        <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="52" enabled="true"/>
-        </reductions>
       </actions>
       <solved-conflicts/>
     </state>
@@ -5332,10 +5335,22 @@
 
     <state number="143">
       <itemset>
-        <item rule-number="57" point="3"/>
+        <item rule-number="51" point="1"/>
+        <item rule-number="52" point="1"/>
+        <item rule-number="53" point="0"/>
+        <item rule-number="57" point="3">
+          <lookaheads>
+            <symbol>FROM</symbol>
+            <symbol>','</symbol>
+          </lookaheads>
+        </item>
       </itemset>
       <actions>
-        <transitions/>
+        <transitions>
+          <transition type="shift" symbol="AS" state="82"/>
+          <transition type="shift" symbol="ID" state="83"/>
+          <transition type="goto" symbol="id" state="84"/>
+        </transitions>
         <errors/>
         <reductions>
           <reduction symbol="$default" rule="57" enabled="true"/>

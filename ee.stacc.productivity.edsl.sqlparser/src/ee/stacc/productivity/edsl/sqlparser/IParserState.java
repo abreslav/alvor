@@ -3,6 +3,8 @@
  */
 package ee.stacc.productivity.edsl.sqlparser;
 
+import java.util.Collection;
+
 
 
 public interface IParserState {
@@ -10,7 +12,7 @@ public interface IParserState {
 	public static final IParserState ACCEPT = new IParserState() {
 		
 		@Override
-		public IAction getAction(int symbolNumber) {
+		public Collection<IAction> getActions(int symbolNumber) {
 			throw new UnsupportedOperationException("Already accepted");
 		}
 		
@@ -29,7 +31,7 @@ public interface IParserState {
 		}
 	};
 
-	IAction getAction(int symbolNumber);
+	Collection<IAction> getActions(int symbolNumber);
 	boolean isTerminating();
 	boolean isError();
 }

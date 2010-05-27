@@ -21,29 +21,33 @@ import ee.stacc.productivity.edsl.lexer.sql.SQLLexer;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.util.AsbtractStringUtils;
 
-public class SQLSyntaxChecker {
+public class ParserSimulator<S extends IParserStackLike> {
 
-	private static final IStackFactory<IParserStack> FACTORY = BoundedStack.getFactory(100, null);
-//	private static final IStackFactory FACTORY = SimpleLinkedStack.FACTORY;
-	public static final SQLSyntaxChecker INSTANCE = new SQLSyntaxChecker();
+//	public static final ParserSimulator<IParserStack> LALR_INSTANCE = new ParserSimulator<IParserStack>(Parsers.SQL_PARSER, BoundedStack.getFactory(100, null));
+	public static final ParserSimulator<GLRStack> LALR_INSTANCE = new ParserSimulator<GLRStack>(Parsers.SQL_GLR_PARSER, GLRStack.FACTORY);
 	
-	private SQLSyntaxChecker() {}
-	
+	private final IStackFactory<S> stackFactory;
+	private final ILRParser<S> parser;
 	public long allTime;
-	
+
+	public ParserSimulator(ILRParser<S> parser, IStackFactory<S> factory) {
+		this.stackFactory = factory;
+		this.parser = parser;
+	}
+
 	public List<String> check(IAbstractString str) {
 		if (AsbtractStringUtils.hasLoops(str)) {
 			throw new IllegalArgumentException("The current version does not support loops in abstract strings");
 		}
 		
-		return checkAbstractString(str, FACTORY);
+		return checkAbstractString(str);
 	}
 	
-	public List<String> checkAbstractString(IAbstractString as, IStackFactory<IParserStack> stackFactory) {
+	public List<String> checkAbstractString(IAbstractString as) {
 		final List<String> errors = new ArrayList<String>();
 		State asAut = StringToAutomatonConverter.INSTANCE.convert(as);
 		
-		checkAutomaton(asAut, stackFactory, new IParseErrorHandler() {
+		checkAutomaton(parser, asAut, stackFactory, new IParseErrorHandler() {
 			
 			@Override
 			public void unexpectedItem(IAbstractInputItem item) {
@@ -66,10 +70,10 @@ public class SQLSyntaxChecker {
 	}
 
 	public void checkAutomaton(State asAut, IParseErrorHandler errorHandler) {
-		checkAutomaton(asAut, FACTORY, errorHandler);
+		checkAutomaton(parser, asAut, stackFactory, errorHandler);
 	}
 	
-	private void checkAutomaton(State asAut, IStackFactory<IParserStack> stackFactory, IParseErrorHandler errorHandler) {
+	private void checkAutomaton(final ILRParser<S> parser, State asAut, IStackFactory<S> stackFactory, IParseErrorHandler errorHandler) {
 		State sqlTransducer = SQLLexer.SQL_TRANSDUCER;
 		State transduction = AutomataInclusion.INSTANCE.getTrasduction(sqlTransducer, asAut, SQLLexer.SQL_ALPHABET_CONVERTER);
 		long time = System.nanoTime();
@@ -81,8 +85,6 @@ public class SQLSyntaxChecker {
 			}
 		});
 //		transduction = AutomataDeterminator.determinate(transduction);
-		
-		final LRParser parser = Parsers.SQL_PARSER;
 		
 		final Integer eofTokenIndex = parser.getNamesToTokenNumbers().get("$end");
 		IAlphabetConverter converter = new IAlphabetConverter() {
@@ -103,92 +105,99 @@ public class SQLSyntaxChecker {
 				return tokenNumber;
 			}
 		};
-		FixpointParser fixpointParser = new FixpointParser(parser, converter, SimpleStackSet.FACTORY, stackFactory, eofTokenIndex, errorHandler);
+		FixpointParser<S> fixpointParser = new FixpointParser<S>(parser, converter, SimpleStackSet.<S>getFactory(), stackFactory, eofTokenIndex, errorHandler);
 		fixpointParser.parse(transduction);
 		time = System.nanoTime() - time;
 		allTime += time;
 	}
 	
-	public boolean parseAutomaton(State initial, IAlphabetConverter alphabetConverter, IStackFactory<IParserStack> stackFactory) {
-		return new FixpointParser(
-				Parsers.SQL_PARSER, 
+	public boolean parseAutomaton(State initial, IAlphabetConverter alphabetConverter) {//, IStackFactory<S> stackFactory) {
+		return new FixpointParser<S>(
+				parser, 
 				alphabetConverter, 
-				SimpleStackSet.FACTORY, 
+				SimpleStackSet.<S>getFactory(), 
 				stackFactory, 
-				Parsers.SQL_PARSER.getNamesToTokenNumbers().get("$end"),
+				parser.getEofTokenIndex(),
 				IParseErrorHandler.NONE)
 			.parse(initial);
 	}
 	
-	private interface IAbstractStackSet {
+	private interface IStackSet<S> {
 
 		IParserState hasError();
 		
 		/**
 		 * @return true if there was an actual change 
 		 */
-		boolean add(IParserStack stack);
+		boolean add(S stack);
 		
 		/**
 		 * @return a java.util.Set of all IAbstractStack objects, which is 
 		 *         tolerant for concurrent modification (e.g., a copy)
 		 */
-		Set<IParserStack> asJavaSet();
+		Set<S> asJavaSet();
 	}
 
-	private static class SimpleStackSet implements IAbstractStackSet {
+	private static class SimpleStackSet<S extends IParserStackLike> implements IStackSet<S> {
+		
+		public static <S extends IParserStackLike> IStackSetFactory<S> getFactory() {
+			return new IStackSetFactory<S>() {
+				
+				@Override
+				public IStackSet<S> newAbstractStackSet() {
+					return new SimpleStackSet<S>();
+				}
+			};
+		}
 
-		private static final IAbstractStackSetFactory FACTORY = new IAbstractStackSetFactory() {
-			
-			@Override
-			public IAbstractStackSet newAbstractStackSet() {
-				return new SimpleStackSet();
-			}
-		};
-
-		private final Set<IParserStack> stacks = new HashSet<IParserStack>();
+		private final Set<S> stacks = new HashSet<S>();
 		
 		@Override
 		public IParserState hasError() {
-			for (IParserStack stack : stacks) {
-				IParserState top = stack.top();
-				if (top.isError()) {
-					return top;
+			for (S stack : stacks) {
+				IParserState errorOnTop = stack.getErrorOnTop();
+				if (errorOnTop != null) {
+					return errorOnTop;
 				}
 			}
 			return null;
 		}
 
 		@Override
-		public Set<IParserStack> asJavaSet() {
-			return new HashSet<IParserStack>(stacks);
+		public Set<S> asJavaSet() {
+			return new HashSet<S>(stacks);
 		}
 
 		@Override
-		public boolean add(IParserStack stack) {
+		public boolean add(S stack) {
 			return stacks.add(stack);
+		}
+		
+		@Override
+		public String toString() {
+			return stacks.toString();
 		}
 		
 	}
 	
-	public interface IAbstractStackSetFactory {
-		IAbstractStackSet newAbstractStackSet();
+	public interface IStackSetFactory<S> {
+		IStackSet<S> newAbstractStackSet();
 	}
 	
-	private static final class FixpointParser {
+	private static final class FixpointParser<S extends IParserStackLike> {
 	
-		private final Map<State, IAbstractStackSet> abstractStackSets = new HashMap<State, IAbstractStackSet>();
+		private final Map<State, IStackSet<S>> abstractStackSets = new HashMap<State, IStackSet<S>>();
 		private final IAlphabetConverter alphabetConverter;
-		private final LRParser parser;
-		private final IAbstractStackSetFactory factory;
-		private final IStackFactory<IParserStack> stackFactory;
+		private final ILRParser<S> parser;
+		private final IStackSetFactory<S> factory;
+		private final IStackFactory<S> stackFactory;
 		private final int eofTokenIndex;
 		private final IParseErrorHandler errorHandler; 
 		
-		public FixpointParser(LRParser parser,
+		public FixpointParser(ILRParser<S> parser,
 				IAlphabetConverter alphabetConverter,
-				IAbstractStackSetFactory factory,
-				IStackFactory<IParserStack> stackFactory,
+				IStackSetFactory<S> factory,
+				IStackFactory<S> stackFactory,
 				int eofTokenIndex,
 				IParseErrorHandler parseErrorHandler) {
 			this.parser = parser;
@@ -199,8 +208,8 @@ public class SQLSyntaxChecker {
 			this.errorHandler = parseErrorHandler;
 		}
 		
-		private IAbstractStackSet getSet(State state) {
-			IAbstractStackSet set = abstractStackSets.get(state);
+		private IStackSet<S> getSet(State state) {
+			IStackSet<S> set = abstractStackSets.get(state);
 			if (set == null) {
 				set = factory.newAbstractStackSet();
 				abstractStackSets.put(state, set);
@@ -209,13 +218,13 @@ public class SQLSyntaxChecker {
 		}
 
 		public boolean parse(State initial) {
-			IParserStack initialStack = stackFactory.newStack(parser.getInitialState());
+			S initialStack = stackFactory.newStack(parser.getInitialState());
 			getSet(initial).add(initialStack);
 			return dfs(initial);
 		}
 	
 		private boolean dfs(State current) {
-			IAbstractStackSet setForCurrent = getSet(current);
+			IStackSet<S> setForCurrent = getSet(current);
 			
 			if (current.isAccepting()) {
 				if (!closeWithEof(setForCurrent)) {
@@ -229,13 +238,17 @@ public class SQLSyntaxChecker {
 					throw new IllegalArgumentException("Empty transitions are not supported");
 				}
 				int tokenIndex = alphabetConverter.convert(transition.getInChar().getCode());
-				IAbstractStackSet setForTo = getSet(transition.getTo());
+				IStackSet<S> setForTo = getSet(transition.getTo());
 				boolean changes = transformSet(setForCurrent, transition.getInChar(), tokenIndex, setForTo);
 				if (changes) {
-					IParserState errorState = setForCurrent.hasError();
+					IParserState errorState = setForTo.hasError();
 					if (errorState != null) {
 						IAbstractInputItem unexpectedItem = ((ErrorState) errorState).getUnexpectedItem();
-						errorHandler.unexpectedItem(unexpectedItem);
+						if (unexpectedItem.getCode() >= 0) {
+							errorHandler.unexpectedItem(unexpectedItem);
+						} else {
+							errorHandler.other();
+						}
 						return false;
 					}
 					if (!dfs(transition.getTo())) {
@@ -247,12 +260,12 @@ public class SQLSyntaxChecker {
 			return true;
 		}
 
-		private boolean transformSet(IAbstractStackSet setForCurrent,
-				IAbstractInputItem token, int tokenIndex, IAbstractStackSet setForTo) {
-			Collection<IParserStack> hashSet = setForCurrent.asJavaSet();
+		private boolean transformSet(IStackSet<S> setForCurrent,
+				IAbstractInputItem token, int tokenIndex, IStackSet<S> setForTo) {
+			Collection<S> hashSet = setForCurrent.asJavaSet();
  			boolean changes = false;
-			for (IParserStack stack : hashSet) {
-				IParserStack newStack = parser.processToken(token, tokenIndex, stack);
+			for (S stack : hashSet) {
+				S newStack = parser.processToken(token, tokenIndex, stack);
 				if (setForTo.add(newStack)) {
 					changes = true;
 				}
@@ -260,15 +273,14 @@ public class SQLSyntaxChecker {
 			return changes;
 		}
 
-		private boolean closeWithEof(IAbstractStackSet setForCurrent) {
-			for (IParserStack stack : setForCurrent.asJavaSet()) {
+		private boolean closeWithEof(IStackSet<S> setForCurrent) {
+			for (S stack : setForCurrent.asJavaSet()) {
 				while (true) {
-					IParserStack newStack = parser.processToken(IAbstractInputItem.EOF, eofTokenIndex, stack);
-					IParserState top = newStack.top();
-					if (top.isError()) {
+					S newStack = parser.processToken(IAbstractInputItem.EOF, eofTokenIndex, stack);
+					if (newStack.hasErrorOnTop()) {
 						return false;
 					}
-					if (top == IParserState.ACCEPT) {
+					if (newStack.topAccepts()) {
 						break;
 					}
 					stack = newStack;

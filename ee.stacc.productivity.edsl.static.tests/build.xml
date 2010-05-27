@@ -33,6 +33,13 @@
 			<arg value="grammar/binexp.bg"/>
 		</exec>	
 		<exec executable="bison" dir="${basedir}">
+			<arg value="--xml=src/glr.xml"/>
+			<arg value="--report=state,lookahead,itemset"/>
+			<arg value="--report-file=generated/glr.report"/>
+			<arg value="grammar/glr.bg"/>
+		</exec>	
+    	<delete file="glr.tab.bg"></delete>
+		<exec executable="bison" dir="${basedir}">
 			<arg value="--xml=grammar/sql.xml"/>
 			<arg value="--report=state,lookahead,itemset"/>
 			<arg value="--report-file=grammar/sql.report"/>

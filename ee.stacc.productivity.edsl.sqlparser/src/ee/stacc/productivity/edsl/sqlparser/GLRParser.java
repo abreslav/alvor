@@ -7,8 +7,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
@@ -16,7 +20,7 @@ import org.jdom.JDOMException;
 
 import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
 
-public class LRParser implements ILRParser<IParserStack> {
+public class GLRParser implements ILRParser<GLRStack> {
 
 	private static final IAction ACCEPT_ACTION = new AcceptAction();
 	
@@ -197,7 +201,7 @@ public class LRParser implements ILRParser<IParserStack> {
 			IParserStack newStack = stack.pop(byRule.getRhsLength());
 			Collection<IAction> actions = newStack.top().getActions(byRule.getLhsSymbol());
 			if (actions.size() != 1) {
-				throw new IllegalStateException("No GLR yet");
+				throw new IllegalStateException("GOTO table ambiguities are not supported");
 			}
 			IAction action = actions.iterator().next();
 			return action.process(null, newStack);
@@ -209,7 +213,7 @@ public class LRParser implements ILRParser<IParserStack> {
 		}
 	}
 
-	public static LRParser build(URL xmlFile) throws JDOMException, IOException {
+	public static GLRParser build(URL xmlFile) throws JDOMException, IOException {
 		final List<State> states = new ArrayList<State>();
 		final List<Rule> rules = new ArrayList<Rule>();
 		final List<Integer> symbolByToken = new ArrayList<Integer>();
@@ -270,105 +274,7 @@ public class LRParser implements ILRParser<IParserStack> {
 			}
 		});
 		
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		LRParserLoader.load(xmlFile, new ILRParserBuilder() {
-			
-			@Override
-			public void createState(int number) {
-				check(states.get(number).index == number);
-			}
-			
-			private void check(boolean b) {
-				if (!b) {
-					throw new AssertionError();
-				}
-			}
-
-			private void check(Object message, boolean b) {
-				if (!b) {
-					throw new AssertionError(message);
-				}
-			}
-			
-			@Override
-			public void addTerminal(int symbolNumber, int tokenIndex, String name) {
-			}
-			
-			@Override
-			public void addRule(int number, String lhs, int rhsLength, String text) {
-			}
-			
-			@Override
-			public void addNonterminal(int symbolNumber, String name) {
-			}
-			
-			@Override
-			public void addShiftAction(int stateNumber, String symbol, int toState) {
-				State state = states.get(stateNumber);
-				Integer symbolNumber = namesToSymbolNumbers.get(symbol);
-				Collection<IAction> actions = state.getActions(symbolNumber);
-				check(actions.size() == 1);
-				IAction action = actions.iterator().next();
-				check(action, action instanceof ShiftAction);
-				check(((State)((ShiftAction) action).toState).index == toState);
-			}
-			
-			@Override
-			public void addReduceAction(int stateNumber, String symbol, int rule) {
-				State state = states.get(stateNumber);
-				Integer symbolNumber = namesToSymbolNumbers.get(symbol);
-//				state.addAction(symbolNumber, new ReduceAction(rules.get(rule)));
-				Collection<IAction> actions = state.getActions(symbolNumber);
-				check(actions.size() == 1);
-				IAction action = actions.iterator().next();
-				check(action instanceof ReduceAction);
-				check(((ReduceAction) action).byRule == rules.get(rule));
-			}
-			
-			@Override
-			public void addAcceptAction(int stateNumber, String symbol) {
-				State state = states.get(stateNumber);
-				Integer symbolNumber = namesToSymbolNumbers.get(symbol);
-//				state.addAction(symbolNumber, ACCEPT_ACTION);
-				Collection<IAction> actions = state.getActions(symbolNumber);
-				check(actions.size() == 1);
-				IAction action = actions.iterator().next();
-				check(action == ACCEPT_ACTION);
-			}
-			
-			@Override
-			public void addGotoAction(int stateNumber, String symbol, int toState) {
-				State state = states.get(stateNumber);
-				Integer symbolNumber = namesToSymbolNumbers.get(symbol);
-//				state.addAction(symbolNumber, new GotoAction(states.get(toState)));
-				Collection<IAction> actions = state.getActions(symbolNumber);
-				check(actions.size() == 1);
-				IAction action = actions.iterator().next();
-				check(action instanceof GotoAction);
-				check(((State)((GotoAction) action).toState).index == toState);
-			}
-		});
-		
-		return new LRParser(states.get(0), symbolByToken, namesToTokenNumbers);
+		return new GLRParser(states.get(0), symbolByToken, namesToTokenNumbers);
 	}
 
 	private static <T> void addTo(final List<T> list, int number, T element) {
@@ -384,7 +290,7 @@ public class LRParser implements ILRParser<IParserStack> {
 	private final Map<Integer, String> symbolNumbersToNames;
 	private PrintStream trace;
 	
-	private LRParser(State initialState, List<Integer> symbolByToken, Map<String, Integer> namesToTokenNumbers) {
+	private GLRParser(State initialState, List<Integer> symbolByToken, Map<String, Integer> namesToTokenNumbers) {
 		this.initialState = initialState;
 		this.symbolByToken = new Integer[symbolByToken.size()];
 		symbolByToken.toArray(this.symbolByToken);
@@ -407,28 +313,43 @@ public class LRParser implements ILRParser<IParserStack> {
 		return getNamesToTokenNumbers().get("$end");
 	}
 	
-	// Proceeds until ERROR, ACCEPT or consumption of a given token
+	// Proceeds until ERROR, ACCEPT or consumption of a given token 
 	@Override
-	public IParserStack processToken(IAbstractInputItem token, int tokenIndex, IParserStack stack) {
+	public GLRStack processToken(IAbstractInputItem token, int tokenIndex, GLRStack glrStack) {
+		if (glrStack.hasErrorOnTop()) {
+			return glrStack;
+		}
 
 		int symbolNumber = symbolByToken[tokenIndex];
 		
-		IParserStack currentStack = stack;
-		while (true) {
+		GLRStack result = new GLRStack();
+		Queue<IParserStack> queue = new LinkedList<IParserStack>(glrStack.getVariants());
+		Set<IParserStack> visited = new HashSet<IParserStack>(glrStack.getVariants());
+		
+		
+		while (!queue.isEmpty()) {
+			IParserStack currentStack = queue.poll();
 			IParserState currentState = currentStack.top();
 			if (currentState.isTerminating()) {
-				return currentStack;
+				result.addVariant(currentStack); // terminates, put it to the result
+				continue;
 			}
 			Collection<IAction> actions = currentState.getActions(symbolNumber);
-			if (actions.size() != 1) {
-				throw new IllegalStateException("No GLR yet");
-			}
-			IAction action = actions.iterator().next();
-			currentStack = action.process(token, currentStack);
-			if (action.consumes()) {
-				return currentStack;
+			for (IAction action : actions) {
+				IParserStack newStack = action.process(token, currentStack);
+				if (action.consumes()) {
+					result.addVariant(newStack); // current stack consumed, put it to the result
+				} else {
+					// Did not consume => needs more processing
+					if (!visited.contains(newStack)) {
+						queue.offer(newStack);
+						visited.add(newStack);
+					}
+				}
 			}
 		}
+		
+		return result;
 	}
 
 	private void println(Object o) {

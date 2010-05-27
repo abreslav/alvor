@@ -40,11 +40,11 @@ public class ParserPerformanceTest {
 		List<IAbstractString> all = AbstractStringParser.parseFile("data/earved_all.txt");
 		System.out.println("Strings: " + all.size());
 
-		doTest(all);
-		
-		doTest(all);
-		doTest(all);
-		doTest(all);
+//		doTest(all);
+//		
+//		doTest(all);
+//		doTest(all);
+//		doTest(all);
 		
 	}
 
