@@ -192,11 +192,12 @@ public class NodeSearchEngine {
 		};
 		
 		Measurements.argumentSearchTimer.start();
+		int resultStartSize = result.size();
 		executeSearch(pattern, requestor, scope);
 		Measurements.argumentSearchTimer.stop();
 		
 		assert LOG.message("Searched callsites of '" + nodeRequest.getPatternString() + "', found "
-				+ result.size() + " matches");
+				+ (result.size()-resultStartSize) + " matches");
 	}
 
 	private static void executeSearch(SearchPattern pattern, SearchRequestor requestor,
