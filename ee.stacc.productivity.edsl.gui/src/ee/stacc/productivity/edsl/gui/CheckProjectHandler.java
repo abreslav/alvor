@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
+import ee.stacc.productivity.edsl.cache.CacheService;
 import ee.stacc.productivity.edsl.checkers.AbstractStringCheckerManager;
 import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
 import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
@@ -50,6 +51,8 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 	
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
+		//CacheService.getCacheService().setNocache(true);
+		
 		Timer timer = new Timer();
 		timer.start("TIMER: whole process");
 		assert LOG.message("CheckProjectHandler.execute");

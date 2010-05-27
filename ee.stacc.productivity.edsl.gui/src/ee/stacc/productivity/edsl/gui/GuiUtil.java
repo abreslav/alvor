@@ -21,14 +21,6 @@ public class GuiUtil {
 				}
 			}
 			return result;
-//			Object firstElement = structSel.getFirstElement();
-//			if (firstElement instanceof IJavaElement) {
-//				return (IJavaElement) firstElement;
-//			} else if (firstElement instanceof IAdaptable) {
-//				IAdaptable adaptable = (IAdaptable) firstElement;
-//				Object adapter = adaptable.getAdapter(IJavaElement.class);
-//				return (IJavaElement) adapter;
-//			}
 		}
 		throw new IllegalStateException("No Java element selected");
 	}

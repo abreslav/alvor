@@ -166,6 +166,26 @@ public class ASTUtil {
 	}
 	
 	public static boolean invocationMayUseDeclaration (MethodInvocation inv, MethodDeclaration decl) {
+		// exclude abstract methods
+		if (inv.getName().getIdentifier().contains("getSequenceNextValueFunction")
+				|| inv.getName().getIdentifier().contains("getNextValueSQL")) {
+			System.out.println();
+		}
+		
+		if (decl.getBody() == null) {
+			return false;
+		}
+		
+		IMethodBinding declMethodBinding = decl.resolveBinding();
+		IMethodBinding invMethodBinding = inv.resolveMethodBinding();
+		ITypeBinding invType = invMethodBinding.getDeclaringClass();
+		ITypeBinding declType = declMethodBinding.getDeclaringClass();
+		
+		// easy case
+		if (invMethodBinding.isEqualTo(declMethodBinding)) {
+			return true;
+		}
+		
 		if (!inv.getName().getIdentifier().equals(decl.getName().getIdentifier())) {
 			throw new IllegalStateException("INV: " + inv.getName().getIdentifier()
 					+ ", DECL: " + decl.getName().getIdentifier());
@@ -174,15 +194,6 @@ public class ASTUtil {
 		if (inv.arguments().size() != decl.parameters().size()) {
 			return false;
 		}
-		
-		// not working
-		/*
-		ITypeBinding invType = inv.resolveTypeBinding();
-		ITypeBinding declType = ASTUtil.getContainingTypeDeclaration(decl).resolveBinding();
-		if (! declType.isSubTypeCompatible(invType)) {
-			return false;
-		}
-		*/
 		
 		// finally compare parameter types
 		ITypeBinding[] invPTypes = inv.resolveMethodBinding().getParameterTypes();
@@ -194,14 +205,37 @@ public class ASTUtil {
 			}
 		}
 		
-		// FIXME: need checks for expression type here
-		
-		return true;
-		
+		// FIXME: need proper checks for expression type here
+		// not working if units are not parsed together
+		// if (! declType.isSubTypeCompatible(invType)) {
+		//	return false;
+		//}
+		return isSubtypeOf(declType, invType);		
 		
 		// Approach 2
-		// Does not work for some reason
+		// Does not work if units are not parsed together
 		//return invBinding.isEqualTo(declBinding) || declBinding.overrides(invBinding);
+	}
+	
+	private static boolean isSubtypeOf(ITypeBinding sub, ITypeBinding sup) {
+		
+		// FIXME it's too simplistic at the moment, should do recursion 
+		
+		if (sub.isEqualTo(sup)) {
+			return true;
+		}
+		
+		if (sub.getSuperclass() != null && sub.getSuperclass().isEqualTo(sup)) {
+			return true;
+		}
+
+		for (ITypeBinding iFace : sub.getInterfaces()) {
+			if (iFace.isEqualTo(sup)) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	public static TagElement getJavadocTag(Javadoc javadoc, String name) {

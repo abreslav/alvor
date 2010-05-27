@@ -379,7 +379,6 @@ public class NewASE {
 		
 		MethodTemplateSearcher templateSearcher = new MethodTemplateSearcher(this);
 		List<IAbstractString> templates = 
-//			templateSearcher.findMethodTemplates(scope, inv, argumentIndex);
 			templateSearcher.findMethodTemplates(
 					EclipseUtil.scopeToProjectAndRequiredProjectsScope(scope),
 					inv, argumentIndex);
@@ -725,7 +724,7 @@ public class NewASE {
 			MethodDeclaration method = usage.getMethodDecl();
 			String methodName = method.getName().toString();
 			// TODO: hack, to be cleaned
-			//methodName += ASTUtil.getArgumentTypesString(method.resolveBinding());
+			methodName += ASTUtil.getArgumentTypesString(method.resolveBinding());
 			
 			List<INodeDescriptor> descList = evaluateMethodArgumentAtCallSites(
 					Collections.singleton(
@@ -750,8 +749,9 @@ public class NewASE {
 				}
 			}
 			if (descList.size() == 0) {
-				throw new UnsupportedStringOpEx("Possible problem, no callsites found for: "
-						+ method.getName());
+				throw new UnsupportedStringOpEx("Possible problem, no callsites found in current project for: "
+						+ method.resolveBinding().getDeclaringClass().getQualifiedName() + "."
+						+ method.getName() + ASTUtil.getArgumentTypesString(method.resolveBinding()));
 			}
 			return new StringChoice(
 					PositionUtil.getPosition(

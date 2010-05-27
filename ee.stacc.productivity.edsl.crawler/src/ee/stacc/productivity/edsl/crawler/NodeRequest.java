@@ -12,16 +12,23 @@ public final class NodeRequest implements IHotspotPattern {
 	private final String className;
 	private final String methodName;
 	private final String signatureString;
+	private final String signatureStringWithoutArgTypes;
 	private final String patternString;
 	private final int argumentIndex;
 	
 	public NodeRequest(String className, String methodName, int argumentIndex) {
-//		this.patternString = (!className.isEmpty() ? className + "." : "") + methodName;
 		this.patternString = methodName;
 		this.signatureString = (!className.isEmpty() ? className + "." : "") + methodName;
 		this.argumentIndex = argumentIndex;
 		this.className = className;
 		this.methodName = methodName;
+		if (signatureString.contains("(")) {
+			this.signatureStringWithoutArgTypes = 
+				signatureString.substring(0, signatureString.indexOf('('));
+		}
+		else {
+			this.signatureStringWithoutArgTypes = signatureString;
+		}
 	}
 	
 	/**
@@ -33,7 +40,8 @@ public final class NodeRequest implements IHotspotPattern {
 		if (methodSignature.contains("(")) {
 			throw new IllegalArgumentException("Argument types are not supported");
 		}
-		return methodSignature.endsWith(signatureString);
+		
+		return methodSignature.endsWith(signatureStringWithoutArgTypes);
 	}
 	
 	/**

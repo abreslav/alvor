@@ -34,7 +34,7 @@
 /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:797, "select 1 from invoice where id = ? and REF_DOM_INVOICE_STATE=? and rownum=1"
 /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:1206, "select 1 from invoice " "join invoice_party party on (party.ref_invoice = invoice.id and party.ref_dom_invoice_party_type = 'INVOICE_PARTY_TYPE_SELLER') " "where buy_invoice = 1 and invoice_number = ? and invoice_date = ? and party.reg_number = ? "  {"and invoice.id != ? ", ""}  "and rownum=1" 
 /earved/src/ee/post/earved/dao/invoice/InvoiceItemDAO.java:416, "select 1 from invoice_item join invoice on (invoice.id = invoice_item.ref_invoice and invoice.is_unified=1) " "where ref_invoice = ? and invoice_item.is_unified = 0 and rownum=1" 
-/earved/src/ee/post/earved/dao/invoice/InvoicePartyDAO.java:75, unsupported: Unsupported SQL construction: No declarations found for: DomainValueEnum.INVOICE_PARTY_TYPE_DELIVERER.name() at /earved/src/ee/post/earved/dao/invoice/InvoicePartyDAO.java:75
+/earved/src/ee/post/earved/dao/invoice/InvoicePartyDAO.java:75, unsupported: No declarations found for: DomainValueEnum.INVOICE_PARTY_TYPE_DELIVERER.name()
 /earved/src/ee/post/earved/dao/invoice/InvoiceSendingFailedDAO.java:174, "select 1 from invoice_sending_failed where ref_invoice=? and is_deleted=0 and rownum=1"
 /earved/src/ee/post/earved/dao/notification/NotificationDAO.java:66, "SELECT 1 FROM notifications WHERE trunc(sysdate) >= trunc(start_date) AND trunc(sysdate) <= trunc(end_date) AND" " (billing_plan IS NULL OR billing_plan = ?) AND (legal_person IS NULL OR legal_person = ?) AND rownum = 1 " 
 /earved/src/ee/post/earved/dao/person/InvoiceChannelPreferencesDAO.java:139, "select 1 from invoice_channel_preferences where ref_person_owner = ? and preference_type=1 and rownum=1 "
@@ -98,7 +98,7 @@
 /earved/src/ee/post/earved/dao/integration/UploadDAO.java:109, "SELECT file_name FROM upload where ref_dom_upload_status IN (?,?) AND ref_person = ? AND ref_represented = ? AND system_id = ?"
 /earved/src/ee/post/earved/dao/integration/UploadDAO.java:133, "select id, file_name, total_count, error_count, sent_count, invoice_status_after_upload from upload " "where id = (select max(id) from upload where ref_dom_upload_status = ? " "AND ref_person = ? AND ref_represented = ?)" 
 /earved/src/ee/post/earved/dao/integration/UploadDAO.java:184, "SELECT error FROM upload_processing_error WHERE ref_upload = ?"
-/earved/src/ee/post/earved/dao/integration/XmlBasedInvoiceExportDAO.java:61, unsupported: Unsupported SQL construction: modifications in loop not supported at /earved/src/ee/post/earved/dao/integration/XmlBasedInvoiceExportDAO.java:61
+/earved/src/ee/post/earved/dao/integration/XmlBasedInvoiceExportDAO.java:61, unsupported: modifications in loop not supported
 /earved/src/ee/post/earved/dao/invoice/AttachmentDAO.java:28, "select content from attachment where id = ? "
 /earved/src/ee/post/earved/dao/invoice/AttachmentDAO.java:39, "SELECT attachment_content " "  FROM erp_attachment_v " " WHERE invoice_id = ? AND buyer_id = ? and invoice=1" 
 /earved/src/ee/post/earved/dao/invoice/AttachmentDAO.java:101, "select id, file_name, description, ref_id, file_type, created, external, buy_attachment FROM attachment WHERE ref_invoice=? and invoice=1 and rownum=1"
@@ -120,7 +120,7 @@
 /earved/src/ee/post/earved/dao/invoice/InvoiceAdditionalDAO.java:74, "select " "id, ref_person, code, name, canceled" " from invoice_additional where id = ?" 
 /earved/src/ee/post/earved/dao/invoice/InvoiceChannelDAO.java:85, "select REF_DOM_CHANNEL_COUNTRY from INVOICE_CHANNEL_COUNTRY where COUNTRY=?"
 /earved/src/ee/post/earved/dao/invoice/InvoiceChannelDAO.java:97, "select " " ic.id as channel_id,ic.BANK_PERSON_CODE, ic.ACCOUNT_NUMBER, ic.REF_DOM_CHANNEL, ic.REF_DOM_CHANNEL_COUNTRY, nvl(dv.NAME,ic.country) as COUNTRY_NAME, ic.CITY, ic.EMAIL_ADDRESS, ic.ref_invoice, " "ic.POSTAL_ADDRESS_1, ic.POSTAL_ADDRESS_2, ic.POSTAL_CODE, ic.REG_NUMBER, ic.REF_DOM_BANK, ic.is_sent, ic.ref_invoice_channel_additional, ica.additional_text "  " from invoice_channel ic  left outer join domain_value dv on (dv.value_code = ic.ref_dom_channel_country) left outer join invoice_channel_additional ica on ic.ref_invoice_channel_additional=ica.id " "where ic.ref_invoice in " " (?, ?, ?)" 
-/earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:417, unsupported: Unsupported SQL construction: No declarations found for: DomainValueEnum.INVOICE_TYPE_DEBT.name() at /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:417
+/earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:417, unsupported: No declarations found for: DomainValueEnum.INVOICE_TYPE_DEBT.name()
 /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:431, "SELECT SEQ_REFERENCE_NUMBER_BASE.nextval from dual"
 /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:455, {"select i.*,p.logo from INVOICE i join person p on (i.ref_person_code_sale = p.code) where i.id = ?", "select * from INVOICE where id = ?"}
 /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:743, "select REF_DOM_CONFIRM_TYPE from " "(select invoice.REF_DOM_CONFIRM_TYPE from invoice join confirm on (confirm.ref_invoice=invoice.id and confirm.canceled = 0) " "where invoice.ref_person_code_buy=? and invoice.REF_DOM_CONFIRM_TYPE is not null " "order by confirm.created desc) where rownum=1" 
@@ -133,7 +133,7 @@
 /earved/src/ee/post/earved/dao/invoice/InvoicePartyDAO.java:86, "select " "id, CONTACT_NAME, DEPT_ID, EMAIL_ADDRESS, FAX_NUMBER, ref_invoice, " "REF_DOM_INVOICE_PARTY_TYPE, IS_JURIDICAL_PERSON, NAME, PHONE_NUMBER, REG_NUMBER, UNIQUE_CODE, URL, VAT_REG_NUMBER"  " FROM invoice_party WHERE ref_invoice IN " " (?, ?, ?)" 
 /earved/src/ee/post/earved/dao/invoice/InvoiceSumGroupDAO.java:64, "SELECT * FROM invoice_sum_group WHERE ref_invoice IN " " (?, ?, ?)" 
 /earved/src/ee/post/earved/dao/invoice/UrlDAO.java:28, "select id, ref_invoice, REF_REPRESENTATION_RIGHT, code, end_time, ref_dom_type from url " "where id=? and code=? and end_time >= SYSDATE" 
-/earved/src/ee/post/earved/dao/journal/JournalEntryDAO.java:96, unsupported: Unsupported SQL construction: modifications in loop not supported at /earved/src/ee/post/earved/dao/journal/JournalEntryDAO.java:96
+/earved/src/ee/post/earved/dao/journal/JournalEntryDAO.java:96, unsupported: modifications in loop not supported
 /earved/src/ee/post/earved/dao/person/BillingPlanDAO.java:43, "SELECT bp.code FROM person_billing_plan pbp " "join billing_plan bp on pbp.ref_billing_plan=bp.id WHERE pbp.ref_person = ?"  " AND pbp.from_date <= sysdate and COALESCE(pbp.until_date, sysdate) >= sysdate and rownum=1" 
 /earved/src/ee/post/earved/dao/person/BillingPlanDAO.java:58, "SELECT bp.name FROM person_billing_plan pbp " "join billing_plan bp on pbp.ref_billing_plan=bp.id WHERE pbp.ref_person = ?"  " AND pbp.from_date <= sysdate and COALESCE(pbp.until_date, sysdate) >= sysdate and rownum=1" 
 /earved/src/ee/post/earved/dao/person/InvoiceChannelPreferencesDAO.java:81, "select id, ref_address, ref_dom_bank, bank_account, email_notice_active, " "sms_notice_active, ref_person_notice, ref_person_owner, ref_dom_channel " "from invoice_channel_preferences where id = ? " 
@@ -193,7 +193,7 @@
 /earved/src/ee/post/earved/dao/person/PersonDAO.java:261, "SELECT id FROM person WHERE code = ? and IS_JURIDICAL_PERSON = 0"
 /earved/src/ee/post/earved/dao/person/PersonDAO.java:314, "SELECT 1 FROM person WHERE" " code = ? AND (number_retries < 6 or number_retries is null) "  " and rownum=1" 
 /earved/src/ee/post/earved/dao/test/TestDAO.java:13, "select 1 from dual"
-/earved/src/ee/post/earved/dao/accountCard/AccountCardDAO.java:178, unsupported: Unsupported SQL construction: Possible problem, no callsites found for: getAccountCardCodesForAdding at /earved/src/ee/post/earved/dao/accountCard/AccountCardDAO.java:178
+/earved/src/ee/post/earved/dao/accountCard/AccountCardDAO.java:178, unsupported: Possible problem, no callsites found in current project for: ee.post.earved.dao.accountCard.AccountCardDAO.getAccountCardCodesForAdding(String)
 /earved/src/ee/post/earved/dao/accountCard/AccountCardDAO.java:217, "SELECT upper(account_code) FROM account_card WHERE ref_person = ? and upper(account_code) in " " (?, ?, ?)" 
 /earved/src/ee/post/earved/dao/accountCard/AccountCardDAO.java:244, "SELECT  dim.id,  dim.dimension_name, " "account_dimension_id(dim.id, ?) AS account_req_dimension_id" " FROM dimensions dim WHERE dim.ref_person = ?" 
 /earved/src/ee/post/earved/dao/accountCard/AccountCardDAO.java:278, "select id, account_code, account_name from account_card " "where ref_person=? and (UPPER(account_code) like ? ESCAPE '\\' or UPPER(account_name) like ? ESCAPE '\\')" 
@@ -217,7 +217,7 @@
 /earved/src/ee/post/earved/dao/address/AddressDAO.java:64, "select id, address, ref_dom_address_type, city, country, county, zip from address_explicit_v where ref_person = ?"
 /earved/src/ee/post/earved/dao/bankAccount/BankAccountDAO.java:67, "SELECT " "id, ref_dom_bank, account_no, ref_person, iban" " FROM bank_account WHERE ref_person=?" 
 /earved/src/ee/post/earved/dao/bankAccount/BankAccountDAO.java:81, "SELECT " "id, ref_dom_bank, account_no, ref_person, iban" " FROM bank_account WHERE ref_person=? and REF_DOM_BANK in " " (?, ?, ?)" 
-/earved/src/ee/post/earved/dao/bankAccount/BankDAO.java:18, unsupported: Unsupported SQL construction: No declarations found for: DomainEnum.BANK.name() at /earved/src/ee/post/earved/dao/bankAccount/BankDAO.java:18
+/earved/src/ee/post/earved/dao/bankAccount/BankDAO.java:18, unsupported: No declarations found for: DomainEnum.BANK.name()
 /earved/src/ee/post/earved/dao/channelBank/ChannelBankDAO.java:23, "select cb.id, cb.ref_dom_bank, dv.name, cb.bank_account_code, cb.is_supported from channel_bank cb " " join domain_v dv on cb.ref_dom_bank=dv.code where cb.is_supported=1" 
 /earved/src/ee/post/earved/dao/channelBank/ChannelBankDAO.java:29, "select name from domain_v where code in (select ref_dom_bank from channel_bank where is_supported=1) order by name"
 /earved/src/ee/post/earved/dao/channelBank/ChannelBankDAO.java:34, "select bank_code from channel_bank where is_supported=1"
@@ -239,7 +239,7 @@
 /earved/src/ee/post/earved/dao/dimension/DimensionDataConnectionDAO.java:182, "select id, REF_DIMENSIONS_FROM, REF_DIMENSIONS_TO, REF_DIMENSION_DATA_FROM, REF_DIMENSION_DATA_TO " "from DIMENSION_DATA_CONNECTIONS where (REF_DIMENSIONS_FROM, REF_DIMENSION_DATA_FROM, REF_DIMENSIONS_TO) in " " ((?, ?), (?, ?))" 
 /earved/src/ee/post/earved/dao/dimension/DimensionDataConnectionDAO.java:230, "select " " ref_person, error_msg, import_error_code, dimensions_from_name, dimensions_to_name, dimension_data_from_code, dimension_data_to_code " " from dimension_conn_import_error where import_group_id=?" 
 /earved/src/ee/post/earved/dao/dimension/DimensionDataDAO.java:79, "SELECT id FROM DIMENSION_DATA WHERE ref_dimensions = ?"
-/earved/src/ee/post/earved/dao/dimension/DimensionDataDAO.java:122, unsupported: Unsupported SQL construction: modifications in loop not supported at /earved/src/ee/post/earved/dao/dimension/DimensionDataDAO.java:122
+/earved/src/ee/post/earved/dao/dimension/DimensionDataDAO.java:122, unsupported: modifications in loop not supported
 /earved/src/ee/post/earved/dao/dimension/DimensionDataDAO.java:180, "select id, code, name from dimension_data " "where ref_dimensions=? and (UPPER(code) like ? ESCAPE '\\' or UPPER(name) like ? ESCAPE '\\') and rownum<=?" 
 /earved/src/ee/post/earved/dao/dimension/DimensionDataDAO.java:267, "select code, name from dimension_data where code in " " (?, ?, ?)" 
 /earved/src/ee/post/earved/dao/dimension/DimensionNameDAO.java:22, "SELECT id, dimension_name FROM DIMENSIONS"
@@ -261,18 +261,18 @@
 /earved/src/ee/post/earved/dao/integration/ElektronpostExportDAO.java:40, "SELECT id, ref_attachment AS attachment_id " "  FROM elektronpost_export ex" " WHERE ex.transfered is null " "   AND (ex.attempts is null OR ex.attempts < 3)" " ORDER BY created" 
 /earved/src/ee/post/earved/dao/integration/UploadDAO.java:257, "SELECT * FROM (" " SELECT u.created, " "  (select dv.name from domain_value dv where dv.value_code=u.ref_dom_upload_status) AS status," "   u.total_count as invoice_count, u.error_count, attachment_count " "   FROM upload u" "  WHERE u.upload_type = 'INVOICE_FILE_TYPE_ERP'" "    AND ref_represented = ?" "    AND created is not null " "  ORDER BY created DESC)" " WHERE rownum <= ?" 
 /earved/src/ee/post/earved/dao/invoice/AdditionDAO.java:41, "select id, add_sum, ref_invoice_item from addition where ref_invoice_item IN " " (?, ?, ?)" 
-/earved/src/ee/post/earved/dao/invoice/AdditionDAO.java:54, unsupported: Unsupported SQL construction: modifications in loop not supported at /earved/src/ee/post/earved/dao/invoice/AdditionDAO.java:54
+/earved/src/ee/post/earved/dao/invoice/AdditionDAO.java:54, unsupported: modifications in loop not supported
 /earved/src/ee/post/earved/dao/invoice/AdditionDAO.java:81, "select id, add_content, add_rate, add_sum from addition where ref_invoice_sum_group = ?"
 /earved/src/ee/post/earved/dao/invoice/AdditionDAO.java:91, "select id, ref_invoice_item, add_content, add_rate, add_sum from addition where ref_invoice_item = ?"
 /earved/src/ee/post/earved/dao/invoice/AdditionDAO.java:115, "select a.id, a.ref_invoice_sum_group, a.ref_invoice_item, a.add_code, a.add_content, " "a.add_rate, a.add_sum, a.invoice " "from invoice i " "join invoice_item item on item.ref_invoice = i.id " "join addition a on a.ref_invoice_item = item.id " "where i.id = ?" 
 /earved/src/ee/post/earved/dao/invoice/AttachmentDAO.java:51, "SELECT id, file_name, description, ref_id, file_type, created, buy_attachment FROM attachment WHERE ref_invoice=? " " and buy_attachment=? " 
 /earved/src/ee/post/earved/dao/invoice/AttachmentDAO.java:56, "SELECT id, file_name, description, ref_id, file_type, created, buy_attachment FROM attachment WHERE ref_invoice=? "
-/earved/src/ee/post/earved/dao/invoice/AttachmentDAO.java:156, unsupported: Unsupported SQL construction: modifications in loop not supported at /earved/src/ee/post/earved/dao/invoice/AttachmentDAO.java:156
+/earved/src/ee/post/earved/dao/invoice/AttachmentDAO.java:156, unsupported: modifications in loop not supported
 /earved/src/ee/post/earved/dao/invoice/AttachmentDAO.java:181, "" "SELECT id, ref_invoice, external, page_count, file_name, ref_id, file_type, invoice, buy_attachment"  {" ,content ", ""}  "  FROM attachment WHERE ref_invoice in "  " (?, ?, ?)"  {" AND invoice=1 ", ""} 
 /earved/src/ee/post/earved/dao/invoice/AttachmentDAO.java:196, "" "SELECT id, ref_invoice, external, page_count, nvl(file_name, (select i.invoice_number from invoice i where i.id=ref_invoice)||'.pdf') as file_name, ref_id, file_type, " "invoice, content, buy_attachment FROM attachment WHERE ref_invoice in "   " (?, ?, ?)"  " AND invoice=1 " 
 /earved/src/ee/post/earved/dao/invoice/AutomaticInvoiceDAO.java:87, "select id,ref_invoice, valid_from, valid_until, creating_day, next_creating_date, is_automatic_sending from invoice_automatic " " where next_creating_date=?" 
 /earved/src/ee/post/earved/dao/invoice/BankExportDAO.java:92, "select " " id, ref_invoice as invoice_id " "," " invoice_xml_part " "," " queued, sent "  ", file_id, bank_code"  " from BANK_EXPORT where sent is null and export_state=? and FAILED_ATTEMPTS<? and bank_code=?" 
-/earved/src/ee/post/earved/dao/invoice/BankExportDAO.java:103, unsupported: Unsupported SQL construction: modifications in loop not supported at /earved/src/ee/post/earved/dao/invoice/BankExportDAO.java:103
+/earved/src/ee/post/earved/dao/invoice/BankExportDAO.java:103, unsupported: modifications in loop not supported
 /earved/src/ee/post/earved/dao/invoice/BankExportDAO.java:184, "select ref_invoice from bank_export where file_id=?"
 /earved/src/ee/post/earved/dao/invoice/BankExportDAO.java:192, "select ref_invoice from bank_export where file_id=(select id from bank_export where file_id=?)"
 /earved/src/ee/post/earved/dao/invoice/ConfirmDAO.java:137, "select" " ID, REF_INVOICE, ORDER_NR, REF_PERSON_CONFIRMER, COMMENT_TO_CONFIRMER, " "SENT_TO_CONFIRM_TIME, REF_DOM_CONFIRM_DECISION, DECISION_COMMENT, DECISION_TIME, CANCELED, PREVIOUS, REF_CONFIRM_PATTERN_CONFIRMER "  "from confirm where ref_invoice=? and canceled = 0 and DECISION_TIME is null" 
@@ -336,7 +336,7 @@
 /earved/src/ee/post/earved/dao/person/PersonDAO.java:379, "select p.id, p.name, p.code from channel_preference_sender c " "left join person p on p.id = c.ref_person " "where ref_invoice_channel_preference = ? " 
 /earved/src/ee/post/earved/dao/person/PersonDAO.java:389, "SELECT id, name FROM person WHERE id NOT IN (SELECT DISTINCT ref_person FROM additional_services)  " " AND IS_JURIDICAL_PERSON=1 ORDER BY name ASC" 
 /earved/src/ee/post/earved/dao/person/PersonDAO.java:397, "select (case when is_juridical_person = 0 then given_name || ' ' || name " "else name end) as full_name from person where id in" " (?, ?, ?)" 
-/earved/src/ee/post/earved/dao/person/PersonDAO.java:471, unsupported: Unsupported SQL construction: modifications in loop not supported at /earved/src/ee/post/earved/dao/person/PersonDAO.java:471
+/earved/src/ee/post/earved/dao/person/PersonDAO.java:471, unsupported: modifications in loop not supported
 /earved/src/ee/post/earved/dao/person/PersonStateDAO.java:28, "SELECT person_state_id, person_id, start_date, end_date, notes, state_name, state_code" " FROM person_state_v WHERE person_id = ?" 
 /earved/src/ee/post/earved/dao/person/RepresentationRightDAO.java:62, "select id, ref_person_representative, ref_person_represented, ref_dom_base, email, position " "from representation_right where ref_person_represented=? and from_date < sysdate AND COALESCE(until_date, sysdate) >= sysdate " "and ref_person_representative in "  " (?, ?, ?)" 
 /earved/src/ee/post/earved/dao/person/RepresentationRightDAO.java:112, "SELECT id, represented, represented_id, representative_id, from_date, until_date, role, base, base_code " "FROM representation_rights_v WHERE representative_id = ?" 
@@ -354,14 +354,14 @@
 /earved/src/ee/post/earved/dao/sysparam/SysParamDAO.java:17, "SELECT code, value, name FROM sys_param"
 /earved/src/ee/post/earved/dao/vat/VatCodePersonDAO.java:38, "select " " ID, REF_PERSON, REF_VAT_CODES, ERP_CODE, ERP_DESCRIPTION, IS_DEFAULT " "from vat_code_person where ref_person = ?" 
 /earved/src/ee/post/earved/dao/vat/VatCodePersonDAO.java:50, "select " " pvc_id, vc_id, pvc_person_id, pvc_erp_code, " "pvc_erp_description, pvc_is_default, " "vc_short_description, vc_description, vc_reference, vc_type, vc_is_default, vc_date_created, " "vc_is_deleted, vc_code, vc_rate "  " from PERSON_VAT_CODES_V where pvc_person_id = ? AND vc_is_deleted = 0" 
-/earved/src/ee/post/earved/dao/vat/VatCodePersonDAO.java:83, unsupported: Unsupported SQL construction: modifications in loop not supported at /earved/src/ee/post/earved/dao/vat/VatCodePersonDAO.java:83
-/earved/src/ee/post/earved/dao/vat/VatCodesDAO.java:40, unsupported: Unsupported SQL construction: Unsupported SQL construction: Unsupported type: java.util.Set<java.lang.Long> at /earved/src/ee/post/earved/service/impl/vat/VatServiceImpl.java:86 at /earved/src/ee/post/earved/dao/vat/VatCodesDAO.java:40
-/earved/src/ee/post/earved/dao/vat/VatCodesDAO.java:83, unsupported: Unsupported SQL construction: modifications in loop not supported at /earved/src/ee/post/earved/dao/vat/VatCodesDAO.java:83
+/earved/src/ee/post/earved/dao/vat/VatCodePersonDAO.java:83, unsupported: modifications in loop not supported
+/earved/src/ee/post/earved/dao/vat/VatCodesDAO.java:40, unsupported: Unsupported type: java.util.Set<java.lang.Long>
+/earved/src/ee/post/earved/dao/vat/VatCodesDAO.java:83, unsupported: modifications in loop not supported
 /earved/src/ee/post/earved/dao/accountCard/AccountCardDAO.java:49, "UPDATE account_card SET account_code=?, account_name=?, account_explanation=? WHERE id=?"
 /earved/src/ee/post/earved/dao/accountCard/AccountCardDAO.java:71, "delete from account_card where ref_person=?"
 /earved/src/ee/post/earved/dao/accountCard/AccountCardDAO.java:166, "DELETE FROM account_card WHERE id = ?"
 /earved/src/ee/post/earved/dao/accountCard/AccountCardDAO.java:235, "DELETE FROM account_req_dimension WHERE ref_account_card = ?"
-/earved/src/ee/post/earved/dao/accountCard/AccountCardDAO.java:239, unsupported: Unsupported SQL construction: No declarations found for: StringUtils.join(dimensionIds,",") at /earved/src/ee/post/earved/dao/accountCard/AccountCardDAO.java:239
+/earved/src/ee/post/earved/dao/accountCard/AccountCardDAO.java:239, unsupported: No declarations found for: StringUtils.join(dimensionIds,",")
 /earved/src/ee/post/earved/dao/accountInfo/AccountInfoDAO.java:33, "update account_info set account_number = ? where ref_invoice_party = ?"
 /earved/src/ee/post/earved/dao/accountInfo/AccountInfoDAO.java:46, "" "insert into account_info(id, ref_invoice_party, account_number, bank_name, iban) "  "select SEQ_ACCOUNT_INFO.nextval, ?, bank_account.account_no, bank_domain.name, iban "  "from bank_account join domain_value bank_domain on bank_domain.value_code = bank_account.ref_dom_bank "  "where ref_person = ?" 
 /earved/src/ee/post/earved/dao/accountingPattern/AccountingPatternDAO.java:189, "delete from account_pattern where id in" " (?, ?, ?)" 
@@ -385,30 +385,30 @@
 /earved/src/ee/post/earved/dao/campaignCode/CampaignCodeDAO.java:100, "INSERT INTO campaign_code_person (id, ref_person, ref_campaign_code, date_activated) " "VALUES (seq_campaign_code_person.nextval, ?, ?, sysdate)" 
 /earved/src/ee/post/earved/dao/campaignCode/CampaignCodeDAO.java:148, "DELETE FROM pricelist_campaign_code WHERE ref_pricelist = ?"
 /earved/src/ee/post/earved/dao/client/ClientRegisterAccountDAO.java:38, "delete from client_register_account where ref_client_register in (select id from client_register where ref_person = ?)"
-/earved/src/ee/post/earved/dao/client/ClientRegisterAccountDAO.java:44, unsupported: Unsupported SQL construction: modifications in loop not supported at /earved/src/ee/post/earved/dao/client/ClientRegisterAccountDAO.java:44
+/earved/src/ee/post/earved/dao/client/ClientRegisterAccountDAO.java:44, unsupported: modifications in loop not supported
 /earved/src/ee/post/earved/dao/client/ClientRegisterAccountDAO.java:50, "update client_register_account cra set cra.last_used=(case when cra.id=? then 1 else 0 end) where ref_client_register in (select id from client_register where ref_person=? and reg_number=?)"
 /earved/src/ee/post/earved/dao/client/ClientRegisterDAO.java:48, "delete from client_register where id in " " (?, ?, ?)" 
 /earved/src/ee/post/earved/dao/client/ClientRegisterDAO.java:183, "delete from client_register where ref_person = ? "
 /earved/src/ee/post/earved/dao/confirm/pattern/ConfirmPatternConfirmerDAO.java:35, "delete from confirm_pattern_confirmer where ref_confirm_pattern = ?"
-/earved/src/ee/post/earved/dao/confirm/pattern/ConfirmPatternConfirmerDAO.java:120, unsupported: Unsupported SQL construction: modifications in loop not supported at /earved/src/ee/post/earved/dao/confirm/pattern/ConfirmPatternConfirmerDAO.java:120
-/earved/src/ee/post/earved/dao/confirm/pattern/ConfirmPatternConfirmerDAO.java:130, unsupported: Unsupported SQL construction: modifications in loop not supported at /earved/src/ee/post/earved/dao/confirm/pattern/ConfirmPatternConfirmerDAO.java:130
+/earved/src/ee/post/earved/dao/confirm/pattern/ConfirmPatternConfirmerDAO.java:120, unsupported: modifications in loop not supported
+/earved/src/ee/post/earved/dao/confirm/pattern/ConfirmPatternConfirmerDAO.java:130, unsupported: modifications in loop not supported
 /earved/src/ee/post/earved/dao/confirm/pattern/ConfirmPatternConfirmerDAO.java:134, "update confirm_pattern_confirmer set order_no=NULL where REF_CONFIRM_PATTERN=?"
-/earved/src/ee/post/earved/dao/confirm/pattern/ConfirmPatternDAO.java:279, unsupported: Unsupported SQL construction: modifications in loop not supported at /earved/src/ee/post/earved/dao/confirm/pattern/ConfirmPatternDAO.java:279
+/earved/src/ee/post/earved/dao/confirm/pattern/ConfirmPatternDAO.java:279, unsupported: modifications in loop not supported
 /earved/src/ee/post/earved/dao/dimension/DimensionDAO.java:57, "UPDATE dimensions SET is_main=? WHERE id = ?"
 /earved/src/ee/post/earved/dao/dimension/DimensionDAO.java:61, "UPDATE dimensions SET dimension_name=?, is_main=? WHERE id = ?"
 /earved/src/ee/post/earved/dao/dimension/DimensionDAO.java:118, "update dimensions set is_main=0 where ref_person=? and is_main=1"
 /earved/src/ee/post/earved/dao/dimension/DimensionDataConnectionDAO.java:46, "delete from DIMENSION_DATA_CONNECTIONS where id in " " (?, ?, ?)" 
-/earved/src/ee/post/earved/dao/dimension/DimensionDataConnectionDAO.java:68, unsupported: Unsupported SQL construction: modifications in loop not supported at /earved/src/ee/post/earved/dao/dimension/DimensionDataConnectionDAO.java:68
+/earved/src/ee/post/earved/dao/dimension/DimensionDataConnectionDAO.java:68, unsupported: modifications in loop not supported
 /earved/src/ee/post/earved/dao/dimension/DimensionDataConnectionDAO.java:148, "delete from DIMENSION_DATA_CONNECTIONS where REF_DIMENSION_DATA_FROM = ? or REF_DIMENSION_DATA_TO = ?"
 /earved/src/ee/post/earved/dao/dimension/DimensionDataConnectionDAO.java:161, "delete from DIMENSION_DATA_CONNECTIONS where REF_DIMENSION_DATA_FROM in " " (?, ?, ?)"  " or REF_DIMENSION_DATA_TO in "  " (?, ?, ?)" 
 /earved/src/ee/post/earved/dao/dimension/DimensionDataConnectionDAO.java:206, "delete from dimension_data_connections ddc where exists " " (select 1 from dimension_data_conn_import ddci " "         where ddc.ref_dimensions_from =(select id from dimensions d where d.ref_person = ? and d.dimension_name = ddci.dimensions_from_name) " "           and ddc.ref_dimension_data_from =(select id from dimension_data dd where dd.ref_dimensions = ddc.ref_dimensions_from and dd.code = ddci.dimension_data_from_code))" 
 /earved/src/ee/post/earved/dao/dimension/DimensionDataConnectionDAO.java:211, "delete from dimension_data_conn_import ddci where ddci.ref_person=?"
 /earved/src/ee/post/earved/dao/dimension/DimensionDataConnectionDAO.java:264, "update dimension_data_conn_import ddci set ddci.dimensions_to_name=nvl((SELECT dimension_name FROM (SELECT d.dimension_name,row_number() over(ORDER BY d.id asc) rn FROM dimensions d where d.ref_person=?) WHERE rn=ddci.dimensions_to_name),ddci.dimensions_to_name) where ddci.ref_person=?"
-/earved/src/ee/post/earved/dao/dimension/DimensionDataDAO.java:35, unsupported: Unsupported SQL construction: modifications in loop not supported at /earved/src/ee/post/earved/dao/dimension/DimensionDataDAO.java:35
+/earved/src/ee/post/earved/dao/dimension/DimensionDataDAO.java:35, unsupported: modifications in loop not supported
 /earved/src/ee/post/earved/dao/dimension/DimensionDataDAO.java:53, "UPDATE dimension_data SET code = ?, name = ?  WHERE id = ?"
 /earved/src/ee/post/earved/dao/dimension/DimensionDataDAO.java:60, "DELETE FROM dimension_data WHERE ref_dimensions = ?"
 /earved/src/ee/post/earved/dao/dimension/DimensionDataDAO.java:64, "DELETE FROM dimension_data WHERE id = ?"
-/earved/src/ee/post/earved/dao/dimension/DimensionDataDAO.java:74, unsupported: Unsupported SQL construction: No declarations found for: StringUtils.join(dimensionDataIds,",") at /earved/src/ee/post/earved/dao/dimension/DimensionDataDAO.java:74
+/earved/src/ee/post/earved/dao/dimension/DimensionDataDAO.java:74, unsupported: No declarations found for: StringUtils.join(dimensionDataIds,",")
 /earved/src/ee/post/earved/dao/extension/ExtensionDAO.java:90, "update extension set information_name=?, information_content=? where id=?"
 /earved/src/ee/post/earved/dao/extension/ExtensionDAO.java:95, "delete from extension where id = ?"
 /earved/src/ee/post/earved/dao/extension/ExtensionDAO.java:100, "delete from extension where REF_INVOICE_ITEM_ITEM_RESERVE = ?"
@@ -419,7 +419,7 @@
 /earved/src/ee/post/earved/dao/inbox/InboxAttachmentDAO.java:46, "delete from inbox_attachment where ref_inbox = ? "
 /earved/src/ee/post/earved/dao/inbox/InboxDAO.java:25, "delete from inbox_attachment where ref_inbox in " " (?, ?, ?)" 
 /earved/src/ee/post/earved/dao/inbox/InboxDAO.java:28, "delete from inbox where id in " " (?, ?, ?)" 
-/earved/src/ee/post/earved/dao/integration/DvkDAO.java:71, unsupported: Unsupported SQL construction: modifications in loop not supported at /earved/src/ee/post/earved/dao/integration/DvkDAO.java:71
+/earved/src/ee/post/earved/dao/integration/DvkDAO.java:71, unsupported: modifications in loop not supported
 /earved/src/ee/post/earved/dao/integration/DvkDAO.java:110, "delete from dvk_organization"
 /earved/src/ee/post/earved/dao/integration/ElektronpostExportDAO.java:49, "UPDATE elektronpost_export ex " "   SET ex.transfered=:transfered, " "       ex.ftp_session_id = :ftpSessionId " " WHERE ex.id=:id" 
 /earved/src/ee/post/earved/dao/integration/ElektronpostExportDAO.java:77, "UPDATE elektronpost_export ex " "   SET ex.attempts = ex.attempts+1," "       ex.error_log= ex.error_log || ?" " WHERE id = ?" 
@@ -450,15 +450,15 @@
 /earved/src/ee/post/earved/dao/invoice/ConfirmDAO.java:668, "update confirm set ref_dom_confirm_decision=?, decision_comment=? where id=?"
 /earved/src/ee/post/earved/dao/invoice/ConfirmDAO.java:786, "delete from invoice_confirm_late where (ref_invoice, ref_confirm) not in " " ((?, ?), (?, ?))" 
 /earved/src/ee/post/earved/dao/invoice/ConfirmDAO.java:823, "update confirm set previous=(case when id in " " (?, ?, ?)"  " then 1 else 0 end) where ref_invoice=?" 
-/earved/src/ee/post/earved/dao/invoice/ConfirmDAO.java:835, unsupported: Unsupported SQL construction: modifications in loop not supported at /earved/src/ee/post/earved/dao/invoice/ConfirmDAO.java:835
-/earved/src/ee/post/earved/dao/invoice/ConfirmDAO.java:847, unsupported: Unsupported SQL construction: modifications in loop not supported at /earved/src/ee/post/earved/dao/invoice/ConfirmDAO.java:847
+/earved/src/ee/post/earved/dao/invoice/ConfirmDAO.java:835, unsupported: modifications in loop not supported
+/earved/src/ee/post/earved/dao/invoice/ConfirmDAO.java:847, unsupported: modifications in loop not supported
 /earved/src/ee/post/earved/dao/invoice/ConfirmLogDAO.java:63, "delete from confirm_log where ref_confirm = ?"
 /earved/src/ee/post/earved/dao/invoice/FrequentInvoiceDAO.java:65, "delete from frequent_buy_invoice where id=?"
 /earved/src/ee/post/earved/dao/invoice/FrequentInvoiceDAO.java:70, "delete from frequent_buy_invoice where ref_invoice=? and ref_person=?"
 /earved/src/ee/post/earved/dao/invoice/FrequentInvoiceDAO.java:75, "delete from frequent_buy_invoice where subject_info=? and seller_reg_number=? and ref_person=?"
 /earved/src/ee/post/earved/dao/invoice/HistoryDAO.java:43, "update history set modified = sysdate, modified_by = ? " "where ref_invoice = ? and ref_dom_invoice_event = ? and ref_dom_invoice_state = ?" 
-/earved/src/ee/post/earved/dao/invoice/HistoryDAO.java:118, unsupported: Unsupported SQL construction: No declarations found for: DomainValueEnum.INVOICE_EVENT_VIEWING.name() at /earved/src/ee/post/earved/dao/invoice/HistoryDAO.java:118
-/earved/src/ee/post/earved/dao/invoice/HistoryDAO.java:133, unsupported: Unsupported SQL construction: No declarations found for: DomainValueEnum.INVOICE_EVENT_SENDING.name() at /earved/src/ee/post/earved/dao/invoice/HistoryDAO.java:133
+/earved/src/ee/post/earved/dao/invoice/HistoryDAO.java:118, unsupported: No declarations found for: DomainValueEnum.INVOICE_EVENT_VIEWING.name()
+/earved/src/ee/post/earved/dao/invoice/HistoryDAO.java:133, unsupported: No declarations found for: DomainValueEnum.INVOICE_EVENT_SENDING.name()
 /earved/src/ee/post/earved/dao/invoice/InvoiceAdditionalDAO.java:44, "update invoice_additional set canceled=1 where id=?"
 /earved/src/ee/post/earved/dao/invoice/InvoiceChannelDAO.java:44, "delete from invoice_channel_additional where id in (select ref_invoice_channel_additional from invoice_channel where ref_invoice=? and ref_invoice_automatic is not null)"
 /earved/src/ee/post/earved/dao/invoice/InvoiceChannelDAO.java:49, "delete from invoice_channel where ref_invoice=? and ref_invoice_automatic is not null"
@@ -480,7 +480,7 @@
 /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:603, "update invoice set ref_dom_invoice_state_sale = ? where id = ? "
 /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:608, "update invoice set ref_dom_invoice_state = ?, ref_dom_invoice_state_sale = ? where id = ? "
 /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:637, "update invoice set ACCOUNTING_TRANSACTION_DATE=? where id=? and accounting_transaction_date is null"
-/earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:820, unsupported: Unsupported SQL construction: Unsupported SQL construction: Unsupported type: java.lang.Long at /earved/src/ee/post/earved/service/impl/invoice/InvoiceServiceImpl.java:1205 at /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:820
+/earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:820, unsupported: No declarations found for: StringUtils.join(invoiceIds,',')
 /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:1101, {"" "UPDATE invoice SET "  {"last_status_change_sale", {"sent_to_erp", "last_status_change"}}  "="  {"last_status_change_sale", {"sent_to_erp", "last_status_change"}}  " + INTERVAL '1' SECOND WHERE "  " sale_invoice = 1"  " AND ref_person_code_sale = ?" , "" "UPDATE invoice SET "  {"last_status_change_sale", {"sent_to_erp", "last_status_change"}}  "="  {"last_status_change_sale", {"sent_to_erp", "last_status_change"}}  " + INTERVAL '1' SECOND WHERE "  " buy_invoice = 1"  " AND ref_person_code_buy = ?" } "   AND "  {"last_status_change_sale", {"sent_to_erp", "last_status_change"}}  " = ?"  "   AND id >= ?" 
 /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:1106, "UPDATE attachment SET ref_invoice = ? WHERE ref_upload = ? AND erp_invoiceid_attr = ?"
 /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:1118, "UPDATE invoice set " {"LAST_EXPORT_BUY", "LAST_EXPORT_SALE"} "= " {"sysdate", "null"} " WHERE id IN " " (?, ?, ?)" 
@@ -497,7 +497,7 @@
 /earved/src/ee/post/earved/dao/invoice/InvoiceItemDAO.java:383, "update invoice_item set ACCOUNTING_ACCOUNT_CODE=NULL, ACCOUNTING_ACCOUNT_NAME=NULL, ACCOUNTING_OPPOSITE_ACCOUNT=NULL where ref_invoice = ? and is_unified=?"
 /earved/src/ee/post/earved/dao/invoice/InvoiceItemDAO.java:489, "update invoice_item set accounting_account_code=NULL, accounting_account_name=NULL, " "ACCOUNTING_OPPOSITE_ACCOUNT=NULL where id IN" " (?, ?, ?)" 
 /earved/src/ee/post/earved/dao/invoice/InvoiceItemDAO.java:562, "delete from invoice_item where id in" " (?, ?, ?)" 
-/earved/src/ee/post/earved/dao/invoice/InvoicePartyDAO.java:67, unsupported: Unsupported SQL construction: No declarations found for: DomainValueEnum.INVOICE_PARTY_TYPE_DELIVERER.name() at /earved/src/ee/post/earved/dao/invoice/InvoicePartyDAO.java:67
+/earved/src/ee/post/earved/dao/invoice/InvoicePartyDAO.java:67, unsupported: No declarations found for: DomainValueEnum.INVOICE_PARTY_TYPE_DELIVERER.name()
 /earved/src/ee/post/earved/dao/invoice/InvoiceSendingFailedDAO.java:129, "UPDATE invoice_sending_failed SET is_hidden = 1 WHERE id IN" " (?, ?, ?)" 
 /earved/src/ee/post/earved/dao/invoice/InvoiceSendingFailedDAO.java:156, "update invoice_sending_failed set is_deleted=1 where id in " " (?, ?, ?)" 
 /earved/src/ee/post/earved/dao/invoice/InvoiceSendingFailedDAO.java:167, "UPDATE invoice_sending_failed SET client_informed = 1 WHERE id IN" " (?, ?, ?)" 

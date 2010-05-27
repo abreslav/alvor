@@ -27,6 +27,7 @@ import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.NodeFinder;
+import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
@@ -133,11 +134,24 @@ public class NodeSearchEngine {
 		IJavaElement[] elems = scopeToSearchIn.toArray(new IJavaElement[scopeToSearchIn.size()]);
 		IJavaSearchScope scope = SearchEngine.createJavaSearchScope(elems, IJavaSearchScope.SOURCES);
 		
+//		if (nodeRequest.getPatternString().startsWith("getProductInfoValue")) {
+//			System.out.println("stop");
+//			IJavaElement[] elems2 = {elems[0].getJavaProject()};
+//			scope = SearchEngine.createJavaSearchScope(elems2, IJavaSearchScope.SOURCES);
+//			for (IJavaElement el : scopeToSearchIn) {
+//				System.out.println(el.getElementName());
+//			}
+//		}
+		
 		SearchRequestor requestor = new SearchRequestor() {
 			public void acceptSearchMatch(SearchMatch match) {
 				assert match.getElement() instanceof IMethod;
 				
 				ASTNode node = getASTNode(match);
+				
+				if (node instanceof SuperMethodInvocation) {
+					return; // FIXME should do smth about it
+				}
 				
 				MethodInvocation invoc = (MethodInvocation)node;
 				IMethodBinding methodBinding = invoc.resolveMethodBinding();
@@ -169,6 +183,9 @@ public class NodeSearchEngine {
 				if (arg instanceof Expression) {
 					IPosition position = PositionUtil.getPosition(arg);
 					result.add(position);
+					assert LOG.message("PATTERN=" + nodeRequest.getPatternString()
+							+ ", accepted match=" + PositionUtil.getLineString(position)
+							+ ", invocation=" + invoc);
 					CacheService.getCacheService().getHotspotCache().add(nodeRequest, position);
 				}
 			}
@@ -178,7 +195,7 @@ public class NodeSearchEngine {
 		executeSearch(pattern, requestor, scope);
 		Measurements.argumentSearchTimer.stop();
 		
-		LOG.message("Searched callsites of '" + nodeRequest.getPatternString() + "', found "
+		assert LOG.message("Searched callsites of '" + nodeRequest.getPatternString() + "', found "
 				+ result.size() + " matches");
 	}
 
@@ -202,6 +219,11 @@ public class NodeSearchEngine {
 			+ ASTUtil.getArgumentTypesString(inv.resolveMethodBinding());
 		
 		assert LOG.message("findMethodDeclarations: " + patternStr);
+		
+		if (inv.getName().getIdentifier().contains("getSequenceNextValueFunction")
+				|| inv.getName().getIdentifier().contains("getNextValueSQL")) {
+			System.out.println("stop");
+		}
 		
 		SearchPattern pattern = SearchPattern.createPattern(
 				patternStr, 
