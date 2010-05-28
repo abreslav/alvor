@@ -267,7 +267,13 @@ public final class CacheServiceImpl implements ICacheService {
 			@Override
 			public Integer visitStringRepetition(
 					StringRepetition stringRepetition, Void data) {
-				throw new IllegalArgumentException("Unsupported");
+				IAbstractString body = stringRepetition.getBody();
+				try {
+					int bodyId = createAbstractStringRecords(body, null);
+					return createFromTypeAndA(StringTypes.REPETITION, stringRepetition, bodyId);
+				} catch (SQLException e) {
+					throw new RethrowException(e);
+				}
 			}
 
 			@Override
@@ -284,7 +290,7 @@ public final class CacheServiceImpl implements ICacheService {
 			public Integer visitStringParameter(
 					StringParameter stringParameter, Void data) {
 				try {
-					return createStringParameter(stringParameter);
+					return createFromTypeAndA(StringTypes.PARAMETER, stringParameter, stringParameter.getIndex());
 				} catch (SQLException e) {
 					throw new RethrowException(e);
 				}
@@ -299,15 +305,16 @@ public final class CacheServiceImpl implements ICacheService {
 		}
 	}
 	
-	private Integer createStringParameter(StringParameter stringParameter) throws SQLException {
-		int rangeId = createSourceRange(stringParameter.getPosition());
+	private Integer createFromTypeAndA(int type,
+			IAbstractString abstractString, int a) throws SQLException {
+		int rangeId = createSourceRange(abstractString.getPosition());
 		
 		PreparedStatement preparedStatement = connection.prepareStatement(
 				"INSERT INTO AbstractStrings(type, a, sourceRange) VALUES (?, ?, ?)",
 				Statement.RETURN_GENERATED_KEYS
 		);
-		preparedStatement.setInt(1, StringTypes.PARAMETER);
-		preparedStatement.setInt(2, stringParameter.getIndex());
+		preparedStatement.setInt(1, type);
+		preparedStatement.setInt(2, a);
 		preparedStatement.setInt(3, rangeId);
 		
 		return insertAndGetId(preparedStatement);
