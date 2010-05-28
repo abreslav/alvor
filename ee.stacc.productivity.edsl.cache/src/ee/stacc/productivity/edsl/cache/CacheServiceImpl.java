@@ -524,8 +524,7 @@ public final class CacheServiceImpl implements ICacheService {
 		try {
 			return runStringConstruction(queries.getAbstractStringQuery(position), position);
 		} catch (SQLException e) {
-//			e.printStackTrace();
-			System.err.println(e.getMessage());
+			LOG.exception(e);
 			return null;
 		} catch (StackOverflowError e) {
 			throw new RuntimeException("SOE: " + position.getPath() + ":" + position.getStart());
@@ -562,13 +561,12 @@ public final class CacheServiceImpl implements ICacheService {
 			return getStringConstant(a, position); 
 		case StringTypes.CHAR_SET:
 			return getStringCharacterSet(a, position); 
-//			throw new UnsupportedStringOpEx("CACHE: Char sets are not supported yet");
 		case StringTypes.SEQUENCE:
 			return new StringSequence(position,	getCollectionContents(id));
 		case StringTypes.CHOICE:
 			return new StringChoice(position, getCollectionContents(id));
 		case StringTypes.REPETITION:
-			throw new UnsupportedStringOpEx("CACHE: Repetition is not supported yet");
+			return new StringRepetition(position, getAbstractStringById(a));
 		case StringTypes.SAME_AS:
 			return getAbstractStringById(a);
 		case StringTypes.PARAMETER:

@@ -43,8 +43,9 @@ public class StringConverter {
 								recChoice.getPosition(),
 								new StringSequence(strSeq.getPosition(), seqTail));
 						
+						// TODO problem getting unique positions, using hack for now
 						return new StringSequence(
-								str.getPosition(), 
+								PositionUtil.shiftPosition(namedStr.getPosition(),1,0), 
 								recChoice.getBase(),
 								stringRep);
 						// TODO problem if several RecChoices with same key

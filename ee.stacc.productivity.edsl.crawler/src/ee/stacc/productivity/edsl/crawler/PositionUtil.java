@@ -53,7 +53,13 @@ public class PositionUtil {
 	public static int getLineNumber(ASTNode node) {
 		return getLineNumber(getPosition(node));
 	}
-	
+
+	public static IPosition shiftPosition(IPosition position, int startDelta, int lengthDelta) {
+		return new Position(position.getPath(), 
+				position.getStart() + startDelta,
+				position.getLength() + lengthDelta);
+	}
+
 	public static int getLineNumber(IPosition position) {
 		IFile file = getFile(position);
 		Reader contents = null;

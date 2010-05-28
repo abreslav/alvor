@@ -11,6 +11,7 @@ import ee.stacc.productivity.edsl.string.StringCharacterSet;
 import ee.stacc.productivity.edsl.string.StringChoice;
 import ee.stacc.productivity.edsl.string.StringConstant;
 import ee.stacc.productivity.edsl.string.StringRandomInteger;
+import ee.stacc.productivity.edsl.string.StringRepetition;
 import ee.stacc.productivity.edsl.string.StringSequence;
 
 public class SampleGenerator {
@@ -66,10 +67,19 @@ public class SampleGenerator {
 //				result.add(cs.toString());
 //			}
 		}
+		else if (aStr instanceof StringRepetition) {
+			return getConcreteStrings(repetitionToChoice((StringRepetition)aStr));
+		}
 		else {
 			throw new UnsupportedOperationException("getConcreteStrings, class="
 					+ aStr.getClass());
 		}
 		return result;
+	}
+	
+	private static IAbstractString repetitionToChoice(StringRepetition str) {
+		return new StringChoice(str.getBody(),
+				new StringSequence(str.getBody(), str.getBody())
+				);
 	}
 }
