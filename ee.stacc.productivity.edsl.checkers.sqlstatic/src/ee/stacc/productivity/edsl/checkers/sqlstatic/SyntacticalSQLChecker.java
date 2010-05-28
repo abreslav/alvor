@@ -13,6 +13,7 @@ import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
 import ee.stacc.productivity.edsl.lexer.alphabet.Token;
 import ee.stacc.productivity.edsl.lexer.automata.State;
 import ee.stacc.productivity.edsl.sqlparser.IParseErrorHandler;
+import ee.stacc.productivity.edsl.sqlparser.ParserSimulator;
 import ee.stacc.productivity.edsl.sqlparser.SQLSyntaxChecker;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.IPosition;
@@ -68,7 +69,8 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 		try {
 			State automaton = PositionedCharacterUtil.createPositionedAutomaton(abstractString);
 			
-			SQLSyntaxChecker.INSTANCE.checkAutomaton(automaton, new IParseErrorHandler() {
+//			SQLSyntaxChecker.INSTANCE.checkAutomaton(automaton, new IParseErrorHandler() {
+			ParserSimulator.LALR_INSTANCE.checkAutomaton(automaton, new IParseErrorHandler() {
 				
 				@Override
 				public void unexpectedItem(IAbstractInputItem item) {
@@ -81,6 +83,11 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 				@Override
 				public void other() {
 					errorHandler.handleSQLError("SQL syntax error. Most likely, unfinished query", descriptor.getPosition());
+				}
+
+				@Override
+				public void overabstraction() {
+					errorHandler.handleSQLError("Syntactic analysis failed: nesting is too deep in this sentence", descriptor.getPosition());
 				}
 			});
 		} catch (MalformedStringLiteralException e) {

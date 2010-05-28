@@ -10,7 +10,7 @@ public class StringRandomInteger extends StringCharacterSet {
 	}
 	
 	public String toString() {
-		return "\"666\"";
+		return "([0123456789])+";
 	}
 	
 	public String getExample() {

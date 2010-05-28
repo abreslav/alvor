@@ -40,8 +40,4 @@ public final class ErrorState implements IParserState {
 	public IAbstractInputItem getUnexpectedItem() {
 		return byInputItem;
 	}
-	
-	public IParserState getFromState() {
-		return fromState;
-	}
 }

@@ -13,8 +13,13 @@ public interface IParseErrorHandler {
 		@Override
 		public void other() {
 		}
+		
+		@Override
+		public void overabstraction() {
+		}
 	};
 	
 	void unexpectedItem(IAbstractInputItem item);
 	void other();
+	void overabstraction();
 }

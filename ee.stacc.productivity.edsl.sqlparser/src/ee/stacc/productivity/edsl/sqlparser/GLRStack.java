@@ -13,7 +13,7 @@ public class GLRStack implements IParserStackLike {
 		@Override
 		public GLRStack newStack(IParserState state) {
 			GLRStack glrStack = new GLRStack();
-			glrStack.addVariant(BoundedStack.getFactory(100, null).newStack(state));
+			glrStack.addVariant(BoundedStack.getFactory(100, new ErrorState(null, null)).newStack(state));
 			return glrStack;
 		}
 	};

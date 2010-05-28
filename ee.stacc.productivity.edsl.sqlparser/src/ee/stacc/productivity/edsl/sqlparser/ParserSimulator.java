@@ -36,9 +36,9 @@ public class ParserSimulator<S extends IParserStackLike> {
 	}
 
 	public List<String> check(IAbstractString str) {
-		if (AsbtractStringUtils.hasLoops(str)) {
-			throw new IllegalArgumentException("The current version does not support loops in abstract strings");
-		}
+//		if (AsbtractStringUtils.hasLoops(str)) {
+//			throw new IllegalArgumentException("The current version does not support loops in abstract strings");
+//		}
 		
 		return checkAbstractString(str);
 	}
@@ -64,6 +64,11 @@ public class ParserSimulator<S extends IParserStackLike> {
 				if (errors.isEmpty()) {
 					errors.add("SQL syntax error. Most likely unfinished query");
 				}
+			}
+			
+			@Override
+			public void overabstraction() {
+				errors.add("Syntax analysis failed: recursion is too deep");
 			}
 		});
 		return errors;
@@ -100,7 +105,10 @@ public class ParserSimulator<S extends IParserStackLike> {
 				}
 				Integer tokenNumber = parser.getNamesToTokenNumbers().get("'" + tokenName + "'");
 				if (tokenNumber == null) {
-					throw new IllegalArgumentException("Unknown token: " + tokenName);
+					tokenNumber = parser.getNamesToTokenNumbers().get("error");
+					if (tokenNumber == null) {
+						throw new IllegalArgumentException("Unknown token: " + tokenName);
+					}
 				}
 				return tokenNumber;
 			}
@@ -244,7 +252,9 @@ public class ParserSimulator<S extends IParserStackLike> {
 					IParserState errorState = setForTo.hasError();
 					if (errorState != null) {
 						IAbstractInputItem unexpectedItem = ((ErrorState) errorState).getUnexpectedItem();
-						if (unexpectedItem.getCode() >= 0) {
+						if (unexpectedItem == null) {
+							errorHandler.overabstraction();
+						} else if (unexpectedItem.getCode() >= 0) {
 							errorHandler.unexpectedItem(unexpectedItem);
 						} else {
 							errorHandler.other();

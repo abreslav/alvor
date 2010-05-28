@@ -61,6 +61,11 @@ public class SQLSyntaxChecker {
 					errors.add("SQL syntax error. Most likely unfinished query");
 				}
 			}
+
+			@Override
+			public void overabstraction() {
+				errors.add("[Internal] overabstraction");
+			}
 		});
 		return errors;
 	}
