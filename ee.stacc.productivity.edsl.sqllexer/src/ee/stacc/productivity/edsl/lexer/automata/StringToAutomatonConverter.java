@@ -69,6 +69,9 @@ public class StringToAutomatonConverter {
 		@Override
 		public Set<State> visitStringConstant(StringConstant stringConstant,
 				State initial) {
+			if (stringConstant.isEmpty()) {
+				return Collections.singleton(initial);
+			}
 			State fin = new State("F", false);
 			State current = initial;
 			IAbstractInputItem[] items = factory.createInputItems(stringConstant);
@@ -88,6 +91,9 @@ public class StringToAutomatonConverter {
 		@Override
 		public Set<State> visitStringChoice(StringChoice stringChoice,
 				State initial) {
+			if (stringChoice.isEmpty()) {
+				return Collections.singleton(initial);
+			}
 			Set<State> result = new HashSet<State>();
 			for (IAbstractString item : stringChoice.getItems()) {
 				Set<State> finalStates = convert(item, initial);

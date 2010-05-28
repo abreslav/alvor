@@ -61,9 +61,18 @@ public class AbstractStringOptimizer {
 				StringSequence stringSequence, Void data) {
 			List<IAbstractString> optimized = getOptimizedContents(stringSequence);
 			if (optimized == null) {
-				return stringSequence;
+				optimized = stringSequence.getItems();
 			}
-			return listToAS(optimized);
+			List<IAbstractString> result = new ArrayList<IAbstractString>();
+			for (IAbstractString s : optimized) {
+				if (s instanceof StringSequence) {
+					StringSequence seq = (StringSequence) s;
+					result.addAll(seq.getItems());
+				} else {
+					result.add(s);
+				}
+			}
+			return listToAS(result);
 		}
 		
 		@Override
@@ -131,6 +140,16 @@ public class AbstractStringOptimizer {
 							);
 						
 				}
+			} else {
+				List<IAbstractString> saItems = sa.getItems();
+				if (!saItems.isEmpty() && abstractStringEquals(saItems.get(0), b)) {
+					IAbstractString newSA = new StringSequence(saItems.subList(1, saItems.size()));
+					return new StringSequence((IPosition) null, b, new StringChoice(newSA, new StringConstant("")));
+				}
+			}
+		} else {
+			if (b instanceof StringSequence) {
+				return optimizeChoice(b, a);
 			}
 		}
 		return null;
