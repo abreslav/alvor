@@ -18,6 +18,7 @@ import ee.stacc.productivity.edsl.common.logging.Timer;
 import ee.stacc.productivity.edsl.crawler.NewASE;
 import ee.stacc.productivity.edsl.crawler.NodeRequest;
 import ee.stacc.productivity.edsl.crawler.NodeSearchEngine;
+import ee.stacc.productivity.edsl.crawler.PositionUtil;
 import ee.stacc.productivity.edsl.crawler.UnsupportedNodeDescriptor;
 
 /**
@@ -74,6 +75,9 @@ public class JavaElementChecker {
 		for (INodeDescriptor hotspot : hotspots) {
 			if (hotspot instanceof IStringNodeDescriptor) {
 				validHotspots.add((IStringNodeDescriptor) hotspot);
+				assert LOG.message("STRING node desc, file=" + PositionUtil.getLineString(hotspot.getPosition())
+						+ ", str=" + ((IStringNodeDescriptor) hotspot).getAbstractValue());
+				
 				
 //				// collect connection info
 //				ConnectionDescriptor connDesc = 
@@ -84,11 +88,21 @@ public class JavaElementChecker {
 //				connMap.put(exp, prevCount == null ? 1 : prevCount + 1);
 			}
 			else if (hotspot instanceof UnsupportedNodeDescriptor) {
+				assert LOG.message("UNSUPPORTED node desc, file=" + PositionUtil.getLineString(hotspot.getPosition())
+						+ ", msg=" + ((UnsupportedNodeDescriptor) hotspot).getProblemMessage());
+				
 				errorHandler.handleSQLWarning(((UnsupportedNodeDescriptor)hotspot).getProblemMessage(),
 						hotspot.getPosition());
 			}
+			else {
+				throw new IllegalArgumentException("Unknown type of INodeTypeDescriptor: " + hotspot.getClass().getName());
+			}
 		}
 		checkValidHotspots(validHotspots, errorHandler, checkers, options);
+		
+		assert LOG.message("Processed " + hotspots.size() + " node descriptors, "
+				+ validHotspots.size() + " of them with valid abstract strings");
+
 		
 		
 //		LOG.message("CONNECTION DESCRIPTORS");
