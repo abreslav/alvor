@@ -64,7 +64,7 @@ import ee.stacc.productivity.edsl.tracker.VariableTracker;
  */
 public class NewASE {
 	private int maxLevel = 4;
-	private boolean supportLoops = false;
+	private boolean supportLoops = true;
 	private boolean supportInvocations = true;
 	private boolean optimizeChoice = true;
 	
@@ -138,7 +138,7 @@ public class NewASE {
 				logMessage("EVALUATING", level, node);
 				result = doEval(node);
 				assert result.getPosition() != null;
-				if (shouldUseCache()) {
+				if (shouldUseCache() && !StringConverter.includesStringExtensions(result)) {
 					CacheService.getCacheService().addAbstractString(PositionUtil.getPosition(node), result);
 				}
 			} 
@@ -555,9 +555,9 @@ public class NewASE {
 						PositionUtil.getPosition(usage.getNode()),
 						usage.getNode(),
 						evalNameAfterUsageWithoutLoopCheck(name, usage));
-				//System.out.println("BEFORE WIDENING: " + named);
+				System.out.println("BEFORE WIDENING: " + named);
 				IAbstractString widened = StringConverter.widenToRegular(named);
-				//System.out.println("AFTER WIDENING: " + widened);
+				System.out.println("AFTER WIDENING: " + widened);
 				return widened;
 			} 
 			else {

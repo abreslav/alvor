@@ -145,6 +145,38 @@ public class StringConverter {
 		}
 	}
 	
+	
+	public static boolean includesStringExtensions(IAbstractString str) {
+		if (str instanceof RecursiveStringChoice) {
+			return true;
+		}
+		else if (str instanceof StringConstant) {
+			return false;
+		}
+		else if (str instanceof StringCharacterSet) {
+			return false;
+		}
+		else if (str instanceof StringParameter) {
+			return false;
+		}
+		else if (str instanceof NamedString) {
+			return true;
+		}
+		else if (str instanceof StringRepetition) {
+			return includesStringExtensions(((StringRepetition)str).getBody());
+		}
+		else if (str instanceof AbstractStringCollection) {
+			for (IAbstractString as : ((AbstractStringCollection)str).getItems()) {
+				if (includesStringExtensions(as)) {
+					return true;
+				}
+			}
+			return false;
+		}
+		else {
+			throw new IllegalArgumentException();
+		}
+	}
 	/**
 	 * Transforms sequence of sequences to a flat sequence 
 	 * and same for choices 
