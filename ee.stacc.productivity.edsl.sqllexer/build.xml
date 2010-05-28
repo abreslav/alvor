@@ -18,7 +18,7 @@
 		<!-- SQL lexer : SQL transducer is generated from it -->
 		<jflex
 			file="lexer/sql.flex"
-    		destdir="generated"
+    		destdir="generated" 
 			time="on"
     		nobak="on"
 			pack="off"
@@ -37,11 +37,11 @@
     		destdir="bin">
     	</javac>
 		<!-- Run the compiled class and store the results as a *.java file -->
-    	<mkdir dir="generated/ee/stacc/productivity/edsl/sqllexer"/>
+    	<mkdir dir="scr/ee/stacc/productivity/edsl/sqllexer"/>
     	<java 
     		classpath="bin" 
     		classname="SQLLexerGen" 
-    		output="generated/ee/stacc/productivity/edsl/sqllexer/SQLLexerData.java">
+    		output="src/ee/stacc/productivity/edsl/sqllexer/SQLLexerData.java">
     		<arg value="ee.stacc.productivity.edsl.sqllexer"/>
     		<arg value="SQLLexerData"/>
     	</java>
