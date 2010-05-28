@@ -115,7 +115,7 @@ update
 	;
 assignList
 	: assign
-	| assign ',' assignList
+	| assignList ',' assign
 	;
 assign
 	: ident '=' simpleExpr
@@ -141,7 +141,7 @@ optIdList
 	;
 idList
 	: ID
-	| ID ',' idList
+	| idList ',' ID 
 	;
 bracketedSelect
 	: select
@@ -173,7 +173,7 @@ optGroupBy
 /*
 identList
 	: ident
-	| ident ',' identList
+	| identList ',' ident
 	;*/
 having 
 	: HAVING condition
@@ -193,7 +193,7 @@ byClauses
 	;
 directionList
 	: direction
-	| direction ',' directionList
+	| directionList ',' direction
 	;
 direction
 	: simpleExpr orderDirection
@@ -226,7 +226,7 @@ selectExpressionList
 	;
 tableList 
 	: table
-	| table ',' tableList 
+	| tableList ',' table 
 	;
 table
 	: alias
@@ -277,7 +277,7 @@ condition
 	;
 idList2
 	: ID ',' ID
-	| ID ',' idList2
+	| idList2 ',' ID
 	;
 comparison 
 	: simpleExpr '=' simpleExpr 
@@ -341,7 +341,7 @@ else
 simExList
 	: /*empty*/
 	| simpleExpr
-	| simpleExpr ',' simExList
+	| simExList ',' simpleExpr
 	;
 partition
 	: '(' PARTITION BY ident orderBy ')'
