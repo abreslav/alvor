@@ -85,7 +85,6 @@ import java.io.IOException;
 %lex-token NE = "<>" | "!="
 %lex-token LE = "<="
 %lex-token GE = ">="
-//%lex-token NE = "!="
 %lex-token CONCAT = "||"
 %lex-literal ","
 %lex-literal "("

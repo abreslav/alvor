@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="project" default="default">
+	<property name="lexerProject" value="../ee.stacc.productivity.edsl.sqllexer"></property>
+	<taskdef classname="JFlex.anttask.JFlexTask" name="jflex" classpath="${lexerProject}/lib/JFlex.jar"/>
 
-	<target name="default" depends="depends" description="description">
+	<target name="default" depends="generateLexer" description="description">
         
     </target>
 
-    <target name="depends">
+    <target name="generateParser">
     	<java 
     		classpath="bin" 
     		classname="ee.stacc.productivity.edsl.sqlparser.LexerSpecGenerator"
@@ -13,7 +15,7 @@
     		<arg value="grammar/sql.bgtemplate"/>
     		<arg value="generated/sql.bg"/>
     		<arg value="grammar/sql.flextemplate"/>
-    		<arg value="../ee.stacc.productivity.edsl.sqllexer/generated/sql.flex"/>
+    		<arg value="${lexerProject}/generated/sql.flex"/>
     	</java>
 		<exec executable="bison" dir="${basedir}">
 			<arg value="--xml=src/ee/stacc/productivity/edsl/sqlparser/sql.xml"/>
@@ -23,7 +25,40 @@
 			<arg value="--language=Java"/>
 			<arg value="--debug"/>
 			<arg value="generated/sql.bg"/>
-		</exec>	
+		</exec>
 	</target>
+	
+    <target name="generateLexer" depends="generateParser">  
+		<!-- SQL lexer : SQL transducer is generated from it -->
+		<jflex
+			file="${lexerProject}/generated/sql.flex"
+    		destdir="${lexerProject}/generated" 
+			time="on"
+    		nobak="on"
+			pack="off"
+		/>
+		<!-- Generate a class which will generate the data for a transducer -->
+    	<java classpath="${lexerProject}/bin" classname="Generator">
+    		<arg file="${lexerProject}/generated/"/>
+    		<arg value="SQLLexer"/>
+    		<arg file="${lexerProject}/generated/"/>
+    		<arg value="SQLLexerGen"/>
+    	</java>
+		<!-- Compile the generated class -->
+    	<javac 
+    		srcdir="${lexerProject}/generated" 
+    		classpath="${lexerProject}/generated" 
+    		destdir="${lexerProject}/bin">
+    	</javac>
+		<!-- Run the compiled class and store the results as a *.java file -->
+    	<mkdir dir="${lexerProject}/src/ee/stacc/productivity/edsl/sqllexer"/>
+    	<java 
+    		classpath="${lexerProject}/bin" 
+    		classname="SQLLexerGen" 
+    		output="${lexerProject}/src/ee/stacc/productivity/edsl/sqllexer/SQLLexerData.java">
+    		<arg value="ee.stacc.productivity.edsl.sqllexer"/>
+    		<arg value="SQLLexerData"/>
+    	</java>
+	</target>	
 
 </project>
