@@ -14,7 +14,7 @@
     	>
     		<arg value="grammar/sql.bgtemplate"/>
     		<arg value="generated/sql.bg"/>
-    		<arg value="grammar/sql.flextemplate"/>
+    		<arg value="${lexerProject}/lexer/sql.flextemplate"/>
     		<arg value="${lexerProject}/generated/sql.flex"/>
     	</java>
 		<exec executable="bison" dir="${basedir}">
