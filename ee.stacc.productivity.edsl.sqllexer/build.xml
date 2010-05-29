@@ -7,17 +7,9 @@
     </target>
 
     <target name="depends">  
-		<!-- Simple lexer : used for experimentation -->
-    	<jflex
-			file="lexer/simple.flex"
-    		destdir="generated"
-			time="on"
-    		nobak="on"
-			pack="off"
-		/>
 		<!-- SQL lexer : SQL transducer is generated from it -->
 		<jflex
-			file="lexer/sql.flex"
+			file="generated/sql.flex"
     		destdir="generated" 
 			time="on"
     		nobak="on"
@@ -37,7 +29,7 @@
     		destdir="bin">
     	</javac>
 		<!-- Run the compiled class and store the results as a *.java file -->
-    	<mkdir dir="scr/ee/stacc/productivity/edsl/sqllexer"/>
+    	<mkdir dir="src/ee/stacc/productivity/edsl/sqllexer"/>
     	<java 
     		classpath="bin" 
     		classname="SQLLexerGen" 

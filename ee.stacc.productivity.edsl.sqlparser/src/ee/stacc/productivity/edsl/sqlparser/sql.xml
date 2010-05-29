@@ -2,7 +2,7 @@
 
 <bison-xml-report version="2.4.1">
 
-  <filename>grammar/sql.bg</filename>
+  <filename>generated/sql.bg</filename>
 
   <grammar>
     <rules>
@@ -1015,134 +1015,132 @@
     </rules>
     <terminals>
       <terminal symbol-number="0" token-number="0" name="$end" usefulness="useful"/>
-      <terminal symbol-number="71" token-number="40" name="'('" usefulness="useful"/>
-      <terminal symbol-number="72" token-number="41" name="')'" usefulness="useful"/>
-      <terminal symbol-number="69" token-number="42" name="'*'" usefulness="useful" prec="9" assoc="left"/>
-      <terminal symbol-number="67" token-number="43" name="'+'" usefulness="useful" prec="8" assoc="left"/>
-      <terminal symbol-number="70" token-number="44" name="','" usefulness="useful"/>
-      <terminal symbol-number="66" token-number="45" name="'-'" usefulness="useful" prec="8" assoc="left"/>
-      <terminal symbol-number="73" token-number="46" name="'.'" usefulness="useful"/>
-      <terminal symbol-number="68" token-number="47" name="'/'" usefulness="useful" prec="9" assoc="left"/>
-      <terminal symbol-number="65" token-number="60" name="'&lt;'" usefulness="useful" prec="6" assoc="left"/>
-      <terminal symbol-number="63" token-number="61" name="'='" usefulness="useful" prec="6" assoc="left"/>
-      <terminal symbol-number="64" token-number="62" name="'&gt;'" usefulness="useful" prec="6" assoc="left"/>
-      <terminal symbol-number="74" token-number="63" name="'?'" usefulness="useful"/>
+      <terminal symbol-number="69" token-number="40" name="'('" usefulness="useful"/>
+      <terminal symbol-number="70" token-number="41" name="')'" usefulness="useful"/>
+      <terminal symbol-number="67" token-number="42" name="'*'" usefulness="useful" prec="9" assoc="left"/>
+      <terminal symbol-number="65" token-number="43" name="'+'" usefulness="useful" prec="8" assoc="left"/>
+      <terminal symbol-number="68" token-number="44" name="','" usefulness="useful"/>
+      <terminal symbol-number="64" token-number="45" name="'-'" usefulness="useful" prec="8" assoc="left"/>
+      <terminal symbol-number="71" token-number="46" name="'.'" usefulness="useful"/>
+      <terminal symbol-number="66" token-number="47" name="'/'" usefulness="useful" prec="9" assoc="left"/>
+      <terminal symbol-number="63" token-number="60" name="'&lt;'" usefulness="useful" prec="6" assoc="left"/>
+      <terminal symbol-number="61" token-number="61" name="'='" usefulness="useful" prec="6" assoc="left"/>
+      <terminal symbol-number="62" token-number="62" name="'&gt;'" usefulness="useful" prec="6" assoc="left"/>
+      <terminal symbol-number="72" token-number="63" name="'?'" usefulness="useful"/>
       <terminal symbol-number="1" token-number="256" name="error" usefulness="useful"/>
-      <terminal symbol-number="3" token-number="258" name="VALUES" usefulness="useful"/>
-      <terminal symbol-number="4" token-number="259" name="PARTITION" usefulness="useful"/>
-      <terminal symbol-number="5" token-number="260" name="OVER" usefulness="useful" prec="1" assoc="left"/>
-      <terminal symbol-number="6" token-number="261" name="ESCAPE" usefulness="useful"/>
+      <terminal symbol-number="3" token-number="258" name="PARTITION" usefulness="useful"/>
+      <terminal symbol-number="4" token-number="259" name="DISTINCT" usefulness="useful"/>
+      <terminal symbol-number="5" token-number="260" name="BETWEEN" usefulness="useful"/>
+      <terminal symbol-number="6" token-number="261" name="VALUES" usefulness="useful"/>
       <terminal symbol-number="7" token-number="262" name="SELECT" usefulness="useful"/>
-      <terminal symbol-number="8" token-number="263" name="INSERT" usefulness="useful"/>
-      <terminal symbol-number="9" token-number="264" name="WHERE" usefulness="useful"/>
-      <terminal symbol-number="10" token-number="265" name="ORDER" usefulness="useful"/>
-      <terminal symbol-number="11" token-number="266" name="OUTER" usefulness="useful"/>
-      <terminal symbol-number="12" token-number="267" name="GROUP" usefulness="useful"/>
-      <terminal symbol-number="13" token-number="268" name="RIGHT" usefulness="useful"/>
-      <terminal symbol-number="14" token-number="269" name="INNER" usefulness="useful"/>
-      <terminal symbol-number="15" token-number="270" name="FROM" usefulness="useful"/>
-      <terminal symbol-number="16" token-number="271" name="JOIN" usefulness="useful"/>
-      <terminal symbol-number="17" token-number="272" name="LEFT" usefulness="useful"/>
-      <terminal symbol-number="18" token-number="273" name="WHEN" usefulness="useful"/>
-      <terminal symbol-number="19" token-number="274" name="THEN" usefulness="useful"/>
-      <terminal symbol-number="20" token-number="275" name="ELSE" usefulness="useful"/>
-      <terminal symbol-number="21" token-number="276" name="CASE" usefulness="useful"/>
-      <terminal symbol-number="22" token-number="277" name="INTO" usefulness="useful"/>
-      <terminal symbol-number="23" token-number="278" name="FULL" usefulness="useful"/>
-      <terminal symbol-number="24" token-number="279" name="DESC" usefulness="useful"/>
-      <terminal symbol-number="25" token-number="280" name="ASC" usefulness="useful"/>
-      <terminal symbol-number="26" token-number="281" name="AND" usefulness="useful" prec="3" assoc="left"/>
-      <terminal symbol-number="27" token-number="282" name="END" usefulness="useful"/>
-      <terminal symbol-number="28" token-number="283" name="XOR" usefulness="useful" prec="2" assoc="left"/>
-      <terminal symbol-number="29" token-number="284" name="NOT" usefulness="useful" prec="4" assoc="right"/>
-      <terminal symbol-number="30" token-number="285" name="OR" usefulness="useful" prec="2" assoc="left"/>
-      <terminal symbol-number="31" token-number="286" name="ON" usefulness="useful"/>
-      <terminal symbol-number="32" token-number="287" name="BY" usefulness="useful"/>
-      <terminal symbol-number="33" token-number="288" name="AS" usefulness="useful"/>
-      <terminal symbol-number="34" token-number="289" name="IN" usefulness="useful"/>
-      <terminal symbol-number="35" token-number="290" name="IS" usefulness="useful"/>
-      <terminal symbol-number="36" token-number="291" name="NULL" usefulness="useful"/>
-      <terminal symbol-number="37" token-number="292" name="DIGAL_ERR" usefulness="unused-in-grammar"/>
-      <terminal symbol-number="38" token-number="293" name="STRING_DQ" usefulness="unused-in-grammar"/>
-      <terminal symbol-number="39" token-number="294" name="STRING_DQ_ERR" usefulness="unused-in-grammar"/>
-      <terminal symbol-number="40" token-number="295" name="STRING_SQ" usefulness="useful"/>
-      <terminal symbol-number="41" token-number="296" name="STRING_SQ_ERR" usefulness="unused-in-grammar"/>
-      <terminal symbol-number="42" token-number="297" name="NUMBER" usefulness="useful"/>
-      <terminal symbol-number="43" token-number="298" name="ID" usefulness="useful"/>
-      <terminal symbol-number="44" token-number="299" name="DISTINCT" usefulness="useful"/>
-      <terminal symbol-number="45" token-number="300" name="UNKNOWN_CHARACTER_ERR" usefulness="unused-in-grammar"/>
-      <terminal symbol-number="46" token-number="301" name="NE" usefulness="useful" prec="6" assoc="left"/>
-      <terminal symbol-number="47" token-number="302" name="LE" usefulness="useful" prec="6" assoc="left"/>
-      <terminal symbol-number="48" token-number="303" name="GE" usefulness="useful" prec="6" assoc="left"/>
-      <terminal symbol-number="49" token-number="304" name="CONCAT" usefulness="useful" prec="9" assoc="left"/>
-      <terminal symbol-number="50" token-number="305" name="TABLE" usefulness="useful"/>
-      <terminal symbol-number="51" token-number="306" name="LIKE" usefulness="useful" prec="7" assoc="left"/>
-      <terminal symbol-number="52" token-number="307" name="FOR" usefulness="useful"/>
-      <terminal symbol-number="53" token-number="308" name="UPDATE" usefulness="useful"/>
-      <terminal symbol-number="54" token-number="309" name="EXISTS" usefulness="useful"/>
-      <terminal symbol-number="55" token-number="310" name="BETWEEN" usefulness="useful"/>
-      <terminal symbol-number="56" token-number="311" name="HAVING" usefulness="useful"/>
-      <terminal symbol-number="57" token-number="312" name="OUTERJ" usefulness="useful" prec="9" assoc="left"/>
-      <terminal symbol-number="58" token-number="313" name="UNION" usefulness="useful" prec="5" assoc="left"/>
-      <terminal symbol-number="59" token-number="314" name="DELETE" usefulness="useful"/>
-      <terminal symbol-number="60" token-number="315" name="SET" usefulness="useful"/>
-      <terminal symbol-number="61" token-number="316" name="COMMIT" usefulness="useful"/>
-      <terminal symbol-number="62" token-number="317" name="CAST" usefulness="useful"/>
+      <terminal symbol-number="8" token-number="263" name="DELETE" usefulness="useful"/>
+      <terminal symbol-number="9" token-number="264" name="INSERT" usefulness="useful"/>
+      <terminal symbol-number="10" token-number="265" name="ESCAPE" usefulness="useful"/>
+      <terminal symbol-number="11" token-number="266" name="OVER" usefulness="useful" prec="1" assoc="left"/>
+      <terminal symbol-number="12" token-number="267" name="UPDATE" usefulness="useful"/>
+      <terminal symbol-number="13" token-number="268" name="EXISTS" usefulness="useful"/>
+      <terminal symbol-number="14" token-number="269" name="HAVING" usefulness="useful"/>
+      <terminal symbol-number="15" token-number="270" name="COMMIT" usefulness="useful"/>
+      <terminal symbol-number="16" token-number="271" name="WHERE" usefulness="useful"/>
+      <terminal symbol-number="17" token-number="272" name="TABLE" usefulness="useful"/>
+      <terminal symbol-number="18" token-number="273" name="ORDER" usefulness="useful"/>
+      <terminal symbol-number="19" token-number="274" name="OR" usefulness="useful" prec="2" assoc="left"/>
+      <terminal symbol-number="20" token-number="275" name="GROUP" usefulness="useful"/>
+      <terminal symbol-number="21" token-number="276" name="RIGHT" usefulness="useful"/>
+      <terminal symbol-number="22" token-number="277" name="INNER" usefulness="useful"/>
+      <terminal symbol-number="23" token-number="278" name="OUTER" usefulness="useful"/>
+      <terminal symbol-number="24" token-number="279" name="UNION" usefulness="useful" prec="5" assoc="left"/>
+      <terminal symbol-number="25" token-number="280" name="FROM" usefulness="useful"/>
+      <terminal symbol-number="26" token-number="281" name="WHEN" usefulness="useful"/>
+      <terminal symbol-number="27" token-number="282" name="THEN" usefulness="useful"/>
+      <terminal symbol-number="28" token-number="283" name="CASE" usefulness="useful"/>
+      <terminal symbol-number="29" token-number="284" name="CAST" usefulness="useful"/>
+      <terminal symbol-number="30" token-number="285" name="ELSE" usefulness="useful"/>
+      <terminal symbol-number="31" token-number="286" name="DESC" usefulness="useful"/>
+      <terminal symbol-number="32" token-number="287" name="LIKE" usefulness="useful" prec="7" assoc="left"/>
+      <terminal symbol-number="33" token-number="288" name="JOIN" usefulness="useful"/>
+      <terminal symbol-number="34" token-number="289" name="LEFT" usefulness="useful"/>
+      <terminal symbol-number="35" token-number="290" name="NULL" usefulness="useful"/>
+      <terminal symbol-number="36" token-number="291" name="FULL" usefulness="useful"/>
+      <terminal symbol-number="37" token-number="292" name="INTO" usefulness="useful"/>
+      <terminal symbol-number="38" token-number="293" name="AND" usefulness="useful" prec="3" assoc="left"/>
+      <terminal symbol-number="39" token-number="294" name="SET" usefulness="useful"/>
+      <terminal symbol-number="40" token-number="295" name="END" usefulness="useful"/>
+      <terminal symbol-number="41" token-number="296" name="ASC" usefulness="useful"/>
+      <terminal symbol-number="42" token-number="297" name="XOR" usefulness="useful" prec="2" assoc="left"/>
+      <terminal symbol-number="43" token-number="298" name="FOR" usefulness="useful"/>
+      <terminal symbol-number="44" token-number="299" name="NOT" usefulness="useful" prec="4" assoc="right"/>
+      <terminal symbol-number="45" token-number="300" name="ON" usefulness="useful"/>
+      <terminal symbol-number="46" token-number="301" name="BY" usefulness="useful"/>
+      <terminal symbol-number="47" token-number="302" name="AS" usefulness="useful"/>
+      <terminal symbol-number="48" token-number="303" name="IN" usefulness="useful"/>
+      <terminal symbol-number="49" token-number="304" name="IS" usefulness="useful"/>
+      <terminal symbol-number="50" token-number="305" name="OUTERJ" usefulness="useful" prec="9" assoc="left"/>
+      <terminal symbol-number="51" token-number="306" name="NE" usefulness="useful" prec="6" assoc="left"/>
+      <terminal symbol-number="52" token-number="307" name="LE" usefulness="useful" prec="6" assoc="left"/>
+      <terminal symbol-number="53" token-number="308" name="GE" usefulness="useful" prec="6" assoc="left"/>
+      <terminal symbol-number="54" token-number="309" name="CONCAT" usefulness="useful" prec="9" assoc="left"/>
+      <terminal symbol-number="55" token-number="310" name="DIGAL_ERR" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="56" token-number="311" name="STRING_SQ" usefulness="useful"/>
+      <terminal symbol-number="57" token-number="312" name="STRING_SQ_ERR" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="58" token-number="313" name="NUMBER" usefulness="useful"/>
+      <terminal symbol-number="59" token-number="314" name="ID" usefulness="useful"/>
+      <terminal symbol-number="60" token-number="315" name="UNKNOWN_CHARACTER_ERR" usefulness="unused-in-grammar"/>
     </terminals>
     <nonterminals>
-      <nonterminal symbol-number="75" name="$accept" usefulness="useful"/>
-      <nonterminal symbol-number="76" name="query" usefulness="useful"/>
-      <nonterminal symbol-number="77" name="update" usefulness="useful"/>
-      <nonterminal symbol-number="78" name="assignList" usefulness="useful"/>
-      <nonterminal symbol-number="79" name="assign" usefulness="useful"/>
-      <nonterminal symbol-number="80" name="delete" usefulness="useful"/>
-      <nonterminal symbol-number="81" name="optFrom" usefulness="useful"/>
-      <nonterminal symbol-number="82" name="insert" usefulness="useful"/>
-      <nonterminal symbol-number="83" name="insertRest" usefulness="useful"/>
-      <nonterminal symbol-number="84" name="optIdList" usefulness="useful"/>
-      <nonterminal symbol-number="85" name="idList" usefulness="useful"/>
-      <nonterminal symbol-number="86" name="bracketedSelect" usefulness="useful"/>
-      <nonterminal symbol-number="87" name="select" usefulness="useful"/>
-      <nonterminal symbol-number="88" name="basicSelect" usefulness="useful"/>
-      <nonterminal symbol-number="89" name="where" usefulness="useful"/>
-      <nonterminal symbol-number="90" name="forUpdate" usefulness="useful"/>
-      <nonterminal symbol-number="91" name="groupBy" usefulness="useful"/>
-      <nonterminal symbol-number="92" name="optGroupBy" usefulness="useful"/>
-      <nonterminal symbol-number="93" name="having" usefulness="useful"/>
-      <nonterminal symbol-number="94" name="orderBy" usefulness="useful"/>
-      <nonterminal symbol-number="95" name="optOrderBy" usefulness="useful"/>
-      <nonterminal symbol-number="96" name="byClauses" usefulness="useful"/>
-      <nonterminal symbol-number="97" name="directionList" usefulness="useful"/>
-      <nonterminal symbol-number="98" name="direction" usefulness="useful"/>
-      <nonterminal symbol-number="99" name="orderDirection" usefulness="useful"/>
-      <nonterminal symbol-number="100" name="optDist" usefulness="useful"/>
-      <nonterminal symbol-number="101" name="whatToSelect" usefulness="useful"/>
-      <nonterminal symbol-number="102" name="selectExpression" usefulness="useful"/>
-      <nonterminal symbol-number="103" name="id" usefulness="useful"/>
-      <nonterminal symbol-number="104" name="expression" usefulness="useful"/>
-      <nonterminal symbol-number="105" name="selectExpressionList" usefulness="useful"/>
-      <nonterminal symbol-number="106" name="tableList" usefulness="useful"/>
-      <nonterminal symbol-number="107" name="table" usefulness="useful"/>
-      <nonterminal symbol-number="108" name="join" usefulness="useful"/>
-      <nonterminal symbol-number="109" name="outerType" usefulness="useful"/>
-      <nonterminal symbol-number="110" name="alias" usefulness="useful"/>
-      <nonterminal symbol-number="111" name="tableExpr" usefulness="useful"/>
-      <nonterminal symbol-number="112" name="ident" usefulness="useful"/>
-      <nonterminal symbol-number="113" name="whereCond" usefulness="useful"/>
-      <nonterminal symbol-number="114" name="condition" usefulness="useful"/>
-      <nonterminal symbol-number="115" name="idList2" usefulness="useful"/>
-      <nonterminal symbol-number="116" name="comparison" usefulness="useful"/>
-      <nonterminal symbol-number="117" name="escape" usefulness="useful"/>
-      <nonterminal symbol-number="118" name="inExpr" usefulness="useful"/>
-      <nonterminal symbol-number="119" name="optNot" usefulness="useful"/>
-      <nonterminal symbol-number="120" name="simpleExpr" usefulness="useful"/>
-      <nonterminal symbol-number="121" name="optSize" usefulness="useful"/>
-      <nonterminal symbol-number="122" name="identRest" usefulness="useful"/>
-      <nonterminal symbol-number="123" name="whenList" usefulness="useful"/>
-      <nonterminal symbol-number="124" name="when" usefulness="useful"/>
-      <nonterminal symbol-number="125" name="else" usefulness="useful"/>
-      <nonterminal symbol-number="126" name="simExList" usefulness="useful"/>
-      <nonterminal symbol-number="127" name="partition" usefulness="useful"/>
+      <nonterminal symbol-number="73" name="$accept" usefulness="useful"/>
+      <nonterminal symbol-number="74" name="query" usefulness="useful"/>
+      <nonterminal symbol-number="75" name="update" usefulness="useful"/>
+      <nonterminal symbol-number="76" name="assignList" usefulness="useful"/>
+      <nonterminal symbol-number="77" name="assign" usefulness="useful"/>
+      <nonterminal symbol-number="78" name="delete" usefulness="useful"/>
+      <nonterminal symbol-number="79" name="optFrom" usefulness="useful"/>
+      <nonterminal symbol-number="80" name="insert" usefulness="useful"/>
+      <nonterminal symbol-number="81" name="insertRest" usefulness="useful"/>
+      <nonterminal symbol-number="82" name="optIdList" usefulness="useful"/>
+      <nonterminal symbol-number="83" name="idList" usefulness="useful"/>
+      <nonterminal symbol-number="84" name="bracketedSelect" usefulness="useful"/>
+      <nonterminal symbol-number="85" name="select" usefulness="useful"/>
+      <nonterminal symbol-number="86" name="basicSelect" usefulness="useful"/>
+      <nonterminal symbol-number="87" name="where" usefulness="useful"/>
+      <nonterminal symbol-number="88" name="forUpdate" usefulness="useful"/>
+      <nonterminal symbol-number="89" name="groupBy" usefulness="useful"/>
+      <nonterminal symbol-number="90" name="optGroupBy" usefulness="useful"/>
+      <nonterminal symbol-number="91" name="having" usefulness="useful"/>
+      <nonterminal symbol-number="92" name="orderBy" usefulness="useful"/>
+      <nonterminal symbol-number="93" name="optOrderBy" usefulness="useful"/>
+      <nonterminal symbol-number="94" name="byClauses" usefulness="useful"/>
+      <nonterminal symbol-number="95" name="directionList" usefulness="useful"/>
+      <nonterminal symbol-number="96" name="direction" usefulness="useful"/>
+      <nonterminal symbol-number="97" name="orderDirection" usefulness="useful"/>
+      <nonterminal symbol-number="98" name="optDist" usefulness="useful"/>
+      <nonterminal symbol-number="99" name="whatToSelect" usefulness="useful"/>
+      <nonterminal symbol-number="100" name="selectExpression" usefulness="useful"/>
+      <nonterminal symbol-number="101" name="id" usefulness="useful"/>
+      <nonterminal symbol-number="102" name="expression" usefulness="useful"/>
+      <nonterminal symbol-number="103" name="selectExpressionList" usefulness="useful"/>
+      <nonterminal symbol-number="104" name="tableList" usefulness="useful"/>
+      <nonterminal symbol-number="105" name="table" usefulness="useful"/>
+      <nonterminal symbol-number="106" name="join" usefulness="useful"/>
+      <nonterminal symbol-number="107" name="outerType" usefulness="useful"/>
+      <nonterminal symbol-number="108" name="alias" usefulness="useful"/>
+      <nonterminal symbol-number="109" name="tableExpr" usefulness="useful"/>
+      <nonterminal symbol-number="110" name="ident" usefulness="useful"/>
+      <nonterminal symbol-number="111" name="whereCond" usefulness="useful"/>
+      <nonterminal symbol-number="112" name="condition" usefulness="useful"/>
+      <nonterminal symbol-number="113" name="idList2" usefulness="useful"/>
+      <nonterminal symbol-number="114" name="comparison" usefulness="useful"/>
+      <nonterminal symbol-number="115" name="escape" usefulness="useful"/>
+      <nonterminal symbol-number="116" name="inExpr" usefulness="useful"/>
+      <nonterminal symbol-number="117" name="optNot" usefulness="useful"/>
+      <nonterminal symbol-number="118" name="simpleExpr" usefulness="useful"/>
+      <nonterminal symbol-number="119" name="optSize" usefulness="useful"/>
+      <nonterminal symbol-number="120" name="identRest" usefulness="useful"/>
+      <nonterminal symbol-number="121" name="whenList" usefulness="useful"/>
+      <nonterminal symbol-number="122" name="when" usefulness="useful"/>
+      <nonterminal symbol-number="123" name="else" usefulness="useful"/>
+      <nonterminal symbol-number="124" name="simExList" usefulness="useful"/>
+      <nonterminal symbol-number="125" name="partition" usefulness="useful"/>
     </nonterminals>
   </grammar>
 
@@ -1168,9 +1166,9 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="SELECT" state="1"/>
-          <transition type="shift" symbol="INSERT" state="2"/>
-          <transition type="shift" symbol="UPDATE" state="3"/>
-          <transition type="shift" symbol="DELETE" state="4"/>
+          <transition type="shift" symbol="DELETE" state="2"/>
+          <transition type="shift" symbol="INSERT" state="3"/>
+          <transition type="shift" symbol="UPDATE" state="4"/>
           <transition type="shift" symbol="COMMIT" state="5"/>
           <transition type="shift" symbol="'('" state="6"/>
           <transition type="goto" symbol="query" state="7"/>
@@ -1193,14 +1191,14 @@
         <item rule-number="47" point="0"/>
         <item rule-number="48" point="0">
           <lookaheads>
+            <symbol>EXISTS</symbol>
             <symbol>CASE</symbol>
-            <symbol>NOT</symbol>
+            <symbol>CAST</symbol>
             <symbol>NULL</symbol>
+            <symbol>NOT</symbol>
             <symbol>STRING_SQ</symbol>
             <symbol>NUMBER</symbol>
             <symbol>ID</symbol>
-            <symbol>EXISTS</symbol>
-            <symbol>CAST</symbol>
             <symbol>'-'</symbol>
             <symbol>'*'</symbol>
             <symbol>'('</symbol>
@@ -1223,11 +1221,36 @@
 
     <state number="2">
       <itemset>
+        <item rule-number="11" point="1"/>
+        <item rule-number="12" point="0"/>
+        <item rule-number="13" point="0">
+          <lookaheads>
+            <symbol>TABLE</symbol>
+            <symbol>ID</symbol>
+            <symbol>'('</symbol>
+          </lookaheads>
+        </item>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="FROM" state="16"/>
+          <transition type="goto" symbol="optFrom" state="17"/>
+        </transitions>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="13" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="3">
+      <itemset>
         <item rule-number="14" point="1"/>
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="INTO" state="16"/>
+          <transition type="shift" symbol="INTO" state="18"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -1235,7 +1258,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="3">
+    <state number="4">
       <itemset>
         <item rule-number="6" point="1"/>
         <item rule-number="69" point="0"/>
@@ -1249,40 +1272,15 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="ID" state="17"/>
-          <transition type="shift" symbol="TABLE" state="18"/>
-          <transition type="shift" symbol="'('" state="19"/>
-          <transition type="goto" symbol="alias" state="20"/>
-          <transition type="goto" symbol="tableExpr" state="21"/>
-          <transition type="goto" symbol="ident" state="22"/>
+          <transition type="shift" symbol="TABLE" state="19"/>
+          <transition type="shift" symbol="ID" state="20"/>
+          <transition type="shift" symbol="'('" state="21"/>
+          <transition type="goto" symbol="alias" state="22"/>
+          <transition type="goto" symbol="tableExpr" state="23"/>
+          <transition type="goto" symbol="ident" state="24"/>
         </transitions>
         <errors/>
         <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="4">
-      <itemset>
-        <item rule-number="11" point="1"/>
-        <item rule-number="12" point="0"/>
-        <item rule-number="13" point="0">
-          <lookaheads>
-            <symbol>ID</symbol>
-            <symbol>TABLE</symbol>
-            <symbol>'('</symbol>
-          </lookaheads>
-        </item>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="FROM" state="23"/>
-          <transition type="goto" symbol="optFrom" state="24"/>
-        </transitions>
-        <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="13" enabled="true"/>
-        </reductions>
       </actions>
       <solved-conflicts/>
     </state>
@@ -1420,8 +1418,8 @@
             <symbol>$end</symbol>
             <symbol>ORDER</symbol>
             <symbol>GROUP</symbol>
-            <symbol>FOR</symbol>
             <symbol>UNION</symbol>
+            <symbol>FOR</symbol>
             <symbol>')'</symbol>
           </lookaheads>
         </item>
@@ -1509,14 +1507,14 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NOT" state="31"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="EXISTS" state="36"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="EXISTS" state="30"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="NOT" state="34"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="40"/>
@@ -1538,173 +1536,6 @@
 
     <state number="16">
       <itemset>
-        <item rule-number="14" point="2"/>
-        <item rule-number="69" point="0"/>
-        <item rule-number="70" point="0"/>
-        <item rule-number="71" point="0"/>
-        <item rule-number="72" point="0"/>
-        <item rule-number="73" point="0"/>
-        <item rule-number="74" point="0"/>
-        <item rule-number="75" point="0"/>
-        <item rule-number="76" point="0"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="ID" state="17"/>
-          <transition type="shift" symbol="TABLE" state="18"/>
-          <transition type="shift" symbol="'('" state="19"/>
-          <transition type="goto" symbol="alias" state="50"/>
-          <transition type="goto" symbol="tableExpr" state="21"/>
-          <transition type="goto" symbol="ident" state="22"/>
-        </transitions>
-        <errors/>
-        <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="17">
-      <itemset>
-        <item rule-number="74" point="1">
-          <lookaheads>
-            <symbol>$end</symbol>
-            <symbol>VALUES</symbol>
-            <symbol>SELECT</symbol>
-            <symbol>WHERE</symbol>
-            <symbol>ORDER</symbol>
-            <symbol>GROUP</symbol>
-            <symbol>RIGHT</symbol>
-            <symbol>INNER</symbol>
-            <symbol>JOIN</symbol>
-            <symbol>LEFT</symbol>
-            <symbol>FULL</symbol>
-            <symbol>ON</symbol>
-            <symbol>ID</symbol>
-            <symbol>FOR</symbol>
-            <symbol>UNION</symbol>
-            <symbol>SET</symbol>
-            <symbol>'='</symbol>
-            <symbol>','</symbol>
-            <symbol>'('</symbol>
-            <symbol>')'</symbol>
-          </lookaheads>
-        </item>
-        <item rule-number="75" point="1"/>
-        <item rule-number="76" point="1"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="'.'" state="51"/>
-        </transitions>
-        <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="74" enabled="true"/>
-        </reductions>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="18">
-      <itemset>
-        <item rule-number="72" point="1"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="'('" state="52"/>
-        </transitions>
-        <errors/>
-        <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="19">
-      <itemset>
-        <item rule-number="23" point="0"/>
-        <item rule-number="24" point="0"/>
-        <item rule-number="25" point="0"/>
-        <item rule-number="73" point="1"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="SELECT" state="1"/>
-          <transition type="goto" symbol="select" state="53"/>
-          <transition type="goto" symbol="basicSelect" state="13"/>
-        </transitions>
-        <errors/>
-        <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="20">
-      <itemset>
-        <item rule-number="6" point="2"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="SET" state="54"/>
-        </transitions>
-        <errors/>
-        <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="21">
-      <itemset>
-        <item rule-number="69" point="1">
-          <lookaheads>
-            <symbol>$end</symbol>
-            <symbol>VALUES</symbol>
-            <symbol>SELECT</symbol>
-            <symbol>WHERE</symbol>
-            <symbol>ORDER</symbol>
-            <symbol>GROUP</symbol>
-            <symbol>RIGHT</symbol>
-            <symbol>INNER</symbol>
-            <symbol>JOIN</symbol>
-            <symbol>LEFT</symbol>
-            <symbol>FULL</symbol>
-            <symbol>ON</symbol>
-            <symbol>FOR</symbol>
-            <symbol>UNION</symbol>
-            <symbol>SET</symbol>
-            <symbol>','</symbol>
-            <symbol>'('</symbol>
-            <symbol>')'</symbol>
-          </lookaheads>
-        </item>
-        <item rule-number="70" point="1"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="ID" state="55"/>
-        </transitions>
-        <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="69" enabled="true"/>
-        </reductions>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="22">
-      <itemset>
-        <item rule-number="71" point="1"/>
-      </itemset>
-      <actions>
-        <transitions/>
-        <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="71" enabled="true"/>
-        </reductions>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="23">
-      <itemset>
         <item rule-number="12" point="1"/>
       </itemset>
       <actions>
@@ -1717,7 +1548,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="24">
+    <state number="17">
       <itemset>
         <item rule-number="11" point="2"/>
         <item rule-number="69" point="0"/>
@@ -1731,15 +1562,182 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="ID" state="17"/>
-          <transition type="shift" symbol="TABLE" state="18"/>
-          <transition type="shift" symbol="'('" state="19"/>
-          <transition type="goto" symbol="alias" state="56"/>
-          <transition type="goto" symbol="tableExpr" state="21"/>
-          <transition type="goto" symbol="ident" state="22"/>
+          <transition type="shift" symbol="TABLE" state="19"/>
+          <transition type="shift" symbol="ID" state="20"/>
+          <transition type="shift" symbol="'('" state="21"/>
+          <transition type="goto" symbol="alias" state="50"/>
+          <transition type="goto" symbol="tableExpr" state="23"/>
+          <transition type="goto" symbol="ident" state="24"/>
         </transitions>
         <errors/>
         <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="18">
+      <itemset>
+        <item rule-number="14" point="2"/>
+        <item rule-number="69" point="0"/>
+        <item rule-number="70" point="0"/>
+        <item rule-number="71" point="0"/>
+        <item rule-number="72" point="0"/>
+        <item rule-number="73" point="0"/>
+        <item rule-number="74" point="0"/>
+        <item rule-number="75" point="0"/>
+        <item rule-number="76" point="0"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="TABLE" state="19"/>
+          <transition type="shift" symbol="ID" state="20"/>
+          <transition type="shift" symbol="'('" state="21"/>
+          <transition type="goto" symbol="alias" state="51"/>
+          <transition type="goto" symbol="tableExpr" state="23"/>
+          <transition type="goto" symbol="ident" state="24"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="19">
+      <itemset>
+        <item rule-number="72" point="1"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="'('" state="52"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="20">
+      <itemset>
+        <item rule-number="74" point="1">
+          <lookaheads>
+            <symbol>$end</symbol>
+            <symbol>VALUES</symbol>
+            <symbol>SELECT</symbol>
+            <symbol>WHERE</symbol>
+            <symbol>ORDER</symbol>
+            <symbol>GROUP</symbol>
+            <symbol>RIGHT</symbol>
+            <symbol>INNER</symbol>
+            <symbol>UNION</symbol>
+            <symbol>JOIN</symbol>
+            <symbol>LEFT</symbol>
+            <symbol>FULL</symbol>
+            <symbol>SET</symbol>
+            <symbol>FOR</symbol>
+            <symbol>ON</symbol>
+            <symbol>ID</symbol>
+            <symbol>'='</symbol>
+            <symbol>','</symbol>
+            <symbol>'('</symbol>
+            <symbol>')'</symbol>
+          </lookaheads>
+        </item>
+        <item rule-number="75" point="1"/>
+        <item rule-number="76" point="1"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="'.'" state="53"/>
+        </transitions>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="74" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="21">
+      <itemset>
+        <item rule-number="23" point="0"/>
+        <item rule-number="24" point="0"/>
+        <item rule-number="25" point="0"/>
+        <item rule-number="73" point="1"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="SELECT" state="1"/>
+          <transition type="goto" symbol="select" state="54"/>
+          <transition type="goto" symbol="basicSelect" state="13"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="22">
+      <itemset>
+        <item rule-number="6" point="2"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="SET" state="55"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="23">
+      <itemset>
+        <item rule-number="69" point="1">
+          <lookaheads>
+            <symbol>$end</symbol>
+            <symbol>VALUES</symbol>
+            <symbol>SELECT</symbol>
+            <symbol>WHERE</symbol>
+            <symbol>ORDER</symbol>
+            <symbol>GROUP</symbol>
+            <symbol>RIGHT</symbol>
+            <symbol>INNER</symbol>
+            <symbol>UNION</symbol>
+            <symbol>JOIN</symbol>
+            <symbol>LEFT</symbol>
+            <symbol>FULL</symbol>
+            <symbol>SET</symbol>
+            <symbol>FOR</symbol>
+            <symbol>ON</symbol>
+            <symbol>','</symbol>
+            <symbol>'('</symbol>
+            <symbol>')'</symbol>
+          </lookaheads>
+        </item>
+        <item rule-number="70" point="1"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="ID" state="56"/>
+        </transitions>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="69" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="24">
+      <itemset>
+        <item rule-number="71" point="1"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="71" enabled="true"/>
+        </reductions>
       </actions>
       <solved-conflicts/>
     </state>
@@ -1842,14 +1840,14 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NOT" state="31"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="EXISTS" state="36"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="EXISTS" state="30"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="NOT" state="34"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="40"/>
@@ -1876,8 +1874,8 @@
         <item rule-number="40" point="0">
           <lookaheads>
             <symbol>$end</symbol>
-            <symbol>FOR</symbol>
             <symbol>UNION</symbol>
+            <symbol>FOR</symbol>
             <symbol>')'</symbol>
           </lookaheads>
         </item>
@@ -1900,16 +1898,11 @@
 
     <state number="30">
       <itemset>
-        <item rule-number="108" point="1"/>
-        <item rule-number="128" point="0"/>
-        <item rule-number="129" point="0"/>
-        <item rule-number="130" point="0"/>
+        <item rule-number="90" point="1"/>
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="WHEN" state="67"/>
-          <transition type="goto" symbol="whenList" state="68"/>
-          <transition type="goto" symbol="when" state="69"/>
+          <transition type="shift" symbol="'('" state="67"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -1918,6 +1911,53 @@
     </state>
 
     <state number="31">
+      <itemset>
+        <item rule-number="108" point="1"/>
+        <item rule-number="128" point="0"/>
+        <item rule-number="129" point="0"/>
+        <item rule-number="130" point="0"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="WHEN" state="68"/>
+          <transition type="goto" symbol="whenList" state="69"/>
+          <transition type="goto" symbol="when" state="70"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="32">
+      <itemset>
+        <item rule-number="118" point="1"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="'('" state="71"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="33">
+      <itemset>
+        <item rule-number="123" point="1"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="123" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="34">
       <itemset>
         <item rule-number="74" point="0"/>
         <item rule-number="75" point="0"/>
@@ -1965,20 +2005,20 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NOT" state="31"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="EXISTS" state="36"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="EXISTS" state="30"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="NOT" state="34"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="40"/>
           <transition type="shift" symbol="'?'" state="41"/>
           <transition type="goto" symbol="ident" state="46"/>
-          <transition type="goto" symbol="condition" state="70"/>
+          <transition type="goto" symbol="condition" state="72"/>
           <transition type="goto" symbol="comparison" state="48"/>
           <transition type="goto" symbol="simpleExpr" state="61"/>
         </transitions>
@@ -1988,21 +2028,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="32">
-      <itemset>
-        <item rule-number="123" point="1"/>
-      </itemset>
-      <actions>
-        <transitions/>
-        <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="123" enabled="true"/>
-        </reductions>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="33">
+    <state number="35">
       <itemset>
         <item rule-number="109" point="1"/>
       </itemset>
@@ -2016,7 +2042,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="34">
+    <state number="36">
       <itemset>
         <item rule-number="105" point="1"/>
       </itemset>
@@ -2030,46 +2056,46 @@
       <solved-conflicts/>
     </state>
 
-    <state number="35">
+    <state number="37">
       <itemset>
         <item rule-number="74" point="1">
           <lookaheads>
             <symbol>$end</symbol>
-            <symbol>OVER</symbol>
+            <symbol>BETWEEN</symbol>
             <symbol>ESCAPE</symbol>
+            <symbol>OVER</symbol>
+            <symbol>HAVING</symbol>
             <symbol>WHERE</symbol>
             <symbol>ORDER</symbol>
+            <symbol>OR</symbol>
             <symbol>GROUP</symbol>
             <symbol>RIGHT</symbol>
             <symbol>INNER</symbol>
+            <symbol>UNION</symbol>
             <symbol>FROM</symbol>
-            <symbol>JOIN</symbol>
-            <symbol>LEFT</symbol>
             <symbol>WHEN</symbol>
             <symbol>THEN</symbol>
             <symbol>ELSE</symbol>
-            <symbol>FULL</symbol>
             <symbol>DESC</symbol>
-            <symbol>ASC</symbol>
+            <symbol>LIKE</symbol>
+            <symbol>JOIN</symbol>
+            <symbol>LEFT</symbol>
+            <symbol>FULL</symbol>
             <symbol>AND</symbol>
             <symbol>END</symbol>
+            <symbol>ASC</symbol>
             <symbol>XOR</symbol>
+            <symbol>FOR</symbol>
             <symbol>NOT</symbol>
-            <symbol>OR</symbol>
             <symbol>AS</symbol>
             <symbol>IN</symbol>
             <symbol>IS</symbol>
-            <symbol>ID</symbol>
+            <symbol>OUTERJ</symbol>
             <symbol>NE</symbol>
             <symbol>LE</symbol>
             <symbol>GE</symbol>
             <symbol>CONCAT</symbol>
-            <symbol>LIKE</symbol>
-            <symbol>FOR</symbol>
-            <symbol>BETWEEN</symbol>
-            <symbol>HAVING</symbol>
-            <symbol>OUTERJ</symbol>
-            <symbol>UNION</symbol>
+            <symbol>ID</symbol>
             <symbol>'='</symbol>
             <symbol>'&gt;'</symbol>
             <symbol>'&lt;'</symbol>
@@ -2088,40 +2114,12 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="'.'" state="71"/>
+          <transition type="shift" symbol="'.'" state="73"/>
         </transitions>
         <errors/>
         <reductions>
           <reduction symbol="$default" rule="74" enabled="true"/>
         </reductions>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="36">
-      <itemset>
-        <item rule-number="90" point="1"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="'('" state="72"/>
-        </transitions>
-        <errors/>
-        <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="37">
-      <itemset>
-        <item rule-number="118" point="1"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="'('" state="73"/>
-        </transitions>
-        <errors/>
-        <reductions/>
       </actions>
       <solved-conflicts/>
     </state>
@@ -2154,12 +2152,12 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="74"/>
@@ -2245,14 +2243,14 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="SELECT" state="1"/>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NOT" state="31"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
+          <transition type="shift" symbol="EXISTS" state="30"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="NOT" state="34"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
           <transition type="shift" symbol="ID" state="76"/>
-          <transition type="shift" symbol="EXISTS" state="36"/>
-          <transition type="shift" symbol="CAST" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="40"/>
@@ -2367,41 +2365,41 @@
         <item rule-number="127" point="0">
           <lookaheads>
             <symbol>$end</symbol>
-            <symbol>OVER</symbol>
+            <symbol>BETWEEN</symbol>
             <symbol>ESCAPE</symbol>
+            <symbol>OVER</symbol>
+            <symbol>HAVING</symbol>
             <symbol>WHERE</symbol>
             <symbol>ORDER</symbol>
+            <symbol>OR</symbol>
             <symbol>GROUP</symbol>
             <symbol>RIGHT</symbol>
             <symbol>INNER</symbol>
+            <symbol>UNION</symbol>
             <symbol>FROM</symbol>
-            <symbol>JOIN</symbol>
-            <symbol>LEFT</symbol>
             <symbol>WHEN</symbol>
             <symbol>THEN</symbol>
             <symbol>ELSE</symbol>
-            <symbol>FULL</symbol>
             <symbol>DESC</symbol>
-            <symbol>ASC</symbol>
+            <symbol>LIKE</symbol>
+            <symbol>JOIN</symbol>
+            <symbol>LEFT</symbol>
+            <symbol>FULL</symbol>
             <symbol>AND</symbol>
             <symbol>END</symbol>
+            <symbol>ASC</symbol>
             <symbol>XOR</symbol>
+            <symbol>FOR</symbol>
             <symbol>NOT</symbol>
-            <symbol>OR</symbol>
             <symbol>AS</symbol>
             <symbol>IN</symbol>
             <symbol>IS</symbol>
-            <symbol>ID</symbol>
+            <symbol>OUTERJ</symbol>
             <symbol>NE</symbol>
             <symbol>LE</symbol>
             <symbol>GE</symbol>
             <symbol>CONCAT</symbol>
-            <symbol>LIKE</symbol>
-            <symbol>FOR</symbol>
-            <symbol>BETWEEN</symbol>
-            <symbol>HAVING</symbol>
-            <symbol>OUTERJ</symbol>
-            <symbol>UNION</symbol>
+            <symbol>ID</symbol>
             <symbol>'='</symbol>
             <symbol>'&gt;'</symbol>
             <symbol>'&lt;'</symbol>
@@ -2443,9 +2441,9 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="AND" state="88"/>
-          <transition type="shift" symbol="XOR" state="89"/>
-          <transition type="shift" symbol="OR" state="90"/>
+          <transition type="shift" symbol="OR" state="88"/>
+          <transition type="shift" symbol="AND" state="89"/>
+          <transition type="shift" symbol="XOR" state="90"/>
         </transitions>
         <errors/>
         <reductions>
@@ -2494,9 +2492,9 @@
         <item rule-number="103" point="0"/>
         <item rule-number="104" point="0">
           <lookaheads>
-            <symbol>IN</symbol>
-            <symbol>LIKE</symbol>
             <symbol>BETWEEN</symbol>
+            <symbol>LIKE</symbol>
+            <symbol>IN</symbol>
           </lookaheads>
         </item>
         <item rule-number="106" point="1"/>
@@ -2512,11 +2510,11 @@
           <transition type="shift" symbol="OVER" state="91"/>
           <transition type="shift" symbol="NOT" state="92"/>
           <transition type="shift" symbol="IS" state="93"/>
-          <transition type="shift" symbol="NE" state="94"/>
-          <transition type="shift" symbol="LE" state="95"/>
-          <transition type="shift" symbol="GE" state="96"/>
-          <transition type="shift" symbol="CONCAT" state="97"/>
-          <transition type="shift" symbol="OUTERJ" state="98"/>
+          <transition type="shift" symbol="OUTERJ" state="94"/>
+          <transition type="shift" symbol="NE" state="95"/>
+          <transition type="shift" symbol="LE" state="96"/>
+          <transition type="shift" symbol="GE" state="97"/>
+          <transition type="shift" symbol="CONCAT" state="98"/>
           <transition type="shift" symbol="'='" state="99"/>
           <transition type="shift" symbol="'&gt;'" state="100"/>
           <transition type="shift" symbol="'&lt;'" state="101"/>
@@ -2529,9 +2527,9 @@
         </transitions>
         <errors/>
         <reductions>
-          <reduction symbol="IN" rule="104" enabled="true"/>
-          <reduction symbol="LIKE" rule="104" enabled="true"/>
           <reduction symbol="BETWEEN" rule="104" enabled="true"/>
+          <reduction symbol="LIKE" rule="104" enabled="true"/>
+          <reduction symbol="IN" rule="104" enabled="true"/>
           <reduction symbol="$default" rule="55" enabled="true"/>
         </reductions>
       </actions>
@@ -2539,6 +2537,29 @@
     </state>
 
     <state number="50">
+      <itemset>
+        <item rule-number="11" point="3"/>
+        <item rule-number="26" point="0"/>
+        <item rule-number="27" point="0">
+          <lookaheads>
+            <symbol>$end</symbol>
+          </lookaheads>
+        </item>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="WHERE" state="28"/>
+          <transition type="goto" symbol="where" state="108"/>
+        </transitions>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="27" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="51">
       <itemset>
         <item rule-number="14" point="3"/>
         <item rule-number="17" point="0">
@@ -2551,28 +2572,13 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="'('" state="108"/>
-          <transition type="goto" symbol="optIdList" state="109"/>
+          <transition type="shift" symbol="'('" state="109"/>
+          <transition type="goto" symbol="optIdList" state="110"/>
         </transitions>
         <errors/>
         <reductions>
           <reduction symbol="$default" rule="17" enabled="true"/>
         </reductions>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="51">
-      <itemset>
-        <item rule-number="75" point="2"/>
-        <item rule-number="76" point="2"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="ID" state="110"/>
-        </transitions>
-        <errors/>
-        <reductions/>
       </actions>
       <solved-conflicts/>
     </state>
@@ -2605,12 +2611,12 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="74"/>
@@ -2626,13 +2632,12 @@
 
     <state number="53">
       <itemset>
-        <item rule-number="24" point="1"/>
-        <item rule-number="73" point="2"/>
+        <item rule-number="75" point="2"/>
+        <item rule-number="76" point="2"/>
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="UNION" state="27"/>
-          <transition type="shift" symbol="')'" state="112"/>
+          <transition type="shift" symbol="ID" state="112"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -2641,6 +2646,22 @@
     </state>
 
     <state number="54">
+      <itemset>
+        <item rule-number="24" point="1"/>
+        <item rule-number="73" point="2"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="UNION" state="27"/>
+          <transition type="shift" symbol="')'" state="113"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="55">
       <itemset>
         <item rule-number="6" point="3"/>
         <item rule-number="7" point="0"/>
@@ -2653,11 +2674,11 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="ID" state="17"/>
-          <transition type="shift" symbol="'('" state="113"/>
-          <transition type="goto" symbol="assignList" state="114"/>
-          <transition type="goto" symbol="assign" state="115"/>
-          <transition type="goto" symbol="ident" state="116"/>
+          <transition type="shift" symbol="ID" state="20"/>
+          <transition type="shift" symbol="'('" state="114"/>
+          <transition type="goto" symbol="assignList" state="115"/>
+          <transition type="goto" symbol="assign" state="116"/>
+          <transition type="goto" symbol="ident" state="117"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -2665,7 +2686,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="55">
+    <state number="56">
       <itemset>
         <item rule-number="70" point="2"/>
       </itemset>
@@ -2674,29 +2695,6 @@
         <errors/>
         <reductions>
           <reduction symbol="$default" rule="70" enabled="true"/>
-        </reductions>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="56">
-      <itemset>
-        <item rule-number="11" point="3"/>
-        <item rule-number="26" point="0"/>
-        <item rule-number="27" point="0">
-          <lookaheads>
-            <symbol>$end</symbol>
-          </lookaheads>
-        </item>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="WHERE" state="28"/>
-          <transition type="goto" symbol="where" state="117"/>
-        </transitions>
-        <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="27" enabled="true"/>
         </reductions>
       </actions>
       <solved-conflicts/>
@@ -2760,8 +2758,8 @@
             <symbol>$end</symbol>
             <symbol>ORDER</symbol>
             <symbol>GROUP</symbol>
-            <symbol>FOR</symbol>
             <symbol>UNION</symbol>
+            <symbol>FOR</symbol>
             <symbol>')'</symbol>
           </lookaheads>
         </item>
@@ -2771,9 +2769,9 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="AND" state="88"/>
-          <transition type="shift" symbol="XOR" state="89"/>
-          <transition type="shift" symbol="OR" state="90"/>
+          <transition type="shift" symbol="OR" state="88"/>
+          <transition type="shift" symbol="AND" state="89"/>
+          <transition type="shift" symbol="XOR" state="90"/>
         </transitions>
         <errors/>
         <reductions>
@@ -2800,9 +2798,9 @@
         <item rule-number="103" point="0"/>
         <item rule-number="104" point="0">
           <lookaheads>
-            <symbol>IN</symbol>
-            <symbol>LIKE</symbol>
             <symbol>BETWEEN</symbol>
+            <symbol>LIKE</symbol>
+            <symbol>IN</symbol>
           </lookaheads>
         </item>
         <item rule-number="106" point="1"/>
@@ -2818,11 +2816,11 @@
           <transition type="shift" symbol="OVER" state="91"/>
           <transition type="shift" symbol="NOT" state="92"/>
           <transition type="shift" symbol="IS" state="93"/>
-          <transition type="shift" symbol="NE" state="94"/>
-          <transition type="shift" symbol="LE" state="95"/>
-          <transition type="shift" symbol="GE" state="96"/>
-          <transition type="shift" symbol="CONCAT" state="97"/>
-          <transition type="shift" symbol="OUTERJ" state="98"/>
+          <transition type="shift" symbol="OUTERJ" state="94"/>
+          <transition type="shift" symbol="NE" state="95"/>
+          <transition type="shift" symbol="LE" state="96"/>
+          <transition type="shift" symbol="GE" state="97"/>
+          <transition type="shift" symbol="CONCAT" state="98"/>
           <transition type="shift" symbol="'='" state="99"/>
           <transition type="shift" symbol="'&gt;'" state="100"/>
           <transition type="shift" symbol="'&lt;'" state="101"/>
@@ -2876,8 +2874,8 @@
         <item rule-number="37" point="0">
           <lookaheads>
             <symbol>$end</symbol>
-            <symbol>FOR</symbol>
             <symbol>UNION</symbol>
+            <symbol>FOR</symbol>
             <symbol>')'</symbol>
           </lookaheads>
         </item>
@@ -2904,8 +2902,8 @@
         <item rule-number="32" point="0">
           <lookaheads>
             <symbol>$end</symbol>
-            <symbol>FOR</symbol>
             <symbol>UNION</symbol>
+            <symbol>FOR</symbol>
             <symbol>')'</symbol>
           </lookaheads>
         </item>
@@ -2951,6 +2949,25 @@
     </state>
 
     <state number="67">
+      <itemset>
+        <item rule-number="23" point="0"/>
+        <item rule-number="24" point="0"/>
+        <item rule-number="25" point="0"/>
+        <item rule-number="90" point="2"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="SELECT" state="1"/>
+          <transition type="goto" symbol="select" state="126"/>
+          <transition type="goto" symbol="basicSelect" state="13"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="68">
       <itemset>
         <item rule-number="74" point="0"/>
         <item rule-number="75" point="0"/>
@@ -2998,20 +3015,20 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NOT" state="31"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="EXISTS" state="36"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="EXISTS" state="30"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="NOT" state="34"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="40"/>
           <transition type="shift" symbol="'?'" state="41"/>
           <transition type="goto" symbol="ident" state="46"/>
-          <transition type="goto" symbol="condition" state="126"/>
+          <transition type="goto" symbol="condition" state="127"/>
           <transition type="goto" symbol="comparison" state="48"/>
           <transition type="goto" symbol="simpleExpr" state="61"/>
         </transitions>
@@ -3021,7 +3038,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="68">
+    <state number="69">
       <itemset>
         <item rule-number="108" point="2"/>
         <item rule-number="131" point="0"/>
@@ -3033,8 +3050,8 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="ELSE" state="127"/>
-          <transition type="goto" symbol="else" state="128"/>
+          <transition type="shift" symbol="ELSE" state="128"/>
+          <transition type="goto" symbol="else" state="129"/>
         </transitions>
         <errors/>
         <reductions>
@@ -3044,7 +3061,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="69">
+    <state number="70">
       <itemset>
         <item rule-number="128" point="0"/>
         <item rule-number="128" point="1">
@@ -3059,9 +3076,9 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="WHEN" state="67"/>
-          <transition type="goto" symbol="whenList" state="129"/>
-          <transition type="goto" symbol="when" state="69"/>
+          <transition type="shift" symbol="WHEN" state="68"/>
+          <transition type="goto" symbol="whenList" state="130"/>
+          <transition type="goto" symbol="when" state="70"/>
         </transitions>
         <errors/>
         <reductions>
@@ -3071,87 +3088,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="70">
-      <itemset>
-        <item rule-number="78" point="1"/>
-        <item rule-number="79" point="1"/>
-        <item rule-number="80" point="1"/>
-        <item rule-number="81" point="2">
-          <lookaheads>
-            <symbol>$end</symbol>
-            <symbol>WHERE</symbol>
-            <symbol>ORDER</symbol>
-            <symbol>GROUP</symbol>
-            <symbol>RIGHT</symbol>
-            <symbol>INNER</symbol>
-            <symbol>FROM</symbol>
-            <symbol>JOIN</symbol>
-            <symbol>LEFT</symbol>
-            <symbol>THEN</symbol>
-            <symbol>FULL</symbol>
-            <symbol>AND</symbol>
-            <symbol>XOR</symbol>
-            <symbol>OR</symbol>
-            <symbol>AS</symbol>
-            <symbol>ID</symbol>
-            <symbol>FOR</symbol>
-            <symbol>UNION</symbol>
-            <symbol>','</symbol>
-            <symbol>')'</symbol>
-          </lookaheads>
-        </item>
-      </itemset>
-      <actions>
-        <transitions/>
-        <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="81" enabled="true"/>
-        </reductions>
-      </actions>
-      <solved-conflicts>
-        <resolution rule="81" symbol="AND" type="reduce">AND &lt; NOT</resolution>
-        <resolution rule="81" symbol="XOR" type="reduce">XOR &lt; NOT</resolution>
-        <resolution rule="81" symbol="OR" type="reduce">OR &lt; NOT</resolution>
-      </solved-conflicts>
-    </state>
-
     <state number="71">
-      <itemset>
-        <item rule-number="75" point="2"/>
-        <item rule-number="76" point="2"/>
-        <item rule-number="120" point="2"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="ID" state="110"/>
-          <transition type="shift" symbol="'*'" state="130"/>
-        </transitions>
-        <errors/>
-        <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="72">
-      <itemset>
-        <item rule-number="23" point="0"/>
-        <item rule-number="24" point="0"/>
-        <item rule-number="25" point="0"/>
-        <item rule-number="90" point="2"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="SELECT" state="1"/>
-          <transition type="goto" symbol="select" state="131"/>
-          <transition type="goto" symbol="basicSelect" state="13"/>
-        </transitions>
-        <errors/>
-        <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="73">
       <itemset>
         <item rule-number="74" point="0"/>
         <item rule-number="75" point="0"/>
@@ -3179,18 +3116,79 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="74"/>
           <transition type="shift" symbol="'?'" state="41"/>
           <transition type="goto" symbol="ident" state="46"/>
-          <transition type="goto" symbol="simpleExpr" state="132"/>
+          <transition type="goto" symbol="simpleExpr" state="131"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="72">
+      <itemset>
+        <item rule-number="78" point="1"/>
+        <item rule-number="79" point="1"/>
+        <item rule-number="80" point="1"/>
+        <item rule-number="81" point="2">
+          <lookaheads>
+            <symbol>$end</symbol>
+            <symbol>WHERE</symbol>
+            <symbol>ORDER</symbol>
+            <symbol>OR</symbol>
+            <symbol>GROUP</symbol>
+            <symbol>RIGHT</symbol>
+            <symbol>INNER</symbol>
+            <symbol>UNION</symbol>
+            <symbol>FROM</symbol>
+            <symbol>THEN</symbol>
+            <symbol>JOIN</symbol>
+            <symbol>LEFT</symbol>
+            <symbol>FULL</symbol>
+            <symbol>AND</symbol>
+            <symbol>XOR</symbol>
+            <symbol>FOR</symbol>
+            <symbol>AS</symbol>
+            <symbol>ID</symbol>
+            <symbol>','</symbol>
+            <symbol>')'</symbol>
+          </lookaheads>
+        </item>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="81" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts>
+        <resolution rule="81" symbol="OR" type="reduce">OR &lt; NOT</resolution>
+        <resolution rule="81" symbol="AND" type="reduce">AND &lt; NOT</resolution>
+        <resolution rule="81" symbol="XOR" type="reduce">XOR &lt; NOT</resolution>
+      </solved-conflicts>
+    </state>
+
+    <state number="73">
+      <itemset>
+        <item rule-number="75" point="2"/>
+        <item rule-number="76" point="2"/>
+        <item rule-number="120" point="2"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="ID" state="112"/>
+          <transition type="shift" symbol="'*'" state="132"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -3231,12 +3229,12 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="SELECT" state="1"/>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="74"/>
@@ -3258,39 +3256,39 @@
         <item rule-number="107" point="2">
           <lookaheads>
             <symbol>$end</symbol>
-            <symbol>OVER</symbol>
+            <symbol>BETWEEN</symbol>
             <symbol>ESCAPE</symbol>
+            <symbol>OVER</symbol>
+            <symbol>HAVING</symbol>
             <symbol>WHERE</symbol>
             <symbol>ORDER</symbol>
+            <symbol>OR</symbol>
             <symbol>GROUP</symbol>
             <symbol>RIGHT</symbol>
             <symbol>INNER</symbol>
+            <symbol>UNION</symbol>
             <symbol>FROM</symbol>
-            <symbol>JOIN</symbol>
-            <symbol>LEFT</symbol>
             <symbol>WHEN</symbol>
             <symbol>THEN</symbol>
             <symbol>ELSE</symbol>
-            <symbol>FULL</symbol>
             <symbol>DESC</symbol>
-            <symbol>ASC</symbol>
+            <symbol>LIKE</symbol>
+            <symbol>JOIN</symbol>
+            <symbol>LEFT</symbol>
+            <symbol>FULL</symbol>
             <symbol>AND</symbol>
             <symbol>END</symbol>
+            <symbol>ASC</symbol>
             <symbol>XOR</symbol>
+            <symbol>FOR</symbol>
             <symbol>NOT</symbol>
-            <symbol>OR</symbol>
             <symbol>AS</symbol>
             <symbol>IN</symbol>
             <symbol>IS</symbol>
-            <symbol>ID</symbol>
             <symbol>NE</symbol>
             <symbol>LE</symbol>
             <symbol>GE</symbol>
-            <symbol>LIKE</symbol>
-            <symbol>FOR</symbol>
-            <symbol>BETWEEN</symbol>
-            <symbol>HAVING</symbol>
-            <symbol>UNION</symbol>
+            <symbol>ID</symbol>
             <symbol>'='</symbol>
             <symbol>'&gt;'</symbol>
             <symbol>'&lt;'</symbol>
@@ -3309,8 +3307,8 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CONCAT" state="97"/>
-          <transition type="shift" symbol="OUTERJ" state="98"/>
+          <transition type="shift" symbol="OUTERJ" state="94"/>
+          <transition type="shift" symbol="CONCAT" state="98"/>
           <transition type="shift" symbol="'/'" state="104"/>
           <transition type="shift" symbol="'*'" state="105"/>
         </transitions>
@@ -3321,8 +3319,8 @@
       </actions>
       <solved-conflicts>
         <resolution rule="107" symbol="OVER" type="reduce">OVER &lt; '-'</resolution>
-        <resolution rule="107" symbol="CONCAT" type="shift">'-' &lt; CONCAT</resolution>
         <resolution rule="107" symbol="OUTERJ" type="shift">'-' &lt; OUTERJ</resolution>
+        <resolution rule="107" symbol="CONCAT" type="shift">'-' &lt; CONCAT</resolution>
         <resolution rule="107" symbol="'-'" type="reduce">%left '-'</resolution>
         <resolution rule="107" symbol="'+'" type="reduce">%left '+'</resolution>
         <resolution rule="107" symbol="'/'" type="shift">'-' &lt; '/'</resolution>
@@ -3334,17 +3332,17 @@
       <itemset>
         <item rule-number="74" point="1">
           <lookaheads>
+            <symbol>BETWEEN</symbol>
             <symbol>OVER</symbol>
+            <symbol>LIKE</symbol>
             <symbol>NOT</symbol>
             <symbol>IN</symbol>
             <symbol>IS</symbol>
+            <symbol>OUTERJ</symbol>
             <symbol>NE</symbol>
             <symbol>LE</symbol>
             <symbol>GE</symbol>
             <symbol>CONCAT</symbol>
-            <symbol>LIKE</symbol>
-            <symbol>BETWEEN</symbol>
-            <symbol>OUTERJ</symbol>
             <symbol>'='</symbol>
             <symbol>'&gt;'</symbol>
             <symbol>'&lt;'</symbol>
@@ -3364,7 +3362,7 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="','" state="134"/>
-          <transition type="shift" symbol="'.'" state="71"/>
+          <transition type="shift" symbol="'.'" state="73"/>
         </transitions>
         <errors/>
         <reductions>
@@ -3399,9 +3397,9 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="AND" state="88"/>
-          <transition type="shift" symbol="XOR" state="89"/>
-          <transition type="shift" symbol="OR" state="90"/>
+          <transition type="shift" symbol="OR" state="88"/>
+          <transition type="shift" symbol="AND" state="89"/>
+          <transition type="shift" symbol="XOR" state="90"/>
           <transition type="shift" symbol="')'" state="136"/>
         </transitions>
         <errors/>
@@ -3444,9 +3442,9 @@
         <item rule-number="103" point="0"/>
         <item rule-number="104" point="0">
           <lookaheads>
-            <symbol>IN</symbol>
-            <symbol>LIKE</symbol>
             <symbol>BETWEEN</symbol>
+            <symbol>LIKE</symbol>
+            <symbol>IN</symbol>
           </lookaheads>
         </item>
         <item rule-number="106" point="1"/>
@@ -3463,11 +3461,11 @@
           <transition type="shift" symbol="OVER" state="91"/>
           <transition type="shift" symbol="NOT" state="92"/>
           <transition type="shift" symbol="IS" state="93"/>
-          <transition type="shift" symbol="NE" state="94"/>
-          <transition type="shift" symbol="LE" state="95"/>
-          <transition type="shift" symbol="GE" state="96"/>
-          <transition type="shift" symbol="CONCAT" state="97"/>
-          <transition type="shift" symbol="OUTERJ" state="98"/>
+          <transition type="shift" symbol="OUTERJ" state="94"/>
+          <transition type="shift" symbol="NE" state="95"/>
+          <transition type="shift" symbol="LE" state="96"/>
+          <transition type="shift" symbol="GE" state="97"/>
+          <transition type="shift" symbol="CONCAT" state="98"/>
           <transition type="shift" symbol="'='" state="99"/>
           <transition type="shift" symbol="'&gt;'" state="100"/>
           <transition type="shift" symbol="'&lt;'" state="101"/>
@@ -3505,14 +3503,14 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="ID" state="17"/>
-          <transition type="shift" symbol="TABLE" state="18"/>
-          <transition type="shift" symbol="'('" state="19"/>
+          <transition type="shift" symbol="TABLE" state="19"/>
+          <transition type="shift" symbol="ID" state="20"/>
+          <transition type="shift" symbol="'('" state="21"/>
           <transition type="goto" symbol="tableList" state="140"/>
           <transition type="goto" symbol="table" state="141"/>
           <transition type="goto" symbol="alias" state="142"/>
-          <transition type="goto" symbol="tableExpr" state="21"/>
-          <transition type="goto" symbol="ident" state="22"/>
+          <transition type="goto" symbol="tableExpr" state="23"/>
+          <transition type="goto" symbol="ident" state="24"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -3617,14 +3615,14 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NOT" state="31"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="EXISTS" state="36"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="EXISTS" state="30"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="NOT" state="34"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="40"/>
@@ -3678,12 +3676,12 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="74"/>
@@ -3715,148 +3713,6 @@
     </state>
 
     <state number="88">
-      <itemset>
-        <item rule-number="74" point="0"/>
-        <item rule-number="75" point="0"/>
-        <item rule-number="76" point="0"/>
-        <item rule-number="78" point="0"/>
-        <item rule-number="78" point="2"/>
-        <item rule-number="79" point="0"/>
-        <item rule-number="80" point="0"/>
-        <item rule-number="81" point="0"/>
-        <item rule-number="82" point="0"/>
-        <item rule-number="83" point="0"/>
-        <item rule-number="84" point="0"/>
-        <item rule-number="85" point="0"/>
-        <item rule-number="86" point="0"/>
-        <item rule-number="87" point="0"/>
-        <item rule-number="88" point="0"/>
-        <item rule-number="89" point="0"/>
-        <item rule-number="90" point="0"/>
-        <item rule-number="91" point="0"/>
-        <item rule-number="94" point="0"/>
-        <item rule-number="95" point="0"/>
-        <item rule-number="96" point="0"/>
-        <item rule-number="97" point="0"/>
-        <item rule-number="98" point="0"/>
-        <item rule-number="99" point="0"/>
-        <item rule-number="105" point="0"/>
-        <item rule-number="106" point="0"/>
-        <item rule-number="107" point="0"/>
-        <item rule-number="108" point="0"/>
-        <item rule-number="109" point="0"/>
-        <item rule-number="110" point="0"/>
-        <item rule-number="111" point="0"/>
-        <item rule-number="112" point="0"/>
-        <item rule-number="113" point="0"/>
-        <item rule-number="114" point="0"/>
-        <item rule-number="115" point="0"/>
-        <item rule-number="116" point="0"/>
-        <item rule-number="117" point="0"/>
-        <item rule-number="118" point="0"/>
-        <item rule-number="119" point="0"/>
-        <item rule-number="120" point="0"/>
-        <item rule-number="121" point="0"/>
-        <item rule-number="122" point="0"/>
-        <item rule-number="123" point="0"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NOT" state="31"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="EXISTS" state="36"/>
-          <transition type="shift" symbol="CAST" state="37"/>
-          <transition type="shift" symbol="'-'" state="38"/>
-          <transition type="shift" symbol="'*'" state="39"/>
-          <transition type="shift" symbol="'('" state="40"/>
-          <transition type="shift" symbol="'?'" state="41"/>
-          <transition type="goto" symbol="ident" state="46"/>
-          <transition type="goto" symbol="condition" state="147"/>
-          <transition type="goto" symbol="comparison" state="48"/>
-          <transition type="goto" symbol="simpleExpr" state="61"/>
-        </transitions>
-        <errors/>
-        <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="89">
-      <itemset>
-        <item rule-number="74" point="0"/>
-        <item rule-number="75" point="0"/>
-        <item rule-number="76" point="0"/>
-        <item rule-number="78" point="0"/>
-        <item rule-number="79" point="0"/>
-        <item rule-number="80" point="0"/>
-        <item rule-number="80" point="2"/>
-        <item rule-number="81" point="0"/>
-        <item rule-number="82" point="0"/>
-        <item rule-number="83" point="0"/>
-        <item rule-number="84" point="0"/>
-        <item rule-number="85" point="0"/>
-        <item rule-number="86" point="0"/>
-        <item rule-number="87" point="0"/>
-        <item rule-number="88" point="0"/>
-        <item rule-number="89" point="0"/>
-        <item rule-number="90" point="0"/>
-        <item rule-number="91" point="0"/>
-        <item rule-number="94" point="0"/>
-        <item rule-number="95" point="0"/>
-        <item rule-number="96" point="0"/>
-        <item rule-number="97" point="0"/>
-        <item rule-number="98" point="0"/>
-        <item rule-number="99" point="0"/>
-        <item rule-number="105" point="0"/>
-        <item rule-number="106" point="0"/>
-        <item rule-number="107" point="0"/>
-        <item rule-number="108" point="0"/>
-        <item rule-number="109" point="0"/>
-        <item rule-number="110" point="0"/>
-        <item rule-number="111" point="0"/>
-        <item rule-number="112" point="0"/>
-        <item rule-number="113" point="0"/>
-        <item rule-number="114" point="0"/>
-        <item rule-number="115" point="0"/>
-        <item rule-number="116" point="0"/>
-        <item rule-number="117" point="0"/>
-        <item rule-number="118" point="0"/>
-        <item rule-number="119" point="0"/>
-        <item rule-number="120" point="0"/>
-        <item rule-number="121" point="0"/>
-        <item rule-number="122" point="0"/>
-        <item rule-number="123" point="0"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NOT" state="31"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="EXISTS" state="36"/>
-          <transition type="shift" symbol="CAST" state="37"/>
-          <transition type="shift" symbol="'-'" state="38"/>
-          <transition type="shift" symbol="'*'" state="39"/>
-          <transition type="shift" symbol="'('" state="40"/>
-          <transition type="shift" symbol="'?'" state="41"/>
-          <transition type="goto" symbol="ident" state="46"/>
-          <transition type="goto" symbol="condition" state="148"/>
-          <transition type="goto" symbol="comparison" state="48"/>
-          <transition type="goto" symbol="simpleExpr" state="61"/>
-        </transitions>
-        <errors/>
-        <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="90">
       <itemset>
         <item rule-number="74" point="0"/>
         <item rule-number="75" point="0"/>
@@ -3904,14 +3760,156 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NOT" state="31"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="EXISTS" state="36"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="EXISTS" state="30"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="NOT" state="34"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
+          <transition type="shift" symbol="'-'" state="38"/>
+          <transition type="shift" symbol="'*'" state="39"/>
+          <transition type="shift" symbol="'('" state="40"/>
+          <transition type="shift" symbol="'?'" state="41"/>
+          <transition type="goto" symbol="ident" state="46"/>
+          <transition type="goto" symbol="condition" state="147"/>
+          <transition type="goto" symbol="comparison" state="48"/>
+          <transition type="goto" symbol="simpleExpr" state="61"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="89">
+      <itemset>
+        <item rule-number="74" point="0"/>
+        <item rule-number="75" point="0"/>
+        <item rule-number="76" point="0"/>
+        <item rule-number="78" point="0"/>
+        <item rule-number="78" point="2"/>
+        <item rule-number="79" point="0"/>
+        <item rule-number="80" point="0"/>
+        <item rule-number="81" point="0"/>
+        <item rule-number="82" point="0"/>
+        <item rule-number="83" point="0"/>
+        <item rule-number="84" point="0"/>
+        <item rule-number="85" point="0"/>
+        <item rule-number="86" point="0"/>
+        <item rule-number="87" point="0"/>
+        <item rule-number="88" point="0"/>
+        <item rule-number="89" point="0"/>
+        <item rule-number="90" point="0"/>
+        <item rule-number="91" point="0"/>
+        <item rule-number="94" point="0"/>
+        <item rule-number="95" point="0"/>
+        <item rule-number="96" point="0"/>
+        <item rule-number="97" point="0"/>
+        <item rule-number="98" point="0"/>
+        <item rule-number="99" point="0"/>
+        <item rule-number="105" point="0"/>
+        <item rule-number="106" point="0"/>
+        <item rule-number="107" point="0"/>
+        <item rule-number="108" point="0"/>
+        <item rule-number="109" point="0"/>
+        <item rule-number="110" point="0"/>
+        <item rule-number="111" point="0"/>
+        <item rule-number="112" point="0"/>
+        <item rule-number="113" point="0"/>
+        <item rule-number="114" point="0"/>
+        <item rule-number="115" point="0"/>
+        <item rule-number="116" point="0"/>
+        <item rule-number="117" point="0"/>
+        <item rule-number="118" point="0"/>
+        <item rule-number="119" point="0"/>
+        <item rule-number="120" point="0"/>
+        <item rule-number="121" point="0"/>
+        <item rule-number="122" point="0"/>
+        <item rule-number="123" point="0"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="EXISTS" state="30"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="NOT" state="34"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
+          <transition type="shift" symbol="'-'" state="38"/>
+          <transition type="shift" symbol="'*'" state="39"/>
+          <transition type="shift" symbol="'('" state="40"/>
+          <transition type="shift" symbol="'?'" state="41"/>
+          <transition type="goto" symbol="ident" state="46"/>
+          <transition type="goto" symbol="condition" state="148"/>
+          <transition type="goto" symbol="comparison" state="48"/>
+          <transition type="goto" symbol="simpleExpr" state="61"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="90">
+      <itemset>
+        <item rule-number="74" point="0"/>
+        <item rule-number="75" point="0"/>
+        <item rule-number="76" point="0"/>
+        <item rule-number="78" point="0"/>
+        <item rule-number="79" point="0"/>
+        <item rule-number="80" point="0"/>
+        <item rule-number="80" point="2"/>
+        <item rule-number="81" point="0"/>
+        <item rule-number="82" point="0"/>
+        <item rule-number="83" point="0"/>
+        <item rule-number="84" point="0"/>
+        <item rule-number="85" point="0"/>
+        <item rule-number="86" point="0"/>
+        <item rule-number="87" point="0"/>
+        <item rule-number="88" point="0"/>
+        <item rule-number="89" point="0"/>
+        <item rule-number="90" point="0"/>
+        <item rule-number="91" point="0"/>
+        <item rule-number="94" point="0"/>
+        <item rule-number="95" point="0"/>
+        <item rule-number="96" point="0"/>
+        <item rule-number="97" point="0"/>
+        <item rule-number="98" point="0"/>
+        <item rule-number="99" point="0"/>
+        <item rule-number="105" point="0"/>
+        <item rule-number="106" point="0"/>
+        <item rule-number="107" point="0"/>
+        <item rule-number="108" point="0"/>
+        <item rule-number="109" point="0"/>
+        <item rule-number="110" point="0"/>
+        <item rule-number="111" point="0"/>
+        <item rule-number="112" point="0"/>
+        <item rule-number="113" point="0"/>
+        <item rule-number="114" point="0"/>
+        <item rule-number="115" point="0"/>
+        <item rule-number="116" point="0"/>
+        <item rule-number="117" point="0"/>
+        <item rule-number="118" point="0"/>
+        <item rule-number="119" point="0"/>
+        <item rule-number="120" point="0"/>
+        <item rule-number="121" point="0"/>
+        <item rule-number="122" point="0"/>
+        <item rule-number="123" point="0"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="EXISTS" state="30"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="NOT" state="34"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="40"/>
@@ -3982,6 +3980,20 @@
 
     <state number="94">
       <itemset>
+        <item rule-number="106" point="2"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="106" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="95">
+      <itemset>
         <item rule-number="74" point="0"/>
         <item rule-number="75" point="0"/>
         <item rule-number="76" point="0"/>
@@ -4008,12 +4020,12 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="74"/>
@@ -4027,7 +4039,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="95">
+    <state number="96">
       <itemset>
         <item rule-number="74" point="0"/>
         <item rule-number="75" point="0"/>
@@ -4055,12 +4067,12 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="74"/>
@@ -4074,7 +4086,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="96">
+    <state number="97">
       <itemset>
         <item rule-number="74" point="0"/>
         <item rule-number="75" point="0"/>
@@ -4102,12 +4114,12 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="74"/>
@@ -4121,7 +4133,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="97">
+    <state number="98">
       <itemset>
         <item rule-number="74" point="0"/>
         <item rule-number="75" point="0"/>
@@ -4149,12 +4161,12 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="74"/>
@@ -4164,20 +4176,6 @@
         </transitions>
         <errors/>
         <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="98">
-      <itemset>
-        <item rule-number="106" point="2"/>
-      </itemset>
-      <actions>
-        <transitions/>
-        <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="106" enabled="true"/>
-        </reductions>
       </actions>
       <solved-conflicts/>
     </state>
@@ -4210,12 +4208,12 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="74"/>
@@ -4257,12 +4255,12 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="74"/>
@@ -4304,12 +4302,12 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="74"/>
@@ -4351,12 +4349,12 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="74"/>
@@ -4398,12 +4396,12 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="74"/>
@@ -4445,12 +4443,12 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="74"/>
@@ -4492,12 +4490,12 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="74"/>
@@ -4534,9 +4532,9 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="IN" state="165"/>
+          <transition type="shift" symbol="BETWEEN" state="165"/>
           <transition type="shift" symbol="LIKE" state="166"/>
-          <transition type="shift" symbol="BETWEEN" state="167"/>
+          <transition type="shift" symbol="IN" state="167"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -4545,6 +4543,20 @@
     </state>
 
     <state number="108">
+      <itemset>
+        <item rule-number="11" point="4"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="11" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="109">
       <itemset>
         <item rule-number="18" point="1"/>
         <item rule-number="19" point="0"/>
@@ -4561,7 +4573,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="109">
+    <state number="110">
       <itemset>
         <item rule-number="14" point="4"/>
         <item rule-number="15" point="0"/>
@@ -4584,50 +4596,78 @@
       <solved-conflicts/>
     </state>
 
-    <state number="110">
+    <state number="111">
+      <itemset>
+        <item rule-number="72" point="3"/>
+        <item rule-number="106" point="1"/>
+        <item rule-number="112" point="1"/>
+        <item rule-number="113" point="1"/>
+        <item rule-number="114" point="1"/>
+        <item rule-number="115" point="1"/>
+        <item rule-number="116" point="1"/>
+        <item rule-number="117" point="1"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="OVER" state="91"/>
+          <transition type="shift" symbol="OUTERJ" state="94"/>
+          <transition type="shift" symbol="CONCAT" state="98"/>
+          <transition type="shift" symbol="'-'" state="102"/>
+          <transition type="shift" symbol="'+'" state="103"/>
+          <transition type="shift" symbol="'/'" state="104"/>
+          <transition type="shift" symbol="'*'" state="105"/>
+          <transition type="shift" symbol="')'" state="173"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="112">
       <itemset>
         <item rule-number="75" point="3">
           <lookaheads>
             <symbol>$end</symbol>
+            <symbol>BETWEEN</symbol>
             <symbol>VALUES</symbol>
-            <symbol>OVER</symbol>
-            <symbol>ESCAPE</symbol>
             <symbol>SELECT</symbol>
+            <symbol>ESCAPE</symbol>
+            <symbol>OVER</symbol>
+            <symbol>HAVING</symbol>
             <symbol>WHERE</symbol>
             <symbol>ORDER</symbol>
+            <symbol>OR</symbol>
             <symbol>GROUP</symbol>
             <symbol>RIGHT</symbol>
             <symbol>INNER</symbol>
+            <symbol>UNION</symbol>
             <symbol>FROM</symbol>
-            <symbol>JOIN</symbol>
-            <symbol>LEFT</symbol>
             <symbol>WHEN</symbol>
             <symbol>THEN</symbol>
             <symbol>ELSE</symbol>
-            <symbol>FULL</symbol>
             <symbol>DESC</symbol>
-            <symbol>ASC</symbol>
+            <symbol>LIKE</symbol>
+            <symbol>JOIN</symbol>
+            <symbol>LEFT</symbol>
+            <symbol>FULL</symbol>
             <symbol>AND</symbol>
+            <symbol>SET</symbol>
             <symbol>END</symbol>
+            <symbol>ASC</symbol>
             <symbol>XOR</symbol>
+            <symbol>FOR</symbol>
             <symbol>NOT</symbol>
-            <symbol>OR</symbol>
             <symbol>ON</symbol>
             <symbol>AS</symbol>
             <symbol>IN</symbol>
             <symbol>IS</symbol>
-            <symbol>ID</symbol>
+            <symbol>OUTERJ</symbol>
             <symbol>NE</symbol>
             <symbol>LE</symbol>
             <symbol>GE</symbol>
             <symbol>CONCAT</symbol>
-            <symbol>LIKE</symbol>
-            <symbol>FOR</symbol>
-            <symbol>BETWEEN</symbol>
-            <symbol>HAVING</symbol>
-            <symbol>OUTERJ</symbol>
-            <symbol>UNION</symbol>
-            <symbol>SET</symbol>
+            <symbol>ID</symbol>
             <symbol>'='</symbol>
             <symbol>'&gt;'</symbol>
             <symbol>'&lt;'</symbol>
@@ -4644,7 +4684,7 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="'.'" state="173"/>
+          <transition type="shift" symbol="'.'" state="174"/>
         </transitions>
         <errors/>
         <reductions>
@@ -4654,35 +4694,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="111">
-      <itemset>
-        <item rule-number="72" point="3"/>
-        <item rule-number="106" point="1"/>
-        <item rule-number="112" point="1"/>
-        <item rule-number="113" point="1"/>
-        <item rule-number="114" point="1"/>
-        <item rule-number="115" point="1"/>
-        <item rule-number="116" point="1"/>
-        <item rule-number="117" point="1"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="OVER" state="91"/>
-          <transition type="shift" symbol="CONCAT" state="97"/>
-          <transition type="shift" symbol="OUTERJ" state="98"/>
-          <transition type="shift" symbol="'-'" state="102"/>
-          <transition type="shift" symbol="'+'" state="103"/>
-          <transition type="shift" symbol="'/'" state="104"/>
-          <transition type="shift" symbol="'*'" state="105"/>
-          <transition type="shift" symbol="')'" state="174"/>
-        </transitions>
-        <errors/>
-        <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="112">
+    <state number="113">
       <itemset>
         <item rule-number="73" point="3"/>
       </itemset>
@@ -4696,7 +4708,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="113">
+    <state number="114">
       <itemset>
         <item rule-number="10" point="1"/>
         <item rule-number="19" point="0"/>
@@ -4713,7 +4725,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="114">
+    <state number="115">
       <itemset>
         <item rule-number="6" point="4"/>
         <item rule-number="8" point="1"/>
@@ -4738,7 +4750,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="115">
+    <state number="116">
       <itemset>
         <item rule-number="7" point="1"/>
       </itemset>
@@ -4752,7 +4764,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="116">
+    <state number="117">
       <itemset>
         <item rule-number="9" point="1"/>
       </itemset>
@@ -4762,20 +4774,6 @@
         </transitions>
         <errors/>
         <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="117">
-      <itemset>
-        <item rule-number="11" point="4"/>
-      </itemset>
-      <actions>
-        <transitions/>
-        <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="11" enabled="true"/>
-        </reductions>
       </actions>
       <solved-conflicts/>
     </state>
@@ -4811,12 +4809,12 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="74"/>
@@ -4860,10 +4858,10 @@
         <item rule-number="133" point="0">
           <lookaheads>
             <symbol>$end</symbol>
-            <symbol>ORDER</symbol>
-            <symbol>FOR</symbol>
             <symbol>HAVING</symbol>
+            <symbol>ORDER</symbol>
             <symbol>UNION</symbol>
+            <symbol>FOR</symbol>
             <symbol>','</symbol>
             <symbol>')'</symbol>
           </lookaheads>
@@ -4873,12 +4871,12 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="74"/>
@@ -4981,17 +4979,13 @@
 
     <state number="126">
       <itemset>
-        <item rule-number="78" point="1"/>
-        <item rule-number="79" point="1"/>
-        <item rule-number="80" point="1"/>
-        <item rule-number="130" point="2"/>
+        <item rule-number="24" point="1"/>
+        <item rule-number="90" point="3"/>
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="THEN" state="184"/>
-          <transition type="shift" symbol="AND" state="88"/>
-          <transition type="shift" symbol="XOR" state="89"/>
-          <transition type="shift" symbol="OR" state="90"/>
+          <transition type="shift" symbol="UNION" state="27"/>
+          <transition type="shift" symbol="')'" state="184"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -5000,6 +4994,26 @@
     </state>
 
     <state number="127">
+      <itemset>
+        <item rule-number="78" point="1"/>
+        <item rule-number="79" point="1"/>
+        <item rule-number="80" point="1"/>
+        <item rule-number="130" point="2"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="OR" state="88"/>
+          <transition type="shift" symbol="THEN" state="185"/>
+          <transition type="shift" symbol="AND" state="89"/>
+          <transition type="shift" symbol="XOR" state="90"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="128">
       <itemset>
         <item rule-number="74" point="0"/>
         <item rule-number="75" point="0"/>
@@ -5027,32 +5041,18 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="74"/>
           <transition type="shift" symbol="'?'" state="41"/>
           <transition type="goto" symbol="ident" state="46"/>
-          <transition type="goto" symbol="simpleExpr" state="185"/>
-        </transitions>
-        <errors/>
-        <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="128">
-      <itemset>
-        <item rule-number="108" point="3"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="END" state="186"/>
+          <transition type="goto" symbol="simpleExpr" state="186"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -5061,6 +5061,20 @@
     </state>
 
     <state number="129">
+      <itemset>
+        <item rule-number="108" point="3"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="END" state="187"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="130">
       <itemset>
         <item rule-number="129" point="2"/>
       </itemset>
@@ -5074,37 +5088,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="130">
-      <itemset>
-        <item rule-number="120" point="3"/>
-      </itemset>
-      <actions>
-        <transitions/>
-        <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="120" enabled="true"/>
-        </reductions>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
     <state number="131">
-      <itemset>
-        <item rule-number="24" point="1"/>
-        <item rule-number="90" point="3"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="UNION" state="27"/>
-          <transition type="shift" symbol="')'" state="187"/>
-        </transitions>
-        <errors/>
-        <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="132">
       <itemset>
         <item rule-number="106" point="1"/>
         <item rule-number="112" point="1"/>
@@ -5119,8 +5103,8 @@
         <transitions>
           <transition type="shift" symbol="OVER" state="91"/>
           <transition type="shift" symbol="AS" state="188"/>
-          <transition type="shift" symbol="CONCAT" state="97"/>
-          <transition type="shift" symbol="OUTERJ" state="98"/>
+          <transition type="shift" symbol="OUTERJ" state="94"/>
+          <transition type="shift" symbol="CONCAT" state="98"/>
           <transition type="shift" symbol="'-'" state="102"/>
           <transition type="shift" symbol="'+'" state="103"/>
           <transition type="shift" symbol="'/'" state="104"/>
@@ -5128,6 +5112,20 @@
         </transitions>
         <errors/>
         <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="132">
+      <itemset>
+        <item rule-number="120" point="3"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="120" enabled="true"/>
+        </reductions>
       </actions>
       <solved-conflicts/>
     </state>
@@ -5146,8 +5144,8 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="OVER" state="91"/>
-          <transition type="shift" symbol="CONCAT" state="97"/>
-          <transition type="shift" symbol="OUTERJ" state="98"/>
+          <transition type="shift" symbol="OUTERJ" state="94"/>
+          <transition type="shift" symbol="CONCAT" state="98"/>
           <transition type="shift" symbol="'-'" state="102"/>
           <transition type="shift" symbol="'+'" state="103"/>
           <transition type="shift" symbol="'/'" state="104"/>
@@ -5264,8 +5262,8 @@
             <symbol>WHERE</symbol>
             <symbol>ORDER</symbol>
             <symbol>GROUP</symbol>
-            <symbol>FOR</symbol>
             <symbol>UNION</symbol>
+            <symbol>FOR</symbol>
             <symbol>')'</symbol>
           </lookaheads>
         </item>
@@ -5291,8 +5289,8 @@
             <symbol>WHERE</symbol>
             <symbol>ORDER</symbol>
             <symbol>GROUP</symbol>
-            <symbol>FOR</symbol>
             <symbol>UNION</symbol>
+            <symbol>FOR</symbol>
             <symbol>','</symbol>
             <symbol>')'</symbol>
           </lookaheads>
@@ -5390,10 +5388,10 @@
         <item rule-number="134" point="1">
           <lookaheads>
             <symbol>$end</symbol>
-            <symbol>ORDER</symbol>
-            <symbol>FOR</symbol>
             <symbol>HAVING</symbol>
+            <symbol>ORDER</symbol>
             <symbol>UNION</symbol>
+            <symbol>FOR</symbol>
             <symbol>','</symbol>
             <symbol>')'</symbol>
           </lookaheads>
@@ -5402,8 +5400,8 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="OVER" state="91"/>
-          <transition type="shift" symbol="CONCAT" state="97"/>
-          <transition type="shift" symbol="OUTERJ" state="98"/>
+          <transition type="shift" symbol="OUTERJ" state="94"/>
+          <transition type="shift" symbol="CONCAT" state="98"/>
           <transition type="shift" symbol="'-'" state="102"/>
           <transition type="shift" symbol="'+'" state="103"/>
           <transition type="shift" symbol="'/'" state="104"/>
@@ -5436,26 +5434,71 @@
     <state number="147">
       <itemset>
         <item rule-number="78" point="1"/>
+        <item rule-number="79" point="1"/>
+        <item rule-number="79" point="3">
+          <lookaheads>
+            <symbol>$end</symbol>
+            <symbol>WHERE</symbol>
+            <symbol>ORDER</symbol>
+            <symbol>OR</symbol>
+            <symbol>GROUP</symbol>
+            <symbol>RIGHT</symbol>
+            <symbol>INNER</symbol>
+            <symbol>UNION</symbol>
+            <symbol>FROM</symbol>
+            <symbol>THEN</symbol>
+            <symbol>JOIN</symbol>
+            <symbol>LEFT</symbol>
+            <symbol>FULL</symbol>
+            <symbol>XOR</symbol>
+            <symbol>FOR</symbol>
+            <symbol>AS</symbol>
+            <symbol>ID</symbol>
+            <symbol>','</symbol>
+            <symbol>')'</symbol>
+          </lookaheads>
+        </item>
+        <item rule-number="80" point="1"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="AND" state="89"/>
+        </transitions>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="79" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts>
+        <resolution rule="79" symbol="OR" type="reduce">%left OR</resolution>
+        <resolution rule="79" symbol="AND" type="shift">OR &lt; AND</resolution>
+        <resolution rule="79" symbol="XOR" type="reduce">%left XOR</resolution>
+      </solved-conflicts>
+    </state>
+
+    <state number="148">
+      <itemset>
+        <item rule-number="78" point="1"/>
         <item rule-number="78" point="3">
           <lookaheads>
             <symbol>$end</symbol>
             <symbol>WHERE</symbol>
             <symbol>ORDER</symbol>
+            <symbol>OR</symbol>
             <symbol>GROUP</symbol>
             <symbol>RIGHT</symbol>
             <symbol>INNER</symbol>
+            <symbol>UNION</symbol>
             <symbol>FROM</symbol>
+            <symbol>THEN</symbol>
             <symbol>JOIN</symbol>
             <symbol>LEFT</symbol>
-            <symbol>THEN</symbol>
             <symbol>FULL</symbol>
             <symbol>AND</symbol>
             <symbol>XOR</symbol>
-            <symbol>OR</symbol>
+            <symbol>FOR</symbol>
             <symbol>AS</symbol>
             <symbol>ID</symbol>
-            <symbol>FOR</symbol>
-            <symbol>UNION</symbol>
             <symbol>','</symbol>
             <symbol>')'</symbol>
           </lookaheads>
@@ -5471,13 +5514,13 @@
         </reductions>
       </actions>
       <solved-conflicts>
+        <resolution rule="78" symbol="OR" type="reduce">OR &lt; AND</resolution>
         <resolution rule="78" symbol="AND" type="reduce">%left AND</resolution>
         <resolution rule="78" symbol="XOR" type="reduce">XOR &lt; AND</resolution>
-        <resolution rule="78" symbol="OR" type="reduce">OR &lt; AND</resolution>
       </solved-conflicts>
     </state>
 
-    <state number="148">
+    <state number="149">
       <itemset>
         <item rule-number="78" point="1"/>
         <item rule-number="79" point="1"/>
@@ -5487,20 +5530,20 @@
             <symbol>$end</symbol>
             <symbol>WHERE</symbol>
             <symbol>ORDER</symbol>
+            <symbol>OR</symbol>
             <symbol>GROUP</symbol>
             <symbol>RIGHT</symbol>
             <symbol>INNER</symbol>
+            <symbol>UNION</symbol>
             <symbol>FROM</symbol>
+            <symbol>THEN</symbol>
             <symbol>JOIN</symbol>
             <symbol>LEFT</symbol>
-            <symbol>THEN</symbol>
             <symbol>FULL</symbol>
             <symbol>XOR</symbol>
-            <symbol>OR</symbol>
+            <symbol>FOR</symbol>
             <symbol>AS</symbol>
             <symbol>ID</symbol>
-            <symbol>FOR</symbol>
-            <symbol>UNION</symbol>
             <symbol>','</symbol>
             <symbol>')'</symbol>
           </lookaheads>
@@ -5508,7 +5551,7 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="AND" state="88"/>
+          <transition type="shift" symbol="AND" state="89"/>
         </transitions>
         <errors/>
         <reductions>
@@ -5516,54 +5559,9 @@
         </reductions>
       </actions>
       <solved-conflicts>
+        <resolution rule="80" symbol="OR" type="reduce">%left OR</resolution>
         <resolution rule="80" symbol="AND" type="shift">XOR &lt; AND</resolution>
         <resolution rule="80" symbol="XOR" type="reduce">%left XOR</resolution>
-        <resolution rule="80" symbol="OR" type="reduce">%left OR</resolution>
-      </solved-conflicts>
-    </state>
-
-    <state number="149">
-      <itemset>
-        <item rule-number="78" point="1"/>
-        <item rule-number="79" point="1"/>
-        <item rule-number="79" point="3">
-          <lookaheads>
-            <symbol>$end</symbol>
-            <symbol>WHERE</symbol>
-            <symbol>ORDER</symbol>
-            <symbol>GROUP</symbol>
-            <symbol>RIGHT</symbol>
-            <symbol>INNER</symbol>
-            <symbol>FROM</symbol>
-            <symbol>JOIN</symbol>
-            <symbol>LEFT</symbol>
-            <symbol>THEN</symbol>
-            <symbol>FULL</symbol>
-            <symbol>XOR</symbol>
-            <symbol>OR</symbol>
-            <symbol>AS</symbol>
-            <symbol>ID</symbol>
-            <symbol>FOR</symbol>
-            <symbol>UNION</symbol>
-            <symbol>','</symbol>
-            <symbol>')'</symbol>
-          </lookaheads>
-        </item>
-        <item rule-number="80" point="1"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="AND" state="88"/>
-        </transitions>
-        <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="79" enabled="true"/>
-        </reductions>
-      </actions>
-      <solved-conflicts>
-        <resolution rule="79" symbol="AND" type="shift">OR &lt; AND</resolution>
-        <resolution rule="79" symbol="XOR" type="reduce">%left XOR</resolution>
-        <resolution rule="79" symbol="OR" type="reduce">%left OR</resolution>
       </solved-conflicts>
     </state>
 
@@ -5616,21 +5614,21 @@
             <symbol>$end</symbol>
             <symbol>WHERE</symbol>
             <symbol>ORDER</symbol>
+            <symbol>OR</symbol>
             <symbol>GROUP</symbol>
             <symbol>RIGHT</symbol>
             <symbol>INNER</symbol>
+            <symbol>UNION</symbol>
             <symbol>FROM</symbol>
+            <symbol>THEN</symbol>
             <symbol>JOIN</symbol>
             <symbol>LEFT</symbol>
-            <symbol>THEN</symbol>
             <symbol>FULL</symbol>
             <symbol>AND</symbol>
             <symbol>XOR</symbol>
-            <symbol>OR</symbol>
+            <symbol>FOR</symbol>
             <symbol>AS</symbol>
             <symbol>ID</symbol>
-            <symbol>FOR</symbol>
-            <symbol>UNION</symbol>
             <symbol>','</symbol>
             <symbol>')'</symbol>
           </lookaheads>
@@ -5646,8 +5644,8 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="OVER" state="91"/>
-          <transition type="shift" symbol="CONCAT" state="97"/>
-          <transition type="shift" symbol="OUTERJ" state="98"/>
+          <transition type="shift" symbol="OUTERJ" state="94"/>
+          <transition type="shift" symbol="CONCAT" state="98"/>
           <transition type="shift" symbol="'-'" state="102"/>
           <transition type="shift" symbol="'+'" state="103"/>
           <transition type="shift" symbol="'/'" state="104"/>
@@ -5668,21 +5666,21 @@
             <symbol>$end</symbol>
             <symbol>WHERE</symbol>
             <symbol>ORDER</symbol>
+            <symbol>OR</symbol>
             <symbol>GROUP</symbol>
             <symbol>RIGHT</symbol>
             <symbol>INNER</symbol>
+            <symbol>UNION</symbol>
             <symbol>FROM</symbol>
+            <symbol>THEN</symbol>
             <symbol>JOIN</symbol>
             <symbol>LEFT</symbol>
-            <symbol>THEN</symbol>
             <symbol>FULL</symbol>
             <symbol>AND</symbol>
             <symbol>XOR</symbol>
-            <symbol>OR</symbol>
+            <symbol>FOR</symbol>
             <symbol>AS</symbol>
             <symbol>ID</symbol>
-            <symbol>FOR</symbol>
-            <symbol>UNION</symbol>
             <symbol>','</symbol>
             <symbol>')'</symbol>
           </lookaheads>
@@ -5698,8 +5696,8 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="OVER" state="91"/>
-          <transition type="shift" symbol="CONCAT" state="97"/>
-          <transition type="shift" symbol="OUTERJ" state="98"/>
+          <transition type="shift" symbol="OUTERJ" state="94"/>
+          <transition type="shift" symbol="CONCAT" state="98"/>
           <transition type="shift" symbol="'-'" state="102"/>
           <transition type="shift" symbol="'+'" state="103"/>
           <transition type="shift" symbol="'/'" state="104"/>
@@ -5720,21 +5718,21 @@
             <symbol>$end</symbol>
             <symbol>WHERE</symbol>
             <symbol>ORDER</symbol>
+            <symbol>OR</symbol>
             <symbol>GROUP</symbol>
             <symbol>RIGHT</symbol>
             <symbol>INNER</symbol>
+            <symbol>UNION</symbol>
             <symbol>FROM</symbol>
+            <symbol>THEN</symbol>
             <symbol>JOIN</symbol>
             <symbol>LEFT</symbol>
-            <symbol>THEN</symbol>
             <symbol>FULL</symbol>
             <symbol>AND</symbol>
             <symbol>XOR</symbol>
-            <symbol>OR</symbol>
+            <symbol>FOR</symbol>
             <symbol>AS</symbol>
             <symbol>ID</symbol>
-            <symbol>FOR</symbol>
-            <symbol>UNION</symbol>
             <symbol>','</symbol>
             <symbol>')'</symbol>
           </lookaheads>
@@ -5750,8 +5748,8 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="OVER" state="91"/>
-          <transition type="shift" symbol="CONCAT" state="97"/>
-          <transition type="shift" symbol="OUTERJ" state="98"/>
+          <transition type="shift" symbol="OUTERJ" state="94"/>
+          <transition type="shift" symbol="CONCAT" state="98"/>
           <transition type="shift" symbol="'-'" state="102"/>
           <transition type="shift" symbol="'+'" state="103"/>
           <transition type="shift" symbol="'/'" state="104"/>
@@ -5776,41 +5774,41 @@
         <item rule-number="116" point="3">
           <lookaheads>
             <symbol>$end</symbol>
-            <symbol>OVER</symbol>
+            <symbol>BETWEEN</symbol>
             <symbol>ESCAPE</symbol>
+            <symbol>OVER</symbol>
+            <symbol>HAVING</symbol>
             <symbol>WHERE</symbol>
             <symbol>ORDER</symbol>
+            <symbol>OR</symbol>
             <symbol>GROUP</symbol>
             <symbol>RIGHT</symbol>
             <symbol>INNER</symbol>
+            <symbol>UNION</symbol>
             <symbol>FROM</symbol>
-            <symbol>JOIN</symbol>
-            <symbol>LEFT</symbol>
             <symbol>WHEN</symbol>
             <symbol>THEN</symbol>
             <symbol>ELSE</symbol>
-            <symbol>FULL</symbol>
             <symbol>DESC</symbol>
-            <symbol>ASC</symbol>
+            <symbol>LIKE</symbol>
+            <symbol>JOIN</symbol>
+            <symbol>LEFT</symbol>
+            <symbol>FULL</symbol>
             <symbol>AND</symbol>
             <symbol>END</symbol>
+            <symbol>ASC</symbol>
             <symbol>XOR</symbol>
+            <symbol>FOR</symbol>
             <symbol>NOT</symbol>
-            <symbol>OR</symbol>
             <symbol>AS</symbol>
             <symbol>IN</symbol>
             <symbol>IS</symbol>
-            <symbol>ID</symbol>
+            <symbol>OUTERJ</symbol>
             <symbol>NE</symbol>
             <symbol>LE</symbol>
             <symbol>GE</symbol>
             <symbol>CONCAT</symbol>
-            <symbol>LIKE</symbol>
-            <symbol>FOR</symbol>
-            <symbol>BETWEEN</symbol>
-            <symbol>HAVING</symbol>
-            <symbol>OUTERJ</symbol>
-            <symbol>UNION</symbol>
+            <symbol>ID</symbol>
             <symbol>'='</symbol>
             <symbol>'&gt;'</symbol>
             <symbol>'&lt;'</symbol>
@@ -5833,8 +5831,8 @@
       </actions>
       <solved-conflicts>
         <resolution rule="116" symbol="OVER" type="reduce">OVER &lt; CONCAT</resolution>
-        <resolution rule="116" symbol="CONCAT" type="reduce">%left CONCAT</resolution>
         <resolution rule="116" symbol="OUTERJ" type="reduce">%left OUTERJ</resolution>
+        <resolution rule="116" symbol="CONCAT" type="reduce">%left CONCAT</resolution>
         <resolution rule="116" symbol="'-'" type="reduce">'-' &lt; CONCAT</resolution>
         <resolution rule="116" symbol="'+'" type="reduce">'+' &lt; CONCAT</resolution>
         <resolution rule="116" symbol="'/'" type="reduce">%left '/'</resolution>
@@ -5849,21 +5847,21 @@
             <symbol>$end</symbol>
             <symbol>WHERE</symbol>
             <symbol>ORDER</symbol>
+            <symbol>OR</symbol>
             <symbol>GROUP</symbol>
             <symbol>RIGHT</symbol>
             <symbol>INNER</symbol>
+            <symbol>UNION</symbol>
             <symbol>FROM</symbol>
+            <symbol>THEN</symbol>
             <symbol>JOIN</symbol>
             <symbol>LEFT</symbol>
-            <symbol>THEN</symbol>
             <symbol>FULL</symbol>
             <symbol>AND</symbol>
             <symbol>XOR</symbol>
-            <symbol>OR</symbol>
+            <symbol>FOR</symbol>
             <symbol>AS</symbol>
             <symbol>ID</symbol>
-            <symbol>FOR</symbol>
-            <symbol>UNION</symbol>
             <symbol>','</symbol>
             <symbol>')'</symbol>
           </lookaheads>
@@ -5879,8 +5877,8 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="OVER" state="91"/>
-          <transition type="shift" symbol="CONCAT" state="97"/>
-          <transition type="shift" symbol="OUTERJ" state="98"/>
+          <transition type="shift" symbol="OUTERJ" state="94"/>
+          <transition type="shift" symbol="CONCAT" state="98"/>
           <transition type="shift" symbol="'-'" state="102"/>
           <transition type="shift" symbol="'+'" state="103"/>
           <transition type="shift" symbol="'/'" state="104"/>
@@ -5901,21 +5899,21 @@
             <symbol>$end</symbol>
             <symbol>WHERE</symbol>
             <symbol>ORDER</symbol>
+            <symbol>OR</symbol>
             <symbol>GROUP</symbol>
             <symbol>RIGHT</symbol>
             <symbol>INNER</symbol>
+            <symbol>UNION</symbol>
             <symbol>FROM</symbol>
+            <symbol>THEN</symbol>
             <symbol>JOIN</symbol>
             <symbol>LEFT</symbol>
-            <symbol>THEN</symbol>
             <symbol>FULL</symbol>
             <symbol>AND</symbol>
             <symbol>XOR</symbol>
-            <symbol>OR</symbol>
+            <symbol>FOR</symbol>
             <symbol>AS</symbol>
             <symbol>ID</symbol>
-            <symbol>FOR</symbol>
-            <symbol>UNION</symbol>
             <symbol>','</symbol>
             <symbol>')'</symbol>
           </lookaheads>
@@ -5931,8 +5929,8 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="OVER" state="91"/>
-          <transition type="shift" symbol="CONCAT" state="97"/>
-          <transition type="shift" symbol="OUTERJ" state="98"/>
+          <transition type="shift" symbol="OUTERJ" state="94"/>
+          <transition type="shift" symbol="CONCAT" state="98"/>
           <transition type="shift" symbol="'-'" state="102"/>
           <transition type="shift" symbol="'+'" state="103"/>
           <transition type="shift" symbol="'/'" state="104"/>
@@ -5953,21 +5951,21 @@
             <symbol>$end</symbol>
             <symbol>WHERE</symbol>
             <symbol>ORDER</symbol>
+            <symbol>OR</symbol>
             <symbol>GROUP</symbol>
             <symbol>RIGHT</symbol>
             <symbol>INNER</symbol>
+            <symbol>UNION</symbol>
             <symbol>FROM</symbol>
+            <symbol>THEN</symbol>
             <symbol>JOIN</symbol>
             <symbol>LEFT</symbol>
-            <symbol>THEN</symbol>
             <symbol>FULL</symbol>
             <symbol>AND</symbol>
             <symbol>XOR</symbol>
-            <symbol>OR</symbol>
+            <symbol>FOR</symbol>
             <symbol>AS</symbol>
             <symbol>ID</symbol>
-            <symbol>FOR</symbol>
-            <symbol>UNION</symbol>
             <symbol>','</symbol>
             <symbol>')'</symbol>
           </lookaheads>
@@ -5983,8 +5981,8 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="OVER" state="91"/>
-          <transition type="shift" symbol="CONCAT" state="97"/>
-          <transition type="shift" symbol="OUTERJ" state="98"/>
+          <transition type="shift" symbol="OUTERJ" state="94"/>
+          <transition type="shift" symbol="CONCAT" state="98"/>
           <transition type="shift" symbol="'-'" state="102"/>
           <transition type="shift" symbol="'+'" state="103"/>
           <transition type="shift" symbol="'/'" state="104"/>
@@ -6005,39 +6003,39 @@
         <item rule-number="112" point="3">
           <lookaheads>
             <symbol>$end</symbol>
-            <symbol>OVER</symbol>
+            <symbol>BETWEEN</symbol>
             <symbol>ESCAPE</symbol>
+            <symbol>OVER</symbol>
+            <symbol>HAVING</symbol>
             <symbol>WHERE</symbol>
             <symbol>ORDER</symbol>
+            <symbol>OR</symbol>
             <symbol>GROUP</symbol>
             <symbol>RIGHT</symbol>
             <symbol>INNER</symbol>
+            <symbol>UNION</symbol>
             <symbol>FROM</symbol>
-            <symbol>JOIN</symbol>
-            <symbol>LEFT</symbol>
             <symbol>WHEN</symbol>
             <symbol>THEN</symbol>
             <symbol>ELSE</symbol>
-            <symbol>FULL</symbol>
             <symbol>DESC</symbol>
-            <symbol>ASC</symbol>
+            <symbol>LIKE</symbol>
+            <symbol>JOIN</symbol>
+            <symbol>LEFT</symbol>
+            <symbol>FULL</symbol>
             <symbol>AND</symbol>
             <symbol>END</symbol>
+            <symbol>ASC</symbol>
             <symbol>XOR</symbol>
+            <symbol>FOR</symbol>
             <symbol>NOT</symbol>
-            <symbol>OR</symbol>
             <symbol>AS</symbol>
             <symbol>IN</symbol>
             <symbol>IS</symbol>
-            <symbol>ID</symbol>
             <symbol>NE</symbol>
             <symbol>LE</symbol>
             <symbol>GE</symbol>
-            <symbol>LIKE</symbol>
-            <symbol>FOR</symbol>
-            <symbol>BETWEEN</symbol>
-            <symbol>HAVING</symbol>
-            <symbol>UNION</symbol>
+            <symbol>ID</symbol>
             <symbol>'='</symbol>
             <symbol>'&gt;'</symbol>
             <symbol>'&lt;'</symbol>
@@ -6055,8 +6053,8 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CONCAT" state="97"/>
-          <transition type="shift" symbol="OUTERJ" state="98"/>
+          <transition type="shift" symbol="OUTERJ" state="94"/>
+          <transition type="shift" symbol="CONCAT" state="98"/>
           <transition type="shift" symbol="'/'" state="104"/>
           <transition type="shift" symbol="'*'" state="105"/>
         </transitions>
@@ -6067,8 +6065,8 @@
       </actions>
       <solved-conflicts>
         <resolution rule="112" symbol="OVER" type="reduce">OVER &lt; '-'</resolution>
-        <resolution rule="112" symbol="CONCAT" type="shift">'-' &lt; CONCAT</resolution>
         <resolution rule="112" symbol="OUTERJ" type="shift">'-' &lt; OUTERJ</resolution>
+        <resolution rule="112" symbol="CONCAT" type="shift">'-' &lt; CONCAT</resolution>
         <resolution rule="112" symbol="'-'" type="reduce">%left '-'</resolution>
         <resolution rule="112" symbol="'+'" type="reduce">%left '+'</resolution>
         <resolution rule="112" symbol="'/'" type="shift">'-' &lt; '/'</resolution>
@@ -6084,39 +6082,39 @@
         <item rule-number="113" point="3">
           <lookaheads>
             <symbol>$end</symbol>
-            <symbol>OVER</symbol>
+            <symbol>BETWEEN</symbol>
             <symbol>ESCAPE</symbol>
+            <symbol>OVER</symbol>
+            <symbol>HAVING</symbol>
             <symbol>WHERE</symbol>
             <symbol>ORDER</symbol>
+            <symbol>OR</symbol>
             <symbol>GROUP</symbol>
             <symbol>RIGHT</symbol>
             <symbol>INNER</symbol>
+            <symbol>UNION</symbol>
             <symbol>FROM</symbol>
-            <symbol>JOIN</symbol>
-            <symbol>LEFT</symbol>
             <symbol>WHEN</symbol>
             <symbol>THEN</symbol>
             <symbol>ELSE</symbol>
-            <symbol>FULL</symbol>
             <symbol>DESC</symbol>
-            <symbol>ASC</symbol>
+            <symbol>LIKE</symbol>
+            <symbol>JOIN</symbol>
+            <symbol>LEFT</symbol>
+            <symbol>FULL</symbol>
             <symbol>AND</symbol>
             <symbol>END</symbol>
+            <symbol>ASC</symbol>
             <symbol>XOR</symbol>
+            <symbol>FOR</symbol>
             <symbol>NOT</symbol>
-            <symbol>OR</symbol>
             <symbol>AS</symbol>
             <symbol>IN</symbol>
             <symbol>IS</symbol>
-            <symbol>ID</symbol>
             <symbol>NE</symbol>
             <symbol>LE</symbol>
             <symbol>GE</symbol>
-            <symbol>LIKE</symbol>
-            <symbol>FOR</symbol>
-            <symbol>BETWEEN</symbol>
-            <symbol>HAVING</symbol>
-            <symbol>UNION</symbol>
+            <symbol>ID</symbol>
             <symbol>'='</symbol>
             <symbol>'&gt;'</symbol>
             <symbol>'&lt;'</symbol>
@@ -6133,8 +6131,8 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CONCAT" state="97"/>
-          <transition type="shift" symbol="OUTERJ" state="98"/>
+          <transition type="shift" symbol="OUTERJ" state="94"/>
+          <transition type="shift" symbol="CONCAT" state="98"/>
           <transition type="shift" symbol="'/'" state="104"/>
           <transition type="shift" symbol="'*'" state="105"/>
         </transitions>
@@ -6145,8 +6143,8 @@
       </actions>
       <solved-conflicts>
         <resolution rule="113" symbol="OVER" type="reduce">OVER &lt; '+'</resolution>
-        <resolution rule="113" symbol="CONCAT" type="shift">'+' &lt; CONCAT</resolution>
         <resolution rule="113" symbol="OUTERJ" type="shift">'+' &lt; OUTERJ</resolution>
+        <resolution rule="113" symbol="CONCAT" type="shift">'+' &lt; CONCAT</resolution>
         <resolution rule="113" symbol="'-'" type="reduce">%left '-'</resolution>
         <resolution rule="113" symbol="'+'" type="reduce">%left '+'</resolution>
         <resolution rule="113" symbol="'/'" type="shift">'+' &lt; '/'</resolution>
@@ -6164,41 +6162,41 @@
         <item rule-number="115" point="3">
           <lookaheads>
             <symbol>$end</symbol>
-            <symbol>OVER</symbol>
+            <symbol>BETWEEN</symbol>
             <symbol>ESCAPE</symbol>
+            <symbol>OVER</symbol>
+            <symbol>HAVING</symbol>
             <symbol>WHERE</symbol>
             <symbol>ORDER</symbol>
+            <symbol>OR</symbol>
             <symbol>GROUP</symbol>
             <symbol>RIGHT</symbol>
             <symbol>INNER</symbol>
+            <symbol>UNION</symbol>
             <symbol>FROM</symbol>
-            <symbol>JOIN</symbol>
-            <symbol>LEFT</symbol>
             <symbol>WHEN</symbol>
             <symbol>THEN</symbol>
             <symbol>ELSE</symbol>
-            <symbol>FULL</symbol>
             <symbol>DESC</symbol>
-            <symbol>ASC</symbol>
+            <symbol>LIKE</symbol>
+            <symbol>JOIN</symbol>
+            <symbol>LEFT</symbol>
+            <symbol>FULL</symbol>
             <symbol>AND</symbol>
             <symbol>END</symbol>
+            <symbol>ASC</symbol>
             <symbol>XOR</symbol>
+            <symbol>FOR</symbol>
             <symbol>NOT</symbol>
-            <symbol>OR</symbol>
             <symbol>AS</symbol>
             <symbol>IN</symbol>
             <symbol>IS</symbol>
-            <symbol>ID</symbol>
+            <symbol>OUTERJ</symbol>
             <symbol>NE</symbol>
             <symbol>LE</symbol>
             <symbol>GE</symbol>
             <symbol>CONCAT</symbol>
-            <symbol>LIKE</symbol>
-            <symbol>FOR</symbol>
-            <symbol>BETWEEN</symbol>
-            <symbol>HAVING</symbol>
-            <symbol>OUTERJ</symbol>
-            <symbol>UNION</symbol>
+            <symbol>ID</symbol>
             <symbol>'='</symbol>
             <symbol>'&gt;'</symbol>
             <symbol>'&lt;'</symbol>
@@ -6222,8 +6220,8 @@
       </actions>
       <solved-conflicts>
         <resolution rule="115" symbol="OVER" type="reduce">OVER &lt; '/'</resolution>
-        <resolution rule="115" symbol="CONCAT" type="reduce">%left CONCAT</resolution>
         <resolution rule="115" symbol="OUTERJ" type="reduce">%left OUTERJ</resolution>
+        <resolution rule="115" symbol="CONCAT" type="reduce">%left CONCAT</resolution>
         <resolution rule="115" symbol="'-'" type="reduce">'-' &lt; '/'</resolution>
         <resolution rule="115" symbol="'+'" type="reduce">'+' &lt; '/'</resolution>
         <resolution rule="115" symbol="'/'" type="reduce">%left '/'</resolution>
@@ -6240,41 +6238,41 @@
         <item rule-number="114" point="3">
           <lookaheads>
             <symbol>$end</symbol>
-            <symbol>OVER</symbol>
+            <symbol>BETWEEN</symbol>
             <symbol>ESCAPE</symbol>
+            <symbol>OVER</symbol>
+            <symbol>HAVING</symbol>
             <symbol>WHERE</symbol>
             <symbol>ORDER</symbol>
+            <symbol>OR</symbol>
             <symbol>GROUP</symbol>
             <symbol>RIGHT</symbol>
             <symbol>INNER</symbol>
+            <symbol>UNION</symbol>
             <symbol>FROM</symbol>
-            <symbol>JOIN</symbol>
-            <symbol>LEFT</symbol>
             <symbol>WHEN</symbol>
             <symbol>THEN</symbol>
             <symbol>ELSE</symbol>
-            <symbol>FULL</symbol>
             <symbol>DESC</symbol>
-            <symbol>ASC</symbol>
+            <symbol>LIKE</symbol>
+            <symbol>JOIN</symbol>
+            <symbol>LEFT</symbol>
+            <symbol>FULL</symbol>
             <symbol>AND</symbol>
             <symbol>END</symbol>
+            <symbol>ASC</symbol>
             <symbol>XOR</symbol>
+            <symbol>FOR</symbol>
             <symbol>NOT</symbol>
-            <symbol>OR</symbol>
             <symbol>AS</symbol>
             <symbol>IN</symbol>
             <symbol>IS</symbol>
-            <symbol>ID</symbol>
+            <symbol>OUTERJ</symbol>
             <symbol>NE</symbol>
             <symbol>LE</symbol>
             <symbol>GE</symbol>
             <symbol>CONCAT</symbol>
-            <symbol>LIKE</symbol>
-            <symbol>FOR</symbol>
-            <symbol>BETWEEN</symbol>
-            <symbol>HAVING</symbol>
-            <symbol>OUTERJ</symbol>
-            <symbol>UNION</symbol>
+            <symbol>ID</symbol>
             <symbol>'='</symbol>
             <symbol>'&gt;'</symbol>
             <symbol>'&lt;'</symbol>
@@ -6299,8 +6297,8 @@
       </actions>
       <solved-conflicts>
         <resolution rule="114" symbol="OVER" type="reduce">OVER &lt; '*'</resolution>
-        <resolution rule="114" symbol="CONCAT" type="reduce">%left CONCAT</resolution>
         <resolution rule="114" symbol="OUTERJ" type="reduce">%left OUTERJ</resolution>
+        <resolution rule="114" symbol="CONCAT" type="reduce">%left CONCAT</resolution>
         <resolution rule="114" symbol="'-'" type="reduce">'-' &lt; '*'</resolution>
         <resolution rule="114" symbol="'+'" type="reduce">'+' &lt; '*'</resolution>
         <resolution rule="114" symbol="'/'" type="reduce">%left '/'</resolution>
@@ -6349,12 +6347,12 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="SELECT" state="1"/>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="74"/>
@@ -6375,14 +6373,47 @@
 
     <state number="165">
       <itemset>
-        <item rule-number="102" point="2"/>
+        <item rule-number="74" point="0"/>
+        <item rule-number="75" point="0"/>
+        <item rule-number="76" point="0"/>
+        <item rule-number="91" point="3"/>
+        <item rule-number="105" point="0"/>
+        <item rule-number="106" point="0"/>
+        <item rule-number="107" point="0"/>
+        <item rule-number="108" point="0"/>
+        <item rule-number="109" point="0"/>
+        <item rule-number="110" point="0"/>
+        <item rule-number="111" point="0"/>
+        <item rule-number="112" point="0"/>
+        <item rule-number="113" point="0"/>
+        <item rule-number="114" point="0"/>
+        <item rule-number="115" point="0"/>
+        <item rule-number="116" point="0"/>
+        <item rule-number="117" point="0"/>
+        <item rule-number="118" point="0"/>
+        <item rule-number="119" point="0"/>
+        <item rule-number="120" point="0"/>
+        <item rule-number="121" point="0"/>
+        <item rule-number="122" point="0"/>
+        <item rule-number="123" point="0"/>
       </itemset>
       <actions>
-        <transitions/>
+        <transitions>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
+          <transition type="shift" symbol="'-'" state="38"/>
+          <transition type="shift" symbol="'*'" state="39"/>
+          <transition type="shift" symbol="'('" state="74"/>
+          <transition type="shift" symbol="'?'" state="41"/>
+          <transition type="goto" symbol="ident" state="46"/>
+          <transition type="goto" symbol="simpleExpr" state="207"/>
+        </transitions>
         <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="102" enabled="true"/>
-        </reductions>
+        <reductions/>
       </actions>
       <solved-conflicts/>
     </state>
@@ -6415,59 +6446,12 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="CAST" state="37"/>
-          <transition type="shift" symbol="'-'" state="38"/>
-          <transition type="shift" symbol="'*'" state="39"/>
-          <transition type="shift" symbol="'('" state="74"/>
-          <transition type="shift" symbol="'?'" state="41"/>
-          <transition type="goto" symbol="ident" state="46"/>
-          <transition type="goto" symbol="simpleExpr" state="207"/>
-        </transitions>
-        <errors/>
-        <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="167">
-      <itemset>
-        <item rule-number="74" point="0"/>
-        <item rule-number="75" point="0"/>
-        <item rule-number="76" point="0"/>
-        <item rule-number="91" point="3"/>
-        <item rule-number="105" point="0"/>
-        <item rule-number="106" point="0"/>
-        <item rule-number="107" point="0"/>
-        <item rule-number="108" point="0"/>
-        <item rule-number="109" point="0"/>
-        <item rule-number="110" point="0"/>
-        <item rule-number="111" point="0"/>
-        <item rule-number="112" point="0"/>
-        <item rule-number="113" point="0"/>
-        <item rule-number="114" point="0"/>
-        <item rule-number="115" point="0"/>
-        <item rule-number="116" point="0"/>
-        <item rule-number="117" point="0"/>
-        <item rule-number="118" point="0"/>
-        <item rule-number="119" point="0"/>
-        <item rule-number="120" point="0"/>
-        <item rule-number="121" point="0"/>
-        <item rule-number="122" point="0"/>
-        <item rule-number="123" point="0"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="74"/>
@@ -6477,6 +6461,20 @@
         </transitions>
         <errors/>
         <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="167">
+      <itemset>
+        <item rule-number="102" point="2"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="102" enabled="true"/>
+        </reductions>
       </actions>
       <solved-conflicts/>
     </state>
@@ -6571,20 +6569,6 @@
 
     <state number="173">
       <itemset>
-        <item rule-number="76" point="4"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="ID" state="212"/>
-        </transitions>
-        <errors/>
-        <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="174">
-      <itemset>
         <item rule-number="72" point="4"/>
       </itemset>
       <actions>
@@ -6593,6 +6577,20 @@
         <reductions>
           <reduction symbol="$default" rule="72" enabled="true"/>
         </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="174">
+      <itemset>
+        <item rule-number="76" point="4"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="ID" state="212"/>
+        </transitions>
+        <errors/>
+        <reductions/>
       </actions>
       <solved-conflicts/>
     </state>
@@ -6624,10 +6622,10 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="ID" state="17"/>
-          <transition type="shift" symbol="'('" state="113"/>
+          <transition type="shift" symbol="ID" state="20"/>
+          <transition type="shift" symbol="'('" state="114"/>
           <transition type="goto" symbol="assign" state="214"/>
-          <transition type="goto" symbol="ident" state="116"/>
+          <transition type="goto" symbol="ident" state="117"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -6677,12 +6675,12 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="74"/>
@@ -6702,8 +6700,8 @@
           <lookaheads>
             <symbol>$end</symbol>
             <symbol>GROUP</symbol>
-            <symbol>FOR</symbol>
             <symbol>UNION</symbol>
+            <symbol>FOR</symbol>
             <symbol>')'</symbol>
           </lookaheads>
         </item>
@@ -6744,8 +6742,8 @@
           <lookaheads>
             <symbol>$end</symbol>
             <symbol>GROUP</symbol>
-            <symbol>FOR</symbol>
             <symbol>UNION</symbol>
+            <symbol>FOR</symbol>
             <symbol>','</symbol>
             <symbol>')'</symbol>
           </lookaheads>
@@ -6763,8 +6761,8 @@
           <transition type="shift" symbol="OVER" state="91"/>
           <transition type="shift" symbol="DESC" state="217"/>
           <transition type="shift" symbol="ASC" state="218"/>
-          <transition type="shift" symbol="CONCAT" state="97"/>
-          <transition type="shift" symbol="OUTERJ" state="98"/>
+          <transition type="shift" symbol="OUTERJ" state="94"/>
+          <transition type="shift" symbol="CONCAT" state="98"/>
           <transition type="shift" symbol="'-'" state="102"/>
           <transition type="shift" symbol="'+'" state="103"/>
           <transition type="shift" symbol="'/'" state="104"/>
@@ -6787,8 +6785,8 @@
           <lookaheads>
             <symbol>$end</symbol>
             <symbol>ORDER</symbol>
-            <symbol>FOR</symbol>
             <symbol>UNION</symbol>
+            <symbol>FOR</symbol>
             <symbol>')'</symbol>
           </lookaheads>
         </item>
@@ -6824,6 +6822,20 @@
 
     <state number="184">
       <itemset>
+        <item rule-number="90" point="4"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="90" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="185">
+      <itemset>
         <item rule-number="74" point="0"/>
         <item rule-number="75" point="0"/>
         <item rule-number="76" point="0"/>
@@ -6850,12 +6862,12 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="74"/>
@@ -6869,7 +6881,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="185">
+    <state number="186">
       <itemset>
         <item rule-number="106" point="1"/>
         <item rule-number="112" point="1"/>
@@ -6887,8 +6899,8 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="OVER" state="91"/>
-          <transition type="shift" symbol="CONCAT" state="97"/>
-          <transition type="shift" symbol="OUTERJ" state="98"/>
+          <transition type="shift" symbol="OUTERJ" state="94"/>
+          <transition type="shift" symbol="CONCAT" state="98"/>
           <transition type="shift" symbol="'-'" state="102"/>
           <transition type="shift" symbol="'+'" state="103"/>
           <transition type="shift" symbol="'/'" state="104"/>
@@ -6902,7 +6914,7 @@
       <solved-conflicts/>
     </state>
 
-    <state number="186">
+    <state number="187">
       <itemset>
         <item rule-number="108" point="4"/>
       </itemset>
@@ -6911,20 +6923,6 @@
         <errors/>
         <reductions>
           <reduction symbol="$default" rule="108" enabled="true"/>
-        </reductions>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="187">
-      <itemset>
-        <item rule-number="90" point="4"/>
-      </itemset>
-      <actions>
-        <transitions/>
-        <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="90" enabled="true"/>
         </reductions>
       </actions>
       <solved-conflicts/>
@@ -6993,7 +6991,7 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="IN" state="165"/>
+          <transition type="shift" symbol="IN" state="167"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -7017,13 +7015,13 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="ID" state="17"/>
-          <transition type="shift" symbol="TABLE" state="18"/>
-          <transition type="shift" symbol="'('" state="19"/>
+          <transition type="shift" symbol="TABLE" state="19"/>
+          <transition type="shift" symbol="ID" state="20"/>
+          <transition type="shift" symbol="'('" state="21"/>
           <transition type="goto" symbol="table" state="225"/>
           <transition type="goto" symbol="alias" state="142"/>
-          <transition type="goto" symbol="tableExpr" state="21"/>
-          <transition type="goto" symbol="ident" state="22"/>
+          <transition type="goto" symbol="tableExpr" state="23"/>
+          <transition type="goto" symbol="ident" state="24"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -7122,12 +7120,12 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="ID" state="17"/>
-          <transition type="shift" symbol="TABLE" state="18"/>
-          <transition type="shift" symbol="'('" state="19"/>
+          <transition type="shift" symbol="TABLE" state="19"/>
+          <transition type="shift" symbol="ID" state="20"/>
+          <transition type="shift" symbol="'('" state="21"/>
           <transition type="goto" symbol="alias" state="228"/>
-          <transition type="goto" symbol="tableExpr" state="21"/>
-          <transition type="goto" symbol="ident" state="22"/>
+          <transition type="goto" symbol="tableExpr" state="23"/>
+          <transition type="goto" symbol="ident" state="24"/>
         </transitions>
         <errors/>
         <reductions/>
@@ -7177,12 +7175,12 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="74"/>
@@ -7272,6 +7270,34 @@
 
     <state number="207">
       <itemset>
+        <item rule-number="91" point="4"/>
+        <item rule-number="106" point="1"/>
+        <item rule-number="112" point="1"/>
+        <item rule-number="113" point="1"/>
+        <item rule-number="114" point="1"/>
+        <item rule-number="115" point="1"/>
+        <item rule-number="116" point="1"/>
+        <item rule-number="117" point="1"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="OVER" state="91"/>
+          <transition type="shift" symbol="AND" state="234"/>
+          <transition type="shift" symbol="OUTERJ" state="94"/>
+          <transition type="shift" symbol="CONCAT" state="98"/>
+          <transition type="shift" symbol="'-'" state="102"/>
+          <transition type="shift" symbol="'+'" state="103"/>
+          <transition type="shift" symbol="'/'" state="104"/>
+          <transition type="shift" symbol="'*'" state="105"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="208">
+      <itemset>
         <item rule-number="89" point="4"/>
         <item rule-number="100" point="0"/>
         <item rule-number="101" point="0">
@@ -7279,21 +7305,21 @@
             <symbol>$end</symbol>
             <symbol>WHERE</symbol>
             <symbol>ORDER</symbol>
+            <symbol>OR</symbol>
             <symbol>GROUP</symbol>
             <symbol>RIGHT</symbol>
             <symbol>INNER</symbol>
+            <symbol>UNION</symbol>
             <symbol>FROM</symbol>
+            <symbol>THEN</symbol>
             <symbol>JOIN</symbol>
             <symbol>LEFT</symbol>
-            <symbol>THEN</symbol>
             <symbol>FULL</symbol>
             <symbol>AND</symbol>
             <symbol>XOR</symbol>
-            <symbol>OR</symbol>
+            <symbol>FOR</symbol>
             <symbol>AS</symbol>
             <symbol>ID</symbol>
-            <symbol>FOR</symbol>
-            <symbol>UNION</symbol>
             <symbol>','</symbol>
             <symbol>')'</symbol>
           </lookaheads>
@@ -7308,48 +7334,20 @@
       </itemset>
       <actions>
         <transitions>
+          <transition type="shift" symbol="ESCAPE" state="235"/>
           <transition type="shift" symbol="OVER" state="91"/>
-          <transition type="shift" symbol="ESCAPE" state="234"/>
-          <transition type="shift" symbol="CONCAT" state="97"/>
-          <transition type="shift" symbol="OUTERJ" state="98"/>
+          <transition type="shift" symbol="OUTERJ" state="94"/>
+          <transition type="shift" symbol="CONCAT" state="98"/>
           <transition type="shift" symbol="'-'" state="102"/>
           <transition type="shift" symbol="'+'" state="103"/>
           <transition type="shift" symbol="'/'" state="104"/>
           <transition type="shift" symbol="'*'" state="105"/>
-          <transition type="goto" symbol="escape" state="235"/>
+          <transition type="goto" symbol="escape" state="236"/>
         </transitions>
         <errors/>
         <reductions>
           <reduction symbol="$default" rule="101" enabled="true"/>
         </reductions>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="208">
-      <itemset>
-        <item rule-number="91" point="4"/>
-        <item rule-number="106" point="1"/>
-        <item rule-number="112" point="1"/>
-        <item rule-number="113" point="1"/>
-        <item rule-number="114" point="1"/>
-        <item rule-number="115" point="1"/>
-        <item rule-number="116" point="1"/>
-        <item rule-number="117" point="1"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="OVER" state="91"/>
-          <transition type="shift" symbol="AND" state="236"/>
-          <transition type="shift" symbol="CONCAT" state="97"/>
-          <transition type="shift" symbol="OUTERJ" state="98"/>
-          <transition type="shift" symbol="'-'" state="102"/>
-          <transition type="shift" symbol="'+'" state="103"/>
-          <transition type="shift" symbol="'/'" state="104"/>
-          <transition type="shift" symbol="'*'" state="105"/>
-        </transitions>
-        <errors/>
-        <reductions/>
       </actions>
       <solved-conflicts/>
     </state>
@@ -7458,8 +7456,8 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="OVER" state="91"/>
-          <transition type="shift" symbol="CONCAT" state="97"/>
-          <transition type="shift" symbol="OUTERJ" state="98"/>
+          <transition type="shift" symbol="OUTERJ" state="94"/>
+          <transition type="shift" symbol="CONCAT" state="98"/>
           <transition type="shift" symbol="'-'" state="102"/>
           <transition type="shift" symbol="'+'" state="103"/>
           <transition type="shift" symbol="'/'" state="104"/>
@@ -7502,12 +7500,12 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="74"/>
@@ -7612,14 +7610,14 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NOT" state="31"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="EXISTS" state="36"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="EXISTS" state="30"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="NOT" state="34"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="40"/>
@@ -7669,8 +7667,8 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="OVER" state="91"/>
-          <transition type="shift" symbol="CONCAT" state="97"/>
-          <transition type="shift" symbol="OUTERJ" state="98"/>
+          <transition type="shift" symbol="OUTERJ" state="94"/>
+          <transition type="shift" symbol="CONCAT" state="98"/>
           <transition type="shift" symbol="'-'" state="102"/>
           <transition type="shift" symbol="'+'" state="103"/>
           <transition type="shift" symbol="'/'" state="104"/>
@@ -7748,12 +7746,12 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="SELECT" state="1"/>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="74"/>
@@ -7780,8 +7778,8 @@
             <symbol>WHERE</symbol>
             <symbol>ORDER</symbol>
             <symbol>GROUP</symbol>
-            <symbol>FOR</symbol>
             <symbol>UNION</symbol>
+            <symbol>FOR</symbol>
             <symbol>','</symbol>
             <symbol>')'</symbol>
           </lookaheads>
@@ -7881,10 +7879,10 @@
         <item rule-number="135" point="3">
           <lookaheads>
             <symbol>$end</symbol>
-            <symbol>ORDER</symbol>
-            <symbol>FOR</symbol>
             <symbol>HAVING</symbol>
+            <symbol>ORDER</symbol>
             <symbol>UNION</symbol>
+            <symbol>FOR</symbol>
             <symbol>','</symbol>
             <symbol>')'</symbol>
           </lookaheads>
@@ -7893,8 +7891,8 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="OVER" state="91"/>
-          <transition type="shift" symbol="CONCAT" state="97"/>
-          <transition type="shift" symbol="OUTERJ" state="98"/>
+          <transition type="shift" symbol="OUTERJ" state="94"/>
+          <transition type="shift" symbol="CONCAT" state="98"/>
           <transition type="shift" symbol="'-'" state="102"/>
           <transition type="shift" symbol="'+'" state="103"/>
           <transition type="shift" symbol="'/'" state="104"/>
@@ -7917,7 +7915,7 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="ID" state="17"/>
+          <transition type="shift" symbol="ID" state="20"/>
           <transition type="goto" symbol="ident" state="247"/>
         </transitions>
         <errors/>
@@ -7956,34 +7954,6 @@
 
     <state number="234">
       <itemset>
-        <item rule-number="100" point="1"/>
-      </itemset>
-      <actions>
-        <transitions>
-          <transition type="shift" symbol="STRING_SQ" state="248"/>
-        </transitions>
-        <errors/>
-        <reductions/>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="235">
-      <itemset>
-        <item rule-number="89" point="5"/>
-      </itemset>
-      <actions>
-        <transitions/>
-        <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="89" enabled="true"/>
-        </reductions>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="236">
-      <itemset>
         <item rule-number="74" point="0"/>
         <item rule-number="75" point="0"/>
         <item rule-number="76" point="0"/>
@@ -8010,21 +7980,49 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="74"/>
           <transition type="shift" symbol="'?'" state="41"/>
           <transition type="goto" symbol="ident" state="46"/>
-          <transition type="goto" symbol="simpleExpr" state="249"/>
+          <transition type="goto" symbol="simpleExpr" state="248"/>
         </transitions>
         <errors/>
         <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="235">
+      <itemset>
+        <item rule-number="100" point="1"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="STRING_SQ" state="249"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="236">
+      <itemset>
+        <item rule-number="89" point="5"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="89" enabled="true"/>
+        </reductions>
       </actions>
       <solved-conflicts/>
     </state>
@@ -8071,12 +8069,12 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="74"/>
@@ -8110,8 +8108,8 @@
           <lookaheads>
             <symbol>$end</symbol>
             <symbol>ORDER</symbol>
-            <symbol>FOR</symbol>
             <symbol>UNION</symbol>
+            <symbol>FOR</symbol>
             <symbol>')'</symbol>
           </lookaheads>
         </item>
@@ -8121,9 +8119,9 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="AND" state="88"/>
-          <transition type="shift" symbol="XOR" state="89"/>
-          <transition type="shift" symbol="OR" state="90"/>
+          <transition type="shift" symbol="OR" state="88"/>
+          <transition type="shift" symbol="AND" state="89"/>
+          <transition type="shift" symbol="XOR" state="90"/>
         </transitions>
         <errors/>
         <reductions>
@@ -8241,14 +8239,14 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="CASE" state="30"/>
-          <transition type="shift" symbol="NOT" state="31"/>
-          <transition type="shift" symbol="NULL" state="32"/>
-          <transition type="shift" symbol="STRING_SQ" state="33"/>
-          <transition type="shift" symbol="NUMBER" state="34"/>
-          <transition type="shift" symbol="ID" state="35"/>
-          <transition type="shift" symbol="EXISTS" state="36"/>
-          <transition type="shift" symbol="CAST" state="37"/>
+          <transition type="shift" symbol="EXISTS" state="30"/>
+          <transition type="shift" symbol="CASE" state="31"/>
+          <transition type="shift" symbol="CAST" state="32"/>
+          <transition type="shift" symbol="NULL" state="33"/>
+          <transition type="shift" symbol="NOT" state="34"/>
+          <transition type="shift" symbol="STRING_SQ" state="35"/>
+          <transition type="shift" symbol="NUMBER" state="36"/>
+          <transition type="shift" symbol="ID" state="37"/>
           <transition type="shift" symbol="'-'" state="38"/>
           <transition type="shift" symbol="'*'" state="39"/>
           <transition type="shift" symbol="'('" state="40"/>
@@ -8296,40 +8294,26 @@
 
     <state number="248">
       <itemset>
-        <item rule-number="100" point="2"/>
-      </itemset>
-      <actions>
-        <transitions/>
-        <errors/>
-        <reductions>
-          <reduction symbol="$default" rule="100" enabled="true"/>
-        </reductions>
-      </actions>
-      <solved-conflicts/>
-    </state>
-
-    <state number="249">
-      <itemset>
         <item rule-number="91" point="6">
           <lookaheads>
             <symbol>$end</symbol>
             <symbol>WHERE</symbol>
             <symbol>ORDER</symbol>
+            <symbol>OR</symbol>
             <symbol>GROUP</symbol>
             <symbol>RIGHT</symbol>
             <symbol>INNER</symbol>
+            <symbol>UNION</symbol>
             <symbol>FROM</symbol>
+            <symbol>THEN</symbol>
             <symbol>JOIN</symbol>
             <symbol>LEFT</symbol>
-            <symbol>THEN</symbol>
             <symbol>FULL</symbol>
             <symbol>AND</symbol>
             <symbol>XOR</symbol>
-            <symbol>OR</symbol>
+            <symbol>FOR</symbol>
             <symbol>AS</symbol>
             <symbol>ID</symbol>
-            <symbol>FOR</symbol>
-            <symbol>UNION</symbol>
             <symbol>','</symbol>
             <symbol>')'</symbol>
           </lookaheads>
@@ -8345,8 +8329,8 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="OVER" state="91"/>
-          <transition type="shift" symbol="CONCAT" state="97"/>
-          <transition type="shift" symbol="OUTERJ" state="98"/>
+          <transition type="shift" symbol="OUTERJ" state="94"/>
+          <transition type="shift" symbol="CONCAT" state="98"/>
           <transition type="shift" symbol="'-'" state="102"/>
           <transition type="shift" symbol="'+'" state="103"/>
           <transition type="shift" symbol="'/'" state="104"/>
@@ -8355,6 +8339,20 @@
         <errors/>
         <reductions>
           <reduction symbol="$default" rule="91" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="249">
+      <itemset>
+        <item rule-number="100" point="2"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="100" enabled="true"/>
         </reductions>
       </actions>
       <solved-conflicts/>
@@ -8380,8 +8378,8 @@
       <actions>
         <transitions>
           <transition type="shift" symbol="OVER" state="91"/>
-          <transition type="shift" symbol="CONCAT" state="97"/>
-          <transition type="shift" symbol="OUTERJ" state="98"/>
+          <transition type="shift" symbol="OUTERJ" state="94"/>
+          <transition type="shift" symbol="CONCAT" state="98"/>
           <transition type="shift" symbol="'-'" state="102"/>
           <transition type="shift" symbol="'+'" state="103"/>
           <transition type="shift" symbol="'/'" state="104"/>
@@ -8461,11 +8459,11 @@
             <symbol>GROUP</symbol>
             <symbol>RIGHT</symbol>
             <symbol>INNER</symbol>
+            <symbol>UNION</symbol>
             <symbol>JOIN</symbol>
             <symbol>LEFT</symbol>
             <symbol>FULL</symbol>
             <symbol>FOR</symbol>
-            <symbol>UNION</symbol>
             <symbol>','</symbol>
             <symbol>')'</symbol>
           </lookaheads>
@@ -8476,9 +8474,9 @@
       </itemset>
       <actions>
         <transitions>
-          <transition type="shift" symbol="AND" state="88"/>
-          <transition type="shift" symbol="XOR" state="89"/>
-          <transition type="shift" symbol="OR" state="90"/>
+          <transition type="shift" symbol="OR" state="88"/>
+          <transition type="shift" symbol="AND" state="89"/>
+          <transition type="shift" symbol="XOR" state="90"/>
         </transitions>
         <errors/>
         <reductions>

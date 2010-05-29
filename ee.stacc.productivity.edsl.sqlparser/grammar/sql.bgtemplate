@@ -33,65 +33,90 @@ import java.io.IOException;
 }
 %define parser_class_name "SQLParser"
 
-%token VALUES PARTITION OVER
-%token ESCAPE
-%token SELECT
-%token INSERT
-%token WHERE
-%token ORDER
-%token OUTER
-%token GROUP
-%token RIGHT
-%token INNER
-%token FROM
-%token JOIN
-%token LEFT
-%token WHEN
-%token THEN
-%token ELSE
-%token CASE
-%token INTO
-%token FULL
-%token DESC
-%token ASC
-%token AND
-%token END
-%token XOR
-%token NOT
-%token OR
-%token ON
-%token BY
-%token AS
-%token IN
-%token IS
-%token NULL
-%token DIGAL_ERR
-%token STRING_DQ
-%token STRING_DQ_ERR 
-%token STRING_SQ
-%token STRING_SQ_ERR 
-%token NUMBER  
-%token ID
-%token DISTINCT
-%token UNKNOWN_CHARACTER_ERR
-%token NE
-%token LE
-%token GE
-%token CONCAT
-%token TABLE
-%token LIKE
-%token FOR
-%token UPDATE
-%token EXISTS
-%token BETWEEN
-%token HAVING
-%token OUTERJ
-%token UNION
-%token DELETE
-%token SET
-%token COMMIT CAST
+%lex-keyword PARTITION
+%lex-keyword DISTINCT
+%lex-keyword BETWEEN
+%lex-keyword VALUES
+%lex-keyword SELECT
+%lex-keyword DELETE
+%lex-keyword INSERT
+%lex-keyword ESCAPE
+%lex-keyword OVER
+%lex-keyword UPDATE
+%lex-keyword EXISTS
+%lex-keyword HAVING
+%lex-keyword COMMIT
+%lex-keyword WHERE
+%lex-keyword TABLE
+%lex-keyword ORDER
+%lex-keyword OR
+%lex-keyword GROUP
+%lex-keyword RIGHT
+%lex-keyword INNER
+%lex-keyword OUTER
+%lex-keyword UNION
+%lex-keyword FROM
+%lex-keyword WHEN
+%lex-keyword THEN
+%lex-keyword CASE
+%lex-keyword CAST
+%lex-keyword ELSE
+%lex-keyword DESC
+%lex-keyword LIKE
+%lex-keyword JOIN
+%lex-keyword LEFT
+%lex-keyword NULL
+%lex-keyword FULL
+%lex-keyword INTO
+%lex-keyword AND
+%lex-keyword SET
+%lex-keyword END
+%lex-keyword ASC
+%lex-keyword XOR
+%lex-keyword FOR
+%lex-keyword NOT
+%lex-keyword ON
+%lex-keyword BY
+%lex-keyword AS
+%lex-keyword IN
+%lex-keyword IS
 
-//%left AS
+%lex-token OUTERJ = "(+)"
+%lex-token NE = "<>" | "!="
+%lex-token LE = "<="
+%lex-token GE = ">="
+//%lex-token NE = "!="
+%lex-token CONCAT = "||"
+%lex-literal ","
+%lex-literal "("
+%lex-literal ")"
+%lex-literal "."
+%lex-literal "+"
+%lex-literal "-"
+%lex-literal "*"
+%lex-literal "/"
+%lex-literal "="
+%lex-literal "<"
+%lex-literal ">"
+%lex-literal "?"
+
+%lex-helper ALPHA=[A-Za-z]
+%lex-helper DIGIT=[0-9]
+%lex-helper NONNEWLINE_WHITE_SPACE_CHAR=[\ \t\b\012]
+%lex-helper NEWLINE=\r|\n|\r\n
+%lex-helper WHITE_SPACE_CHAR=[\n\r\ \t\b\012]
+%lex-helper SQ_STRING_TEXT=(\'\' | [^\n\r\'] | \")*
+%lex-helper COMMENT_TEXT=([^*/\n]|[^*\n]"/"[^*\n]|[^/\n]"*"[^/\n]|"*"[^/\n]|"/"[^*\n])*
+%lex-helper Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
+
+%lex-whitespace {NONNEWLINE_WHITE_SPACE_CHAR}+ 
+%lex-token DIGAL_ERR = {DIGIT}+{ALPHA}({DIGIT}|{ALPHA})*
+%lex-token STRING_SQ = N?\'{SQ_STRING_TEXT}\'
+%lex-token STRING_SQ_ERR = \'{SQ_STRING_TEXT} 
+%lex-token NUMBER = {DIGIT}+(\.{DIGIT}+)?  
+%lex-token ID = {Ident}
+%lex-token UNKNOWN_CHARACTER_ERR = .
+
 %left OVER
 %left OR XOR
 %left AND

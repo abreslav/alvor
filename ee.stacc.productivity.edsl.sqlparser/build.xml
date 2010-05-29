@@ -6,6 +6,15 @@
     </target>
 
     <target name="depends">
+    	<java 
+    		classpath="bin" 
+    		classname="ee.stacc.productivity.edsl.sqlparser.LexerSpecGenerator"
+    	>
+    		<arg value="grammar/sql.bgtemplate"/>
+    		<arg value="generated/sql.bg"/>
+    		<arg value="grammar/sql.flextemplate"/>
+    		<arg value="../ee.stacc.productivity.edsl.sqllexer/generated/sql.flex"/>
+    	</java>
 		<exec executable="bison" dir="${basedir}">
 			<arg value="--xml=src/ee/stacc/productivity/edsl/sqlparser/sql.xml"/>
 			<arg value="--report=state,lookahead,itemset"/>
@@ -13,7 +22,7 @@
 			<arg value="--output=generated/SQLParser.java"/>
 			<arg value="--language=Java"/>
 			<arg value="--debug"/>
-			<arg value="grammar/sql.bg"/>
+			<arg value="generated/sql.bg"/>
 		</exec>	
 	</target>
 
