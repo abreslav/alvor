@@ -19,7 +19,6 @@ import ee.stacc.productivity.edsl.lexer.automata.Transition;
 import ee.stacc.productivity.edsl.lexer.automata.EmptyTransitionEliminator.IEmptinessExpert;
 import ee.stacc.productivity.edsl.lexer.sql.SQLLexer;
 import ee.stacc.productivity.edsl.string.IAbstractString;
-import ee.stacc.productivity.edsl.string.util.AsbtractStringUtils;
 
 public class ParserSimulator<S extends IParserStackLike> {
 

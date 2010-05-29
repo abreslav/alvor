@@ -1,6 +1,5 @@
 package ee.stacc.productivity.edsl.sqlparser;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;

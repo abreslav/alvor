@@ -1,5 +1,7 @@
 package ee.stacc.productivity.edsl.lexer.automata;
 
+import static ee.stacc.productivity.edsl.lexer.automata.AutomataInclusion.getSet;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
