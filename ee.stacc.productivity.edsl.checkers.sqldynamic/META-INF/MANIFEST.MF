@@ -10,4 +10,5 @@ Require-Bundle: ee.stacc.productivity.edsl.checkers;bundle-version="1.0.0",
 Export-Package: ee.stacc.productivity.edsl.checkers.sqldynamic
 Bundle-ClassPath: lib/ojdbc6.jar,
  lib/postgresql.jar,
+ lib/hsqldb.jar,
  .
