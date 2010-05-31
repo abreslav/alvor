@@ -135,6 +135,10 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 			finalMessage = "Unsupported SQL construction: " + message 
 				+ " at " + PositionUtil.getLineString(pos);
 		}
+		else if (markerType.equals(ERROR_MARKER_ID)) {
+			finalMessage = "SQL checker: " + message 
+			+ " at " + PositionUtil.getLineString(pos);
+		}
 		
 		MarkerUtilities.setMessage(map, finalMessage);
 		MarkerUtilities.setCharStart(map, charStart);
