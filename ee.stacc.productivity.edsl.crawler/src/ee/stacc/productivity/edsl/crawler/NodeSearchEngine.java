@@ -22,6 +22,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
@@ -126,8 +127,14 @@ public class NodeSearchEngine {
 	private static void performArgumentSearchInScope(
 			final NodeRequest nodeRequest, List<IJavaElement> scopeToSearchIn,
 			final List<? super IPosition> result) {
-		SearchPattern pattern = SearchPattern.createPattern(nodeRequest.getPatternString(), 
-				IJavaSearchConstants.METHOD, IJavaSearchConstants.REFERENCES, 
+		
+		int searchFor = IJavaSearchConstants.METHOD;
+		if (nodeRequest.getMethodName().equals("new")) {
+			searchFor = IJavaSearchConstants.CONSTRUCTOR;
+		}
+		SearchPattern pattern = SearchPattern.createPattern(
+				nodeRequest.getPatternString(), searchFor,
+				IJavaSearchConstants.REFERENCES, 
 				SearchPattern.R_ERASURE_MATCH | SearchPattern.R_CASE_SENSITIVE);
 		assert LOG.message(pattern);
 				
@@ -149,29 +156,39 @@ public class NodeSearchEngine {
 				
 				ASTNode node = getASTNode(match);
 				
-				if (node instanceof SuperMethodInvocation) {
+				List arguments = null;
+				ASTNode invoc = null;
+				IMethodBinding methodBinding = null;
+				String signature = null;
+				
+				if (node instanceof ClassInstanceCreation) {
+					arguments = ((ClassInstanceCreation)node).arguments();
+					methodBinding = ((ClassInstanceCreation)node).resolveConstructorBinding();
+				}
+				else if (node instanceof MethodInvocation) {
+					arguments = ((MethodInvocation)node).arguments();
+					methodBinding = ((MethodInvocation)node).resolveMethodBinding();
+				}
+				else { // eg. SuperMethodInvocation
 					return; // FIXME should do smth about it
 				}
-				
-				MethodInvocation invoc = (MethodInvocation)node;
-				IMethodBinding methodBinding = invoc.resolveMethodBinding();
 				
 				if (methodBinding == null || methodBinding.getDeclaringClass() == null) {
 					LOG.error("TODO: crawler methodBinding.getDeclaringClass() == null");
 					return;
 				}
-				
-				String signature = methodBinding.getDeclaringClass().getQualifiedName()
+				signature = methodBinding.getDeclaringClass().getQualifiedName()
 					+ "." + methodBinding.getMethodDeclaration().getName();
 				
-				if (!nodeRequest.signatureMatches(signature)) {
+				if (node instanceof MethodInvocation 
+						&& !nodeRequest.signatureMatches(signature)) {
 					LOG.error("Signature does not match: " + methodBinding);
 					return;
 				}					
 				
 				// TODO overloading may complicate things 
 				int requestedArgumentIndex = nodeRequest.getArgumentIndex();
-				if (invoc.arguments().size() < requestedArgumentIndex) {
+				if (arguments.size() < requestedArgumentIndex) {
 					LOG.error("can't find required argument (" + requestedArgumentIndex + "), method="
 							+ methodBinding.getDeclaringClass().getQualifiedName()
 							+ "." + methodBinding.getName());
@@ -179,7 +196,7 @@ public class NodeSearchEngine {
 				}
 				
 
-				ASTNode arg = (ASTNode) invoc.arguments().get(requestedArgumentIndex - 1);
+				ASTNode arg = (ASTNode) arguments.get(requestedArgumentIndex - 1);
 				if (arg instanceof Expression) {
 					IPosition position = PositionUtil.getPosition(arg);
 					result.add(position);

@@ -17,7 +17,12 @@ public final class NodeRequest implements IHotspotPattern {
 	private final int argumentIndex;
 	
 	public NodeRequest(String className, String methodName, int argumentIndex) {
-		this.patternString = methodName;
+		if (methodName.equals("new")) {
+			this.patternString = className; // maybe constructor name is faster ???
+		} else {
+			this.patternString = methodName;
+		}
+		
 		this.signatureString = (!className.isEmpty() ? className + "." : "") + methodName;
 		this.argumentIndex = argumentIndex;
 		this.className = className;
