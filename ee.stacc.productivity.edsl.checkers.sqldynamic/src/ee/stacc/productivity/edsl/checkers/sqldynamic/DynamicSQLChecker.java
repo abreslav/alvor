@@ -74,7 +74,7 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 			for (Entry<String, String> entry : errorMap.entrySet()) {
 				String message = entry.getKey().trim() + "\nSQL: \n" 
 						+ entry.getValue();
-				message = message.substring(0, Math.min(200, message.length()));
+				//message = message.substring(0, Math.min(200, message.length()));
 				errorHandler.handleSQLError(message, nodeDesc.getPosition());
 			}
 
