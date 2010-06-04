@@ -142,10 +142,10 @@
             overviewRulerPreferenceValue="true"
             textStylePreferenceKey="highlight.text.style" >
         </specification >
+<!--               colorPreferenceKey="highlight.color-2"
+               colorPreferenceValue="255,120,120"-->
          <specification
                annotationType="unsupported"
-               colorPreferenceKey="highlight.color-2"
-               colorPreferenceValue="255,120,120"
                highlightPreferenceKey="highlight.background"
                highlightPreferenceValue="true"
                label="unsupported"

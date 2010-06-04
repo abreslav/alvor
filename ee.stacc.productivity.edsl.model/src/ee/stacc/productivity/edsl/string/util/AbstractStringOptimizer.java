@@ -16,6 +16,10 @@ import ee.stacc.productivity.edsl.string.StringParameter;
 import ee.stacc.productivity.edsl.string.StringRepetition;
 import ee.stacc.productivity.edsl.string.StringSequence;
 
+/**
+ * @author abreslav
+ *
+ */
 public class AbstractStringOptimizer {
 
 	private static IAbstractStringVisitor<Boolean, IAbstractString> EQUALS_VISITOR = new AbstractStringEqualsVisitor();

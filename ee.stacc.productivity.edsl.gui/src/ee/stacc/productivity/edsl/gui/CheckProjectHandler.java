@@ -15,7 +15,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
-import ee.stacc.productivity.edsl.cache.CacheService;
 import ee.stacc.productivity.edsl.checkers.AbstractStringCheckerManager;
 import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
 import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
@@ -158,7 +157,7 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 			if (hotspot instanceof IStringNodeDescriptor) {
 				IStringNodeDescriptor snd = (IStringNodeDescriptor) hotspot;
 				IAbstractString abstractValue = snd.getAbstractValue();
-				message = "Abstract string: " + AbstractStringOptimizer.optimize(abstractValue);
+				message = "Abstract string: " + CommonNotationRenderer.render(AbstractStringOptimizer.optimize(abstractValue));
 				if (message.length() > Character.MAX_VALUE) {
 					message = message.substring(0, Character.MAX_VALUE - 3) + "...";
 				}
