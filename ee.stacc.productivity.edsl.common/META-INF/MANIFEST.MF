@@ -7,3 +7,5 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: ee.stacc.productivity.edsl.common.logging
 Require-Bundle: org.eclipse.core.resources;bundle-version="3.5.1",
  org.eclipse.core.runtime;bundle-version="3.5.0"
+Bundle-Activator: ee.stacc.productivity.edsl.common.logging.EDSLCommonPlugin
+Bundle-ActivationPolicy: lazy

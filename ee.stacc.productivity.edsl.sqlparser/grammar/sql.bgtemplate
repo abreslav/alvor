@@ -81,6 +81,7 @@ import java.io.IOException;
 %lex-keyword IN
 %lex-keyword IS
 
+
 %lex-token OUTERJ = "(+)"
 %lex-token NE = "<>" | "!="
 %lex-token LE = "<="
@@ -125,6 +126,8 @@ import java.io.IOException;
 %left LIKE
 %left '-' '+'  
 %left '/' '*' CONCAT OUTERJ
+
+%glr-parser
 
 %%
 query

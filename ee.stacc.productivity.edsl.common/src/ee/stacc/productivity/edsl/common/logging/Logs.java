@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
 
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Platform;
 
 public class Logs {
@@ -36,7 +35,8 @@ public class Logs {
 				
 				String logRootDirStr = properties.getProperty("$log.root.dir", ".");
 				if (Platform.isRunning()) {
-					logRootDirStr = logRootDirStr.replace("$workspace", ResourcesPlugin.getWorkspace().getRoot().getLocation().toPortableString());
+					logRootDirStr = logRootDirStr.replace("$workspace", EDSLCommonPlugin.getDefault().getStateLocation().toOSString());
+//					logRootDirStr = logRootDirStr.replace("$workspace", ResourcesPlugin.getWorkspace().getRoot().getLocation().toPortableString());
 				}
 				File logRootDir = new File(logRootDirStr);
 				
