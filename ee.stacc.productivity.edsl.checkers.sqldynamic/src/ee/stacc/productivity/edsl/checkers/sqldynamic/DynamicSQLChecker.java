@@ -19,12 +19,25 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 	@Override
 	public void checkAbstractStrings(List<IStringNodeDescriptor> descriptors,
 			ISQLErrorHandler errorHandler, Map<String, Object> options) {
-		SQLStringAnalyzer analyzer = new SQLStringAnalyzer(				
+		if (descriptors.size() == 0) {
+			return;
+		}
+		
+		
+		SQLStringAnalyzer analyzer = null;
+		try {
+			analyzer = new SQLStringAnalyzer(				
 				options.get("DBDriverName").toString(),
 				options.get("DBUrl").toString(),
 				options.get("DBUsername").toString(),
 				options.get("DBPassword").toString());
-
+		} catch (Exception e) {
+			// for position use first pos from the list
+			errorHandler.handleSQLError("can't connect with database schema: "
+					+ e.getMessage(), descriptors.get(0).getPosition());
+			return;
+		}
+		
 		int totalConcrete = 0;
 		Map<String, Integer> concretes = new HashMap<String, Integer>();
 		

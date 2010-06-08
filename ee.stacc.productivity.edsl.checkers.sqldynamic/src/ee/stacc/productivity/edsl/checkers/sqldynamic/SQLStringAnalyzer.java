@@ -19,17 +19,14 @@ public class SQLStringAnalyzer {
 	private int usageCount=0;
 	
 	public SQLStringAnalyzer(String driverName, String url, String username,
-			String password) {
+			String password) throws SQLException, ClassNotFoundException {
 		
 		this.url = url;
 		this.username = username;
 		this.password = password;
 		
-		try {
-			Class.forName (driverName);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		Class.forName (driverName);
+		checkConnect();
 	}
 	
 	private void checkConnect() throws SQLException {
