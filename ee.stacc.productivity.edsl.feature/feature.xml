@@ -2,7 +2,7 @@
 <feature
       id="ee.stacc.productivity.edsl.feature"
       label="SQL Checker"
-      version="0.1">
+      version="0.2">
 
    <description url="http://www.example.com/description">
       [Enter Feature Description here.]
