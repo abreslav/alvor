@@ -103,24 +103,25 @@ public class Logs {
 	}
 	
 	public static ILog getLog(Class<?> clazz) {
-		defaultConfiguration();
-		ILog log = OPTIONS.get(clazz.getCanonicalName());
-		if (log != null) {
-			return log;
-		}
-
-		String pack = clazz.getPackage().getName();
-		while (true) {
-			log = OPTIONS.get(pack);
-			if (log != null) {
-				return log;
-			}
-			int lastIndexOf = pack.lastIndexOf('.');
-			if (lastIndexOf < 0) {
-				break;
-			}
-			pack = pack.substring(0, lastIndexOf);
-		}
-		return OPTIONS.get("");
+		return new AlternativeLog(clazz);
+//		defaultConfiguration();
+//		ILog log = OPTIONS.get(clazz.getCanonicalName());
+//		if (log != null) {
+//			return log;
+//		}
+//
+//		String pack = clazz.getPackage().getName();
+//		while (true) {
+//			log = OPTIONS.get(pack);
+//			if (log != null) {
+//				return log;
+//			}
+//			int lastIndexOf = pack.lastIndexOf('.');
+//			if (lastIndexOf < 0) {
+//				break;
+//			}
+//			pack = pack.substring(0, lastIndexOf);
+//		}
+//		return OPTIONS.get("");
 	}
 }
