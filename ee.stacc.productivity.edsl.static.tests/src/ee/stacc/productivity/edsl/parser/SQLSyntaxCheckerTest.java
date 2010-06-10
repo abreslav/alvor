@@ -13,12 +13,12 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import ee.stacc.productivity.edsl.checkers.sqlstatic.AbstractStringSizeCounter;
 import ee.stacc.productivity.edsl.checkers.sqlstatic.SyntacticalSQLChecker;
 import ee.stacc.productivity.edsl.sqlparser.ParserSimulator;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.parser.AbstractStringParser;
 import ee.stacc.productivity.edsl.string.util.AbstractStringOptimizer;
+import ee.stacc.productivity.edsl.string.util.AbstractStringSizeCounter;
 
 
 @RunWith(Parameterized.class)
