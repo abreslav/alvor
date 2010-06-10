@@ -59,7 +59,7 @@ public class AbstractStringPrinter implements IEditorActionDelegate{
 			
 			NodeSearchEngine.clearCache();
 			CacheService.getCacheService().clearAll();
-			assert LOG.message(NewASE.evaluateExpression
+			LOG.message(NewASE.evaluateExpression
 					((Expression)node).toString());
 		} 
 		else {

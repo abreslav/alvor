@@ -52,14 +52,14 @@ public class JavaElementChecker {
 		if (requests.isEmpty()) {
 			throw new IllegalArgumentException("No hotspots found");
 		}
-		NodeSearchEngine.clearCache();
 //		return AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(requests, scope, 0);
 		List<INodeDescriptor> result = NewASE.evaluateMethodArgumentAtCallSites(requests, scope, 0);
-		timer.printTime();
+		timer.printTime(); // String construction
 		
 		LOG.message(Measurements.parseTimer);
 		LOG.message(Measurements.methodDeclSearchTimer);
 		LOG.message(Measurements.argumentSearchTimer);
+		
 		return result;
 	}
 
@@ -70,6 +70,7 @@ public class JavaElementChecker {
 		Map<String, Object> options) {
 		
 //		Map<String, Integer> connMap = new Hashtable<String, Integer>();
+		int unsupportedCount = 0;
 		
 		List<IStringNodeDescriptor> validHotspots = new ArrayList<IStringNodeDescriptor>();
 		for (INodeDescriptor hotspot : hotspots) {
@@ -90,7 +91,7 @@ public class JavaElementChecker {
 			else if (hotspot instanceof UnsupportedNodeDescriptor) {
 				assert LOG.message("UNSUPPORTED node desc, file=" + PositionUtil.getLineString(hotspot.getPosition())
 						+ ", msg=" + ((UnsupportedNodeDescriptor) hotspot).getProblemMessage());
-				
+				unsupportedCount++;
 				errorHandler.handleSQLWarning(((UnsupportedNodeDescriptor)hotspot).getProblemMessage(),
 						hotspot.getPosition());
 			}
@@ -100,8 +101,9 @@ public class JavaElementChecker {
 		}
 		checkValidHotspots(validHotspots, errorHandler, checkers, options);
 		
-		assert LOG.message("Processed " + hotspots.size() + " node descriptors, "
-				+ validHotspots.size() + " of them with valid abstract strings");
+		LOG.message("Processed " + hotspots.size() + " node descriptors, "
+				+ validHotspots.size() + " of them with valid abstract strings, "
+				+ "unsupported cases: " + unsupportedCount);
 
 		
 		

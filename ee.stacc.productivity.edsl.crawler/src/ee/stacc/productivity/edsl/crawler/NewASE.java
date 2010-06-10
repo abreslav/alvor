@@ -64,7 +64,7 @@ import ee.stacc.productivity.edsl.tracker.VariableTracker;
  */
 public class NewASE {
 	private int maxLevel = 4;
-	private boolean supportLoops = true;
+	private boolean supportLoops = false;
 	private boolean supportInvocations = true;
 	private boolean optimizeChoice = true;
 	
@@ -280,6 +280,11 @@ public class NewASE {
 	}
 
 	private IAbstractString evalInvocationResult(MethodInvocation inv) {
+//		if (inv.toString().contains("Integer.toString")) {
+//			ITypeBinding typ = inv.getExpression().resolveTypeBinding();
+//			System.err.println(typ.getQualifiedName());
+//		}
+
 		if (inv.getExpression() != null
 				&& ASTUtil.isStringOrStringBuilderOrBuffer(inv.getExpression().resolveTypeBinding())) {
 			if (inv.getName().getIdentifier().equals("toString")) {
@@ -301,6 +306,11 @@ public class NewASE {
 						PositionUtil.getPosition(inv)); 
 			}
 		}
+		if (inv.getExpression() != null
+				&& ASTUtil.isIntegral(inv.getExpression().resolveTypeBinding())
+				&& inv.getName().getIdentifier().equals("toString")) {
+			return new StringRandomInteger(PositionUtil.getPosition(inv));
+		}
 		else  {
 			return evalInvocationResultOrArgOut(inv, -1);
 		}			
@@ -311,70 +321,13 @@ public class NewASE {
 		return evalInvocationResultOrArgOut(inv, argumentIndex); 
 	}
 
-	/**
-	 * 
-	 * @param inv 
-	 * @param argumentIndex -1 means return value
-	 * @return
-	 */
-	private IAbstractString evalInvocationResultOrArgOut_old(MethodInvocation inv,
-			int argumentIndex) {
-		if (! supportInvocations) {
-			throw new UnsupportedStringOpEx("Method call");
-		}
-
-		List<MethodDeclaration> decls = 
-			NodeSearchEngine.findMethodDeclarations(scope, inv);
-		
-		if (decls.size() == 0) {
-			throw new UnsupportedStringOpEx("No declarations found for: " + inv.toString());
-		}
-		
-		NewASE argEvaluator = new NewASE(this.level+1, this.scope, this.templateConstructionMode);
-		
-		// evaluate argumets
-		List<IAbstractString> arguments = new ArrayList<IAbstractString>();
-		for (Object item : inv.arguments()) {
-			Expression arg = (Expression)item;
-			ITypeBinding typ = arg.resolveTypeBinding();
-			if (ASTUtil.isStringOrStringBuilderOrBuffer(typ)) {
-				arguments.add(argEvaluator.eval(arg));
-			}
-			else {
-				arguments.add(null);
-			}
-		}
-		
-		// evaluate method bodies and apply arguments
-		List<IAbstractString> choices = new ArrayList<IAbstractString>();
-		for (MethodDeclaration decl: decls) {
-			IAbstractString methodString;
-			if (argumentIndex == -1) {
-				methodString = getMethodReturnTemplate(decl);
-			}
-			else {
-				methodString = getMethodArgOutTemplate(decl, argumentIndex);
-			}
-			System.out.println("METHOD STRING for " + decl.getName().getFullyQualifiedName() + ": " + methodString);
-			choices.add(ArgumentApplier.applyArguments(methodString, arguments));
-		}
-		
-		// return single result or list
-		if (choices.size() == 1) {
-			return choices.get(0);
-		}
-		else {
-			return new StringChoice(PositionUtil.getPosition(inv), choices);
-		}
-	}
-
 	private IAbstractString evalInvocationResultOrArgOut(MethodInvocation inv,
 			int argumentIndex) {
 		if (! supportInvocations) {
 			throw new UnsupportedStringOpEx("Method call");
 		}
-
-		System.err.println("evalInvocationResultOrArgOut: " + inv.resolveMethodBinding()
+		
+		assert LOG.message("evalInvocationResultOrArgOut: " + inv.resolveMethodBinding()
 				+ ":" + argumentIndex);
 		
 		MethodTemplateSearcher templateSearcher = new MethodTemplateSearcher(this);

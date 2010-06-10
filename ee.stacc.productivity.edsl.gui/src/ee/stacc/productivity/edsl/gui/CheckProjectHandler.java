@@ -22,6 +22,7 @@ import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.common.logging.Timer;
+import ee.stacc.productivity.edsl.crawler.NodeSearchEngine;
 import ee.stacc.productivity.edsl.crawler.PositionUtil;
 import ee.stacc.productivity.edsl.crawler.UnsupportedNodeDescriptor;
 import ee.stacc.productivity.edsl.main.JavaElementChecker;
@@ -52,6 +53,13 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		//CacheService.getCacheService().setNocache(true);
 		
+		NodeSearchEngine.clearCache();
+		Runtime.getRuntime().gc();
+		System.out.println("MEM: totalMemory() == " + Runtime.getRuntime().totalMemory());
+		System.out.println("MEM: maxMemory() == " + Runtime.getRuntime().maxMemory());
+		System.out.println("MEM: freeMemory() == " + Runtime.getRuntime().freeMemory());
+		System.out.println("MEM: used memory == " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
+		
 		Timer timer = new Timer();
 		timer.start("TIMER: whole process");
 		assert LOG.message("CheckProjectHandler.execute");
@@ -73,6 +81,7 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 		try {
 			Map<String, Object> options = OptionLoader.getElementSqlCheckerProperties(optionsFrom);
 			List<INodeDescriptor> hotspots = projectChecker.findHotspots(scope, options);
+			NodeSearchEngine.clearCache(); // clean up stuff
 			markHotspots(hotspots);
 			
 			projectChecker.processHotspots(hotspots, this,

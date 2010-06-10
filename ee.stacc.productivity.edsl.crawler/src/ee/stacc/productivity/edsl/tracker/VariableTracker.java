@@ -329,6 +329,11 @@ public class VariableTracker {
 	private static NameUsage getLastReachingModInInv(IVariableBinding var,
 			ASTNode target, MethodInvocation inv) {
 		
+//		// TODO: too bold statement, but speeds up things
+//		if (inv.getName().getIdentifier().equals("toString")) {
+//			return null;
+//		}
+		
 		// optimize for immutable types
 		if (ASTUtil.isString(var.getType())) {
 			return null;
@@ -348,7 +353,11 @@ public class VariableTracker {
 			
 			// check in arguments
 			// special case: StringBuffer methods don't modify their arguments 
-			if (exp != null && ASTUtil.isStringBuilderOrBuffer(exp.resolveTypeBinding())) {
+			if (exp != null 
+					&& (
+							ASTUtil.isStringBuilderOrBuffer(exp.resolveTypeBinding())
+							|| exp.resolveTypeBinding().getQualifiedName().equals("java.lang.Integer"))
+					) {
 				return null;
 			}
 			

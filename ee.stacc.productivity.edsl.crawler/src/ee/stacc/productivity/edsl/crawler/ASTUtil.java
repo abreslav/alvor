@@ -442,6 +442,11 @@ public class ASTUtil {
 		|| typeBinding.getQualifiedName().equals("java.lang.StringBuilder");
 	}
 
+	public static boolean isIntegral(ITypeBinding typeBinding) {
+		return typeBinding.getQualifiedName().equals("java.lang.Integer")
+		|| typeBinding.getQualifiedName().equals("java.lang.Long");
+	}
+
 	public static boolean isStringOrStringBuilderOrBuffer(ITypeBinding typeBinding) {
 		return isString(typeBinding) || isStringBuilderOrBuffer(typeBinding);
 	}

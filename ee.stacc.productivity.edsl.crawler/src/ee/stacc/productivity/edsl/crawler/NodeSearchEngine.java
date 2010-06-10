@@ -182,7 +182,7 @@ public class NodeSearchEngine {
 				
 				if (node instanceof MethodInvocation 
 						&& !nodeRequest.signatureMatches(signature)) {
-					LOG.error("Signature does not match: " + methodBinding);
+					assert LOG.message("Signature does not match: " + methodBinding);
 					return;
 				}					
 				
@@ -385,15 +385,22 @@ public class NodeSearchEngine {
 			parser.setSource(cUnit);
 			ast = parser.createAST(null);
 			Measurements.parseTimer.stop();
-			
-			if (astCache.size() > 80) {
-				astCache.clear();
-				System.err.println("Cleaning ast cache");
-//				System.gc();
-//				System.err.println("GC done");
-			}
+			checkClearCache(20);
 			astCache.put(cUnit, ast);
 		}
 		return NodeFinder.perform(ast, start, length);
+	}
+	
+	public static void checkClearCache(int freeMBsRequired) {
+		if (astCache.size() > 30 && getAvailableMemory() < freeMBsRequired * 1024 * 1024) {
+			astCache.clear();
+			System.err.println("Cleaning ast cache");
+		}
+	}
+	
+	private static long getAvailableMemory() {
+		Runtime rt = Runtime.getRuntime();
+		long used = rt.totalMemory() - rt.freeMemory();
+		return rt.maxMemory() - used;
 	}
 }
