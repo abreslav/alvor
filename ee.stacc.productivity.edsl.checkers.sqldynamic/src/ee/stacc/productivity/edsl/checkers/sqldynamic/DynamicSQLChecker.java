@@ -12,9 +12,11 @@ import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.string.samplegen.SampleGenerator;
+import ee.stacc.productivity.edsl.string.util.AbstractStringSizeCounter;
 
 public class DynamicSQLChecker implements IAbstractStringChecker {
 	private static final ILog LOG = Logs.getLog(DynamicSQLChecker.class);
+	private static final int SIZE_LIMIT = 10000;
 
 	@Override
 	public void checkAbstractStrings(List<IStringNodeDescriptor> descriptors,
@@ -41,10 +43,17 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 		int totalConcrete = 0;
 		Map<String, Integer> concretes = new HashMap<String, Integer>();
 		
-		LOG.message("============================================");
+		assert LOG.message("============================================");
 		
 		for (IStringNodeDescriptor nodeDesc: descriptors) {
-			LOG.message("ABS: " + nodeDesc.getAbstractValue());
+			assert LOG.message("ABS: " + nodeDesc.getAbstractValue());
+			
+			if (AbstractStringSizeCounter.size(nodeDesc.getAbstractValue()) > SIZE_LIMIT) {
+				errorHandler.handleSQLWarning("Testing facility: abstract string is too big", 
+						nodeDesc.getPosition());
+				continue;
+			}
+			
 			List<String> concreteStr = SampleGenerator.getConcreteStrings(nodeDesc.getAbstractValue());
 //			LOG.message(conc);
 			totalConcrete += concreteStr.size();
@@ -58,12 +67,11 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 				Integer countSoFar = concretes.get(s);
 				duplicates = 0;
 				if (countSoFar == null) {
-					LOG.message("CON: " + s);
+					assert LOG.message("CON: " + s);
 					try {
 						analyzer.validate(s);
 					} catch (SQLException e) {
-						LOG.message("    ERR: " + e.getMessage());
-//						errorHandler.handleSQLError(e.getMessage().trim() + "\nSQL:\n" + s, nodeDesc.getPosition());
+						assert LOG.message("    ERR: " + e.getMessage());
 						
 						String errStrings = errorMap.get(e.getMessage());
 						if (errStrings == null) {
@@ -92,8 +100,8 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 			}
 
 			
-			LOG.message("DUPLICATES: " + duplicates);
-			LOG.message("____________________________________________");
+			assert LOG.message("DUPLICATES: " + duplicates);
+			assert LOG.message("____________________________________________");
 		}
 		
 		LOG.message("TOTAL ABSTRACT COUNT: " + descriptors.size());

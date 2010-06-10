@@ -47,7 +47,9 @@ public class SQLStringAnalyzer {
 		try {
 			usageCount++;
 			stmt = conn.prepareStatement(sql);
-			stmt.getMetaData();
+			if (url.contains("oracle") || url.contains("odbc")) {
+				stmt.getMetaData();
+			}
 		} finally {
 			if (stmt != null) {
 				stmt.close();
