@@ -18,6 +18,7 @@ import ee.stacc.productivity.edsl.sqlparser.SQLSyntaxChecker;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.IPosition;
 import ee.stacc.productivity.edsl.string.StringChoice;
+import ee.stacc.productivity.edsl.string.util.AbstractStringSizeCounter;
 
 public class SyntacticalSQLChecker implements IAbstractStringChecker {
 

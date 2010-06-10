@@ -1,7 +1,7 @@
 /**
  * 
  */
-package ee.stacc.productivity.edsl.checkers.sqlstatic;
+package ee.stacc.productivity.edsl.string.util;
 
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.IAbstractStringVisitor;
