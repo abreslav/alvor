@@ -10,6 +10,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Assignment;
+import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.CharacterLiteral;
@@ -19,6 +20,7 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
+import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -27,6 +29,7 @@ import org.eclipse.jdt.core.dom.NullLiteral;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.TagElement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
@@ -64,7 +67,7 @@ import ee.stacc.productivity.edsl.tracker.VariableTracker;
  */
 public class NewASE {
 	private int maxLevel = 4;
-	private boolean supportLoops = false;
+	private boolean supportLoops = true;
 	private boolean supportInvocations = true;
 	private boolean optimizeChoice = true;
 	
@@ -503,7 +506,7 @@ public class NewASE {
 		// alternatively, resolve recursion
 		
 		if (ASTUtil.inALoopSeparatingFrom(usage.getNode(), name)) {
-			if (supportLoops) {
+			if (supportLoops && !isInsideBadLoop(usage.getNode())) {
 				NamedString named = new NamedString(
 						PositionUtil.getPosition(usage.getNode()),
 						usage.getNode(),
@@ -514,7 +517,7 @@ public class NewASE {
 				return widened;
 			} 
 			else {
-				throw new UnsupportedStringOpEx("modifications in loop not supported");
+				throw new UnsupportedStringOpEx("unsupported modification scheme in loop");
 			}
 		}
 		else {
@@ -643,9 +646,26 @@ public class NewASE {
 		}
 	}
 
+	private boolean isInsideBadLoop(ASTNode node) {
+		ASTNode loop = ASTUtil.getContainingLoop(node);
+		if (loop == null) {
+			return false;
+		}
+		else {
+			return ASTUtil.containsConditional(loop);
+		}
+	}
+	
 	private IAbstractString evalNameInLoopChoice(Name name, NameUsageLoopChoice usage) {
-		if (!supportLoops) {
-			throw new UnsupportedStringOpEx("evalNameInLoopChoice");
+		if (!supportLoops 
+				// TODO temporary guards
+				|| isInsideBadLoop(usage.getNode())
+				|| usage.getBaseUsage() == null
+				|| usage.getLoopUsage() == null
+				|| isInsideBadLoop(usage.getBaseUsage().getNode())
+				|| isInsideBadLoop(usage.getLoopUsage().getNode())
+				) {
+			throw new UnsupportedStringOpEx("Unsupported modification scheme in loop");
 		}
 		
 		assert usage.getBaseUsage() != null;

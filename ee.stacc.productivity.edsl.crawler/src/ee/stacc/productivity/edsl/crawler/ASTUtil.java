@@ -366,6 +366,46 @@ public class ASTUtil {
 		}
 	}
 	
+	public static ASTNode getContainingLoop(ASTNode node) {
+		if (node == null) {
+			return null;
+		}
+		else if (isLoopStatement(node)) {
+			return node;
+		}
+		else {
+			return getContainingLoop(node.getParent());
+		}
+	}
+	
+	public static boolean containsConditional(ASTNode node) {
+		// TODO a hack
+		if (node == null) {
+			return false;
+		}
+		else if (node instanceof IfStatement) {
+			return true;
+		}
+		else if (node instanceof Block) {
+			for (Object stmt : ((Block)node).statements()) {
+				if (containsConditional((ASTNode)stmt)) {
+					return true;
+				}
+			}
+			return false;
+		}
+		else if (isLoopStatement(node)) {
+			return containsConditional(getLoopBody(node));
+		}
+		else if (node instanceof TryStatement) {
+			TryStatement tStmt = (TryStatement)node;
+			return containsConditional(tStmt.getBody());
+		}
+		else {
+			return false;
+		}
+	}
+	
 	public static boolean isLoopStatement(ASTNode node) {
 		return node instanceof WhileStatement
 			|| node instanceof ForStatement
