@@ -58,7 +58,7 @@ public class ConnectionTracker {
 			}
 			else {
 				return new ConnectionDescriptor(PositionUtil.getPosition(inv),
-						inv.toString());
+						inv.resolveMethodBinding().toString());
 			}
 		}
 		else {

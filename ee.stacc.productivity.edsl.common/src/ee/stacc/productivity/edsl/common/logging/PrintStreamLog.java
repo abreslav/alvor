@@ -1,7 +1,5 @@
 package ee.stacc.productivity.edsl.common.logging;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.PrintStream;
 
 public class PrintStreamLog implements ILog {

@@ -8,6 +8,12 @@ DELETE FROM address WHERE id = ?
 DELETE FROM attachment WHERE id=?
 DELETE FROM campaign_code WHERE id = ?
 DELETE FROM dimension_data WHERE id = ?
+DELETE FROM dimension_data WHERE id IN (, 666)
+DELETE FROM dimension_data WHERE id IN (, 666, 666)
+DELETE FROM dimension_data WHERE id IN (, 666666)
+DELETE FROM dimension_data WHERE id IN (666)
+DELETE FROM dimension_data WHERE id IN (666, 666)
+DELETE FROM dimension_data WHERE id IN (666666)
 DELETE FROM dimension_data WHERE ref_dimensions = ?
 DELETE FROM notifications WHERE id = ?
 DELETE FROM pricelist_campaign_code WHERE ref_pricelist = ?

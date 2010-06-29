@@ -2,7 +2,7 @@
 <feature
       id="ee.stacc.productivity.edsl.feature"
       label="SQL Checker"
-      version="0.2">
+      version="0.3">
 
    <description url="http://barclay.stacc.ee/edsl">
       Embedded SQL checker

@@ -1,10 +1,7 @@
 package ee.stacc.productivity.edsl.string.samplegen;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.StringCharacterSet;
@@ -15,8 +12,8 @@ import ee.stacc.productivity.edsl.string.StringRepetition;
 import ee.stacc.productivity.edsl.string.StringSequence;
 
 public class SampleGenerator {
-	private static Set<Character> intCharset = 
-		new HashSet<Character>(Arrays.asList('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'));
+//	private static Set<Character> intCharset = 
+//		new HashSet<Character>(Arrays.asList('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'));
 	
 	public static List<String> getConcreteStrings(IAbstractString aStr) {
 		List<String> result = new ArrayList<String>();

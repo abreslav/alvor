@@ -20,7 +20,7 @@ import ee.stacc.productivity.edsl.string.IPosition;
 import ee.stacc.productivity.edsl.string.Position;
 
 public class PositionUtil {
-	private static final ILog LOG = Logs.getLog(AbstractStringEvaluator.class);
+	private static final ILog LOG = Logs.getLog(NewASE.class);
 
 	public static IFile getFile(ASTNode node) {
 		try {

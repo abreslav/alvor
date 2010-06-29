@@ -23,7 +23,6 @@ import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.common.logging.Timer;
 import ee.stacc.productivity.edsl.crawler.NodeSearchEngine;
-import ee.stacc.productivity.edsl.crawler.PositionUtil;
 import ee.stacc.productivity.edsl.crawler.UnsupportedNodeDescriptor;
 import ee.stacc.productivity.edsl.main.JavaElementChecker;
 import ee.stacc.productivity.edsl.main.OptionLoader;

@@ -151,6 +151,7 @@ public class NodeSearchEngine {
 //		}
 		
 		SearchRequestor requestor = new SearchRequestor() {
+			@SuppressWarnings("unchecked")
 			public void acceptSearchMatch(SearchMatch match) {
 				assert match.getElement() instanceof IMethod;
 				

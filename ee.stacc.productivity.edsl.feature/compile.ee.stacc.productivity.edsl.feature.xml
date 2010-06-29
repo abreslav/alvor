@@ -5,10 +5,10 @@
 		<ant antfile="build.xml" dir="../ee.stacc.productivity.edsl.common" target="build.jars"/>
 		<ant antfile="build.xml" dir="../ee.stacc.productivity.edsl.sqllexer" target="build.jars"/>
 		<ant antfile="build.xml" dir="../ee.stacc.productivity.edsl.sqlparser" target="build.jars"/>
-		<ant antfile="build.xml" dir="../ee.stacc.productivity.edsl.cache" target="build.jars"/>
 		<ant antfile="build.xml" dir="../ee.stacc.productivity.edsl.checkers" target="build.jars"/>
-		<ant antfile="build.xml" dir="../ee.stacc.productivity.edsl.checkers.sqldynamic" target="build.jars"/>
 		<ant antfile="build.xml" dir="../ee.stacc.productivity.edsl.checkers.sqlstatic" target="build.jars"/>
+		<ant antfile="build.xml" dir="../ee.stacc.productivity.edsl.checkers.sqldynamic" target="build.jars"/>
+		<ant antfile="build.xml" dir="../ee.stacc.productivity.edsl.cache" target="build.jars"/>
 		<ant antfile="build.xml" dir="../ee.stacc.productivity.edsl.crawler" target="build.jars"/>
 		<ant antfile="build.xml" dir="../ee.stacc.productivity.edsl.gui" target="build.jars"/>
 		<ant antfile="build.xml" dir="../ee.stacc.productivity.edsl.javaproject" target="build.jars"/>

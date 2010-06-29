@@ -51,10 +51,10 @@ import ee.stacc.productivity.edsl.string.StringRandomInteger;
 import ee.stacc.productivity.edsl.string.StringSequence;
 
 @Deprecated
-public class AbstractStringEvaluator {
+public class Old_AbstractStringEvaluator {
 	private static final String RESULT_FOR_SQL_CHECKER = "@ResultForSQLChecker";
 	private static final String SIMPLIFIED_BODY_FOR_SC = "@SimplifiedBodyForSQLChecker";
-	private static final ILog LOG = Logs.getLog(AbstractStringEvaluator.class);
+	private static final ILog LOG = Logs.getLog(Old_AbstractStringEvaluator.class);
 	private int maxLevel = 2;
 	private boolean supportParameters = true;
 	private boolean supportInvocations = true;
@@ -64,12 +64,12 @@ public class AbstractStringEvaluator {
 	private IJavaElement[] scope;
 	
 	public static IAbstractString evaluateExpression(Expression node) {
-		AbstractStringEvaluator evaluator = 
-			new AbstractStringEvaluator(0, null, new IJavaElement[] {ASTUtil.getNodeProject(node)});
+		Old_AbstractStringEvaluator evaluator = 
+			new Old_AbstractStringEvaluator(0, null, new IJavaElement[] {ASTUtil.getNodeProject(node)});
 		return evaluator.eval(node);
 	}
 	
-	private AbstractStringEvaluator(int level, MethodInvocation invocationContext,
+	private Old_AbstractStringEvaluator(int level, MethodInvocation invocationContext,
 			IJavaElement[] scope) {
 		
 		if (level > maxLevel) {
@@ -421,8 +421,8 @@ public class AbstractStringEvaluator {
 		if (! supportInvocations) {
 			throw new UnsupportedStringOpEx("Method call");
 		}
-		final AbstractStringEvaluator evaluatorWithNewContext = 
-			new AbstractStringEvaluator(level+1, inv, scope);
+		final Old_AbstractStringEvaluator evaluatorWithNewContext = 
+			new Old_AbstractStringEvaluator(level+1, inv, scope);
 
 		List<MethodDeclaration> decls = NodeSearchEngine.findMethodDeclarations(scope, inv);
 		
@@ -607,8 +607,8 @@ public class AbstractStringEvaluator {
 						assert LOG.message("*NODE: " + node);
 						
 						Expression arg = (Expression)node;// NodeSearchEngine.getASTNode(sr);
-						AbstractStringEvaluator evaluator = 
-							new AbstractStringEvaluator(level, null, scope);
+						Old_AbstractStringEvaluator evaluator = 
+							new Old_AbstractStringEvaluator(level, null, scope);
 						abstractString = evaluator.eval(arg);
 					}
 					result.add(new StringNodeDescriptor(sr, abstractString));
@@ -642,15 +642,15 @@ public class AbstractStringEvaluator {
 				
 				if (this.invocationContext != null) {
 					// TODO: check that invocation context matches
-					AbstractStringEvaluator nextLevelEvaluator = 
-						new AbstractStringEvaluator(level+1, null, scope);
+					Old_AbstractStringEvaluator nextLevelEvaluator = 
+						new Old_AbstractStringEvaluator(level+1, null, scope);
 					
 					return nextLevelEvaluator.eval
 						((Expression)this.invocationContext.arguments().get(paramIndexPlus1-1));
 				}
 				else {
 					List<INodeDescriptor> descList = 
-						AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(
+						Old_AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(
 								Collections.singleton(
 										new NodeRequest(
 												ASTUtil.getMethodClassName(method), 
