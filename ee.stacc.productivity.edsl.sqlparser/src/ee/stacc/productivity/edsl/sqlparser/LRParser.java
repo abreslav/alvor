@@ -270,26 +270,10 @@ public class LRParser implements ILRParser<IParserStack> {
 			}
 		});
 		
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
-		System.err.println("Rechecking parser on load!!!");
+		System.err.println("Rechecking LR parser on load!!!");
+		System.err.println("Rechecking LR parser on load!!!");
+		System.err.println("Rechecking LR parser on load!!!");
+		System.err.println("Rechecking LR parser on load!!!");
 		LRParserLoader.load(xmlFile, new ILRParserBuilder() {
 			
 			@Override
@@ -431,6 +415,7 @@ public class LRParser implements ILRParser<IParserStack> {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private void println(Object o) {
 		if (trace != null) {
 			trace.println(o.toString());

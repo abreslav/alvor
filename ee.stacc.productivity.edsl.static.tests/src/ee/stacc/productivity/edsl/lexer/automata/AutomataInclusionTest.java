@@ -226,14 +226,14 @@ public class AutomataInclusionTest {
 		String[] expected = {
 			"SELECT ID . ID FROM ID ID",
 			"SELECT ID . ID FROM ID ID",
-			"SELECT ID , ID FROM ID WHERE ID = ? AND ID = STRING_SQ",
+			"SELECT ID , ID FROM ID WHERE ID = ? AND ACTION = STRING_SQ",
 			"SELECT ID , ID , ID FROM ID . ID",
 			"INSERT INTO ID(ID, ID) VALUES(?,?)",
 			"SELECT * FROM ID",
 			"INSERT INTO ID(ID, ID) VALUES(?,?)",
 			"SELECT ID.ID FROM ID ID INNER JOIN ID ID ON (ID.ID=ID.ID) ",
 			"SELECT ID, ID FROM ID WHERE ID=STRING_SQ ORDER BY NUMBER",
-			"SELECT ID(*) FROM ID WHERE ID=?",
+			"SELECT COUNT(*) FROM ID WHERE ID=?",
 		};
 		checkAutomatonTransduction(expected, automaton);
 	}

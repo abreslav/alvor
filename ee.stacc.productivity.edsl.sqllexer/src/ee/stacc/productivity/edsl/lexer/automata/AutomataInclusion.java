@@ -1,7 +1,5 @@
 package ee.stacc.productivity.edsl.lexer.automata;
 
-import static ee.stacc.productivity.edsl.lexer.automata.AutomataInclusion.getSet;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,7 +36,7 @@ public class AutomataInclusion {
 	 * @return the resulting automaton's initial state
 	 */
 	public State getTrasduction(State transducerInitial, State inputInitial, IAlphabetConverter converter) {
-		return getTrasduction(transducerInitial, inputInitial, converter, PushYieldInterpreter.INSTANCE);
+		return getTrasduction(transducerInitial, inputInitial, converter, PushYieldInterpreterWithKeywords.INSTANCE);
 	}
 	
 	public State getTrasduction(State transducerInitial, State inputInitial, IAlphabetConverter converter, IOutputItemInterpreter interpreter) {

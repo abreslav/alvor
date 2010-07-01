@@ -352,6 +352,7 @@ public class GLRParser implements ILRParser<GLRStack> {
 		return result;
 	}
 
+	@SuppressWarnings("unused")
 	private void println(Object o) {
 		if (trace != null) {
 			trace.println(o.toString());

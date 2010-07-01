@@ -7,10 +7,13 @@ import static ee.stacc.productivity.edsl.sqllexer.SQLLexerData.STATE_COUNT;
 import static ee.stacc.productivity.edsl.sqllexer.SQLLexerData.TRANSITIONS;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
 import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractOutputItem;
@@ -39,12 +42,20 @@ public class SQLLexer {
 	};
 
 	public static final State SQL_TRANSDUCER = new AutomataConverter().convert();
+
+	private static final int ID_CODE;
+	private static final Set<String> KEYWORDS = new HashSet<String>(Arrays.asList(SQLLexerData.KEYWORDS));
 	private static final Map<String, Integer> TOKEN_NAME_TO_CODE = new HashMap<String, Integer>();
 	static {
 		TOKEN_NAME_TO_CODE.put("EOF", -1);
-		for (int i = 0; i < SQLLexerData.TOKENS.length; i++) {
+		int nonKeywordCount = SQLLexerData.TOKENS.length;
+		for (int i = 0; i < nonKeywordCount; i++) {
 			TOKEN_NAME_TO_CODE.put(SQLLexerData.TOKENS[i], i);
 		}
+		for (int i = 0; i < SQLLexerData.KEYWORDS.length; i++) {
+			TOKEN_NAME_TO_CODE.put(SQLLexerData.KEYWORDS[i], nonKeywordCount + i);
+		}
+		ID_CODE = getCodeByName("ID");
 	}
 	
 	public static int getCodeByName(String name) {
@@ -67,7 +78,11 @@ public class SQLLexer {
 		if (c == -1) {
 			return "EOF";
 		}
-		return SQLLexerData.TOKENS[c];		
+		int nonKeywordCount = SQLLexerData.TOKENS.length;
+		if (c < nonKeywordCount) {
+			return SQLLexerData.TOKENS[c];
+		}
+		return SQLLexerData.KEYWORDS[c - nonKeywordCount];
 	}
 	
 	private static class AutomataConverter {
@@ -165,4 +180,15 @@ public class SQLLexer {
 		return tokenName + "[" + textToStr + "]";
 	}
 
+	/**
+	 * @param id -- token text
+	 * @return keyword token if id is a keyword or the code for ID token otherwise 
+	 */
+	public static int getIdentifierTokenType(String id) {
+		String upperCase = id.toUpperCase();
+		if (KEYWORDS.contains(upperCase)) {
+			return getCodeByName(upperCase);
+		} 
+		return ID_CODE; 
+	}
 }

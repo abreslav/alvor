@@ -36,24 +36,26 @@ public class LexerSpecGenerator {
 	private static final Pattern PATTERN_KEYWORD = Pattern.compile(LEX_KEYWORD + "\\s*([a-zA-Z_]+)");
 
 	public static void main(String[] args) throws FileNotFoundException, IOException {
-		System.out.println(INSTANCE.getTokenName("%lex-token  NAME = adsfas"));
-		System.out.println(INSTANCE.getTokenValue("%lex-token  NAME = adsfas"));
-		System.out.println(INSTANCE.getHelperValue("%lex-helper  NAME = adsfas"));
-		System.out.println(INSTANCE.getHelperName("%lex-helper  NAME = adsfas"));
-		System.out.println(INSTANCE.getLiteral("%lex-literal \"sdf\""));
-		System.out.println(INSTANCE.getKeyword("%lex-keyword ASDCsda"));
-		System.out.println(INSTANCE.getWhitespace("%lex-whitespace ASDCsda"));
+//		System.out.println(INSTANCE.getTokenName("%lex-token  NAME = adsfas"));
+//		System.out.println(INSTANCE.getTokenValue("%lex-token  NAME = adsfas"));
+//		System.out.println(INSTANCE.getHelperValue("%lex-helper  NAME = adsfas"));
+//		System.out.println(INSTANCE.getHelperName("%lex-helper  NAME = adsfas"));
+//		System.out.println(INSTANCE.getLiteral("%lex-literal \"sdf\""));
+//		System.out.println(INSTANCE.getKeyword("%lex-keyword ASDCsda"));
+//		System.out.println(INSTANCE.getWhitespace("%lex-whitespace ASDCsda"));
 		
 		String parserTempName = "grammar/sql.bgtemplate";
 		String parserOutName = "grammar/sql.bg";
 		String lexerTempName = "grammar/sql.flextemplate";
 		String lexerOutName = "grammar/sql.flex";
+		String keywordsName = "grammar/sql.keywords";
 		
-		if (args.length >= 4) {
+		if (args.length >= 5) {
 			parserTempName = args[0];
 			parserOutName = args[1];
 			lexerTempName = args[2];
 			lexerOutName = args[3];
+			keywordsName = args[4];
 		}
 		
 		BufferedReader in = new BufferedReader(new FileReader(parserTempName));
@@ -65,7 +67,11 @@ public class LexerSpecGenerator {
 		in = new BufferedReader(new FileReader(lexerTempName));
 		out = new PrintWriter(lexerOutName);
 		INSTANCE.generateLexerSpec(lexerSpec, in, out);
+		out.close();
 		in.close();
+
+		out = new PrintWriter(keywordsName);
+		lexerSpec.printKeywords(out);
 		out.close();
 	}
 
@@ -149,6 +155,7 @@ public class LexerSpecGenerator {
 	private static final class LexerSpec {
 		private final List<String> helpers = new ArrayList<String>();
 		private final List<String> literals = new ArrayList<String>();
+		private final List<String> keywords = new ArrayList<String>();
 		private final List<String> tokens = new ArrayList<String>();
 
 		public void printTokens(PrintWriter out) {
@@ -172,9 +179,14 @@ public class LexerSpecGenerator {
 				out.println(helper);
 			}
 		}
+		
+		public void printKeywords(PrintWriter out) {
+//			Collections.sort(keywords, Collections.reverseOrder());
+			printList(out, keywords);
+		}
 
 		public void addKeyword(String keyword) {
-			addLiteral(keyword);
+			keywords.add(keyword);
 		}
 		
 		public void addHelper(String name, String value) {

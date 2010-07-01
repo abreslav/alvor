@@ -1,3 +1,4 @@
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -68,8 +69,23 @@ public class Generator {
 		fileWriter.write(source, 0, source.lastIndexOf('}'));
 		// Write the beginning of the main function
 		fileWriter.write(mainTemplate.toString());
+		
+		// Write keywords
+		fileWriter.write("System.out.println(\"    public static final String[] KEYWORDS = {\");\n");
+		BufferedReader keywordsReader = new BufferedReader(new InputStreamReader(Generator.class.getResourceAsStream("sql.keywords")));
+		do {
+			String readLine = keywordsReader.readLine();
+			if (readLine == null) {
+				break;
+			}
+			fileWriter.write("System.out.println(\"        \\\"" + readLine + "\\\",\");\n");
+		} while(true);
+		fileWriter.write("System.out.println(\"    };\");\n");
+		
 		// Write the statements which denote tokens
 		fileWriter.write(tokens.toString());
+		
+		
 		// Close the main function and the class
 		fileWriter.write("\n    }\n}");
 		fileWriter.close();

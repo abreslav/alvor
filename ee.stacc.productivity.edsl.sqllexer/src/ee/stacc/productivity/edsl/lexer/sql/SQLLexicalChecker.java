@@ -54,7 +54,7 @@ public class SQLLexicalChecker {
 			if (!transition.isEmpty()) {
 				IAbstractInputItem inChar = transition.getInChar();
 				if (inChar.getCode() != -1) {
-					String token = SQLLexerData.TOKENS[inChar.getCode()];
+					String token = SQLLexer.getTokenName(inChar.getCode());
 					if (token == null) {
 						LOG.error(inChar);
 					}

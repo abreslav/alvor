@@ -71,7 +71,7 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 			State automaton = PositionedCharacterUtil.createPositionedAutomaton(abstractString);
 			
 //			SQLSyntaxChecker.INSTANCE.checkAutomaton(automaton, new IParseErrorHandler() {
-			ParserSimulator.LALR_INSTANCE.checkAutomaton(automaton, new IParseErrorHandler() {
+			ParserSimulator.GLR_INSTANCE.checkAutomaton(automaton, new IParseErrorHandler() {
 				
 				@Override
 				public void unexpectedItem(IAbstractInputItem item) {

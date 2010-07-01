@@ -22,8 +22,8 @@ import ee.stacc.productivity.edsl.string.IAbstractString;
 
 public class ParserSimulator<S extends IParserStackLike> {
 
-//	public static final ParserSimulator<IParserStack> LALR_INSTANCE = new ParserSimulator<IParserStack>(Parsers.SQL_PARSER, BoundedStack.getFactory(100, null));
-	public static final ParserSimulator<GLRStack> LALR_INSTANCE = new ParserSimulator<GLRStack>(Parsers.SQL_GLR_PARSER, GLRStack.FACTORY);
+	public static final ParserSimulator<IParserStack> LALR_INSTANCE = new ParserSimulator<IParserStack>(Parsers.SQL_PARSER, BoundedStack.getFactory(100, null));
+	public static final ParserSimulator<GLRStack> GLR_INSTANCE = new ParserSimulator<GLRStack>(Parsers.SQL_GLR_PARSER, GLRStack.FACTORY);
 	
 	private final IStackFactory<S> stackFactory;
 	private final ILRParser<S> parser;

@@ -175,13 +175,13 @@ public class FixpointParsingTest {
 	private void assertParses(String abstractString) {
 		IAbstractString as = AbstractStringParser.parseOneFromString(abstractString);
 //		List<String> errors = SQLSyntaxChecker.INSTANCE.checkAbstractString(as, stackFactory);
-		List<String> errors = ParserSimulator.LALR_INSTANCE.checkAbstractString(as);//, stackFactory);
+		List<String> errors = ParserSimulator.GLR_INSTANCE.checkAbstractString(as);//, stackFactory);
 		assertTrue(errors.toString(), errors.isEmpty());
 	}
 
 	private boolean parseAbstractString(String abstractString) {
 		IAbstractString as = AbstractStringParser.parseOneFromString(abstractString);
 //		return SQLSyntaxChecker.INSTANCE.checkAbstractString(as, stackFactory).isEmpty();
-		return ParserSimulator.LALR_INSTANCE.checkAbstractString(as).isEmpty();//, stackFactory).isEmpty();
+		return ParserSimulator.GLR_INSTANCE.checkAbstractString(as).isEmpty();//, stackFactory).isEmpty();
 	}
 }

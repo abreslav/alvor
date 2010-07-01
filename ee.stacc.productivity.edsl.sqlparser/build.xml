@@ -8,6 +8,25 @@
     </target>
 
     <target name="generateParser">
+		<!-- Old LR-parser -->
+    	<java 
+    		classpath="bin" 
+    		classname="ee.stacc.productivity.edsl.sqlparser.LexerSpecGenerator"
+    	>
+    		<arg value="grammar/sql.lr.bgtemplate"/>
+    		<arg value="generated/sql.lr.bg"/>
+    		<arg value="${lexerProject}/lexer/sql.flextemplate"/>
+    		<arg value="${lexerProject}/generated/sql.flex"/>
+    		<arg value="${lexerProject}/generated/sql.keywords"/>
+    	</java>
+		<exec executable="bison" dir="${basedir}">
+			<arg value="--xml=src/ee/stacc/productivity/edsl/sqlparser/sql.lr.xml"/>
+			<arg value="--report=state,lookahead,itemset"/>
+			<arg value="--report-file=generated/sql.lr.report"/>
+			<arg value="generated/sql.lr.bg"/>
+		</exec>
+    	<delete file="sql.lr.tab.bg"></delete>
+		<!-- New GLR-parser -->
     	<java 
     		classpath="bin" 
     		classname="ee.stacc.productivity.edsl.sqlparser.LexerSpecGenerator"
@@ -16,6 +35,7 @@
     		<arg value="generated/sql.bg"/>
     		<arg value="${lexerProject}/lexer/sql.flextemplate"/>
     		<arg value="${lexerProject}/generated/sql.flex"/>
+    		<arg value="${lexerProject}/generated/sql.keywords"/>
     	</java>
 <!--
     	<arg value="- -language=Java"/>

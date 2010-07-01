@@ -30,7 +30,7 @@ public class AutomataConverterTest {
 
 
 		input = "SELECT t from 1 as = seleCt";
-		expected = "SELECT  ID  FROM  NUMBER  AS  =  SELECT EOF";
+		expected = "ID  ID  ID  NUMBER  ID  =  ID EOF";
 		
 		output = interpret(initial, input);
 		assertEquals(expected, output.toString().trim());
@@ -51,14 +51,14 @@ public class AutomataConverterTest {
 		
 		
 		input = "SELECT cc.ColumnName FROM AD_Column c";
-		expected = "SELECT  ID . ID  FROM  ID  ID EOF";
+		expected = "ID  ID . ID  ID  ID  ID EOF";
 		
 		output = interpret(initial, input);
 		assertEquals(expected, output.toString().trim());
 		
 		
 		input = "INSERT INTO X_Test(Text1, Text2) values(?,?)";
-		expected = "INSERT  INTO  ID ( ID ,  ID )  VALUES ( ? , ? ) EOF";
+		expected = "ID  ID  ID ( ID ,  ID )  ID ( ? , ? ) EOF";
 		
 		output = interpret(initial, input);
 		assertEquals(expected, output.toString().trim());
