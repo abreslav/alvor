@@ -6,13 +6,15 @@ import java.io.PrintStream;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 
 public class AlternativeLog implements ILog {
 	
 	private PrintStream messageStream;
 	
 	public AlternativeLog(Class<?> clazz) {
-		IPath wsPath = ResourcesPlugin.getWorkspace().getRoot().getLocation();
+		IPath wsPath = Platform.isRunning()? ResourcesPlugin.getWorkspace().getRoot().getLocation() : new Path(".");
 		IPath logFolder = wsPath.append(".metadata/.plugins/ee.stacc.productivity.edsl.common/");
 		File f = logFolder.append(clazz.getCanonicalName() + ".log").toFile();
 		
