@@ -8,7 +8,7 @@ import java.util.List;
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
-import ee.stacc.productivity.edsl.lexer.automata.AutomataInclusion;
+import ee.stacc.productivity.edsl.lexer.automata.AutomataTransduction;
 import ee.stacc.productivity.edsl.lexer.automata.State;
 import ee.stacc.productivity.edsl.lexer.automata.StringToAutomatonConverter;
 import ee.stacc.productivity.edsl.lexer.automata.Transition;
@@ -36,7 +36,7 @@ public class SQLLexicalChecker {
 		
 		State automaton = StringToAutomatonConverter.INSTANCE.convert(str);
 
-		State transduction = AutomataInclusion.INSTANCE.getTrasduction(sqlTransducer, automaton, SQLLexer.SQL_ALPHABET_CONVERTER);
+		State transduction = AutomataTransduction.INSTANCE.getTrasduction(sqlTransducer, automaton, SQLLexer.SQL_ALPHABET_CONVERTER);
 		
 		Collection<String> errorTokens = new ArrayList<String>();
 		findErrorTokens(transduction, new HashSet<Transition>(), errorTokens);

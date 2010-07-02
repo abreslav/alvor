@@ -10,7 +10,7 @@ import java.util.Set;
 
 import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
 import ee.stacc.productivity.edsl.lexer.alphabet.Token;
-import ee.stacc.productivity.edsl.lexer.automata.AutomataInclusion;
+import ee.stacc.productivity.edsl.lexer.automata.AutomataTransduction;
 import ee.stacc.productivity.edsl.lexer.automata.EmptyTransitionEliminator;
 import ee.stacc.productivity.edsl.lexer.automata.IAlphabetConverter;
 import ee.stacc.productivity.edsl.lexer.automata.State;
@@ -76,7 +76,7 @@ public class SQLSyntaxChecker {
 	
 	private void checkAutomaton(State asAut, IStackFactory<IParserStack> stackFactory, IParseErrorHandler errorHandler) {
 		State sqlTransducer = SQLLexer.SQL_TRANSDUCER;
-		State transduction = AutomataInclusion.INSTANCE.getTrasduction(sqlTransducer, asAut, SQLLexer.SQL_ALPHABET_CONVERTER);
+		State transduction = AutomataTransduction.INSTANCE.getTrasduction(sqlTransducer, asAut, SQLLexer.SQL_ALPHABET_CONVERTER);
 		long time = System.nanoTime();
 		transduction = EmptyTransitionEliminator.INSTANCE.eliminateEmptySetTransitions(transduction, new IEmptinessExpert() {
 			

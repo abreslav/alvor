@@ -15,16 +15,35 @@ import ee.stacc.productivity.edsl.string.StringParameter;
 import ee.stacc.productivity.edsl.string.StringRepetition;
 import ee.stacc.productivity.edsl.string.StringSequence;
 
+/**
+ * Converts an abstract string to a (nondeterministic) automaton
+ * 
+ * @author abreslav
+ *
+ */
 public class StringToAutomatonConverter {
 
+	/**
+	 * Singleton instance. Use instead of creating objects of this class
+	 */
 	public static final StringToAutomatonConverter INSTANCE = new StringToAutomatonConverter();
 	
 	private StringToAutomatonConverter() {}
 	
+	/**
+	 * Converts an abstract string into an automaton with simple characters on edges
+	 */
 	public State convert(IAbstractString string) {
 		return convert(string, SimpleCharacterFactory.INSTANCE);
 	}
 	
+	/**
+	 * Converts an abstract string into a (nondeterministic) automaton and uses a factory to transform individual 
+	 * Unicode characters into {@link IAbstractInputItem}s 
+	 * @param string input abstract string
+	 * @param factory transforms Unicode characters into {@link IAbstractInputItem}s
+	 * @return initial state of the resulting automaton
+	 */
 	public State convert(IAbstractString string, IInputItemFactory factory) {
 		State initial = new State("START", false);
 		State eof = new State("EOF", true);
@@ -34,7 +53,6 @@ public class StringToAutomatonConverter {
 			createTransition(state, eof, IAbstractInputItem.EOF);
 		}
 		return initial;
-//		return AutomataDeterminator.determinate(initial);
 	}
 	
 	private static final class StringToAutomatonConverterVisitor implements
@@ -142,9 +160,6 @@ public class StringToAutomatonConverter {
 			return current;
 		}
 		
-//		private Transition createTransition(State initial, State fin, int character) {
-//			return StringToAutomatonConverter.createTransition(initial, fin, SimpleCharacter.create(character));
-//		}
 	}
 	
 	private static Transition createTransition(State initial, State fin,

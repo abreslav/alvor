@@ -14,11 +14,17 @@ import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
 import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractOutputItem;
 import ee.stacc.productivity.edsl.lexer.alphabet.ISequence;
 
-public class AutomataInclusion {
+/**
+ * Performs inclusion checks and transductions
+ * 
+ * @author abreslav
+ *
+ */
+public class AutomataTransduction {
 
-	public static final AutomataInclusion INSTANCE = new AutomataInclusion();
+	public static final AutomataTransduction INSTANCE = new AutomataTransduction();
 	
-	private AutomataInclusion() {}
+	private AutomataTransduction() {}
 	
 	/**
 	 * Check if the first contains the second
@@ -80,6 +86,8 @@ public class AutomataInclusion {
 		return oldToNewStates.get(inputInitial);
 	}
 
+	
+	@SuppressWarnings("unused")
 	private void println(String string) {
 //		System.out.println(string);
 	}

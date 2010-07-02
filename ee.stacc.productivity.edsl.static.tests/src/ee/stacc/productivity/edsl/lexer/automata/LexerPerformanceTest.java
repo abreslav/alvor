@@ -45,13 +45,13 @@ public class LexerPerformanceTest {
 		for (IAbstractString string : strings) {
 			string = optimize(string);
 			State initial = StringToAutomatonConverter.INSTANCE.convert(string);
-			State transduction = AutomataInclusion.INSTANCE.getTrasduction(sqlTransducer, initial, SQLLexer.SQL_ALPHABET_CONVERTER);
+			State transduction = AutomataTransduction.INSTANCE.getTrasduction(sqlTransducer, initial, SQLLexer.SQL_ALPHABET_CONVERTER);
 			transduction = EmptyTransitionEliminator.INSTANCE.eliminateEmptySetTransitions(transduction);
 //			transduction = AutomataDeterminator.determinate(transduction);
 
 			for (Entry<String, IInputToString> entry : expectedMap.entrySet()) {
 				IInputToString toStr = entry.getValue();
-				Set<String> generated = AutomataInclusion.getSet(generatedMap, entry.getKey());
+				Set<String> generated = AutomataTransduction.getSet(generatedMap, entry.getKey());
 
 				List<String> generate = TestUtil.generate(transduction, toStr);
 				generated.addAll(generate);

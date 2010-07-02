@@ -10,6 +10,12 @@ import ee.stacc.productivity.edsl.lexer.alphabet.PushInput;
 import ee.stacc.productivity.edsl.lexer.alphabet.Token;
 import ee.stacc.productivity.edsl.lexer.alphabet.Yield;
 
+/**
+ * This interpreter supports {@link PushInput} and {@link Yield}. 
+ * 
+ * @author abreslav
+ *
+ */
 public class PushYieldInterpreter implements IOutputItemInterpreter {
 
 	public static PushYieldInterpreter INSTANCE = new PushYieldInterpreter();

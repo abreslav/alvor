@@ -105,7 +105,7 @@ public class AutomataDeterminator {
 		for (Entry<Integer, Set<State>> entry : transitions.entrySet()) {
 			Integer Integer = entry.getKey();
 			Set<State> smallTo = entry.getValue();
-			Set<State> bigTo = AutomataInclusion.getSet(newStateTransitions, Integer);
+			Set<State> bigTo = AutomataTransduction.getSet(newStateTransitions, Integer);
 			bigTo.addAll(smallTo);
 		}
 	}
@@ -135,7 +135,7 @@ public class AutomataDeterminator {
 		if (transition.isEmpty()) {
 			throw new IllegalArgumentException("Only nonempty transitions suported");
 		}
-		Set<State> stateSet = AutomataInclusion.getSet(map, transition.getInChar().getCode());
+		Set<State> stateSet = AutomataTransduction.getSet(map, transition.getInChar().getCode());
 		stateSet.add(transition.getTo());
 	}
 

@@ -6,9 +6,24 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Eliminates empty transitions from automata by adding corresponding nonempty transitions
+ * 
+ * @author abreslav
+ *
+ */
 public class EmptyTransitionEliminator {
 
+	/**
+	 * Decides whether a transition is empty
+	 *  
+	 * @author abreslav
+	 *
+	 */
 	public interface IEmptinessExpert {
+		/**
+		 * Considers the transitions with no input char on them, empty
+		 */
 		IEmptinessExpert DEFAULT = new IEmptinessExpert() {
 			
 			@Override
@@ -30,7 +45,8 @@ public class EmptyTransitionEliminator {
 	}
 	
 	/**
-	 * This \epsilon-closes the transducer
+	 * \epsilon-closes the transducer
+	 * @return initial state of the new transducer (having no empty transitions)
 	 */
 	public State eliminateEmptySetTransitions(State initial, IEmptinessExpert emptinessExpert) {
 		// Collect reachable states

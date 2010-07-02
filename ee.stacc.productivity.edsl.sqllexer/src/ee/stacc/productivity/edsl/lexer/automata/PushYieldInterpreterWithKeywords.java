@@ -10,7 +10,15 @@ import ee.stacc.productivity.edsl.lexer.alphabet.PushInput;
 import ee.stacc.productivity.edsl.lexer.alphabet.Token;
 import ee.stacc.productivity.edsl.lexer.alphabet.Yield;
 import ee.stacc.productivity.edsl.lexer.sql.SQLLexer;
+import ee.stacc.productivity.edsl.sqllexer.SQLLexerData;
 
+/**
+ * This interpreter supports {@link PushInput} and {@link Yield}, and creates keyword tokens
+ * based on the information in {@link SQLLexer} class (this information was initially got from 
+ * "*.keywords" file, and integrated into {@link SQLLexerData} by the generator). 
+ * @author abreslav
+ *
+ */
 public class PushYieldInterpreterWithKeywords implements IOutputItemInterpreter {
 
 	public static PushYieldInterpreterWithKeywords INSTANCE = new PushYieldInterpreterWithKeywords();

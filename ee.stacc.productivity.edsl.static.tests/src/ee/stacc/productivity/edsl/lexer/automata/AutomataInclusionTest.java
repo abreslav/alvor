@@ -28,73 +28,73 @@ public class AutomataInclusionTest {
 
 		automaton1 = "!A - !A:x;";
 		automaton2 = "!A1 - !B1:x;" + "!B1 - !B1:y";
-		assertFalse(AutomataInclusion.INSTANCE.checkInclusion(AutomataParser
+		assertFalse(AutomataTransduction.INSTANCE.checkInclusion(AutomataParser
 				.parse(automaton1), AutomataParser.parse(
 				automaton2)));
 
 		automaton1 = "A - !B:q;";
 		automaton2 = automaton1;
-		assertTrue(AutomataInclusion.INSTANCE.checkInclusion(AutomataParser
+		assertTrue(AutomataTransduction.INSTANCE.checkInclusion(AutomataParser
 				.parse(automaton1), AutomataParser.parse(
 				automaton2)));
 
 		automaton1 = "!A - !B:q;";
 		automaton2 = automaton1;
-		assertTrue(AutomataInclusion.INSTANCE.checkInclusion(AutomataParser
+		assertTrue(AutomataTransduction.INSTANCE.checkInclusion(AutomataParser
 				.parse(automaton1), AutomataParser.parse(
 				automaton2)));
 
 		automaton1 = "!A - !A:q;";
 		automaton2 = automaton1;
-		assertTrue(AutomataInclusion.INSTANCE.checkInclusion(AutomataParser
+		assertTrue(AutomataTransduction.INSTANCE.checkInclusion(AutomataParser
 				.parse(automaton1), AutomataParser.parse(
 				automaton2)));
 
 		automaton1 = "!A - B:q C:x;" + "B - B:k C:m;" + "C - !D:l";
 		automaton2 = automaton1;
-		assertTrue(AutomataInclusion.INSTANCE.checkInclusion(AutomataParser
+		assertTrue(AutomataTransduction.INSTANCE.checkInclusion(AutomataParser
 				.parse(automaton1), AutomataParser.parse(
 				automaton2)));
 
 		automaton1 = "!A - !A:x;";
 		automaton2 = "!A - !B:x;" + "!B - !B:x";
-		assertTrue(AutomataInclusion.INSTANCE.checkInclusion(AutomataParser
+		assertTrue(AutomataTransduction.INSTANCE.checkInclusion(AutomataParser
 				.parse(automaton1), AutomataParser.parse(
 				automaton2)));
 
 		automaton1 = "!A - !A:x;";
 		automaton2 = "!A1 - !B1:y;";
-		assertFalse(AutomataInclusion.INSTANCE.checkInclusion(AutomataParser
+		assertFalse(AutomataTransduction.INSTANCE.checkInclusion(AutomataParser
 				.parse(automaton1), AutomataParser.parse(
 				automaton2)));
 
 		automaton1 = "!A - !A:x;";
 		automaton2 = "!A1 - !B1:y;" + "!B1 - !B1:x";
-		assertFalse(AutomataInclusion.INSTANCE.checkInclusion(AutomataParser
+		assertFalse(AutomataTransduction.INSTANCE.checkInclusion(AutomataParser
 				.parse(automaton1), AutomataParser.parse(
 				automaton2)));
 
 		automaton1 = "S1 - !S2:a;" + "!S2 - S3:b;" + "S3 - S2:a";
 		automaton2 = "A1 - A2:a !A3:a;" + "!A2 - A1:b";
-		assertTrue(AutomataInclusion.INSTANCE.checkInclusion(AutomataParser
+		assertTrue(AutomataTransduction.INSTANCE.checkInclusion(AutomataParser
 				.parse(automaton1), AutomataParser.parse(
 				automaton2)));
 
 		automaton1 = "S1 - !S2:a;" + "!S2 - S3:b;" + "S3 - S2:a";
 		automaton2 = "!A1 - !A2:a !A3:a;" + "!A2 - !A1:b";
-		assertFalse(AutomataInclusion.INSTANCE.checkInclusion(AutomataParser
+		assertFalse(AutomataTransduction.INSTANCE.checkInclusion(AutomataParser
 				.parse(automaton1), AutomataParser.parse(
 				automaton2)));
 
 		automaton1 = "S1 - !S2:a S1:x;" + "!S2 - S3:b;" + "S3 - S2:a";
 		automaton2 = "A1 - A2:a !A3:a;" + "!A2 - A1:b";
-		assertTrue(AutomataInclusion.INSTANCE.checkInclusion(AutomataParser
+		assertTrue(AutomataTransduction.INSTANCE.checkInclusion(AutomataParser
 				.parse(automaton1), AutomataParser.parse(
 				automaton2)));
 
 		automaton1 = "S1 - !S2:a;" + "!S2 - S3:b;" + "S3 - S2:a";
 		automaton2 = "A1 - A2:a !A3:a A1:x;" + "!A2 - A1:b";
-		assertFalse(AutomataInclusion.INSTANCE.checkInclusion(AutomataParser
+		assertFalse(AutomataTransduction.INSTANCE.checkInclusion(AutomataParser
 				.parse(automaton1), AutomataParser.parse(
 				automaton2)));
 
@@ -102,7 +102,7 @@ public class AutomataInclusionTest {
 		automaton1 = "A1 - !A2:a;" + "!A2 - !A2:a A3:b";
 		// aaa*
 		automaton2 = "S1 - S2:a;" + "S2 - !S3:a;" + "!S3 - !S3:a;";
-		assertTrue(AutomataInclusion.INSTANCE.checkInclusion(AutomataParser
+		assertTrue(AutomataTransduction.INSTANCE.checkInclusion(AutomataParser
 				.parse(automaton1), AutomataParser.parse(
 				automaton2)));
 
@@ -111,13 +111,13 @@ public class AutomataInclusionTest {
 				+ "!C13 - !C13:V C6:S;" + "C6 - C6:S !C7:V;";
 		automaton2 = "A1 - !A3:V A4:S;" + "!A3 - !A3:V A4:S;"
 				+ "A4 - A4:S !A5:V;";
-		assertTrue(AutomataInclusion.INSTANCE.checkInclusion(AutomataParser
+		assertTrue(AutomataTransduction.INSTANCE.checkInclusion(AutomataParser
 				.parse(automaton1), AutomataParser.parse(
 				automaton2)));
 
 		automaton1 = "C1 - C1:V C2:S !C3:V;" + "C2 - C2:S !C3:V;";
 		automaton2 = "A1 - A4:S !A5:V A1:V;" + "A4 - A4:S !A5:V;" + "!A5;";
-		assertTrue(AutomataInclusion.INSTANCE.checkInclusion(
+		assertTrue(AutomataTransduction.INSTANCE.checkInclusion(
 				AutomataDeterminator.determinate(AutomataParser.parse(
 						automaton1)), AutomataDeterminator
 						.determinate(AutomataParser.parse(automaton2)
@@ -126,7 +126,7 @@ public class AutomataInclusionTest {
 		automaton1 = "C1 - !C13:V C2:S;" + "C2 - C2:S !C3:V;"
 				+ "!C13 - !C13:V C6:S;" + "C6 - C6:S !C7:V;";
 		automaton2 = "A1 - A4:S !A5:V A1:V;" + "A4 - A4:S !A5:V;" + "!A5;";
-		assertTrue(AutomataInclusion.INSTANCE.checkInclusion(AutomataParser
+		assertTrue(AutomataTransduction.INSTANCE.checkInclusion(AutomataParser
 				.parse(automaton1),
 				AutomataDeterminator.determinate(AutomataParser.parse(
 						automaton2))));
@@ -181,7 +181,7 @@ public class AutomataInclusionTest {
 		State check = AutomataParser.parse(checkStr);
 		check = AutomataDeterminator.determinate(check);
 		
-		State transduction = AutomataInclusion.INSTANCE.getTrasduction(transducer, automaton, IAlphabetConverter.ID, new IOutputItemInterpreter() {
+		State transduction = AutomataTransduction.INSTANCE.getTrasduction(transducer, automaton, IAlphabetConverter.ID, new IOutputItemInterpreter() {
 
 			@Override
 			public ISequence<IAbstractInputItem> processOutputCommands(
@@ -202,8 +202,8 @@ public class AutomataInclusionTest {
 //		AutomataUtils.printAutomaton(automaton);
 //		AutomataUtils.printAutomaton(check);
 //		AutomataUtils.printAutomaton(transduction);
-		assertTrue(AutomataInclusion.INSTANCE.checkInclusion(check, transduction));
-		assertTrue(AutomataInclusion.INSTANCE.checkInclusion(transduction, check));
+		assertTrue(AutomataTransduction.INSTANCE.checkInclusion(check, transduction));
+		assertTrue(AutomataTransduction.INSTANCE.checkInclusion(transduction, check));
 	}
 
 	@Test
@@ -241,7 +241,7 @@ public class AutomataInclusionTest {
 
 	private void checkAutomatonTransduction(String[] expected, State init) {
 		State sqlTransducer = SQLLexer.SQL_TRANSDUCER;
-		State transduction = AutomataInclusion.INSTANCE.getTrasduction(
+		State transduction = AutomataTransduction.INSTANCE.getTrasduction(
 				sqlTransducer, init, SQLLexer.SQL_ALPHABET_CONVERTER);
 		transduction = EmptyTransitionEliminator.INSTANCE
 				.eliminateEmptySetTransitions(transduction);
