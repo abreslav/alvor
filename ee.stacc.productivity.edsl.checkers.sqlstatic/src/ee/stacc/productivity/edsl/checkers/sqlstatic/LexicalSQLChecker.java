@@ -5,6 +5,9 @@ import java.util.List;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 import ee.stacc.productivity.edsl.lexer.sql.SQLLexicalChecker;
 
+/*
+ * This class is osolete
+ */
 public class LexicalSQLChecker extends StaticSQLChecker {
 
 	@Override

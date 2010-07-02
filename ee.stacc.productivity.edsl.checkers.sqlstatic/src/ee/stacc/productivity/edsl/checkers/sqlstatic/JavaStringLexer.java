@@ -3,6 +3,13 @@ package ee.stacc.productivity.edsl.checkers.sqlstatic;
 import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
 import ee.stacc.productivity.edsl.string.IPosition;
 
+/**
+ * Lexical analyzer to break up Java string literal into individual characters.
+ * E.g., "\nfoo\u0011" is divided into '\n' 'f' 'o' 'o' and '\u0011'
+ * 
+ * @author abreslav
+ *
+ */
 public class JavaStringLexer {
 	private static enum LexerState {
 		EXPECT_STRING_START,
@@ -15,6 +22,14 @@ public class JavaStringLexer {
 		OK;
 	}
 	
+	/**
+	 * @param escapedValue Java literal (with \n, \001 or \u0011 and (!!!) outer quotes, single or double)
+	 * @param result an array to put positioned characters into, the length of this 
+	 * array in known to the caller because the caller knows the "literal" value of the same 
+	 * string which is the value with all escapes resolved. 
+	 * @param stringPosition position of the string being tokenized
+	 * @throws MalformedStringLiteralException is the string does not conform to Java rules
+	 */
 	public static void tokenizeJavaString(String escapedValue,
 			IAbstractInputItem[] result, IPosition stringPosition) {
 		try {

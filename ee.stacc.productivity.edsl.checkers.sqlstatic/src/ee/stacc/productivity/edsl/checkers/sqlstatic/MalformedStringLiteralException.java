@@ -5,6 +5,12 @@ package ee.stacc.productivity.edsl.checkers.sqlstatic;
 
 import ee.stacc.productivity.edsl.string.IPosition;
 
+/**
+ * Thrown is a string literal is not a proper Java string literal
+ * 
+ * @author abreslav
+ *
+ */
 @SuppressWarnings("serial")
 public final class MalformedStringLiteralException extends RuntimeException {
 
@@ -14,6 +20,9 @@ public final class MalformedStringLiteralException extends RuntimeException {
 		super(message);
 	}
 
+	/**
+	 * Position of the malformed literal
+	 */
 	public IPosition getLiteralPosition() {
 		return literalPosition;
 	}

@@ -71,6 +71,9 @@ public class StringToAutomatonConverter {
 		@Override
 		public Set<State> visitStringCharacterSet(
 				StringCharacterSet characterSet, State initial) {
+			if (characterSet.isEmpty()) {
+				return Collections.singleton(initial);
+			}
 			State fin = new State("F", false);
 			for (Character character : characterSet.getContents()) {
 				createTransition(initial, fin, factory.createInputItem(characterSet, (int) character));

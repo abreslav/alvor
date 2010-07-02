@@ -16,12 +16,26 @@ import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.IPosition;
 import ee.stacc.productivity.edsl.string.Position;
 
+/**
+ * Implements miscellaneous functions on positioned characters
+ * 
+ * @author abreslav
+ *
+ */
 public class PositionedCharacterUtil {
 
+	/**
+	 * Converts an abstract strings into an automaton with positioned characters on edges
+	 */
 	public static State createPositionedAutomaton(IAbstractString abstractString) {
 		return StringToAutomatonConverter.INSTANCE.convert(abstractString, PositionedCharacter.FACTORY);
 	}
 
+	/**
+	 * Returns a list of positions to be marked in a file in order to underline all characters in the given text.
+	 * Why not only one position? Because one token can be spread over several string literals located on different 
+	 * lines and maybe even in different files.
+	 */
 	public static Collection<IPosition> getMarkerPositions(ISequence<IAbstractInputItem> text) {
 		if (text.isEmpty()) {
 			return Collections.emptySet();
@@ -72,6 +86,9 @@ public class PositionedCharacterUtil {
 		}
 	}
 
+	/**
+	 * Renders tokens as their texts
+	 */
 	public static String render(IAbstractInputItem item) {
 		if (item instanceof Token) {
 			Token token = (Token) item;

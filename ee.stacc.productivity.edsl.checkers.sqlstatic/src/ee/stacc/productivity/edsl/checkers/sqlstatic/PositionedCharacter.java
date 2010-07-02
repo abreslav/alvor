@@ -9,14 +9,25 @@ import ee.stacc.productivity.edsl.string.IPosition;
 import ee.stacc.productivity.edsl.string.StringCharacterSet;
 import ee.stacc.productivity.edsl.string.StringConstant;
 
+/**
+ * A Unicode character together with its {@link IPosition Position}
+ * 
+ * @author abreslav
+ *
+ */
 public final class PositionedCharacter implements IAbstractInputItem {
 	
+	/**
+	 * Creates positioned characters for given abstract strings
+	 */
 	public static final IInputItemFactory FACTORY = new IInputItemFactory() {
 		
 		@Override
 		public IAbstractInputItem createInputItem(StringCharacterSet set,
 				int character) {
 			IPosition position = set.getPosition();
+			// TODO: passing zero as indexInString is not very honest, and may cause numbers to be 
+			// underlined only partially
 			return new PositionedCharacter(character, position, 0, position.getLength());
 		}
 		
@@ -37,6 +48,13 @@ public final class PositionedCharacter implements IAbstractInputItem {
 	private final int indexInString;
 	private final int lengthInSource;
 	
+	/**
+	 * @param code character code (Unicode)
+	 * @param stringPosition position of the abstract string containing this character
+	 * @param indexInString position of the character inside the string
+	 * @param lengthInSource length of the character in the source file (might be greater 
+	 * than one, consider '\n' or '\u0001')
+	 */
 	public PositionedCharacter(int code,
 			IPosition stringPosition, int indexInString,
 			int lengthInSource) {
@@ -46,19 +64,33 @@ public final class PositionedCharacter implements IAbstractInputItem {
 		this.lengthInSource = lengthInSource;
 	}
 
+	/**
+	 * Character code (Unicode)
+	 */
 	@Override
 	public int getCode() {
 		return code;
 	}
 	
+	/**
+	 * Position of this character in the innermost abstract string in which it appears 
+	 * @return
+	 */
 	public int getIndexInString() {
 		return indexInString;
 	}
 	
+	/**
+	 * Length of this character in the source file. Might be greater 
+	 * than one, consider '\n' or '\u0001'.
+	 */
 	public int getLengthInSource() {
 		return lengthInSource;
 	}
 	
+	/**
+	 * Position of the innermost abstract string containing this caharacter
+	 */
 	public IPosition getStringPosition() {
 		return stringPosition;
 	}

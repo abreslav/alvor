@@ -14,16 +14,26 @@ import ee.stacc.productivity.edsl.lexer.alphabet.Token;
 import ee.stacc.productivity.edsl.lexer.automata.State;
 import ee.stacc.productivity.edsl.sqlparser.IParseErrorHandler;
 import ee.stacc.productivity.edsl.sqlparser.ParserSimulator;
-import ee.stacc.productivity.edsl.sqlparser.SQLSyntaxChecker;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.IPosition;
 import ee.stacc.productivity.edsl.string.StringChoice;
 import ee.stacc.productivity.edsl.string.util.AbstractStringSizeCounter;
 
+/**
+ * Performs syntax checking for abstract strings containing SQL statements
+ * 
+ * @author abreslav
+ *
+ */
 public class SyntacticalSQLChecker implements IAbstractStringChecker {
 
-	private static int SIZE_THRESHOLD = 25000;
 	private static final ILog LOG = Logs.getLog(SyntacticalSQLChecker.class);
+
+	/**
+	 * Maximum size of abstract strings. Bigger strings are likely to cause OutOfMemoryError, 
+	 * and must be rejected.
+	 */
+	private static int SIZE_THRESHOLD = 25000;
 	
 	@Override
 	public void checkAbstractStrings(List<IStringNodeDescriptor> descriptors,
@@ -42,7 +52,8 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 							try {
 								checkStringOfAppropriateSize(errorHandler, descriptor, option);
 								hasSmallSubstrings = true;
-							} catch (StackOverflowError e) { // TODO: This hack is no good. May be it can be fixed in the FixpointParser   
+							} catch (StackOverflowError e) { 
+								// TODO: This hack is no good. May be it can be fixed in the FixpointParser   
 								hasBigSubstrings = true;
 							}
 						}
@@ -57,6 +68,8 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 				try {
 					checkStringOfAppropriateSize(errorHandler, descriptor, abstractString);
 				} catch (StackOverflowError e) {
+					// The analyzer has caused a stack overflow in the dfs-based evaluation procedure.
+					// See FixpointParser class
 					errorHandler.handleSQLWarning("Abstract string is too big", descriptor.getPosition());
 				}
 			}
@@ -70,7 +83,6 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 		try {
 			State automaton = PositionedCharacterUtil.createPositionedAutomaton(abstractString);
 			
-//			SQLSyntaxChecker.INSTANCE.checkAutomaton(automaton, new IParseErrorHandler() {
 			ParserSimulator.GLR_INSTANCE.checkAutomaton(automaton, new IParseErrorHandler() {
 				
 				@Override
@@ -97,7 +109,8 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 				errorPosition = descriptor.getPosition(); 
 			}
 			errorHandler.handleSQLError("Malformed literal: " + e.getMessage(), errorPosition);
-		} catch (StackOverflowError e) {  // TODO: This hack is no good (see method above)
+		} catch (StackOverflowError e) {  
+			// TODO: This hack is no good (see the method above)
 			throw e;
 		} catch (Throwable e) {
 			LOG.exception(e);
@@ -105,6 +118,9 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 		}
 	}
 
+	/**
+	 * Checks if the string is small enough for the corresponding automaton to fit into memory 
+	 */
 	public static boolean hasAcceptableSize(IAbstractString abstractString) {
 		return AbstractStringSizeCounter.size(abstractString) <= SIZE_THRESHOLD;
 	}

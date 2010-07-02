@@ -7,6 +7,9 @@ import ee.stacc.productivity.edsl.checkers.IAbstractStringChecker;
 import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
 import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
 
+/*
+ * This class is obsolete
+ */
 public abstract class StaticSQLChecker implements IAbstractStringChecker {
 
 	@Override
