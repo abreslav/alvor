@@ -7,14 +7,34 @@ import java.util.List;
 import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
 import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractOutputItem;
 
-
+/**
+ * Represents a transition in an automaton of transducer
+ * 
+ * @author abreslav
+ *
+ */
 public class Transition {
 
+	/**
+	 * A factory method to create new transducer transitions. Must be used instead of the constructor
+	 * @param from start state
+	 * @param to end state
+	 * @param inChar input character
+	 * @param output output actions
+	 * @return a new transition
+	 */
 	public static Transition create(State from, State to, IAbstractInputItem inChar,
 			List<? extends IAbstractOutputItem> output) {
 		return new Transition(from, to, inChar, output);
 	}
 	
+	/**
+	 * A factory method to create new automata transitions (no output actions). Must be used instead of the constructor
+	 * @param from start state
+	 * @param to end state
+	 * @param inChar input character
+	 * @return a new transition
+	 */
 	public static Transition create(State from, State to, IAbstractInputItem inChar) {
 		return new Transition(from, to, inChar);
 	}
@@ -25,7 +45,7 @@ public class Transition {
 	private final boolean empty; 
 	private final List<IAbstractOutputItem> output; 
 	
-	/**
+	/*
 	 * This automatically puts the created transition into 
 	 * 		from.getOutgoingTransitions() 
 	 * 		and 
@@ -49,27 +69,46 @@ public class Transition {
 		this(from, to, inChar, Collections.<IAbstractOutputItem>emptyList());
 	}
 	
+	/**
+	 * Removes this transition from the automaton. 
+	 * Automatically deletes it from all collections in start and end states
+	 */
 	public void remove() {
 		from.removeOutgoing(this);
 		to.removeIncoming(this);
 	}
 	
+	/**
+	 * @return true iff this transition has no input character
+	 */
 	public boolean isEmpty() {
 		return empty;
 	}
 	
+	/**
+	 * @return start state
+	 */
 	public State getFrom() {
 		return from;
 	}
 
+	/**
+	 * @return end state
+	 */
 	public State getTo() {
 		return to;
 	}
 
+	/**
+	 * @return input character
+	 */
 	public IAbstractInputItem getInChar() {
 		return inChar;
 	}
 	
+	/**
+	 * @return output actions
+	 */
 	public List<IAbstractOutputItem> getOutput() {
 		return output;
 	}

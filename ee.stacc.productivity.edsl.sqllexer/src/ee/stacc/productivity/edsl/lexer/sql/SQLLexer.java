@@ -7,7 +7,6 @@ import static ee.stacc.productivity.edsl.sqllexer.SQLLexerData.STATE_COUNT;
 import static ee.stacc.productivity.edsl.sqllexer.SQLLexerData.TRANSITIONS;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;

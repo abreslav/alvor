@@ -96,8 +96,8 @@ public class BranchingSequenceTest {
 		public static final Concat INSTANCE = new Concat();
 		
 		@Override
-		public String body(String init, Integer arg, boolean last) {
-			return init + arg + (last ? "" : " ");
+		public String body(String result, Integer arg, boolean last) {
+			return result + arg + (last ? "" : " ");
 		}
 		
 	}

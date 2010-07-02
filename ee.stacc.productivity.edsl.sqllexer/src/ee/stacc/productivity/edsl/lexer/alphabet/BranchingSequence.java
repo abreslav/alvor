@@ -1,8 +1,19 @@
 package ee.stacc.productivity.edsl.lexer.alphabet;
 
-
+/**
+ * Simple implementation of an immutable sequence.
+ * 
+ * This implementation is based on a "branching" linked list
+ * 
+ * @author abreslav
+ *
+ * @param <E> element type
+ */
 public class BranchingSequence<E> implements ISequence<E> {
 
+	/*
+	 * Linked list node, with a reference to a previous item
+	 */
 	private static final class Item<E> {
 		private final Item<E> previous;
 		private final E data;
@@ -114,11 +125,11 @@ public class BranchingSequence<E> implements ISequence<E> {
 
 	@Override
 	public String toString() {
-		return "<" + fold(new StringBuilder(), new  IFoldFunction<StringBuilder, E>() {
+		return "<" + fold(new StringBuilder(), new IFoldFunction<StringBuilder, E>() {
 			
 			@Override
-			public StringBuilder body(StringBuilder init, E arg, boolean last) {
-				return init.append(arg).append(last ? "" : " ");
+			public StringBuilder body(StringBuilder result, E arg, boolean last) {
+				return result.append(arg).append(last ? "" : " ");
 			}
 			
 		}) + ">";

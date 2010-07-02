@@ -8,6 +8,13 @@ import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.LinkedHashSet;
 
+/**
+ * Represents states of an automaton or transducer (a transducer is considered a special case 
+ * of automaton -- no output actions of transitions).
+ * 
+ * @author abreslav
+ *
+ */
 public class State {
 	private final String name;
 	private final boolean accepting;
@@ -17,15 +24,25 @@ public class State {
 	private Collection<Transition> incomingTransitions;
 	private Iterable<Transition> incomingTransitionsRO;
 
+	/**
+	 * @param name a symbolic name for the state, needed for debugging purposes only
+	 * @param accepting whether this is an accepting state of the corresponding automaton
+	 */
 	public State(String name, boolean accepting) {
 		this.name = name;
 		this.accepting = accepting;
 	}
 
+	/**
+	 * @return symbolic name of the state (needed for debugging only)
+	 */
 	public String getName() {
 		return name;
 	}
 	
+	/*
+	 * This is called only by {@link IncomingTransitionsInitializer} 
+	 */
 	/*package*/ void initializeIncomingTransitions() {
 		if (incomingTransitions != null) {
 			return;
@@ -34,22 +51,34 @@ public class State {
 		incomingTransitionsRO = Collections.unmodifiableCollection(incomingTransitions);
 	}
 
+	/*
+	 * This is called only by {@link Transition} 
+	 */
 	/*package*/ void addIncoming(Transition transition) {
 		if (incomingTransitions != null) {
 			incomingTransitions.add(transition);
 		}
 	}
 	
+	/*
+	 * This is called only by {@link Transition} 
+	 */
 	/*package*/ void removeIncoming(Transition transition) {
 		if (incomingTransitions != null) {
 			incomingTransitions.remove(transition);
 		}
 	}
 	
+	/*
+	 * This is called only by {@link Transition} 
+	 */
 	/*package*/ void addOutgoing(Transition transition) {
 		outgoingTransitions.add(transition);
 	}
 	
+	/*
+	 * This is called only by {@link Transition} 
+	 */
 	/*package*/ void removeOutgoing(Transition transition) {
 		outgoingTransitions.remove(transition);
 	}
@@ -67,6 +96,9 @@ public class State {
 	 * This collection is filled in automatically when transitions are created
 	 * The iterator() is vulnerable to {@link ConcurrentModificationException}
 	 * To remove a transition, call its own method
+	 * 
+	 * NOTE: this method will throw an exception, unless {@link IncomingTransitionsInitializer} was invoked 
+	 * explicitly on the automaton containing this state (automata are represented by their initial state)
 	 */
 	public Iterable<Transition> getIncomingTransitions() {
 		if (incomingTransitions == null) {
@@ -75,6 +107,9 @@ public class State {
 		return incomingTransitionsRO;
 	}
 	
+	/**
+	 * @return true iff there are outgoing transitions in this state
+	 */
 	public boolean hasOutgoingTransitions() {
 		return !outgoingTransitions.isEmpty();
 	}
@@ -87,6 +122,9 @@ public class State {
 		return new LinkedHashSet<Transition>(outgoingTransitions);
 	}
 	
+	/**
+	 * @return true if this is an accepting state
+	 */
 	public boolean isAccepting() {
 		return accepting;
 	}

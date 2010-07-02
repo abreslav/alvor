@@ -1,6 +1,14 @@
 package ee.stacc.productivity.edsl.lexer.alphabet;
 
 
+/**
+ * Simple Unicode character as an input item of an automaton/transducer.
+ * 
+ * Used for debugging and testing.
+ * 
+ * @author abreslav
+ *
+ */
 public class SimpleCharacter implements IAbstractInputItem {
 
 	public static IAbstractInputItem create(int code) {

@@ -30,10 +30,10 @@ public class PositionedCharacterUtil {
 		List<PositionedCharacter> chars = text.fold(new ArrayList<PositionedCharacter>(), new IFoldFunction<List<PositionedCharacter>, IAbstractInputItem>() {
 			@Override
 			public List<PositionedCharacter> body(
-					List<PositionedCharacter> init, IAbstractInputItem arg,
+					List<PositionedCharacter> result, IAbstractInputItem arg,
 					boolean last) {
-				init.add((PositionedCharacter) arg);
-				return init;
+				result.add((PositionedCharacter) arg);
+				return result;
 			}
 		});
 		

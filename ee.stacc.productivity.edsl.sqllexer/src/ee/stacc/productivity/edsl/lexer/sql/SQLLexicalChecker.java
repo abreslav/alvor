@@ -12,10 +12,14 @@ import ee.stacc.productivity.edsl.lexer.automata.AutomataInclusion;
 import ee.stacc.productivity.edsl.lexer.automata.State;
 import ee.stacc.productivity.edsl.lexer.automata.StringToAutomatonConverter;
 import ee.stacc.productivity.edsl.lexer.automata.Transition;
-import ee.stacc.productivity.edsl.sqllexer.SQLLexerData;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.util.AsbtractStringUtils;
 
+/*
+ * This class is obsolete
+ * 
+ * @author abreslav
+ */
 public class SQLLexicalChecker {
 
 	public static final SQLLexicalChecker INSTANCE = new SQLLexicalChecker();

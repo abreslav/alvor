@@ -1,8 +1,16 @@
 package ee.stacc.productivity.edsl.lexer.alphabet;
 
-
+/**
+ * A token (code + text) as an input character for an automaton/transducer.
+ * 
+ * @author abreslav
+ *
+ */
 public class Token implements IAbstractInputItem {
 	
+	/**
+	 * Factory method to create new tokens. Use instead of the constructor 
+	 */
 	public static Token create(int type, ISequence<IAbstractInputItem> text) {
 		return new Token(type, text);
 	}

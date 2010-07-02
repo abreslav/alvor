@@ -9,9 +9,9 @@ public class CharacterUtil {
 	public static final IFoldFunction<StringBuilder, IAbstractInputItem> TOKEN_TO_STRING = new IFoldFunction<StringBuilder, IAbstractInputItem>() {
 		
 		@Override
-		public StringBuilder body(StringBuilder init, IAbstractInputItem arg,
+		public StringBuilder body(StringBuilder result, IAbstractInputItem arg,
 				boolean last) {
-			return init.append((char) arg.getCode());
+			return result.append((char) arg.getCode());
 		}
 	};
 
