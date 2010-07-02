@@ -9,8 +9,8 @@ import java.util.ConcurrentModificationException;
 import java.util.LinkedHashSet;
 
 /**
- * Represents states of an automaton or transducer (a transducer is considered a special case 
- * of automaton -- no output actions of transitions).
+ * Represents states of an automaton or transducer (an automaton is considered a special case 
+ * of a transducer -- no output actions of transitions).
  * 
  * @author abreslav
  *

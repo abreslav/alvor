@@ -8,7 +8,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import ee.stacc.productivity.edsl.sqlparser.SQLSyntaxChecker;
+import ee.stacc.productivity.edsl.sqlparser.ParserSimulator;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.parser.AbstractStringParser;
 
@@ -34,11 +34,11 @@ public class ParserPerformanceTest {
 		} while (true);
 		reader.close();
 		
-		System.out.println("Lines: " + count);
-		System.out.println("Unique: " + strings.size());
+//		System.out.println("Lines: " + count);
+//		System.out.println("Unique: " + strings.size());
 		
 		List<IAbstractString> all = AbstractStringParser.parseFile("data/earved_all.txt");
-		System.out.println("Strings: " + all.size());
+//		System.out.println("Strings: " + all.size());
 
 //		doTest(all);
 //		
@@ -49,13 +49,13 @@ public class ParserPerformanceTest {
 	}
 
 	private void doTest(List<IAbstractString> all) {
-		SQLSyntaxChecker.INSTANCE.allTime = 0;
+		ParserSimulator.LALR_INSTANCE.allTime = 0;
 		long time = System.nanoTime();
 		for (IAbstractString as : all) {
-			SQLSyntaxChecker.INSTANCE.check(as);
+			ParserSimulator.LALR_INSTANCE.check(as);
 		}
 		printNano("All checks: ", (System.nanoTime() - time));
-		printNano("Syntax: ", SQLSyntaxChecker.INSTANCE.allTime);
+		printNano("Syntax: ", ParserSimulator.LALR_INSTANCE.allTime);
 	}
 
 	private void printNano(String string, long x) {

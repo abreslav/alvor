@@ -1,6 +1,3 @@
-/**
- * 
- */
 package ee.stacc.productivity.edsl.sqlparser;
 
 import java.util.Collection;
@@ -8,10 +5,21 @@ import java.util.Collections;
 
 import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
 
+/**
+ * Error parsing state. Means that there was a parsing error. 
+ * Stores the known cause of the error (if any).
+ * 
+ * @author abreslav
+ *
+ */
 public final class ErrorState implements IParserState {
 	private final IParserState fromState;
 	private final IAbstractInputItem byInputItem;
 	
+	/**
+	 * @param fromState the state in which the error occurred 
+	 * @param byInputItem the input item that caused an error (may be null)
+	 */
 	public ErrorState(IParserState fromState, IAbstractInputItem byInputItem) {
 		this.fromState = fromState;
 		this.byInputItem = byInputItem;
@@ -37,6 +45,9 @@ public final class ErrorState implements IParserState {
 		return "In state " + fromState + " unexpected symbol: " + byInputItem;
 	}
 	
+	/**
+	 * If the error was caused by meeting an unexpected item, returns this item
+	 */
 	public IAbstractInputItem getUnexpectedItem() {
 		return byInputItem;
 	}

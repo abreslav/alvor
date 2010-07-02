@@ -16,10 +16,14 @@ import org.jdom.JDOMException;
 
 import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
 
+/**
+ * Represents an LR-parser as a static structure (or states and actions) and a set of processing rules.
+ * 
+ * @author abreslav
+ *
+ */
 public class LRParser implements ILRParser<IParserStack> {
 
-	private static final IAction ACCEPT_ACTION = new AcceptAction();
-	
 	private static final class Rule {
 		private final int lhsSymbol; 
 		private final int rhsLength; 
@@ -209,6 +213,12 @@ public class LRParser implements ILRParser<IParserStack> {
 		}
 	}
 
+	/**
+	 * The accept action of this parser
+	 */
+	private static final IAction ACCEPT_ACTION = new AcceptAction();
+	
+	
 	public static LRParser build(URL xmlFile) throws JDOMException, IOException {
 		final List<State> states = new ArrayList<State>();
 		final List<Rule> rules = new ArrayList<Rule>();

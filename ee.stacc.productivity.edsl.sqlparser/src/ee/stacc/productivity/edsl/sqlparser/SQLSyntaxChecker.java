@@ -21,6 +21,9 @@ import ee.stacc.productivity.edsl.lexer.sql.SQLLexer;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 import ee.stacc.productivity.edsl.string.util.AsbtractStringUtils;
 
+/*
+ * This class is obsolete
+ */
 public class SQLSyntaxChecker {
 
 	private static final IStackFactory<IParserStack> FACTORY = BoundedStack.getFactory(100, null);

@@ -20,13 +20,28 @@ import ee.stacc.productivity.edsl.lexer.automata.EmptyTransitionEliminator.IEmpt
 import ee.stacc.productivity.edsl.lexer.sql.SQLLexer;
 import ee.stacc.productivity.edsl.string.IAbstractString;
 
+/**
+ * Interpreter that performs the abstract parsing.
+ * 
+ * @author abreslav
+ *
+ * @param <S> type of stacks to work with.
+ */
 public class ParserSimulator<S extends IParserStackLike> {
 
+	/**
+	 * Normal LR-parsing with bounded stacks
+	 */
 	public static final ParserSimulator<IParserStack> LALR_INSTANCE = new ParserSimulator<IParserStack>(Parsers.SQL_PARSER, BoundedStack.getFactory(100, null));
+	
+	/**
+	 * GLR-parsing with bounded stacks (see GLRStack.FACTORY)
+	 */
 	public static final ParserSimulator<GLRStack> GLR_INSTANCE = new ParserSimulator<GLRStack>(Parsers.SQL_GLR_PARSER, GLRStack.FACTORY);
 	
 	private final IStackFactory<S> stackFactory;
 	private final ILRParser<S> parser;
+	// For debugging purposes only
 	public long allTime;
 
 	public ParserSimulator(ILRParser<S> parser, IStackFactory<S> factory) {
@@ -34,17 +49,14 @@ public class ParserSimulator<S extends IParserStackLike> {
 		this.parser = parser;
 	}
 
+	/**
+	 * Performs abstract parsing, returns a list of error messages. Used for testing
+	 * @param str the abstract string to parser
+	 * @return a list of error messages
+	 */
 	public List<String> check(IAbstractString str) {
-//		if (AsbtractStringUtils.hasLoops(str)) {
-//			throw new IllegalArgumentException("The current version does not support loops in abstract strings");
-//		}
-		
-		return checkAbstractString(str);
-	}
-	
-	public List<String> checkAbstractString(IAbstractString as) {
 		final List<String> errors = new ArrayList<String>();
-		State asAut = StringToAutomatonConverter.INSTANCE.convert(as);
+		State asAut = StringToAutomatonConverter.INSTANCE.convert(str);
 		
 		checkAutomaton(parser, asAut, stackFactory, new IParseErrorHandler() {
 			
@@ -73,10 +85,13 @@ public class ParserSimulator<S extends IParserStackLike> {
 		return errors;
 	}
 
+	/**
+	 * Parses the given automaton and reports the errors to the given error handler
+	 */
 	public void checkAutomaton(State asAut, IParseErrorHandler errorHandler) {
 		checkAutomaton(parser, asAut, stackFactory, errorHandler);
 	}
-	
+
 	private void checkAutomaton(final ILRParser<S> parser, State asAut, IStackFactory<S> stackFactory, IParseErrorHandler errorHandler) {
 		State sqlTransducer = SQLLexer.SQL_TRANSDUCER;
 		State transduction = AutomataTransduction.INSTANCE.getTrasduction(sqlTransducer, asAut, SQLLexer.SQL_ALPHABET_CONVERTER);
@@ -88,7 +103,6 @@ public class ParserSimulator<S extends IParserStackLike> {
 				return transition.isEmpty() || SQLLexer.isWhitespace(transition.getInChar().getCode());
 			}
 		});
-//		transduction = AutomataDeterminator.determinate(transduction);
 		
 		final Integer eofTokenIndex = parser.getNamesToTokenNumbers().get("$end");
 		IAlphabetConverter converter = new IAlphabetConverter() {
@@ -118,7 +132,10 @@ public class ParserSimulator<S extends IParserStackLike> {
 		allTime += time;
 	}
 	
-	public boolean parseAutomaton(State initial, IAlphabetConverter alphabetConverter) {//, IStackFactory<S> stackFactory) {
+	/**
+	 * Used for testing.
+	 */
+	public boolean parseAutomaton(State initial, IAlphabetConverter alphabetConverter) {
 		return new FixpointParser<S>(
 				parser, 
 				alphabetConverter, 
@@ -129,8 +146,14 @@ public class ParserSimulator<S extends IParserStackLike> {
 			.parse(initial);
 	}
 	
+	/**
+	 * A set of stacks of type <S>. 
+	 */
 	private interface IStackSet<S> {
 
+		/**
+		 * Is there a stack with an error in this set
+		 */
 		IParserState hasError();
 		
 		/**
@@ -145,6 +168,9 @@ public class ParserSimulator<S extends IParserStackLike> {
 		Set<S> asJavaSet();
 	}
 
+	/**
+	 * A naive implementation of a stack set. May be worth it to optimize it to boost the performance. 
+	 */
 	private static class SimpleStackSet<S extends IParserStackLike> implements IStackSet<S> {
 		
 		public static <S extends IParserStackLike> IStackSetFactory<S> getFactory() {
@@ -187,20 +213,53 @@ public class ParserSimulator<S extends IParserStackLike> {
 		
 	}
 	
+	/**
+	 * A factory for stack sets
+	 */
 	public interface IStackSetFactory<S> {
 		IStackSet<S> newAbstractStackSet();
 	}
 	
+	/**
+	 * The parsing table interpreter itself (uses {@link ILRParser} to do the job). 
+	 * Computes until a fix-point or an error. 
+	 *
+	 * @param <S> the type of stacks to work with.
+	 */
 	private static final class FixpointParser<S extends IParserStackLike> {
 	
+		/**
+		 * Maps an automaton state to a set of stacks with which we come to this state 
+		 */
 		private final Map<State, IStackSet<S>> abstractStackSets = new HashMap<State, IStackSet<S>>();
+		/**
+		 * Converts from lexer's output alphabet to parser's input alphabet
+		 */
 		private final IAlphabetConverter alphabetConverter;
+		/**
+		 * the parser to interpret
+		 */
 		private final ILRParser<S> parser;
+		/**
+		 * A factory to create new stack sets
+		 */
 		private final IStackSetFactory<S> factory;
+		/**
+		 * A factory to create new stacks
+		 */
 		private final IStackFactory<S> stackFactory;
+		/**
+		 * An index of the EOF (end of file) token in the parser's input alphabet
+		 */
 		private final int eofTokenIndex;
+		/**
+		 * The error handler to report errors to
+		 */
 		private final IParseErrorHandler errorHandler; 
 		
+		/**
+		 * See fields for parameter meanings 
+		 */
 		public FixpointParser(ILRParser<S> parser,
 				IAlphabetConverter alphabetConverter,
 				IStackSetFactory<S> factory,
@@ -224,6 +283,11 @@ public class ParserSimulator<S extends IParserStackLike> {
 			return set;
 		}
 
+		/**
+		 * Starts abstract parsing on the automaton represented by its initial state
+		 * @param initial initial state of the automaton to parse
+		 * @return true iff there was no parsing errors
+		 */
 		public boolean parse(State initial) {
 			S initialStack = stackFactory.newStack(parser.getInitialState());
 			getSet(initial).add(initialStack);

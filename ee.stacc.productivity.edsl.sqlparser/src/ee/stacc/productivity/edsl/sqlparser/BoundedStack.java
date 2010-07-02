@@ -7,9 +7,24 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
+/**
+ * A parsing stack of counded depth.
+ * If the stack grows bigger than the given number, it is truncated.
+ * If the bottom is reached, the error state is returned.
+ *  
+ * @author abreslav
+ *
+ */
 public final class BoundedStack implements IParserStack {
 
+	/**
+	 * A factory method. Use instead of the constructor 
+	 * @param maxDepth maximum depth allowed for the stack (the created stacks will initially have the depth 1, 
+	 * but if they grow bigger than this number, they will be truncated)
+	 * @param errorState the state to "put to the bottom" of the truncated stacks 
+	 * @return
+	 */
+	
 	public static IStackFactory<IParserStack> getFactory(final int maxDepth, final IParserState errorState) {
 		return new IStackFactory<IParserStack>() {
 			@Override

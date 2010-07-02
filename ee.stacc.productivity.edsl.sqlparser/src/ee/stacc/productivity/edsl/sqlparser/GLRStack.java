@@ -5,8 +5,19 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * A "multi-stack" for GLR-like parsing. It contains many stacks and drops those that come to an erro state.
+ * No space optimization is performed, so it is not really GLR parsing (it might get worse than N^3), but the
+ * principle is the same.
+ * 
+ * @author abreslav
+ *
+ */
 public class GLRStack implements IParserStackLike {
 
+	/**
+	 * A factory that creates GLR stacks built of bounded stacks
+	 */
 	public static final IStackFactory<GLRStack> FACTORY = new IStackFactory<GLRStack>() {
 		
 		@Override
@@ -21,11 +32,16 @@ public class GLRStack implements IParserStackLike {
 	private final Collection<IParserStack> variantsRO = Collections.unmodifiableCollection(variants);
 	private IParserState errorOnTop = null;
 	
-	
+	/**
+	 * @return a collection of simple stacks this multi-stack is comprised of
+	 */
 	public Collection<IParserStack> getVariants() {
 		return variantsRO;
 	}
 
+	/**
+	 * Adds a new single-stack to this multi-stack
+	 */
 	public void addVariant(IParserStack stack) {
 		if (!stack.hasErrorOnTop()) {
 			variants.add(stack);

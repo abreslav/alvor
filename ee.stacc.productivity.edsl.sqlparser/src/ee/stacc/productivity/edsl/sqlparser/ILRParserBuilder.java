@@ -1,5 +1,11 @@
 package ee.stacc.productivity.edsl.sqlparser;
 
+/**
+ * A builder interface to construct parsers from Bison XML format (see the Builder pattern in GoF)
+ * 
+ * @author abreslav
+ *
+ */
 public interface ILRParserBuilder {
 
 	void addRule(int number, String lhs, int rhsLength, String text);
