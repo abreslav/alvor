@@ -17,7 +17,7 @@
     		<arg value="generated/sql.lr.bg"/>
     		<arg value="${lexerProject}/lexer/sql.flextemplate"/>
     		<arg value="${lexerProject}/generated/sql.flex"/>
-    		<arg value="${lexerProject}/generated/sql.keywords"/>
+    		<arg value="sql.keywords"/>
     	</java>
 		<exec executable="bison" dir="${basedir}">
 			<arg value="--xml=src/ee/stacc/productivity/edsl/sqlparser/sql.lr.xml"/>
@@ -26,6 +26,7 @@
 			<arg value="generated/sql.lr.bg"/>
 		</exec>
     	<delete file="sql.lr.tab.bg"></delete>
+    	<delete file="sql.keywords"></delete>
 		<!-- New GLR-parser -->
     	<java 
     		classpath="bin" 
@@ -65,6 +66,7 @@
     		<arg value="SQLLexer"/>
     		<arg file="${lexerProject}/generated/"/>
     		<arg value="SQLLexerGen"/>
+    		<arg value="${lexerProject}/generated/sql.keywords"/>
     	</java>
 		<!-- Compile the generated class -->
     	<javac 

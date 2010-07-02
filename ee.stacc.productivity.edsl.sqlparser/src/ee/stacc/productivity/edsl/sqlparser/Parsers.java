@@ -4,10 +4,22 @@ import java.io.IOException;
 
 import org.jdom.JDOMException;
 
-
+/**
+ * This class stores parsers loaded from parsing tables (produced by Bison and stored in XML) 
+ * 
+ * @author abreslav
+ *
+ */
 public class Parsers {
 
+	/**
+	 * LR-parser for a simple grammar. In fact, it's not needed, kept just in case
+	 */
 	public static final LRParser SQL_PARSER;
+	
+	/**
+	 * GLR-parser for a reacher grammar
+	 */
 	public static final GLRParser SQL_GLR_PARSER;
 	
 	static {

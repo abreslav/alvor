@@ -1,5 +1,6 @@
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -23,12 +24,14 @@ public class Generator {
 		String outFolder = "generated/";
 		String inClassName = "SQLLexer";
 		String outClassName = "SQLLexerGen";
+		String keywordsFileName = "keywords.txt";
 		
 		if (args.length > 0) {
 			inFolder = args[0];
 			inClassName = args[1];
 			outFolder = args[2];
 			outClassName = args[3];
+			keywordsFileName = args[4];
 		}
 		File inFile = new File(new File(inFolder), inClassName + ".java");
 		File outFile = new File(new File(outFolder),  outClassName + ".java");
@@ -77,7 +80,7 @@ public class Generator {
 		
 		// Write keywords
 		fileWriter.write("System.out.println(\"    public static final String[] KEYWORDS = {\");\n");
-		BufferedReader keywordsReader = new BufferedReader(new InputStreamReader(Generator.class.getResourceAsStream("sql.keywords")));
+		BufferedReader keywordsReader = new BufferedReader(new InputStreamReader(new FileInputStream(keywordsFileName)));
 		do {
 			String readLine = keywordsReader.readLine();
 			if (readLine == null) {

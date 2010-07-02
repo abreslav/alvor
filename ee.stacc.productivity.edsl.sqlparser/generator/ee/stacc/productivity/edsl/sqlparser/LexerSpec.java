@@ -1,7 +1,6 @@
 package ee.stacc.productivity.edsl.sqlparser;
 
 import java.io.PrintWriter;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
