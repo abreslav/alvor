@@ -11,7 +11,7 @@
 		<!-- Old LR-parser -->
     	<java 
     		classpath="bin" 
-    		classname="ee.stacc.productivity.edsl.sqlparser.LexerSpecGenerator"
+    		classname="ee.stacc.productivity.edsl.sqlparser.SpecGeneratorMain"
     	>
     		<arg value="grammar/sql.lr.bgtemplate"/>
     		<arg value="generated/sql.lr.bg"/>
@@ -29,7 +29,7 @@
 		<!-- New GLR-parser -->
     	<java 
     		classpath="bin" 
-    		classname="ee.stacc.productivity.edsl.sqlparser.LexerSpecGenerator"
+    		classname="ee.stacc.productivity.edsl.sqlparser.SpecGeneratorMain"
     	>
     		<arg value="grammar/sql.bgtemplate"/>
     		<arg value="generated/sql.bg"/>

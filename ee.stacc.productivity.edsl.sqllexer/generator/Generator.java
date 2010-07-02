@@ -10,7 +10,12 @@ import java.io.Reader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
+/**
+ * Transforms JFlex output to a java file which prints what we need as a lexer representation.
+ *   
+ * @author abreslav
+ *
+ */
 public class Generator {
 
 	public static void main(String[] args) throws IOException {

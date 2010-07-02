@@ -217,6 +217,7 @@ import java.io.IOException;
 %lex-helper Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
 
 %lex-whitespace {NONNEWLINE_WHITE_SPACE_CHAR}+ 
+%lex-whitespace \/\*{COMMENT_TEXT}\*\/ 
 %lex-token DIGAL_ERR = {DIGIT}+{ALPHA}({DIGIT}|{ALPHA})*
 %lex-token STRING_SQ = N?\'{SQ_STRING_TEXT}\'
 %lex-token STRING_SQ_ERR = \'{SQ_STRING_TEXT} 
