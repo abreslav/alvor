@@ -34,11 +34,8 @@ import java.io.IOException;
 //%define parser_class_name "SQLParser"
 
 %lex-keyword PARTITION
-%lex-keyword IMMEDIATE
 %lex-keyword DISTINCT
-%lex-keyword EXECUTE
 %lex-keyword BETWEEN
-%lex-keyword DECLARE
 %lex-keyword VALUES
 %lex-keyword SELECT
 %lex-keyword DELETE
@@ -50,7 +47,6 @@ import java.io.IOException;
 %lex-keyword HAVING
 %lex-keyword COMMIT
 %lex-keyword WHERE
-%lex-keyword BEGIN
 %lex-keyword TABLE
 %lex-keyword ORDER
 %lex-keyword OR
@@ -64,7 +60,6 @@ import java.io.IOException;
 %lex-keyword THEN
 %lex-keyword CASE
 %lex-keyword CAST
-%lex-keyword CALL
 %lex-keyword ELSE
 %lex-keyword DESC
 %lex-keyword LIKE
@@ -149,6 +144,7 @@ import java.io.IOException;
 %lex-keyword CREATE
 %lex-keyword PARTIAL
 %lex-keyword PRIMARY
+%lex-keyword IMMEDIATE
 %lex-keyword CHECK
 %lex-keyword CHARACTER
 %lex-keyword USER
@@ -192,22 +188,15 @@ import java.io.IOException;
 %lex-keyword TIMEZONE_MINUTE
 %lex-keyword AT
 
-%lex-whitespace {NONNEWLINE_WHITE_SPACE_CHAR}+ 
-%lex-whitespace \/\*{COMMENT_TEXT}\*\/ 
-%lex-whitespace --[^\n]* 
 
 %lex-token OUTERJ = "(+)"
 %lex-token NE = "<>" | "!="
 %lex-token LE = "<="
 %lex-token GE = ">="
 %lex-token CONCAT = "||"
-%lex-token COLONEQUALS = ":="
-%lex-token EQUALSGT = "=>"
 %lex-literal ","
 %lex-literal "("
 %lex-literal ")"
-%lex-literal "{"
-%lex-literal "}"
 %lex-literal "."
 %lex-literal "+"
 %lex-literal "-"
@@ -217,9 +206,6 @@ import java.io.IOException;
 %lex-literal "<"
 %lex-literal ">"
 %lex-literal "?"
-%lex-literal ";"
-%lex-literal ":"
-%lex-literal "%"
 
 %lex-helper ALPHA=[A-Za-z]
 %lex-helper DIGIT=[0-9]
@@ -230,10 +216,11 @@ import java.io.IOException;
 %lex-helper COMMENT_TEXT=([^*/\n]|[^*\n]"/"[^*\n]|[^/\n]"*"[^/\n]|"*"[^/\n]|"/"[^*\n])*
 %lex-helper Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
 
+%lex-whitespace {NONNEWLINE_WHITE_SPACE_CHAR}+ 
+%lex-whitespace \/\*{COMMENT_TEXT}\*\/ 
 %lex-token DIGAL_ERR = {DIGIT}+{ALPHA}({DIGIT}|{ALPHA})*
 %lex-token STRING_SQ = N?\'{SQ_STRING_TEXT}\'
-%lex-token STRING_SQ_ERR = N?\'{SQ_STRING_TEXT} 
-%lex-token MULTILINE_COMMENT_ERR = \/\*{COMMENT_TEXT} 
+%lex-token STRING_SQ_ERR = \'{SQ_STRING_TEXT} 
 %lex-token NUMBER = {DIGIT}+(\.{DIGIT}+)?  
 %lex-token ID = {Ident}
 %lex-token UNKNOWN_CHARACTER_ERR = .
@@ -258,9 +245,6 @@ query
 	| update
 	| COMMIT
 	| tableDefinition
-	| beginEndBlock
-	| declareBeginEndBlock
-	| callStatement
 	;
 id 
 	: ID
@@ -293,46 +277,7 @@ assign
 	;
 delete
 	: DELETE optFrom alias where
-	;
-callStatement
-	: '{' CALL ident identRest  '}'
-declareBeginEndBlock
-	: DECLARE declarationList beginEndBlock
-	;
-declaration
-	: ID ident identRestEx declInitializer ';'
-	| ID identEx declInitializer ';' 
-	;
-declarationList
-	: declaration 
-	| declaration declarationList
-	| /* empty */
-	;
-declInitializer
-	: COLONEQUALS simpleExpr
-	| /*Empty*/
-	;
-beginEndBlock
-	: BEGIN plSqlStatementList END ';'
-	;
-plSqlStatementList
-	: plSqlStatement
-	| plSqlStatement plSqlStatementList
-	;
-plSqlStatement
-	: assignTarget COLONEQUALS simpleExpr ';'
-	| ident identRestEx ';'
-	| selectInto ';'
-	| delete ';'
-	| update ';'
-	| insert ';'
-	| EXECUTE STRING_SQ ';'
-	| EXECUTE IMMEDIATE STRING_SQ ';'
-	;
-assignTarget
-	: '?'
-	| ident
-	;
+	;	
 optFrom
 	: FROM
 	| /*empty*/
@@ -362,20 +307,6 @@ select
 	;
 basicSelect
 	: SELECT optDist whatToSelect FROM tableList
-	;
-selectInto 
-	: basicSelectInto where byClauses 
-	;
-basicSelectInto
-	: SELECT optDist whatToSelect INTO intoList FROM tableList
-	;
-intoList
-	: intoId 
-	| intoId ',' intoList 
-	;
-intoId
-	: ID
-	| ':' ID
 	;
 where
 	: WHERE whereCond
@@ -479,10 +410,6 @@ ident
 	| id '.' id
 	| id '.' id '.' id
 	;
-identEx 
-	: ident 
-	| ident '%' id
-	;
 whereCond
 	: condition;
 condition
@@ -530,7 +457,7 @@ simpleExpr
 	| '-' simpleExpr
 	| CASE whenList else END
 	| STRING_SQ
-	| ident identRestEx
+	| ident identRest
 	| '(' simpleExpr ')'
 	| simpleExpr '-' simpleExpr
 	| simpleExpr '+' simpleExpr
@@ -552,19 +479,6 @@ optSize
 identRest
 	: '(' simExList ')'
 	| /*empty*/
-	;
-identRestEx
-	: identRest
-	| '(' namedArgList ')'
-	;
-namedArgList 
-	: namedArg
-	| namedArg ',' namedArgList
-	| /* empty */
-	;
-namedArg
-	: simpleExpr
-	| ID EQUALSGT simpleExpr
 	;
 whenList
 	: when
