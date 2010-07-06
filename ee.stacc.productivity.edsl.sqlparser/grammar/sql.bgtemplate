@@ -300,8 +300,8 @@ declareBeginEndBlock
 	: DECLARE declarationList beginEndBlock
 	;
 declaration
-	: ID ident identRestEx declInitializer ';'
-	| ID identEx declInitializer ';' 
+	: id ident identRestEx declInitializer ';'
+	| id identEx declInitializer ';' 
 	;
 declarationList
 	: declaration 
@@ -374,8 +374,8 @@ intoList
 	| intoId ',' intoList 
 	;
 intoId
-	: ID
-	| ':' ID
+	: id
+	| ':' id
 	;
 where
 	: WHERE whereCond
@@ -564,7 +564,7 @@ namedArgList
 	;
 namedArg
 	: simpleExpr
-	| ID EQUALSGT simpleExpr
+	| id EQUALSGT simpleExpr
 	;
 whenList
 	: when

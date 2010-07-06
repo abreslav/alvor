@@ -306,7 +306,6 @@ public static final int[] ACTIONS = {
         "CREATE",
         "PARTIAL",
         "PRIMARY",
-        "IMMEDIATE",
         "CHECK",
         "CHARACTER",
         "USER",
