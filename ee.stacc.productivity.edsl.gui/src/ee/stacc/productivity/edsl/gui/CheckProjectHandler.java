@@ -186,6 +186,10 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 		}		
 	}
 
+	/*
+	 * This method makes things slow on big projects, although on small ones the markers look nice
+	 */
+	@SuppressWarnings("unused")
 	private void markConstants(IAbstractString abstractValue) {
 		IAbstractStringVisitor<Void, Void> visitor = new IAbstractStringVisitor<Void, Void>() {
 
