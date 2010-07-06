@@ -45,7 +45,7 @@ public class LexerPerformanceTest {
 		for (IAbstractString string : strings) {
 			string = optimize(string);
 			State initial = StringToAutomatonConverter.INSTANCE.convert(string);
-			State transduction = AutomataTransduction.INSTANCE.getTrasduction(sqlTransducer, initial, SQLLexer.SQL_ALPHABET_CONVERTER);
+			State transduction = AutomataTransduction.INSTANCE.getTransduction(sqlTransducer, initial, SQLLexer.SQL_ALPHABET_CONVERTER);
 			transduction = EmptyTransitionEliminator.INSTANCE.eliminateEmptySetTransitions(transduction);
 //			transduction = AutomataDeterminator.determinate(transduction);
 

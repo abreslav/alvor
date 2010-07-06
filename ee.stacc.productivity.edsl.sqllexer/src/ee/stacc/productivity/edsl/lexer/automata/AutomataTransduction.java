@@ -41,11 +41,11 @@ public class AutomataTransduction {
 	 * Transduce the second by the first
 	 * @return the resulting automaton's initial state
 	 */
-	public State getTrasduction(State transducerInitial, State inputInitial, IAlphabetConverter converter) {
-		return getTrasduction(transducerInitial, inputInitial, converter, PushYieldInterpreterWithKeywords.INSTANCE);
+	public State getTransduction(State transducerInitial, State inputInitial, IAlphabetConverter converter) {
+		return getTransduction(transducerInitial, inputInitial, converter, PushYieldInterpreterWithKeywords.INSTANCE);
 	}
 	
-	public State getTrasduction(State transducerInitial, State inputInitial, IAlphabetConverter converter, IOutputItemInterpreter interpreter) {
+	public State getTransduction(State transducerInitial, State inputInitial, IAlphabetConverter converter, IOutputItemInterpreter interpreter) {
 		Checker checker = new Checker(converter, interpreter);
 		if (!checker.check(transducerInitial, inputInitial)) {
 			throw new IllegalArgumentException("The given automaton does not form a valid input for the given transducer");

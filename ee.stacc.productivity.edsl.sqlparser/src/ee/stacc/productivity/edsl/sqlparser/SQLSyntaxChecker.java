@@ -79,7 +79,7 @@ public class SQLSyntaxChecker {
 	
 	private void checkAutomaton(State asAut, IStackFactory<IParserStack> stackFactory, IParseErrorHandler errorHandler) {
 		State sqlTransducer = SQLLexer.SQL_TRANSDUCER;
-		State transduction = AutomataTransduction.INSTANCE.getTrasduction(sqlTransducer, asAut, SQLLexer.SQL_ALPHABET_CONVERTER);
+		State transduction = AutomataTransduction.INSTANCE.getTransduction(sqlTransducer, asAut, SQLLexer.SQL_ALPHABET_CONVERTER);
 		long time = System.nanoTime();
 		transduction = EmptyTransitionEliminator.INSTANCE.eliminateEmptySetTransitions(transduction, new IEmptinessExpert() {
 			

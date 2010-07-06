@@ -181,7 +181,7 @@ public class AutomataInclusionTest {
 		State check = AutomataParser.parse(checkStr);
 		check = AutomataDeterminator.determinate(check);
 		
-		State transduction = AutomataTransduction.INSTANCE.getTrasduction(transducer, automaton, IAlphabetConverter.ID, new IOutputItemInterpreter() {
+		State transduction = AutomataTransduction.INSTANCE.getTransduction(transducer, automaton, IAlphabetConverter.ID, new IOutputItemInterpreter() {
 
 			@Override
 			public ISequence<IAbstractInputItem> processOutputCommands(
@@ -241,7 +241,7 @@ public class AutomataInclusionTest {
 
 	private void checkAutomatonTransduction(String[] expected, State init) {
 		State sqlTransducer = SQLLexer.SQL_TRANSDUCER;
-		State transduction = AutomataTransduction.INSTANCE.getTrasduction(
+		State transduction = AutomataTransduction.INSTANCE.getTransduction(
 				sqlTransducer, init, SQLLexer.SQL_ALPHABET_CONVERTER);
 		transduction = EmptyTransitionEliminator.INSTANCE
 				.eliminateEmptySetTransitions(transduction);

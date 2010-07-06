@@ -55,10 +55,10 @@ public class SQLLexer {
 		}
 	};
 
-	// The code if ID token (needed to support keywords)
+	// The code of ID token (needed to support keywords)
 	private static final int ID_CODE;
 	
-	// The set of keywords (all in uppper-case) 
+	// The set of keywords (all in upper-case) 
 	private static final Set<String> KEYWORDS = new HashSet<String>();
 	static {
 		for (String keyword : SQLLexerData.KEYWORDS) {
@@ -131,7 +131,7 @@ public class SQLLexer {
 			State EOFState = new State("EOF", true);
 			states[STATE_COUNT] = EOFState;
 			
-			// Create transitions (for recognizing a single token
+			// Create transitions (for recognizing a single token)
 			List<Integer> acceptingStatesIndices = new ArrayList<Integer>();
 			for (int fromIndex = 0; fromIndex < STATE_COUNT; fromIndex++) {
 				State from = states[fromIndex];
