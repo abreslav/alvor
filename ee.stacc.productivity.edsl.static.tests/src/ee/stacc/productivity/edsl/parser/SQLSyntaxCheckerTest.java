@@ -38,6 +38,7 @@ public class SQLSyntaxCheckerTest {
 		addFromFile("data/earved_basic.txt", true, result);
 		addFromFile("data/earved_bugs.txt", false, result);
 		addFromFile("data/expect_fail.txt", false, result);
+
 //		addFromFile("data/big.txt", false, result);
 //		addFromFile("data/new_big.txt", false, result);
 		
@@ -74,7 +75,7 @@ public class SQLSyntaxCheckerTest {
 		}
 		assertTrue("String is too big: " + AbstractStringSizeCounter.size(optimized), SyntacticalSQLChecker.hasAcceptableSize(optimized));
 //		List<String> errors = SQLSyntaxChecker.INSTANCE.check(optimized);
-		List<String> errors = ParserSimulator.GLR_INSTANCE.check(optimized);
+		List<String> errors = ParserSimulator.getGLRInstance().check(optimized);
 		assertEquals(errors + "   " + optimized.toString(), expected, errors.isEmpty());
 	}
 	

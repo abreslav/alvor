@@ -417,9 +417,7 @@ public class GLRParser implements ILRParser<GLRStack> {
 		return namesToTokenNumbers;
 	}
 	
-	/**
-	 * @return a map from parser's input alphabet codes to symbol names
-	 */
+	@Override
 	public Map<Integer, String> getSymbolNumbersToNames() {
 		return symbolNumbersToNames;
 	}

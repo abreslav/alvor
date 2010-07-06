@@ -54,7 +54,7 @@ public class SQLSyntaxChecker {
 					Token token = (Token) item;
 					errors.add("Unexpected token: " + SQLLexer.tokenToString(token));
 				} else {
-					errors.add("Unexpected token: " + Parsers.SQL_PARSER.getSymbolNumbersToNames().get(item.getCode()));
+					errors.add("Unexpected token: " + Parsers.getLALRParserForSQL().getSymbolNumbersToNames().get(item.getCode()));
 				}
 			}
 			
@@ -90,7 +90,7 @@ public class SQLSyntaxChecker {
 		});
 //		transduction = AutomataDeterminator.determinate(transduction);
 		
-		final LRParser parser = Parsers.SQL_PARSER;
+		final ILRParser<IParserStack> parser = Parsers.getLALRParserForSQL();
 		
 		final Integer eofTokenIndex = parser.getNamesToTokenNumbers().get("$end");
 		IAlphabetConverter converter = new IAlphabetConverter() {
@@ -119,11 +119,11 @@ public class SQLSyntaxChecker {
 	
 	public boolean parseAutomaton(State initial, IAlphabetConverter alphabetConverter, IStackFactory<IParserStack> stackFactory) {
 		return new FixpointParser(
-				Parsers.SQL_PARSER, 
+				Parsers.getLALRParserForSQL(), 
 				alphabetConverter, 
 				SimpleStackSet.FACTORY, 
 				stackFactory, 
-				Parsers.SQL_PARSER.getNamesToTokenNumbers().get("$end"),
+				Parsers.getLALRParserForSQL().getNamesToTokenNumbers().get("$end"),
 				IParseErrorHandler.NONE)
 			.parse(initial);
 	}
@@ -187,13 +187,13 @@ public class SQLSyntaxChecker {
 	
 		private final Map<State, IAbstractStackSet> abstractStackSets = new HashMap<State, IAbstractStackSet>();
 		private final IAlphabetConverter alphabetConverter;
-		private final LRParser parser;
+		private final ILRParser<IParserStack> parser;
 		private final IAbstractStackSetFactory factory;
 		private final IStackFactory<IParserStack> stackFactory;
 		private final int eofTokenIndex;
 		private final IParseErrorHandler errorHandler; 
 		
-		public FixpointParser(LRParser parser,
+		public FixpointParser(ILRParser<IParserStack> parser,
 				IAlphabetConverter alphabetConverter,
 				IAbstractStackSetFactory factory,
 				IStackFactory<IParserStack> stackFactory,

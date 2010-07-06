@@ -29,16 +29,30 @@ import ee.stacc.productivity.edsl.string.IAbstractString;
  */
 public class ParserSimulator<S extends IParserStackLike> {
 
+	private static ParserSimulator<IParserStack> LALR_INSTANCE = null;
+	
+	private static ParserSimulator<GLRStack> GLR_INSTANCE = null;
+	
 	/**
 	 * Normal LR-parsing with bounded stacks
 	 */
-	public static final ParserSimulator<IParserStack> LALR_INSTANCE = new ParserSimulator<IParserStack>(Parsers.SQL_PARSER, BoundedStack.getFactory(100, null));
+	public static ParserSimulator<IParserStack> getLALRInstance() {
+		if (LALR_INSTANCE == null) {
+			LALR_INSTANCE = new ParserSimulator<IParserStack>(Parsers.getLALRParserForSQL(), BoundedStack.getFactory(100, null));
+		}
+		return LALR_INSTANCE;
+	}
 	
 	/**
 	 * GLR-parsing with bounded stacks (see GLRStack.FACTORY)
 	 */
-	public static final ParserSimulator<GLRStack> GLR_INSTANCE = new ParserSimulator<GLRStack>(Parsers.SQL_GLR_PARSER, GLRStack.FACTORY);
-	
+	public static ParserSimulator<GLRStack> getGLRInstance() {
+		if (GLR_INSTANCE == null) {
+			GLR_INSTANCE = new ParserSimulator<GLRStack>(Parsers.getGLRParserForSQL(), GLRStack.FACTORY);
+		}
+		return GLR_INSTANCE;
+	}
+
 	private final IStackFactory<S> stackFactory;
 	private final ILRParser<S> parser;
 	// For debugging purposes only
@@ -66,7 +80,7 @@ public class ParserSimulator<S extends IParserStackLike> {
 					Token token = (Token) item;
 					errors.add("Unexpected token: " + SQLLexer.tokenToString(token));
 				} else {
-					errors.add("Unexpected token: " + Parsers.SQL_PARSER.getSymbolNumbersToNames().get(item.getCode()));
+					errors.add("Unexpected token: " + parser.getSymbolNumbersToNames().get(item.getCode()));
 				}
 			}
 			

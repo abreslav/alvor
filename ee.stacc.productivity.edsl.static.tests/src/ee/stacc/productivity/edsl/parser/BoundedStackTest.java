@@ -8,8 +8,8 @@ import java.util.Collection;
 import org.junit.Test;
 
 import ee.stacc.productivity.edsl.sqlparser.BoundedStack;
-import ee.stacc.productivity.edsl.sqlparser.IParserStack;
 import ee.stacc.productivity.edsl.sqlparser.IAction;
+import ee.stacc.productivity.edsl.sqlparser.IParserStack;
 import ee.stacc.productivity.edsl.sqlparser.IParserState;
 import ee.stacc.productivity.edsl.sqlparser.IStackFactory;
 

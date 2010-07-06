@@ -49,13 +49,13 @@ public class ParserPerformanceTest {
 	}
 
 	private void doTest(List<IAbstractString> all) {
-		ParserSimulator.LALR_INSTANCE.allTime = 0;
+		ParserSimulator.getLALRInstance().allTime = 0;
 		long time = System.nanoTime();
 		for (IAbstractString as : all) {
-			ParserSimulator.LALR_INSTANCE.check(as);
+			ParserSimulator.getLALRInstance().check(as);
 		}
 		printNano("All checks: ", (System.nanoTime() - time));
-		printNano("Syntax: ", ParserSimulator.LALR_INSTANCE.allTime);
+		printNano("Syntax: ", ParserSimulator.getLALRInstance().allTime);
 	}
 
 	private void printNano(String string, long x) {

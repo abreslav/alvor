@@ -432,14 +432,17 @@ public class LRParser implements ILRParser<IParserStack> {
 		}
 	}
 	
+	@Override
 	public IParserState getInitialState() {
 		return initialState;
 	}
 	
+	@Override
 	public Map<String, Integer> getNamesToTokenNumbers() {
 		return namesToTokenNumbers;
 	}
-	
+
+	@Override
 	public Map<Integer, String> getSymbolNumbersToNames() {
 		return symbolNumbersToNames;
 	}

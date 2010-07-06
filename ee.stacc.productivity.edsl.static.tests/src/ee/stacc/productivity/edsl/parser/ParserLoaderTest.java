@@ -5,6 +5,8 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import ee.stacc.productivity.edsl.sqlparser.BoundedStack;
+import ee.stacc.productivity.edsl.sqlparser.ILRParser;
+import ee.stacc.productivity.edsl.sqlparser.IParserStack;
 import ee.stacc.productivity.edsl.sqlparser.IParserState;
 import ee.stacc.productivity.edsl.sqlparser.LRParser;
 import ee.stacc.productivity.edsl.sqlparser.Parsers;
@@ -36,7 +38,7 @@ public class ParserLoaderTest {
 				"'1' '+' '+' '1' '*' '0'",
 		}, false);
 		
-		testParser(Parsers.SQL_PARSER, new String[] {
+		testParser(Parsers.getLALRParserForSQL(), new String[] {
 				"SELECT ID FROM ID",
 				"SELECT ID ',' ID FROM ID",
 				"SELECT ID ',' ID FROM ID ',' ID",
@@ -45,7 +47,7 @@ public class ParserLoaderTest {
 				"SELECT ID ID FROM ID",
 		}, true);
 		
-		testParser(Parsers.SQL_PARSER, new String[] {
+		testParser(Parsers.getLALRParserForSQL(), new String[] {
 				"SELECT",
 				"FROM",
 				"SELECT FROM",
@@ -58,10 +60,10 @@ public class ParserLoaderTest {
 		}, false);
 	}
 
-	private void testParser(LRParser parser, String[] correctInputs, boolean expectingAccept) {
+	private void testParser(ILRParser<IParserStack> sqlLalrParser, String[] correctInputs, boolean expectingAccept) {
 		for (String input : correctInputs) {
 			input += " $end $end";
-			IParserState top = LRInterpreter.interpret(parser, BoundedStack.getFactory(100, null), input, expectingAccept);
+			IParserState top = LRInterpreter.interpret((LRParser) sqlLalrParser, BoundedStack.getFactory(100, null), input, expectingAccept);
 			assertEquals(top.toString(), expectingAccept, !top.isError());
 		}
 	}

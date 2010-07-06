@@ -34,8 +34,12 @@ public interface ILRParser<S> {
 	int getEofTokenIndex();
 	
 	/**
-	 * A map from token names to their numbers (indices) in the input alphabet of this parser
-	 * @return
+	 * @return a map from token names to their numbers (indices) in the input alphabet of this parser
 	 */
-	public Map<String, Integer> getNamesToTokenNumbers();
+	Map<String, Integer> getNamesToTokenNumbers();
+
+	/**
+	 * @return a map from parser's input alphabet codes to symbol names
+	 */
+	Map<Integer, String> getSymbolNumbersToNames();
 }

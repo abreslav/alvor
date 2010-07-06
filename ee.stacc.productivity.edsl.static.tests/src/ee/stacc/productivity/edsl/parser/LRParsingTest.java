@@ -14,9 +14,9 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import ee.stacc.productivity.edsl.sqlparser.BoundedStack;
+import ee.stacc.productivity.edsl.sqlparser.ILRParser;
 import ee.stacc.productivity.edsl.sqlparser.IParserStack;
 import ee.stacc.productivity.edsl.sqlparser.IStackFactory;
-import ee.stacc.productivity.edsl.sqlparser.LRParser;
 import ee.stacc.productivity.edsl.sqlparser.Parsers;
 
 @RunWith(Parameterized.class)
@@ -40,7 +40,7 @@ public class LRParsingTest {
 
 	@Test
 	public void testBasics() throws Exception {
-		LRParser parser = Parsers.SQL_PARSER;
+		ILRParser<IParserStack> parser = Parsers.getLALRParserForSQL();
 
 		interpret(parser, stackFactory, 
 				"SELECT ID FROM ID", 
@@ -79,7 +79,7 @@ public class LRParsingTest {
 	
 	@Test
 	public void testNestedParentheses() throws Exception {
-		LRParser parser = Parsers.SQL_PARSER;
+		ILRParser<IParserStack> parser = Parsers.getLALRParserForSQL();
 
 		interpret(parser, stackFactory, 
 				"SELECT ID '(' ID '(' ID ')' ')' FROM ID ',' ID ',' ID", 
@@ -87,7 +87,7 @@ public class LRParsingTest {
 
 	}
 
-	public static boolean interpret(LRParser parser, IStackFactory<IParserStack> factory, String input,
+	public static boolean interpret(ILRParser<IParserStack> parser, IStackFactory<IParserStack> factory, String input,
 			boolean expected) {
 		input += " $end $end"; 
 		Map<String, Integer> namesToTokenNumbers = parser.getNamesToTokenNumbers();
@@ -106,7 +106,7 @@ public class LRParsingTest {
 		return r;
 	}
 
-	private static boolean followParsingTrace(LRParser parser, IParserStack stack, List<String> tokens, String trace, boolean expected, PrintStream out) {
+	private static boolean followParsingTrace(ILRParser<IParserStack> parser, IParserStack stack, List<String> tokens, String trace, boolean expected, PrintStream out) {
 		trace += stack;
 		if (tokens.isEmpty()) {
 			if ((stack.top().isError()) == expected) {

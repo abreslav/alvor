@@ -17,9 +17,9 @@ import ee.stacc.productivity.edsl.lexer.automata.AutomataParser;
 import ee.stacc.productivity.edsl.lexer.automata.IAlphabetConverter;
 import ee.stacc.productivity.edsl.lexer.automata.State;
 import ee.stacc.productivity.edsl.sqlparser.BoundedStack;
+import ee.stacc.productivity.edsl.sqlparser.ILRParser;
 import ee.stacc.productivity.edsl.sqlparser.IParserStack;
 import ee.stacc.productivity.edsl.sqlparser.IStackFactory;
-import ee.stacc.productivity.edsl.sqlparser.LRParser;
 import ee.stacc.productivity.edsl.sqlparser.ParserSimulator;
 import ee.stacc.productivity.edsl.sqlparser.Parsers;
 import ee.stacc.productivity.edsl.string.IAbstractString;
@@ -44,7 +44,7 @@ public class FixpointParsingTest {
 		this.stackFactory = stackFactory;
 	}
 	
-	private static LRParser parser = Parsers.SQL_PARSER;
+	private static ILRParser<IParserStack> parser = Parsers.getLALRParserForSQL();
 	
 	@Test
 	public void testSimple() throws Exception {
@@ -57,9 +57,9 @@ public class FixpointParsingTest {
 		assertFalse(doParse(parser, initial));
 	}
 
-	private boolean doParse(final LRParser parser, State initial) {
+	private boolean doParse(final ILRParser<IParserStack> parser, State initial) {
 //		return SQLSyntaxChecker.INSTANCE.parseAutomaton(initial, new IAlphabetConverter() {
-		return ParserSimulator.LALR_INSTANCE.parseAutomaton(initial, new IAlphabetConverter() {
+		return ParserSimulator.getLALRInstance().parseAutomaton(initial, new IAlphabetConverter() {
 			
 			@Override
 			public int convert(int c) {
@@ -175,13 +175,13 @@ public class FixpointParsingTest {
 	private void assertParses(String abstractString) {
 		IAbstractString as = AbstractStringParser.parseOneFromString(abstractString);
 //		List<String> errors = SQLSyntaxChecker.INSTANCE.checkAbstractString(as, stackFactory);
-		List<String> errors = ParserSimulator.GLR_INSTANCE.check(as);//, stackFactory);
+		List<String> errors = ParserSimulator.getGLRInstance().check(as);//, stackFactory);
 		assertTrue(errors.toString(), errors.isEmpty());
 	}
 
 	private boolean parseAbstractString(String abstractString) {
 		IAbstractString as = AbstractStringParser.parseOneFromString(abstractString);
 //		return SQLSyntaxChecker.INSTANCE.checkAbstractString(as, stackFactory).isEmpty();
-		return ParserSimulator.GLR_INSTANCE.check(as).isEmpty();//, stackFactory).isEmpty();
+		return ParserSimulator.getGLRInstance().check(as).isEmpty();//, stackFactory).isEmpty();
 	}
 }
