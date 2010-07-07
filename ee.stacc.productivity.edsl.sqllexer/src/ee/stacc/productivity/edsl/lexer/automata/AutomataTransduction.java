@@ -169,7 +169,8 @@ public class AutomataTransduction {
 		 */
 		private final Map<State, StatesWithTexts> stateMap = new LinkedHashMap<State, StatesWithTexts>();
 		/**
-		 * Maps a transition of the included automaton to a set of transitions of including automaton  
+		 * Maps a transition of the included automaton to a set of strings generated on this transition during the transduction
+		 * These strings will be later turned into transitions in the resulting automaton  
 		 */
 		private final Map<Transition, Set<List<IAbstractInputItem>>> transitionMap = new LinkedHashMap<Transition, Set<List<IAbstractInputItem>>>();
 

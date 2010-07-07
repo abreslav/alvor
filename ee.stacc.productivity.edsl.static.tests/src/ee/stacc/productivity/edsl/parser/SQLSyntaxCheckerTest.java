@@ -3,7 +3,10 @@ package ee.stacc.productivity.edsl.parser;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -16,6 +19,7 @@ import org.junit.runners.Parameterized.Parameters;
 import ee.stacc.productivity.edsl.checkers.sqlstatic.SyntacticalSQLChecker;
 import ee.stacc.productivity.edsl.sqlparser.ParserSimulator;
 import ee.stacc.productivity.edsl.string.IAbstractString;
+import ee.stacc.productivity.edsl.string.StringConstant;
 import ee.stacc.productivity.edsl.string.parser.AbstractStringParser;
 import ee.stacc.productivity.edsl.string.util.AbstractStringOptimizer;
 import ee.stacc.productivity.edsl.string.util.AbstractStringSizeCounter;
@@ -25,10 +29,14 @@ import ee.stacc.productivity.edsl.string.util.AbstractStringSizeCounter;
 public class SQLSyntaxCheckerTest {
 
 	@Parameters
-	public static Collection<Object[]> parameters() throws FileNotFoundException {
+	public static Collection<Object[]> parameters() throws IOException {
 		List<Object[]> result = new ArrayList<Object[]>();
 /*
 */		
+//		addConcreteFromFile("data/from_projects/base__found_concrete.txt", true, result);
+
+//		addFromFile("data/from_projects/base__found.txt", true, result);
+		
 		addFromFile("data/sql_sub_all_ok.txt", true, result);
 		addFromFile("data/sql_sub_fail.txt", false, result);
 		addFromFile("data/compiere_ok.txt", true, result);
@@ -54,6 +62,18 @@ public class SQLSyntaxCheckerTest {
 		for (IAbstractString str : abstractStrings) {
 			result.add(new Object[] {str, expected});
 		}
+	}
+	
+	private static void addConcreteFromFile(String fileName, boolean expected,
+			List<Object[]> result) throws IOException {
+		BufferedReader bufferedReader = new BufferedReader(new FileReader(fileName));
+		do {
+			String line = bufferedReader.readLine();
+			if (line == null) {
+				return;
+			}
+			result.add(new Object[] {new StringConstant(line), expected});
+		} while (true);
 	}
 	
 	private final IAbstractString abstractString;

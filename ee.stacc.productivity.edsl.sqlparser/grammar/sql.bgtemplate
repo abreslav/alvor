@@ -264,21 +264,37 @@ query
 	;
 id 
 	: ID
-	| UPPER
-	| KEY
-	| SUM
-	| COUNT
-	| USER
-	| MAX
 	| ACTION
-	| MIN
-	| NUMERIC
-	| VALUE
-	| DATE
-	| UPPER
+	| ASC
+	| PRESERVE
+	| KEY
+	| NUMBER
+	| TRANSLATE
+	| TRIM
+	| LOWER
+	| SUM
+	| CHAR_LENGTH
 	| POSITION
-	| DISTINCT
+	| ZONE 
+	| AVG
+	| DEFERRABLE
+	| CHARACTER_LENGTH
+	| MIN
+	| COUNT
+	| CASCADE
 	| COALESCE
+	| TEMPORARY
+	| UPPER
+	| NULLIF
+	| MAX
+	| DEFERRED
+	| OCTET_LENGTH
+	| EXTRACT
+	| PARTIAL
+	| INITIALLY
+	| CONVERT
+	| SUBSTRING
+	| DESC
 	;
 update
 	: UPDATE alias SET assignList where
