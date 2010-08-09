@@ -18,7 +18,7 @@ import ee.stacc.productivity.edsl.checkers.sqlstatic.PositionedCharacterUtil;
 import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
 import ee.stacc.productivity.edsl.lexer.alphabet.Token;
 import ee.stacc.productivity.edsl.lexer.alphabet.ISequence.IFoldFunction;
-import ee.stacc.productivity.edsl.lexer.automata.AutomataInclusion;
+import ee.stacc.productivity.edsl.lexer.automata.AutomataTransduction;
 import ee.stacc.productivity.edsl.lexer.automata.EmptyTransitionEliminator;
 import ee.stacc.productivity.edsl.lexer.automata.IncomingTransitionsInitializer;
 import ee.stacc.productivity.edsl.lexer.automata.State;
@@ -104,7 +104,7 @@ public class TokenLocator {
 		}
 		State automaton = PositionedCharacterUtil.createPositionedAutomaton(abstractString);
 		State sqlTransducer = SQLLexer.SQL_TRANSDUCER;
-		State transduction = AutomataInclusion.INSTANCE.getTrasduction(
+		State transduction = AutomataTransduction.INSTANCE.getTransduction(
 				sqlTransducer, 
 				automaton, 
 				SQLLexer.SQL_ALPHABET_CONVERTER);

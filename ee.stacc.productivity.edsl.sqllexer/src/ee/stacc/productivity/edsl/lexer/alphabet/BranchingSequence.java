@@ -112,7 +112,7 @@ public class BranchingSequence<E> implements ISequence<E> {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings("rawtypes")
 		BranchingSequence<?> other = (BranchingSequence) obj;
 		if (last == null) {
 			if (other.last != null)

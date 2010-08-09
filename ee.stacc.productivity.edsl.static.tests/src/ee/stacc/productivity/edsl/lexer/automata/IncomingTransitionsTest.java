@@ -10,6 +10,7 @@ import org.junit.Test;
 
 public class IncomingTransitionsTest {
 
+	@SuppressWarnings("rawtypes")
 	@Test
 	public void test() throws Exception {
 		State automaton = AutomataParser.parse(

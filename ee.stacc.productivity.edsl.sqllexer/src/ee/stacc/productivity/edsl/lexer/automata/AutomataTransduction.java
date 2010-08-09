@@ -185,12 +185,12 @@ public class AutomataTransduction {
 		}
 
 		public boolean check(State initial, State start) {
-			getSet(stateMap, start).add(initial, new BranchingSequence<IAbstractInputItem>());
+			getSet2(stateMap, start).add(initial, new BranchingSequence<IAbstractInputItem>());
 			return dfs(start);
 		}
 		
 		private boolean dfs(State current) {
-			StatesWithTexts setForCurrent = getSet(stateMap, current);
+			StatesWithTexts setForCurrent = getSet2(stateMap, current);
 			if (setForCurrent.isError()) {
 				return false;
 			}
@@ -237,7 +237,7 @@ public class AutomataTransduction {
 		}
 		
 		private	Change transitionFunction(State state, Set<ISequence<IAbstractInputItem>> texts, State error, Transition underlyingTransition) {
-			StatesWithTexts correspondingStates = getSet(stateMap, underlyingTransition.getTo());
+			StatesWithTexts correspondingStates = getSet2(stateMap, underlyingTransition.getTo());
 			if (underlyingTransition.isEmpty()) {
 				throw new UnsupportedOperationException("Empty transitions are not supported");
 			}
@@ -292,8 +292,8 @@ public class AutomataTransduction {
 		}
 		return set;
 	}
-	
-	private static <K> StatesWithTexts getSet(Map<K, StatesWithTexts> map, K key) {
+
+	private static <K> StatesWithTexts getSet2(Map<K, StatesWithTexts> map, K key) {
 		StatesWithTexts set = map.get(key);
 		if (set == null) {
 			set = new StatesWithTexts();
