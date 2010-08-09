@@ -232,8 +232,6 @@
             <contentTypeBinding contentTypeId="org.eclipse.pde.bundleManifest"/>            
       </editor>
    </extension>
-   
-
    <extension
          point="org.eclipse.ui.views">
       <category
@@ -248,6 +246,5 @@
             id="ee.stacc.productivity.edsl.gui.TestFormView">
       </view>
    </extension>
-  
 </plugin>
 
