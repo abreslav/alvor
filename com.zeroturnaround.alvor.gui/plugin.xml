@@ -213,20 +213,20 @@
             class="com.zeroturnaround.alvor.gui.AlvorGuiStartup">
       </startup>
    </extension>
-
    <extension
          point="org.eclipse.ui.editors">
       <editor
             default="true"
-            name="%editors.pluginManifest.name"
-            icon="$nl$/icons/obj16/plugin_mf_obj.gif"
-            class="org.eclipse.pde.internal.ui.editor.plugin.ManifestEditor"
-            contributorClass="org.eclipse.pde.internal.ui.editor.plugin.ManifestEditorContributor"
-			matchingStrategy="org.eclipse.pde.internal.ui.editor.plugin.ManifestEditorMatchingStrategy"
-            id="org.eclipse.pde.ui.manifestEditor">
+            class="ee.stacc.productivity.edsl.gui.SQLCheckerPrefsEditor"
+            contributorClass="ee.stacc.productivity.edsl.gui.SQLCheckerPrefsEditorContributor"
+			matchingStrategy="ee.stacc.productivity.edsl.gui.SQLCheckerPrefsEditorMatchingStrategy"
+            id="ee.stacc.productivity.edsl.gui.sqlCheckerPrefsEditor">
             <contentTypeBinding contentTypeId="org.eclipse.pde.pluginManifest"/>
             <contentTypeBinding contentTypeId="org.eclipse.pde.fragmentManifest"/>
             <contentTypeBinding contentTypeId="org.eclipse.pde.bundleManifest"/>            
       </editor>
    </extension>
 </plugin>
+
+<!--            name="%editors.pluginManifest.name"
+            icon="$nl$/icons/obj16/plugin_mf_obj.gif" //-->
