@@ -6,7 +6,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public abstract class HSQLDBLayer implements IDBLayer {
+public class HSQLDBLayer implements IDBLayer {
 
 	private Connection connection;
 
@@ -37,7 +37,9 @@ public abstract class HSQLDBLayer implements IDBLayer {
 	}
 
 	
-	protected abstract String getPath();
+	protected String getPath() {
+		return EDSLCachePlugin.getDefault().getStateLocation().append("/cache").toPortableString();
+	}
 
 	@Override
 	public void shutdown() throws SQLException {
