@@ -186,7 +186,6 @@
              markerType="com.zeroturnaround.alvor.gui.unsupported">
          </type>
    </extension>
-
    <extension
          point="org.eclipse.ui.editors.markerAnnotationSpecification">
          <specification
@@ -213,6 +212,7 @@
             class="com.zeroturnaround.alvor.gui.AlvorGuiStartup">
       </startup>
    </extension>
+<!--
    <extension
          point="org.eclipse.ui.editors">
       <editor
@@ -220,18 +220,17 @@
             name="%editors.sqlCheckerPrefs.name"
             class="ee.stacc.productivity.edsl.gui.SQLCheckerPrefsEditor"
             id="ee.stacc.productivity.edsl.gui.sqlCheckerPrefsEditor">
-
-<!--		TODO: These may be added later:
+		TODO: These may be added later:
 	        icon="$nl$/icons/obj16/plugin_mf_obj.gif" 
             contributorClass="ee.stacc.productivity.edsl.gui.SQLCheckerPrefsEditorContributor"
 			matchingStrategy="ee.stacc.productivity.edsl.gui.SQLCheckerPrefsEditorMatchingStrategy"
-            //-->
             
             <contentTypeBinding contentTypeId="org.eclipse.pde.pluginManifest"/>
             <contentTypeBinding contentTypeId="org.eclipse.pde.fragmentManifest"/>
             <contentTypeBinding contentTypeId="org.eclipse.pde.bundleManifest"/>            
       </editor>
    </extension>
+            //-->
    <extension
          point="org.eclipse.ui.views">
       <category
@@ -240,8 +239,8 @@
       </category>
       <view
             name="TestFormView"
+            category="ee.stacc.productivity.edsl.gui"
             icon="icons/sample.gif"
-            category="org.eclipse.ui.forms.article"
             class="ee.stacc.productivity.edsl.gui.TestFormView"
             id="ee.stacc.productivity.edsl.gui.TestFormView">
       </view>
