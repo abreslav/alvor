@@ -1,0 +1,192 @@
+Terminals unused in grammar
+
+   VALUES
+   ESCAPE
+   INSERT
+   WHERE
+   ORDER
+   OUTER
+   GROUP
+   RIGHT
+   INNER
+   JOIN
+   LEFT
+   WHEN
+   THEN
+   ELSE
+   CASE
+   INTO
+   FULL
+   DESC
+   ASC
+   AND
+   END
+   XOR
+   NOT
+   OR
+   ON
+   BY
+   AS
+   IN
+   IS
+   NULL
+   DIGAL_ERR
+   STRING_DQ
+   STRING_DQ_ERR
+   STRING_SQ
+   STRING_SQ_ERR
+   DISTINCT
+   UNKNOWN_CHARACTER_ERR
+   NE
+   LE
+   GE
+   CONCAT
+   TABLE
+   LIKE
+   '='
+   '>'
+   '<'
+   '+'
+   '/'
+   '*'
+
+
+Grammar
+
+    0 $accept: select $end
+
+    1 select: SELECT NUMBER '-' NUMBER FROM ID
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+'*' (42)
+'+' (43)
+'-' (45) 1
+'/' (47)
+'<' (60)
+'=' (61)
+'>' (62)
+error (256)
+VALUES (258)
+ESCAPE (259)
+SELECT (260) 1
+INSERT (261)
+WHERE (262)
+ORDER (263)
+OUTER (264)
+GROUP (265)
+RIGHT (266)
+INNER (267)
+FROM (268) 1
+JOIN (269)
+LEFT (270)
+WHEN (271)
+THEN (272)
+ELSE (273)
+CASE (274)
+INTO (275)
+FULL (276)
+DESC (277)
+ASC (278)
+AND (279)
+END (280)
+XOR (281)
+NOT (282)
+OR (283)
+ON (284)
+BY (285)
+AS (286)
+IN (287)
+IS (288)
+NULL (289)
+DIGAL_ERR (290)
+STRING_DQ (291)
+STRING_DQ_ERR (292)
+STRING_SQ (293)
+STRING_SQ_ERR (294)
+NUMBER (295) 1
+ID (296) 1
+DISTINCT (297)
+UNKNOWN_CHARACTER_ERR (298)
+NE (299)
+LE (300)
+GE (301)
+CONCAT (302)
+TABLE (303)
+LIKE (304)
+
+
+Nonterminals, with rules where they appear
+
+$accept (57)
+    on left: 0
+select (58)
+    on left: 1, on right: 0
+
+
+state 0
+
+    0 $accept: . select $end
+    1 select: . SELECT NUMBER '-' NUMBER FROM ID
+
+    SELECT  shift, and go to state 1
+
+    select  go to state 2
+
+
+state 1
+
+    1 select: SELECT . NUMBER '-' NUMBER FROM ID
+
+    NUMBER  shift, and go to state 3
+
+
+state 2
+
+    0 $accept: select . $end
+
+    $end  shift, and go to state 4
+
+
+state 3
+
+    1 select: SELECT NUMBER . '-' NUMBER FROM ID
+
+    '-'  shift, and go to state 5
+
+
+state 4
+
+    0 $accept: select $end .
+
+    $default  accept
+
+
+state 5
+
+    1 select: SELECT NUMBER '-' . NUMBER FROM ID
+
+    NUMBER  shift, and go to state 6
+
+
+state 6
+
+    1 select: SELECT NUMBER '-' NUMBER . FROM ID
+
+    FROM  shift, and go to state 7
+
+
+state 7
+
+    1 select: SELECT NUMBER '-' NUMBER FROM . ID
+
+    ID  shift, and go to state 8
+
+
+state 8
+
+    1 select: SELECT NUMBER '-' NUMBER FROM ID .
+
+    $default  reduce using rule 1 (select)

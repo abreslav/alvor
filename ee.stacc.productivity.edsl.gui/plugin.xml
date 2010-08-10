@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <viewerContribution
+            id="ee.stacc.productivity.edsl.gui.ShowAbstractValueContribution"
+            targetID="#CompilationUnitEditorContext">
+      	<action
+               class="ee.stacc.productivity.edsl.gui.AbstractStringPrinter"
+               menubarPath="ContextMenu"
+               id="ee.stacc.eclipsesql.ShowAbstractValue"
+               label="Show abstract value">
+         </action>
+      </viewerContribution>
+      <viewerContribution
+            id="ee.stacc.productivity.edsl.gui.ShowConnSourceContribution"
+            targetID="#CompilationUnitEditorContext">
+         <action
+               class="ee.stacc.productivity.edsl.gui.ConnectionSourceFinder"
+               id="ee.stacc.eclipsesql.ShowConnSource"
+               label="Show connection source"
+               menubarPath="_ContextMenu">
+         </action>
+      </viewerContribution>
+   </extension>
+   <extension
+         id="sqlerror"
+         name="SQL error marker" 
+         point="org.eclipse.core.resources.markers">
+      <super type="org.eclipse.core.resources.problemmarker" />
+      <super type="org.eclipse.core.resources.textmarker" />
+      <persistent value="true"/>
+   </extension>
+
+   <extension
+         id="sqlwarning"
+         name="SQL warning marker"
+         point="org.eclipse.core.resources.markers">
+      <super type="org.eclipse.core.resources.problemmarker" />
+      <super type="org.eclipse.core.resources.textmarker" />
+      <persistent value="true"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="org.eclipse.jdt.ui.category.source"
+            defaultHandler="ee.stacc.productivity.edsl.gui.CheckProjectHandler"
+            description="Checks SQL usage in active project"
+            id="ee.stacc.eclipsesql.plugin.CheckProject"
+            name="Check SQL in project">
+      </command>
+      <command
+            categoryId="org.eclipse.jdt.ui.category.source"
+            defaultHandler="ee.stacc.productivity.edsl.gui.ClearCacheHandler"
+            description="Clears cache for the selected project"
+            id="ee.stacc.productivity.edsl.gui.clearCache"
+            name="Clear project cache">
+      </command>
+      <command
+            categoryId="org.eclipse.jdt.ui.category.source"
+            defaultHandler="ee.stacc.productivity.edsl.gui.CheckResultSetsHandler"
+            description="Checks ResultSet-s"
+            id="ee.stacc.productivity.edsl.gui.checkResultSets"
+            name="Check ResultSet-s">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="popup:org.eclipse.jdt.ui.PackageExplorer?after=additions">
+         <command
+               commandId="ee.stacc.eclipsesql.plugin.CheckProject"
+               label="Check SQL in selected elements"
+               style="push">
+         </command>
+         <command
+               commandId="ee.stacc.productivity.edsl.gui.clearCache"
+               label="Clear SQL Analyzer Cache"
+               style="push">
+         </command>
+      </menuContribution>
+   </extension>
+   
+   <extension
+         point="org.eclipse.core.expressions.definitions">
+      <definition
+            id="javaFileSelected">
+         <with
+               variable="selection">
+            <instanceof
+                  value="org.eclipse.jdt.core.ICompilationUnit">
+            </instanceof>
+         </with>
+      </definition>
+   </extension>
+   
+   <extension
+         id="sqlhotspot"
+         name="SQL hot spot marker"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+      <persistent value="true"/>
+    </extension>
+    
+	<extension 
+         point="org.eclipse.ui.editors.annotationTypes">
+         <type
+             name="sqlhotspot"
+             super="org.eclipse.ui.workbench.texteditor.info"
+             markerType="ee.stacc.productivity.edsl.gui.sqlhotspot">
+         </type>
+         <type
+               markerType="ee.stacc.productivity.edsl.gui.sqlstring"
+               name="sqlstring">
+         </type>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.editors.markerAnnotationSpecification">
+         <specification
+             annotationType="sqlhotspot"
+             verticalRulerPreferenceKey="highlight.rulers.vertical"
+             textPreferenceKey="highlight.text"
+            colorPreferenceKey="highlight.color"
+            highlightPreferenceKey="highlight.background"
+            textPreferenceValue="true"
+            textStylePreferenceValue="BOX"
+            overviewRulerPreferenceKey="highlight.rulers.overview"
+            presentationLayer="4"
+            highlightPreferenceValue="true"
+            label="sqlhotspot"
+            colorPreferenceValue="255,240,200"
+            verticalRulerPreferenceValue="true"
+            overviewRulerPreferenceValue="true"
+            textStylePreferenceKey="highlight.text.style" >
+        </specification >
+<!--               colorPreferenceKey="highlight.color-2"
+               colorPreferenceValue="255,120,120"-->
+         <specification
+               annotationType="unsupported"
+               highlightPreferenceKey="highlight.background"
+               highlightPreferenceValue="true"
+               label="unsupported"
+               overviewRulerPreferenceKey="highlight.rulers.overview"
+               overviewRulerPreferenceValue="true"
+               presentationLayer="4"
+               textPreferenceKey="highlight.text"
+               textPreferenceValue="true"
+               textStylePreferenceKey="highlight.text.style"
+               textStylePreferenceValue="BOX"
+               verticalRulerPreferenceKey="highlight.rulers.vertical"
+               verticalRulerPreferenceValue="true">
+         </specification>
+    </extension>
+   
+   <extension
+         id="sqlstring"
+         name="SQL string marker"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+      <persistent value="true"/>
+    </extension>
+    
+
+
+   <extension
+         id="unsupported"
+         name="SQL unsupported marker"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+      <persistent value="true"/>
+    </extension>
+    
+	<extension 
+         point="org.eclipse.ui.editors.annotationTypes">
+         <type
+             name="unsupported"
+             super="org.eclipse.ui.workbench.texteditor.info"
+             markerType="ee.stacc.productivity.edsl.gui.unsupported">
+         </type>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.editors.markerAnnotationSpecification">
+         <specification
+               annotationType="sqlstring"
+               colorPreferenceKey="highlight.color-1"
+               colorPreferenceValue="255,240,200"
+               highlightPreferenceKey="highlight.background"
+               highlightPreferenceValue="true"
+               label="sqlstring"
+               overviewRulerPreferenceKey="highlight.rulers.overview-1"
+               overviewRulerPreferenceValue="false"
+               presentationLayer="0"
+               textPreferenceKey="highlight.text"
+               textPreferenceValue="true"
+               textStylePreferenceKey="highlight.text.style"
+               textStylePreferenceValue="BOX"
+               verticalRulerPreferenceKey="highlight.rulers.vertical-1"
+               verticalRulerPreferenceValue="false">
+         </specification>
+    </extension>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="ee.stacc.productivity.edsl.gui.EdslGuiStartup">
+      </startup>
+   </extension>
+
+</plugin>

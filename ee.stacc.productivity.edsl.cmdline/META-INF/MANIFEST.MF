@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Cmdline
+Bundle-SymbolicName: ee.stacc.productivity.edsl.cmdline; singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources;bundle-version="3.5.1",
+ org.eclipse.jdt.core;bundle-version="3.5.1",
+ ee.stacc.productivity.edsl.model;bundle-version="1.0.0",
+ ee.stacc.productivity.edsl.checkers;bundle-version="1.0.0",
+ ee.stacc.productivity.edsl.crawler;bundle-version="1.0.0",
+ ee.stacc.productivity.edsl.common;bundle-version="1.0.0",
+ ee.stacc.productivity.edsl.cache;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ClassPath: .

@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Cache
+Bundle-SymbolicName: ee.stacc.productivity.edsl.cache
+Bundle-Version: 1.0.0.qualifier
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.jdt.core;bundle-version="3.5.2",
+ ee.stacc.productivity.edsl.model;bundle-version="1.0.0",
+ ee.stacc.productivity.edsl.common;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ClassPath: library.jar,
+ .,
+ lib/hsqldb.jar,
+ db/
+Export-Package: ee.stacc.productivity.edsl.cache
+Bundle-Activator: ee.stacc.productivity.edsl.cache.EDSLCachePlugin
+Bundle-ActivationPolicy: lazy
