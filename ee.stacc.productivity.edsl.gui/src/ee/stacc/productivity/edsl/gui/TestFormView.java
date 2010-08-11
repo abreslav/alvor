@@ -7,10 +7,15 @@ package ee.stacc.productivity.edsl.gui;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Vector;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-
-//import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 //import org.eclipse.swt.widgets.Text;
 //import org.eclipse.ui.forms.FormColors;
 //import org.eclipse.ui.forms.article.FormArticlePlugin;
@@ -20,7 +25,10 @@ import org.eclipse.swt.widgets.Composite;
 //import org.eclipse.ui.forms.events.HyperlinkEvent;
 //import org.eclipse.ui.forms.widgets.ExpandableComposite;
 //import org.eclipse.ui.forms.widgets.FormText;
+
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.TableWrapData;
+import org.eclipse.ui.forms.widgets.TableWrapLayout;
 //import org.eclipse.ui.forms.widgets.Hyperlink;
 //import org.eclipse.ui.forms.widgets.ImageHyperlink;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
@@ -44,14 +52,10 @@ public class TestFormView extends ViewPart {
 	 
 	@Override
 	public void createPartControl(Composite parent) {
-		String formText = new String();
-		
-		toolkit = new FormToolkit(parent.getDisplay());
-		form = toolkit.createScrolledForm(parent);
-
 		Map<String, Object> props = null;
+		
 		try {
-			props = OptionLoader.getElementSqlCheckerProperties(GuiUtil.getSelectedJavaProject());
+			props = OptionLoader.getElementSqlCheckerProperties(GuiUtil.getSelectedJavaElements().get(0));
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -59,14 +63,22 @@ public class TestFormView extends ViewPart {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		formText += "Current properties:\n\n";
+		
+		toolkit = new FormToolkit(parent.getDisplay());
+		form = toolkit.createScrolledForm(parent);
+		TableWrapLayout layout = new TableWrapLayout();
+		//GridLayout layout = new GridLayout();
+		
+		form.setText("Current properties:\n");
+		
+		form.getBody().setLayout(layout);
 		
 		for (Map.Entry<String, Object> entry : props.entrySet()) {
-			formText += entry.getKey() + ": " + entry.getValue().toString() + "\n";
+			toolkit.createLabel(form.getBody(), entry.getKey() +":"); //$NON-NLS-1$
+			Text text = toolkit.createText(form.getBody(), entry.getValue().toString()); //$NON-NLS-1$
+			TableWrapData td = new TableWrapData(TableWrapData.FILL_GRAB);
+			text.setLayoutData(td);
 		}
-
-		form.setText(formText);
 	}
 
 	@Override
