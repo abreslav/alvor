@@ -7,11 +7,7 @@ package ee.stacc.productivity.edsl.gui;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
-import java.util.Vector;
 
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -40,6 +36,33 @@ import org.eclipse.ui.part.ViewPart;
 import ee.stacc.productivity.edsl.main.OptionLoader;
 import ee.stacc.productivity.edsl.gui.GuiUtil;
 
+
+/*
+ * These are the component of current sqlchecker.properties to deal with:
+ * 
+ * In future, we may have multiple instances of DB*:
+ * DBDriverName=oracle.jdbc.OracleDriver
+ * DBDriverName=org.hsqldb.jdbc.JDBCDriver
+ * 	- this is a class which can be selected from somewhere... ?
+ * DBUrl=jdbc:oracle:thin:@localhost:1521:xe
+ * DBUrl=jdbc:hsqldb:file:/Users/cj/Documents/Workspaces/EmbSQL-tests/SampleProject/db/sample_db;shutdown=true;ifexists=true
+ * - what is a reasonable way to build a DBUrl, or should it just be typed in... ?
+ * DBUsername=compiere
+ * DBUsername=sa
+ * DBPassword=password
+ * DBPassword=
+ * - user/password may be empty, password should be *'ed? 
+ *
+ * hotspots=java.sql.Connection,prepareStatement,1
+ * hotspots=java.sql.Connection,prepareStatement,1;\
+ * java.sql.Connection,prepareCall,1;\
+ * java.sql.Statement,execute,1;\
+ * java.sql.Statement,executeQuery,1;\
+ * java.sql.Statement,executeUpdate,1;\
+ * com.missiondata.oss.sqlprocessor.SQLProcessor,new,2;
+ * - this is class, method and argument number containing the sql string
+ * - will they be common between datasources? Not an immediate concern
+*/
 public class TestFormView extends ViewPart {
 	 private FormToolkit toolkit;
 	 private ScrolledForm form;
@@ -67,16 +90,19 @@ public class TestFormView extends ViewPart {
 		toolkit = new FormToolkit(parent.getDisplay());
 		form = toolkit.createScrolledForm(parent);
 		TableWrapLayout layout = new TableWrapLayout();
-		//GridLayout layout = new GridLayout();
+		layout.numColumns = 2;
 		
 		form.setText("Current properties:\n");
 		
 		form.getBody().setLayout(layout);
 		
 		for (Map.Entry<String, Object> entry : props.entrySet()) {
-			toolkit.createLabel(form.getBody(), entry.getKey() +":"); //$NON-NLS-1$
-			Text text = toolkit.createText(form.getBody(), entry.getValue().toString()); //$NON-NLS-1$
 			TableWrapData td = new TableWrapData(TableWrapData.FILL_GRAB);
+			Label label = toolkit.createLabel(form.getBody(), entry.getKey() +":"); //$NON-NLS-1$
+			td = new TableWrapData(TableWrapData.RIGHT);
+			label.setLayoutData(td);
+			td = new TableWrapData(TableWrapData.FILL_GRAB);
+			Text text = toolkit.createText(form.getBody(), entry.getValue().toString()); //$NON-NLS-1$
 			text.setLayoutData(td);
 		}
 	}
