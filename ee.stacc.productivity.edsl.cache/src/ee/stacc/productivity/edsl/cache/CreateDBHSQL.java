@@ -15,29 +15,6 @@ public class CreateDBHSQL {
 
 	private static final ILog LOG = Logs.getLog(CreateDBHSQL.class);
 	
-	public static void main(String[] args) {
-	    try {
-	        Class.forName("org.hsqldb.jdbc.JDBCDriver" );
-	    } catch (Exception e) {
-	        System.err.println("ERROR: failed to load HSQLDB JDBC driver.");
-	        e.printStackTrace();
-	        return;
-	    }
-
-	    Connection conn = null;
-		try {
-			runScript(conn);
-		} finally {
-	    	if (conn != null) {
-	    		try {
-					conn.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-	    	}
-	    }
-	}
-
 	public static void runScript(Connection conn) {
 		try {
 			assert LOG.message("DB creation started");
