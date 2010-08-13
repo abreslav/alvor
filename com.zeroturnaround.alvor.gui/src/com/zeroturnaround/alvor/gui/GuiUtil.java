@@ -29,25 +29,4 @@ public class GuiUtil {
 		}
 		throw new IllegalStateException("No Java element selected");
 	}
-
-	// Adapted from the Eclipse FAQ - CJ
-	public static IJavaProject getSelectedJavaProject() {
-		IProject project;
-		
-		IJavaElement element = getSelectedJavaElements().get(0);
-		
-		if (element instanceof IResource) {
-			project = ((IResource) element).getProject();
-		}
-		else if (!(element instanceof IAdaptable)) {
-			return null;
-		}
-		else {
-			IAdaptable adaptable = (IAdaptable)element;
-			Object adapter = adaptable.getAdapter(IResource.class);
-			project = ((IResource) adapter).getProject();
-		}		
-		
-		return JavaCore.create(project);
-	}
 }
