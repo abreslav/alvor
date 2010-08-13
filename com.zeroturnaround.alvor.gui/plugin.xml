@@ -212,6 +212,17 @@
             class="com.zeroturnaround.alvor.gui.AlvorGuiStartup">
       </startup>
    </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="ee.stacc.productivity.edsl.gui.TestEditor"
+            contributorClass="ee.stacc.productivity.edsl.gui.TestEditorContributor"
+            extensions="mpe"
+            icon="icons/sample.gif"
+            id="ee.stacc.productivity.edsl.gui.TestEditor"
+            name="Test Multi-page Editor">
+      </editor>
+   </extension>
 <!--
    <extension
          point="org.eclipse.ui.editors">
@@ -231,7 +242,7 @@
       </editor>
    </extension>
             //-->
-   <extension
+<!--   <extension
          point="org.eclipse.ui.views">
       <category
             name="EmbSQL"
@@ -244,6 +255,6 @@
             class="ee.stacc.productivity.edsl.gui.TestFormView"
             id="ee.stacc.productivity.edsl.gui.TestFormView">
       </view>
-   </extension>
+   </extension> //-->
 </plugin>
 
