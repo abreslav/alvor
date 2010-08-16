@@ -1,10 +1,13 @@
 package ee.stacc.productivity.edsl.gui;
 
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.resources.IMarker;
@@ -26,11 +29,20 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FontDialog;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.*;
 import org.eclipse.ui.editors.text.TextEditor;
+import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.eclipse.ui.forms.widgets.TableWrapData;
+import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.ide.IDE;
+
+import ee.stacc.productivity.edsl.main.OptionLoader;
+
 
 /**
  * An example showing how to create a multi-page editor.
@@ -51,6 +63,8 @@ public class TestEditor extends MultiPageEditorPart implements IResourceChangeLi
 
 	/** The text widget used in page 2. */
 	private StyledText text;
+	
+
 	/**
 	 * Creates a multi-page editor example.
 	 */
@@ -58,23 +72,45 @@ public class TestEditor extends MultiPageEditorPart implements IResourceChangeLi
 		super();
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
 	}
-	/**
-	 * Creates page 0 of the multi-page editor,
-	 * which contains a text editor.
-	 */
+	
 	void createPage0() {
+		Composite composite = new Composite(getContainer(), SWT.NONE);
+		TableWrapLayout layout = new TableWrapLayout();
+		composite.setLayout(layout);
+		layout.numColumns = 2;
+
+		FormToolkit toolkit = new FormToolkit(composite.getDisplay());
+		ScrolledForm form = toolkit.createScrolledForm(composite);
+
+		form.getBody().setLayout(layout);
+			
+		Map<String, Object> props = null;
+		
 		try {
-			editor = new TextEditor();
-			int index = addPage(editor, getEditorInput());
-			setPageText(index, editor.getTitle());
-		} catch (PartInitException e) {
-			ErrorDialog.openError(
-				getSite().getShell(),
-				"Error creating nested text editor",
-				null,
-				e.getStatus());
+			props = OptionLoader.getElementSqlCheckerProperties(getEditorInput());
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
+		for (Map.Entry<String, Object> entry : props.entrySet()) {
+			TableWrapData td = new TableWrapData(TableWrapData.FILL_GRAB);
+			Label label = toolkit.createLabel(form.getBody(), entry.getKey() +":"); //$NON-NLS-1$
+			td = new TableWrapData(TableWrapData.RIGHT);
+			label.setLayoutData(td);
+			td = new TableWrapData(TableWrapData.FILL_GRAB);
+			Text text = toolkit.createText(form.getBody(), entry.getValue().toString()); //$NON-NLS-1$
+			text.setLayoutData(td);
+		}
+
+		int index = addPage(composite);
+		setPageText(index, "Alvor settings");
 	}
+
+	
 	/**
 	 * Creates page 1 of the multi-page editor,
 	 * which allows you to change the font used in page 2.
@@ -115,6 +151,27 @@ public class TestEditor extends MultiPageEditorPart implements IResourceChangeLi
 		int index = addPage(composite);
 		setPageText(index, "Preview");
 	}
+	
+		
+	/**
+	 * Creates page 0 of the multi-page editor,
+	 * which contains a text editor.
+	 */
+	void createPage3() {
+		try {
+			editor = new TextEditor();
+			int index = addPage(editor, getEditorInput());
+			setPageText(index, editor.getTitle());
+		} catch (PartInitException e) {
+			ErrorDialog.openError(
+				getSite().getShell(),
+				"Error creating nested text editor",
+				null,
+				e.getStatus());
+		}
+	}
+	
+	
 	/**
 	 * Creates the pages of the multi-page editor.
 	 */
@@ -122,6 +179,7 @@ public class TestEditor extends MultiPageEditorPart implements IResourceChangeLi
 		createPage0();
 		createPage1();
 		createPage2();
+		createPage3();
 	}
 	/**
 	 * The <code>MultiPageEditorPart</code> implementation of this 
