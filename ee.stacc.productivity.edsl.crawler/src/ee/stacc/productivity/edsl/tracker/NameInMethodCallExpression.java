@@ -3,7 +3,6 @@ package ee.stacc.productivity.edsl.tracker;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
-import org.eclipse.jdt.core.dom.Name;
 
 public class NameInMethodCallExpression extends NameUsage {
 	private MethodInvocation inv;

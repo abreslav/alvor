@@ -33,7 +33,9 @@ public class JavaElementCheckerTest {
 	JavaElementChecker checker = new JavaElementChecker();
 	IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 	private static final String TEST_FOLDER = 
-		"C:/edslws/ee.stacc.productivity.edsl.crawler.tests/tests";
+		"C:/alvor/ws/ee.stacc.productivity.edsl.crawler.tests/tests";
+	
+	private boolean clearCache = false;
 	
 	public JavaElementCheckerTest()  {
 		
@@ -59,8 +61,10 @@ public class JavaElementCheckerTest {
 			String packageFragmentRoot) throws IOException, CoreException {
 		
 		// clear cache
-		CacheService.getCacheService().clearAll();
-		CacheService.getCacheService().setNocache(true);
+		if (clearCache) {
+			CacheService.getCacheService().clearAll();
+			CacheService.getCacheService().setNocache(true);
+		}
 		
 		IProject project = root.getProject(projectName);
 		

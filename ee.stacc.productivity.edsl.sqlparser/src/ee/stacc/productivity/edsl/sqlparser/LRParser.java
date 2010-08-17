@@ -358,7 +358,7 @@ public class LRParser implements ILRParser<IParserStack> {
 				check(actions.size() == 1);
 				IAction action = actions.iterator().next();
 				check(action instanceof GotoAction);
-				check(((State)((GotoAction) action).toState).index == toState);
+				check(((GotoAction) action).toState.index == toState);
 			}
 		});
 		

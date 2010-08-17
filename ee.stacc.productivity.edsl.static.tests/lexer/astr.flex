@@ -2,6 +2,8 @@ package ee.stacc.productivity.edsl.string.parser;
 
 import static ee.stacc.productivity.edsl.string.parser.TokenType.*;
 
+@SuppressWarnings("unused")
+
 %%
 
 %class AbstractStringLexer

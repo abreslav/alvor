@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -31,6 +30,7 @@ import ee.stacc.productivity.edsl.string.IPosition;
 public class ESQLBuilder extends IncrementalProjectBuilder {
 	
 	private static ILog LOG = Logs.getLog(ESQLBuilder.class);
+	private Set<String> stringsToRemove = new HashSet<String>();
 
 	private class DeltaVisitor implements IResourceDeltaVisitor {
 		private final Collection<IFile> resources = new ArrayList<IFile>();
@@ -73,8 +73,8 @@ public class ESQLBuilder extends IncrementalProjectBuilder {
 
 	public static final String BUILDER_ID = "ee.stacc.productivity.edsl.javaproject.esqlBuilder";
 
+	@SuppressWarnings("rawtypes")
 	@Override
-	@SuppressWarnings("unchecked")
 	protected IProject[] build(int kind, Map args, IProgressMonitor monitor) throws CoreException {
 		switch (kind) {
 		case FULL_BUILD:
@@ -94,14 +94,14 @@ public class ESQLBuilder extends IncrementalProjectBuilder {
 		return null;
 	}
 
-	protected void cleanBuild(final IProgressMonitor monitor) throws CoreException {
+	protected void cleanBuild(final IProgressMonitor monitor) {
 		assert LOG.message("==============================");
 		assert LOG.message("Clean build on " + getProject());
 		clearCache();
 		checkResources(new IJavaElement[] {JavaCore.create(getProject())});
 	}
 
-	protected void fullBuild(final IProgressMonitor monitor) throws CoreException {
+	protected void fullBuild(final IProgressMonitor monitor) {
 		assert LOG.message("==============================");
 		assert LOG.message("Full build on " + getProject());
 		checkResources(new IJavaElement[] {JavaCore.create(getProject())});
@@ -112,7 +112,7 @@ public class ESQLBuilder extends IncrementalProjectBuilder {
 		assert LOG.message("==============================");
 		assert LOG.message("Incremental build on " + getProject());
 		
-		strs.clear();
+		stringsToRemove.clear();
 		
 		Timer overall = new Timer("Overall");
 		
@@ -122,8 +122,8 @@ public class ESQLBuilder extends IncrementalProjectBuilder {
 		DeltaVisitor visitor = new DeltaVisitor();
 		delta.accept(visitor);
 		
-		System.out.println("!!! Strs: " + strs);
-		CacheService.getCacheService().removeFiles(strs);
+		System.out.println("!!! Strs to remove: " + stringsToRemove);
+		CacheService.getCacheService().removeFiles(stringsToRemove);
 		
 		t.printTime();
 		
@@ -161,20 +161,18 @@ public class ESQLBuilder extends IncrementalProjectBuilder {
 	private void checkResources(IJavaElement[] elements) {
 		try {
 			new CheckProjectHandler().performCheck(JavaCore.create(getProject()), elements);
-		} catch (ExecutionException e) {
-			// TODO
-			e.printStackTrace();
-		}
+		} catch (Throwable e) {
+			LOG.error(e);
+		} 
 	}
 
 	private void clearCache() {
 		CacheService.getCacheService().clearAll();		
 	}
 
-	Set<String> strs = new HashSet<String>();
 	private void removeFromCache(IResource resource) {
 		if (resource instanceof IFile) {
-			strs.add(PositionUtil.getFileString(resource));
+			stringsToRemove.add(PositionUtil.getFileString(resource));
 //			CacheService.getCacheService().removeFile(PositionUtil.getFileString(resource));
 		}
 	}

@@ -1,3 +1,4 @@
+ select cb.id, cb.ref_dom_bank, dv.name, cb.bank_account_code, cb.is_supported from channel_bank cb  join domain_v dv on cb.ref_dom_bank=dv.code  where is_supported=1 and bank_account_code like ? ESCAPE '\' and rownum=1
 DELETE FROM BANK_ACCOUNT WHERE ID = ?
 DELETE FROM VAT_CODES WHERE ID = ?
 DELETE FROM VAT_CODE_PERSON WHERE ID = ?
@@ -702,7 +703,6 @@ select account_number from account_info where ref_invoice_party = ? and rownum=1
 select account_number from client_register_account where last_used=1 and ref_client_register in (select id from client_register where ref_person=? and reg_number=?) and rownum=1
 select account_number, bank_name from account_info where ref_invoice_party = ? order by id
 select bank_code from channel_bank where is_supported=1
-select cb.id, cb.ref_dom_bank, dv.name, cb.bank_account_code, cb.is_supported from channel_bank cb  join domain_v dv on cb.ref_dom_bank=dv.code  where is_supported=1 and bank_account_code like ? ESCAPE '\' and rownum=1
 select cb.id, cb.ref_dom_bank, dv.name, cb.bank_account_code, cb.is_supported from channel_bank cb  join domain_v dv on cb.ref_dom_bank=dv.code where cb.is_supported=1
 select code from person where id=?
 select code, name from dimension_data where code in  (?, ?, ?)

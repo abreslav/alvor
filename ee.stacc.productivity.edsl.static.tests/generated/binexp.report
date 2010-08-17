@@ -51,14 +51,14 @@ Terminals unused in grammar
    '*'
 
 
-Grammar
+Grammatika
 
     0 $accept: select $end
 
     1 select: SELECT NUMBER '-' NUMBER FROM ID
 
 
-Terminals, with rules where they appear
+Terminalid, koos reeglitega kus nad ilmuvad
 
 $end (0) 0
 '*' (42)
@@ -118,75 +118,75 @@ TABLE (303)
 LIKE (304)
 
 
-Nonterminals, with rules where they appear
+Mitteterminalid, koos reeglitega kus nad ilmuvad
 
 $accept (57)
-    on left: 0
+    vasakul: 0
 select (58)
-    on left: 1, on right: 0
+    vasakul: 1, paremal: 0
 
 
-state 0
+olek 0
 
     0 $accept: . select $end
     1 select: . SELECT NUMBER '-' NUMBER FROM ID
 
-    SELECT  shift, and go to state 1
+    SELECT  nihuta ja liigu olekule 1
 
-    select  go to state 2
+    select  liigu olekule 2
 
 
-state 1
+olek 1
 
     1 select: SELECT . NUMBER '-' NUMBER FROM ID
 
-    NUMBER  shift, and go to state 3
+    NUMBER  nihuta ja liigu olekule 3
 
 
-state 2
+olek 2
 
     0 $accept: select . $end
 
-    $end  shift, and go to state 4
+    $end  nihuta ja liigu olekule 4
 
 
-state 3
+olek 3
 
     1 select: SELECT NUMBER . '-' NUMBER FROM ID
 
-    '-'  shift, and go to state 5
+    '-'  nihuta ja liigu olekule 5
 
 
-state 4
+olek 4
 
     0 $accept: select $end .
 
-    $default  accept
+    $default  nõustun
 
 
-state 5
+olek 5
 
     1 select: SELECT NUMBER '-' . NUMBER FROM ID
 
-    NUMBER  shift, and go to state 6
+    NUMBER  nihuta ja liigu olekule 6
 
 
-state 6
+olek 6
 
     1 select: SELECT NUMBER '-' NUMBER . FROM ID
 
-    FROM  shift, and go to state 7
+    FROM  nihuta ja liigu olekule 7
 
 
-state 7
+olek 7
 
     1 select: SELECT NUMBER '-' NUMBER FROM . ID
 
-    ID  shift, and go to state 8
+    ID  nihuta ja liigu olekule 8
 
 
-state 8
+olek 8
 
     1 select: SELECT NUMBER '-' NUMBER FROM ID .
 
-    $default  reduce using rule 1 (select)
+    $default  redutseerin kasutades reeglit 1 (select)

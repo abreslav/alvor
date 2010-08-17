@@ -25,8 +25,8 @@ public class OptionLoader {
 		FileInputStream in = new FileInputStream(propsFile);
 		Properties props = new Properties();
 		props.load(in);
-		@SuppressWarnings("unchecked")
-		Map<String, Object> result = (Map) props;
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		Map<String, Object> result = (Map)props;
 		return result;
 	}
 
