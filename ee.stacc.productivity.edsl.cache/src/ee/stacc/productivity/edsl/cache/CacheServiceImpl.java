@@ -1005,25 +1005,10 @@ public final class CacheServiceImpl implements ICacheService {
 	
 	private void cleanup() throws SQLException {
 		
-		/*
-		for (;;) {
-			Statement batch = connection.createStatement();
-			// redundant?
-			//batch.addBatch("DELETE FROM AbstractStrings WHERE (type IN (4, 5)) AND (a IN (SELECT id FROM DeletedAbstractStrings))");
-			//batch.addBatch("DELETE FROM AbstractStrings WHERE (id IN (SELECT id FROM AbstractStringsToDelete))");
-			int[] res = batch.executeBatch();
-			if (res[0] == 0 && res[1] == 0) {
-				break;
-			}
-		} 
-		*/
-
 		Statement batch = connection.createStatement();
 		
-		//batch.addBatch("DELETE FROM AbstractStringsToDelete");
-		// redundant?
-		//batch.addBatch("DELETE FROM DeletedAbstractStrings");
-		batch.addBatch(
+		// unreferenced string constants
+		batch.addBatch(  
 			"DELETE FROM StringConstants WHERE id IN (" +
 			"	SELECT id FROM StringConstants" + 
 			"		LEFT JOIN (SELECT a FROM AbstractStrings WHERE type = 0)" + 
@@ -1031,6 +1016,7 @@ public final class CacheServiceImpl implements ICacheService {
 			"	WHERE a IS NULL" +
 			")"
 		);
+		// unreferenced character sets
 		batch.addBatch(
 			"DELETE FROM CharacterSets WHERE id IN (" +
 			"	SELECT id FROM CharacterSets " +
@@ -1039,6 +1025,7 @@ public final class CacheServiceImpl implements ICacheService {
 			"	WHERE a IS NULL" +
 			")"
 		);
+		// unreferenced unsupported stuff
 		batch.addBatch(
 			"DELETE FROM Unsupported WHERE id IN (" +
 			"	SELECT id FROM Unsupported " +
@@ -1051,6 +1038,8 @@ public final class CacheServiceImpl implements ICacheService {
 		if (res.length != 3) {
 			LOG.error("CLEANUP FAILED!");
 		}
+		
+		// CollectionContents is cleaned using triggers
 	}
 
 	/**
