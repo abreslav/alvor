@@ -53,7 +53,7 @@ public final class CacheServiceImpl implements ICacheService {
 		
 		public DBQueries() throws SQLException {
 	        queryGetAbstractString = connection.prepareStatement(
-		    		"SELECT AbstractStrings.id AS stringId, type, a, b FROM AbstractStrings WHERE sourceRange = " + 
+		    		"SELECT AbstractStrings.id AS stringId, type, a FROM AbstractStrings WHERE sourceRange = " + 
 		    		"	(SELECT id FROM SourceRanges WHERE" + 
 		    		"	(file = (SELECT id FROM Files WHERE name = ?))" + 
 		    		"	AND (start = ?) AND (length = ?))"
@@ -170,9 +170,7 @@ public final class CacheServiceImpl implements ICacheService {
 			
 		} catch (SQLException e) {
 			LOG.exception(e);
-		} catch (StackOverflowError e) {
-			throw new RuntimeException("SOE");
-		}
+		} 
 	}
 
 	@Override
@@ -546,16 +544,15 @@ public final class CacheServiceImpl implements ICacheService {
 		int id = notNull(res, res.getInt("stringId"));
 		int type = notNull(res, res.getInt("type"));
 		Integer a = mayBeNull(res, res.getInt("a"));
-		Integer b = mayBeNull(res, res.getInt("b"));
 
 		if (position == null) {
 			position = fetchPosition(res);
 		}
 		
-		return constructAbstractString(id, type, a, b, position);
+		return constructAbstractString(id, type, a, position);
 	}
 
-	private IAbstractString constructAbstractString(int id, int type, Integer a, Integer b, IPosition position) throws SQLException {
+	private IAbstractString constructAbstractString(int id, int type, Integer a, IPosition position) throws SQLException {
 		switch (type) {
 		case StringTypes.CONSTANT:
 			return getStringConstant(a, position); 
@@ -611,7 +608,7 @@ public final class CacheServiceImpl implements ICacheService {
 
 	private List<IAbstractString> getCollectionContents(int collectionId) throws SQLException {
 		PreparedStatement preparedStatement = connection.prepareStatement(
-				"SELECT AbstractStrings.id AS stringId, type, a, b, name, start, length FROM CollectionContents " +
+				"SELECT AbstractStrings.id AS stringId, type, a, name, start, length FROM CollectionContents " +
 				"	LEFT JOIN AbstractStrings ON (item = AbstractStrings.id) " +
 				"	LEFT JOIN SourceRanges ON (sourceRange = SourceRanges.id) " +
 				"	LEFT JOIN Files ON (SourceRanges.file = Files.id) " +
@@ -634,7 +631,7 @@ public final class CacheServiceImpl implements ICacheService {
 
 	private IAbstractString getAbstractStringById(int id) throws SQLException {
 		PreparedStatement preparedStatement = connection.prepareStatement(
-				"SELECT AbstractStrings.id as stringId, type, a, b, name, start, length FROM AbstractStrings " +
+				"SELECT AbstractStrings.id as stringId, type, a, name, start, length FROM AbstractStrings " +
 				"	LEFT JOIN SourceRanges ON (sourceRange = SourceRanges.id)" +
 				"	LEFT JOIN Files ON (SourceRanges.file = Files.id)" +
 				"WHERE AbstractStrings.id = ?"
@@ -700,7 +697,6 @@ public final class CacheServiceImpl implements ICacheService {
 				return;
 			try {
 				int stringId = createAbstractStringRecords(str, str.getPosition());
-				String signature = desc.getSignature();
 				int signatureId = createSignature(desc.getSignature());
 				
 				PreparedStatement insert = connection.prepareStatement(
@@ -733,7 +729,7 @@ public final class CacheServiceImpl implements ICacheService {
 				return;
 			try {
 				PreparedStatement stmt = connection.prepareStatement(
-						"SELECT a.id as stringId, a.type, a.a, a.b, name, start, length " +
+						"SELECT a.id as stringId, a.type, a.a, name, start, length " +
 						"   FROM Signatures s" +
 						"   JOIN MethodImplementations mi ON (mi.signature = s.id) " +
 						"   JOIN AbstractStrings a        ON (a.id = mi.abstractString) " +
@@ -745,7 +741,7 @@ public final class CacheServiceImpl implements ICacheService {
 				ResultSet res = stmt.executeQuery();
 				
 				while (res.next()) {
-					values.add(runStringConstruction(stmt, null));
+					values.add(fetchAbstractString(null, res));
 				}
 			} catch (SQLException e) {
 				LOG.exception(e);
@@ -1009,20 +1005,24 @@ public final class CacheServiceImpl implements ICacheService {
 	
 	private void cleanup() throws SQLException {
 		
+		/*
 		for (;;) {
 			Statement batch = connection.createStatement();
-			batch.addBatch("DELETE FROM AbstractStrings WHERE (type IN (4, 5)) AND (a IN (SELECT id FROM DeletedAbstractStrings))");
-			batch.addBatch("DELETE FROM AbstractStrings WHERE (id IN (SELECT id FROM AbstractStringsToDelete))");
+			// redundant?
+			//batch.addBatch("DELETE FROM AbstractStrings WHERE (type IN (4, 5)) AND (a IN (SELECT id FROM DeletedAbstractStrings))");
+			//batch.addBatch("DELETE FROM AbstractStrings WHERE (id IN (SELECT id FROM AbstractStringsToDelete))");
 			int[] res = batch.executeBatch();
 			if (res[0] == 0 && res[1] == 0) {
 				break;
 			}
 		} 
+		*/
 
 		Statement batch = connection.createStatement();
 		
-		batch.addBatch("DELETE FROM AbstractStringsToDelete");
-		batch.addBatch("DELETE FROM DeletedAbstractStrings");
+		//batch.addBatch("DELETE FROM AbstractStringsToDelete");
+		// redundant?
+		//batch.addBatch("DELETE FROM DeletedAbstractStrings");
 		batch.addBatch(
 			"DELETE FROM StringConstants WHERE id IN (" +
 			"	SELECT id FROM StringConstants" + 
@@ -1048,11 +1048,14 @@ public final class CacheServiceImpl implements ICacheService {
 			")"
 		);
 		int[] res = batch.executeBatch();
-		if (res.length != 5) {
+		if (res.length != 3) {
 			LOG.error("CLEANUP FAILED!");
 		}
 	}
 
+	/**
+	 * Returns hotspots that don't have corresponding abstract string in cache
+	 */
 	@Override
 	public Collection<IPosition> getInvalidatedHotspotPositions() {
 		try {
