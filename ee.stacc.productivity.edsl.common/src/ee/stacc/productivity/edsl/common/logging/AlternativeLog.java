@@ -58,6 +58,10 @@ public class AlternativeLog implements ILog {
 	@Override
 	public void error(Object message) {
 		messageStream.println(message);
+		if (message instanceof Throwable) {
+			((Throwable) message).printStackTrace(messageStream);
+		}
+		
 		messageStream.flush();
 		
 		System.err.println(message);
