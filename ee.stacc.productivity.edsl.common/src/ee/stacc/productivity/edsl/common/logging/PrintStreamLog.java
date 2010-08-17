@@ -43,6 +43,10 @@ public class PrintStreamLog implements ILog {
 	@Override
 	public void error(Object message) {
 		errorStream.println(message);
+		if (message instanceof Throwable) {
+			((Throwable) message).printStackTrace(messageStream);
+		}
+		
 		errorStream.flush();
 		
 	}
