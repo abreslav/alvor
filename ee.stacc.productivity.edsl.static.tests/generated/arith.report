@@ -1,4 +1,4 @@
-Grammar
+Grammatika
 
     0 $accept: E $end
 
@@ -10,7 +10,7 @@ Grammar
     5  | '1'
 
 
-Terminals, with rules where they appear
+Terminalid, koos reeglitega kus nad ilmuvad
 
 $end (0) 0
 '*' (42) 1
@@ -20,17 +20,17 @@ $end (0) 0
 error (256)
 
 
-Nonterminals, with rules where they appear
+Mitteterminalid, koos reeglitega kus nad ilmuvad
 
 $accept (7)
-    on left: 0
+    vasakul: 0
 E (8)
-    on left: 1 2 3, on right: 0 1 2
+    vasakul: 1 2 3, paremal: 0 1 2
 B (9)
-    on left: 4 5, on right: 1 2 3
+    vasakul: 4 5, paremal: 1 2 3
 
 
-state 0
+olek 0
 
     0 $accept: . E $end
     1 E: . E '*' B
@@ -39,85 +39,85 @@ state 0
     4 B: . '0'
     5  | . '1'
 
-    '0'  shift, and go to state 1
-    '1'  shift, and go to state 2
+    '0'  nihuta ja liigu olekule 1
+    '1'  nihuta ja liigu olekule 2
 
-    E  go to state 3
-    B  go to state 4
+    E  liigu olekule 3
+    B  liigu olekule 4
 
 
-state 1
+olek 1
 
     4 B: '0' .
 
-    $default  reduce using rule 4 (B)
+    $default  redutseerin kasutades reeglit 4 (B)
 
 
-state 2
+olek 2
 
     5 B: '1' .
 
-    $default  reduce using rule 5 (B)
+    $default  redutseerin kasutades reeglit 5 (B)
 
 
-state 3
+olek 3
 
     0 $accept: E . $end
     1 E: E . '*' B
     2  | E . '+' B
 
-    $end  shift, and go to state 5
-    '*'   shift, and go to state 6
-    '+'   shift, and go to state 7
+    $end  nihuta ja liigu olekule 5
+    '*'   nihuta ja liigu olekule 6
+    '+'   nihuta ja liigu olekule 7
 
 
-state 4
+olek 4
 
     3 E: B .
 
-    $default  reduce using rule 3 (E)
+    $default  redutseerin kasutades reeglit 3 (E)
 
 
-state 5
+olek 5
 
     0 $accept: E $end .
 
-    $default  accept
+    $default  nõustun
 
 
-state 6
+olek 6
 
     1 E: E '*' . B
     4 B: . '0'
     5  | . '1'
 
-    '0'  shift, and go to state 1
-    '1'  shift, and go to state 2
+    '0'  nihuta ja liigu olekule 1
+    '1'  nihuta ja liigu olekule 2
 
-    B  go to state 8
+    B  liigu olekule 8
 
 
-state 7
+olek 7
 
     2 E: E '+' . B
     4 B: . '0'
     5  | . '1'
 
-    '0'  shift, and go to state 1
-    '1'  shift, and go to state 2
+    '0'  nihuta ja liigu olekule 1
+    '1'  nihuta ja liigu olekule 2
 
-    B  go to state 9
+    B  liigu olekule 9
 
 
-state 8
+olek 8
 
     1 E: E '*' B .
 
-    $default  reduce using rule 1 (E)
+    $default  redutseerin kasutades reeglit 1 (E)
 
 
-state 9
+olek 9
 
     2 E: E '+' B .
 
-    $default  reduce using rule 2 (E)
+    $default  redutseerin kasutades reeglit 2 (E)

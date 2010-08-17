@@ -37,6 +37,7 @@
 /* Line 1 of "grammar/binexp.bg"  */
 
 import java.io.IOException;
+@SuppressWarnings("unused")
 
 
 /**
@@ -372,7 +373,7 @@ class BinExpParser
 	
 
 /* Line 353 of lalr1.java  */
-/* Line 376 of "generated/BinExpParser.java"  */
+/* Line 377 of "generated/BinExpParser.java"  */
 	default: break;
       }
 
@@ -834,7 +835,7 @@ class BinExpParser
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
   private static final byte yyrline_[] =
   {
-         0,    96,    96
+         0,    97,    97
   };
 
   // Report on the debug stream that the rule yyrule is going to be reduced.
@@ -915,7 +916,7 @@ class BinExpParser
 /* Unqualified %code blocks.  */
 
 /* Line 875 of lalr1.java  */
-/* Line 5 of "grammar/binexp.bg"  */
+/* Line 6 of "grammar/binexp.bg"  */
 
 
 
@@ -950,7 +951,7 @@ class BinExpParser
 
 
 /* Line 875 of lalr1.java  */
-/* Line 954 of "generated/BinExpParser.java"  */
+/* Line 955 of "generated/BinExpParser.java"  */
 
 }
 

@@ -37,6 +37,7 @@
 /* Line 1 of "grammar/arith.bg"  */
 
 import java.io.IOException;
+@SuppressWarnings("unused")
 
 
 /**
@@ -277,7 +278,7 @@ class YYParser
 	
 
 /* Line 353 of lalr1.java  */
-/* Line 281 of "generated/ArithParser.java"  */
+/* Line 282 of "generated/ArithParser.java"  */
 	default: break;
       }
 
@@ -729,7 +730,7 @@ class YYParser
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
   private static final byte yyrline_[] =
   {
-         0,    38,    38,    38,    38,    39,    40
+         0,    39,    39,    39,    39,    40,    41
   };
 
   // Report on the debug stream that the rule yyrule is going to be reduced.
@@ -805,7 +806,7 @@ class YYParser
 /* Unqualified %code blocks.  */
 
 /* Line 875 of lalr1.java  */
-/* Line 5 of "grammar/arith.bg"  */
+/* Line 6 of "grammar/arith.bg"  */
 
 
 
@@ -840,7 +841,7 @@ class YYParser
 
 
 /* Line 875 of lalr1.java  */
-/* Line 844 of "generated/ArithParser.java"  */
+/* Line 845 of "generated/ArithParser.java"  */
 
 }
 

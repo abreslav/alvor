@@ -210,11 +210,11 @@ public class LexerPerformanceTest {
 			StringBuilder newConstant = new StringBuilder();
 			for (IAbstractString item : stringSequence.getItems()) {
 				IAbstractString optimized = optimize(item);
-				if (newConstant != null && optimized instanceof StringConstant) {
+				if (optimized instanceof StringConstant) {
 					StringConstant con = (StringConstant) optimized;
 					newConstant.append(con.getConstant());
 				} else {
-					if (newConstant != null && newConstant.length() > 0) {
+					if (newConstant.length() > 0) {
 						changed.add(new StringConstant(newConstant.toString()));
 						newConstant.setLength(0);
 					}
@@ -224,7 +224,7 @@ public class LexerPerformanceTest {
 			if (changed.isEmpty()) {
 				return new StringConstant(newConstant.toString());
 			}
-			if (newConstant != null && newConstant.length() > 0) {
+			if (newConstant.length() > 0) {
 				changed.add(new StringConstant(newConstant.toString()));
 				newConstant.setLength(0);
 			}

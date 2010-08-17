@@ -39,7 +39,7 @@ public class AutomataUtils {
 					}
 				}
 			}
-			throw new IllegalStateException("Impossible state: '" + ((int) c) + "'");
+			throw new IllegalStateException("Impossible state: '" + c + "'");
 		}
 	};
 

@@ -28,7 +28,6 @@ import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.NodeFinder;
-import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
@@ -151,7 +150,7 @@ public class NodeSearchEngine {
 //		}
 		
 		SearchRequestor requestor = new SearchRequestor() {
-			@SuppressWarnings("unchecked")
+			@SuppressWarnings("rawtypes")
 			public void acceptSearchMatch(SearchMatch match) {
 				assert match.getElement() instanceof IMethod;
 				

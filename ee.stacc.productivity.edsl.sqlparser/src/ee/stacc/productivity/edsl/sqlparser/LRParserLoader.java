@@ -12,7 +12,7 @@ import org.jdom.input.SAXBuilder;
 
 public class LRParserLoader {
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public static void load(URL fileName, ILRParserBuilder builder) throws JDOMException, IOException {
 		Document document = new SAXBuilder().build(fileName);
 		Element root = document.getRootElement();

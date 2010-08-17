@@ -1,3 +1,5 @@
+@SuppressWarnings("unused")
+
 %%
 
 %class SQLLexer
