@@ -22,6 +22,13 @@ public class OptionLoader {
 		IJavaProject project = element.getJavaProject();
 		File propsFile = getElementSqlCheckerPropertiesFile(project);
 		assert LOG.message("PROPS_FILE: " + propsFile);
+		
+		return getFileSqlCheckerProperties(propsFile);
+	}
+
+	public static Map<String, Object> getFileSqlCheckerProperties(File propsFile)
+			throws FileNotFoundException, IOException {
+		
 		FileInputStream in = new FileInputStream(propsFile);
 		Properties props = new Properties();
 		props.load(in);
@@ -29,7 +36,7 @@ public class OptionLoader {
 		Map<String, Object> result = (Map)props;
 		return result;
 	}
-
+	
 	public static File getElementSqlCheckerPropertiesFile(IJavaProject project) {
 		File propsFile = project.getResource().getLocation().append(
 				"sqlchecker.properties").toFile();

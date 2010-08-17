@@ -1,6 +1,7 @@
 package ee.stacc.productivity.edsl.gui;
 
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -10,6 +11,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.eclipse.core.resources.IResource; 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -77,28 +79,22 @@ public class TestEditor extends MultiPageEditorPart implements IResourceChangeLi
 		Composite composite = new Composite(getContainer(), SWT.NONE);
 		TableWrapLayout layout = new TableWrapLayout();
 		composite.setLayout(layout);
-		layout.numColumns = 2;
-
 		FormToolkit toolkit = new FormToolkit(composite.getDisplay());
 		ScrolledForm form = toolkit.createScrolledForm(composite);
+		layout.numColumns = 2;
+		form.getBody().setLayout(layout);	
+		
+		Map<String, Object> props = loadPropertiesFromEditorInput();
+				
+//		Label label = toolkit.createLabel(form.getBody(), "foobar"); //$NON-NLS-1$
+		Label label = new Label(composite, SWT.NONE);
+		label.setText("foobar");
+		TableWrapData td = new TableWrapData(TableWrapData.FILL_GRAB);
+		label.setLayoutData(td);
 
-		form.getBody().setLayout(layout);
-			
-		Map<String, Object> props = null;
-		
-		try {
-			props = OptionLoader.getElementSqlCheckerProperties(getEditorInput());
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
 		for (Map.Entry<String, Object> entry : props.entrySet()) {
-			TableWrapData td = new TableWrapData(TableWrapData.FILL_GRAB);
-			Label label = toolkit.createLabel(form.getBody(), entry.getKey() +":"); //$NON-NLS-1$
+			td = new TableWrapData(TableWrapData.FILL_GRAB);
+			label = toolkit.createLabel(form.getBody(), entry.getKey() +":"); //$NON-NLS-1$
 			td = new TableWrapData(TableWrapData.RIGHT);
 			label.setLayoutData(td);
 			td = new TableWrapData(TableWrapData.FILL_GRAB);
@@ -108,6 +104,37 @@ public class TestEditor extends MultiPageEditorPart implements IResourceChangeLi
 
 		int index = addPage(composite);
 		setPageText(index, "Alvor settings");
+	}
+
+	private Map<String, Object> loadPropertiesFromEditorInput() {
+		Map<String, Object> props = null;
+		
+		try {
+			// TODO We should use something like this to init this page?
+			//			public void init(IEditorSite site, IEditorInput editorInput)
+			//				throws PartInitException {
+			IEditorInput editorInput = getEditorInput();
+			if (!(editorInput instanceof IFileEditorInput))
+				throw new PartInitException("Invalid Input: Must be IFileEditorInput");
+				
+			java.io.File propFile = ((IFileEditorInput) editorInput).getFile().getLocation().toFile();	
+			props = OptionLoader.getFileSqlCheckerProperties(propFile);
+			
+		} catch (PartInitException e) {
+			ErrorDialog.openError(
+				getSite().getShell(),
+				"Error creating nested text editor",
+				null,
+				e.getStatus());
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return props;
 	}
 
 	
