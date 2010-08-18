@@ -215,12 +215,12 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="ee.stacc.productivity.edsl.gui.TestEditor"
-            contributorClass="ee.stacc.productivity.edsl.gui.TestEditorContributor"
+            class="ee.stacc.productivity.edsl.gui.AlvorPropertiesEditor"
+            contributorClass="ee.stacc.productivity.edsl.gui.AlvorPropertiesEditorContributor"
             extensions="mpe"
             icon="icons/sample.gif"
-            id="ee.stacc.productivity.edsl.gui.TestEditor"
-            name="Test Multi-page Editor">
+            id="ee.stacc.productivity.edsl.gui.AlvorPropertiesEditor"
+            name="Alvor Properties Editor">
       </editor>
    </extension>
 <!--

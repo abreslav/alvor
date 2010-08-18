@@ -79,18 +79,25 @@ public class TestEditor extends MultiPageEditorPart implements IResourceChangeLi
 		Composite composite = new Composite(getContainer(), SWT.NONE);
 		TableWrapLayout layout = new TableWrapLayout();
 		composite.setLayout(layout);
+
 		FormToolkit toolkit = new FormToolkit(composite.getDisplay());
 		ScrolledForm form = toolkit.createScrolledForm(composite);
+		layout = new TableWrapLayout();
 		layout.numColumns = 2;
-		form.getBody().setLayout(layout);	
-		
-		Map<String, Object> props = loadPropertiesFromEditorInput();
-				
-//		Label label = toolkit.createLabel(form.getBody(), "foobar"); //$NON-NLS-1$
-		Label label = new Label(composite, SWT.NONE);
-		label.setText("foobar");
+		form.getBody().setLayout(layout);
+
 		TableWrapData td = new TableWrapData(TableWrapData.FILL_GRAB);
+		Label label = toolkit.createLabel(form.getBody(), "foobar"); //$NON-NLS-1$
+		td.colspan = 2;
 		label.setLayoutData(td);
+		
+//		Label label = new Label(composite, SWT.NONE);
+//		label.setText("foobar");
+		
+		td = new TableWrapData(TableWrapData.FILL_GRAB);
+		label.setLayoutData(td);
+
+		Map<String, Object> props = loadPropertiesFromEditorInput();
 
 		for (Map.Entry<String, Object> entry : props.entrySet()) {
 			td = new TableWrapData(TableWrapData.FILL_GRAB);
@@ -104,6 +111,26 @@ public class TestEditor extends MultiPageEditorPart implements IResourceChangeLi
 
 		int index = addPage(composite);
 		setPageText(index, "Alvor settings");
+
+
+		
+/*
+		Composite composite = new Composite(getContainer(), SWT.NONE);
+		TableWrapLayout layout = new TableWrapLayout();
+		composite.setLayout(layout);
+		FormToolkit toolkit = new FormToolkit(composite.getDisplay());
+		ScrolledForm form = toolkit.createScrolledForm(composite);
+		layout.numColumns = 2;
+		form.getBody().setLayout(layout);	
+		
+				
+		Label label = new Label(composite, SWT.NONE);
+		label.setText("foobar");
+		TableWrapData td = new TableWrapData(TableWrapData.FILL_GRAB);
+		label.setLayoutData(td);
+
+		int index = addPage(composite);
+*/
 	}
 
 	private Map<String, Object> loadPropertiesFromEditorInput() {
