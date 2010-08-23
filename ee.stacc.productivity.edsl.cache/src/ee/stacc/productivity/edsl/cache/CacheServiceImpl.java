@@ -227,6 +227,7 @@ public final class CacheServiceImpl implements ICacheService {
 			if (position == null || position.equals(abstractString.getPosition())) {
 				return idByPosition;
 			}
+			// TODO: why? 
 			return createSame(idByPosition, position);
 		}
 		
@@ -363,9 +364,8 @@ public final class CacheServiceImpl implements ICacheService {
 	private int createSame(Integer id, IPosition position) throws SQLException {
 		int rangeId = createSourceRange(position);
 		PreparedStatement preparedStatement = connection.prepareStatement(
-				"INSERT INTO AbstractStrings(type, a, sourceRange) VALUES (5, ?, ?)",
-				Statement.RETURN_GENERATED_KEYS
-		);
+				"INSERT INTO AbstractStrings(type, a, sourceRange) VALUES ("
+					+ StringTypes.SAME_AS + ", ?, ?)", Statement.RETURN_GENERATED_KEYS);
 		preparedStatement.setInt(1, id);
 		preparedStatement.setInt(2, rangeId);
 		
