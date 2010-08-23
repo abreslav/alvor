@@ -2,7 +2,9 @@ package ee.stacc.productivity.edsl.cache;
 
 import java.io.File;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -16,15 +18,19 @@ public class HSQLDBLayer implements IDBLayer {
 			Class.forName("org.hsqldb.jdbc.JDBCDriver");
 			
 			String fileUrl = "jdbc:hsqldb:file:" + getPath() + ";shutdown=true";
-			String url = fileUrl;
+			String serverUrl = "jdbc:hsqldb:hsql://localhost/xdb";
 			
-			// if db is locked, then assume that server is running and connect in server mode (~ debugging mode) 
-			if (new File(getPath() + ".lck").exists()) {
-				url = "jdbc:hsqldb:hsql://localhost/xdb";
+			// if db is locked, then assume that server is running and connect in server mode (~ debugging mode)
+			File lockFile = new File(getPath() + ".lck"); 
+			if (lockFile.exists()) {
+				try {
+					connection = DriverManager.getConnection(serverUrl, "SA", "");
+				} catch (SQLException e) {
+					// Seems that server is not running, probably the lock is leftover from a crash
+					connection = DriverManager.getConnection(fileUrl, "SA", "");
+				}
 			}
-			try {
-				connection = DriverManager.getConnection(url, "SA", "");
-			} catch (SQLException e) {
+			else {
 				connection = DriverManager.getConnection(fileUrl, "SA", "");
 			}
 			
