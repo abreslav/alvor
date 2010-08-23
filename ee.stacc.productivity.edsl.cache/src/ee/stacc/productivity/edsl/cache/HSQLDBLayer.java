@@ -19,12 +19,11 @@ public class HSQLDBLayer implements IDBLayer {
 			String serverUrl = "jdbc:hsqldb:hsql://localhost/xdb";
 			
 			// if db is locked, then assume that server is running and connect in server mode (~ debugging mode)
-			File lockFile = new File(getPath() + ".lck"); 
-			if (lockFile.exists()) {
+			if (new File(getPath() + ".lck").exists()) {
 				try {
 					connection = DriverManager.getConnection(serverUrl, "SA", "");
 				} catch (SQLException e) {
-					// Seems that server is not running, probably the lock is leftover from a crash
+					// Seems that server is not running after all, probably the lock is leftover from a crash
 					// HSQL is now supposed to do some repair on connect
 					connection = DriverManager.getConnection(fileUrl, "SA", "");
 				}

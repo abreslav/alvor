@@ -88,10 +88,11 @@ CREATE TABLE
 		1 - char set(a),
 		2 - sequence(a is null, id references CollectionContents(collection)),
 		3 - choice(a is null, id references CollectionContents(collection)),
-		4 - repetition(a) 
-		5 - sameAs(a) ?? TODO: how it deals with sourceRange ?
-		6 - unsupported (a)
-		7 - parameter (a)
+		4 - repetition(a references AbstractStrings(id)) 
+		5 - sameAs(a references AbstractStrings(id))
+			  used for example for a variable when a repesents earlier assignment expression  
+		6 - unsupported(a references Unsupported(id))
+		7 - parameter(a = ordinal number of parameter)
 	*/
 	type TINYINT NOT NULL, 
 	a INTEGER DEFAULT NULL,
@@ -116,7 +117,7 @@ CREATE TRIGGER DeleteCollectionContentsRow AFTER DELETE
 	REFERENCING OLD ROW AS deleted
 	FOR EACH ROW
 begin atomic
-	-- if one piece of collection is invalidated then all collection should be invalidated
+	-- if one piece of a collection is invalidated then the whole collection should be invalidated
 	-- (but the abstract strings behind other collection items remain)
 
 	-- following statement just doesn't work for some reason
