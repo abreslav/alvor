@@ -2,9 +2,7 @@ package ee.stacc.productivity.edsl.cache;
 
 import java.io.File;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -27,6 +25,7 @@ public class HSQLDBLayer implements IDBLayer {
 					connection = DriverManager.getConnection(serverUrl, "SA", "");
 				} catch (SQLException e) {
 					// Seems that server is not running, probably the lock is leftover from a crash
+					// HSQL is now supposed to do some repair on connect
 					connection = DriverManager.getConnection(fileUrl, "SA", "");
 				}
 			}
