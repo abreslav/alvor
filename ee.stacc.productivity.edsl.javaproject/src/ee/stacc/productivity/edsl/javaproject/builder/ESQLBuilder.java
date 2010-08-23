@@ -23,6 +23,7 @@ import ee.stacc.productivity.edsl.cache.CacheService;
 import ee.stacc.productivity.edsl.common.logging.ILog;
 import ee.stacc.productivity.edsl.common.logging.Logs;
 import ee.stacc.productivity.edsl.common.logging.Timer;
+import ee.stacc.productivity.edsl.crawler.NodeSearchEngine;
 import ee.stacc.productivity.edsl.crawler.PositionUtil;
 import ee.stacc.productivity.edsl.gui.CheckProjectHandler;
 import ee.stacc.productivity.edsl.string.IPosition;
@@ -30,7 +31,7 @@ import ee.stacc.productivity.edsl.string.IPosition;
 public class ESQLBuilder extends IncrementalProjectBuilder {
 	
 	private static ILog LOG = Logs.getLog(ESQLBuilder.class);
-	private Set<String> stringsToRemove = new HashSet<String>();
+	private Set<IFile> invalidatedFiles = new HashSet<IFile>();
 
 	private class DeltaVisitor implements IResourceDeltaVisitor {
 		private final Collection<IFile> resources = new ArrayList<IFile>();
@@ -98,12 +99,13 @@ public class ESQLBuilder extends IncrementalProjectBuilder {
 		assert LOG.message("==============================");
 		assert LOG.message("Clean build on " + getProject());
 		clearCache();
+		NodeSearchEngine.clearCache();
 		checkResources(new IJavaElement[] {JavaCore.create(getProject())});
 	}
 
 	protected void fullBuild(final IProgressMonitor monitor) {
 		assert LOG.message("==============================");
-		assert LOG.message("Full build on " + getProject());
+		assert LOG.message("Full build (no files changed?) on " + getProject());
 		checkResources(new IJavaElement[] {JavaCore.create(getProject())});
 	}
 	
@@ -112,7 +114,7 @@ public class ESQLBuilder extends IncrementalProjectBuilder {
 		assert LOG.message("==============================");
 		assert LOG.message("Incremental build on " + getProject());
 		
-		stringsToRemove.clear();
+		invalidatedFiles.clear();
 		
 		Timer overall = new Timer("Overall");
 		
@@ -122,8 +124,14 @@ public class ESQLBuilder extends IncrementalProjectBuilder {
 		DeltaVisitor visitor = new DeltaVisitor();
 		delta.accept(visitor);
 		
-		System.out.println("!!! Strs to remove: " + stringsToRemove);
-		CacheService.getCacheService().removeFiles(stringsToRemove);
+		// it's supposedly more efficient to remove all files together from cache 
+		Set<String> filesToRemove = new HashSet<String>();
+		for (IFile f : invalidatedFiles) {
+			filesToRemove.add(PositionUtil.getFileString(f));
+			NodeSearchEngine.removeASTFromCache(f);
+		}
+		System.out.println("!!! Strs to remove: " + filesToRemove);
+		CacheService.getCacheService().removeFiles(filesToRemove);
 		
 		t.printTime();
 		
@@ -172,8 +180,7 @@ public class ESQLBuilder extends IncrementalProjectBuilder {
 
 	private void removeFromCache(IResource resource) {
 		if (resource instanceof IFile) {
-			stringsToRemove.add(PositionUtil.getFileString(resource));
-//			CacheService.getCacheService().removeFile(PositionUtil.getFileString(resource));
+			invalidatedFiles.add((IFile)resource);
 		}
 	}
 }

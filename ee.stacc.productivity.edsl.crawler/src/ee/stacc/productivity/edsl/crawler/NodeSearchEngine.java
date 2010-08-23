@@ -71,6 +71,10 @@ public class NodeSearchEngine {
 		astCache.clear();
 	}
 	
+	public static void removeASTFromCache(IFile file) {
+		astCache.remove(JavaCore.createCompilationUnitFrom(file));
+	}
+	
 	public static List<IPosition> findArgumentNodes(IJavaElement[] scope, final Collection<NodeRequest> requests) {
 		// No requests -- no results
 		if (requests.isEmpty()) {
@@ -391,7 +395,7 @@ public class NodeSearchEngine {
 		return NodeFinder.perform(ast, start, length);
 	}
 	
-	public static void checkClearCache(int freeMBsRequired) {
+	private static void checkClearCache(int freeMBsRequired) {
 		if (astCache.size() > 30 && getAvailableMemory() < freeMBsRequired * 1024 * 1024) {
 			astCache.clear();
 			System.err.println("Cleaning ast cache");

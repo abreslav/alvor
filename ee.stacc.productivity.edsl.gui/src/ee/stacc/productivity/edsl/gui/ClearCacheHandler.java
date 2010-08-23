@@ -9,11 +9,13 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.PlatformUI;
 
 import ee.stacc.productivity.edsl.cache.CacheService;
+import ee.stacc.productivity.edsl.crawler.NodeSearchEngine;
 
 public class ClearCacheHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
+		NodeSearchEngine.clearCache();
 		ISelection selection = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService().getSelection();
 		if (selection instanceof StructuredSelection) {
 			StructuredSelection structSel = (StructuredSelection) selection;
