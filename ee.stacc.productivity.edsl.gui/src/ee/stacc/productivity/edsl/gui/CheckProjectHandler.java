@@ -52,13 +52,13 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		//CacheService.getCacheService().setNocache(true);
 		
-		NodeSearchEngine.clearCache();
 		Runtime.getRuntime().gc();
 		System.out.println("MEM: totalMemory() == " + Runtime.getRuntime().totalMemory());
 		System.out.println("MEM: maxMemory() == " + Runtime.getRuntime().maxMemory());
 		System.out.println("MEM: freeMemory() == " + Runtime.getRuntime().freeMemory());
 		System.out.println("MEM: used memory == " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
 		
+		NodeSearchEngine.clearCache();
 		Timer timer = new Timer();
 		timer.start("TIMER: whole process");
 		assert LOG.message("CheckProjectHandler.execute");
@@ -74,13 +74,16 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 		return null; // Must be null
 	}
 
+	/**
+	 * NB! Before calling this you should take care that NodeSearchEngine's ASTCache doesn't
+	 * contain old stuff (either clear it completely or remove updated AST-s)
+	 */
 	public void performCheck(IJavaElement optionsFrom, IJavaElement[] scope)
 			throws ExecutionException {
 		cleanMarkers(scope);
 		try {
 			Map<String, Object> options = OptionLoader.getElementSqlCheckerProperties(optionsFrom);
 			List<INodeDescriptor> hotspots = projectChecker.findHotspots(scope, options);
-			NodeSearchEngine.clearCache(); // clean up stuff
 			markHotspots(hotspots);
 			
 			projectChecker.processHotspots(hotspots, this,
