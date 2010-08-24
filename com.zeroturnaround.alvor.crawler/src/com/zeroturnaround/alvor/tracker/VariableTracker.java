@@ -76,7 +76,9 @@ public class VariableTracker {
 	}
 	
 	/*
-	 * target should be one of scope-s children
+	 * target is a descendant node of scope and we're looking for (possible)modifications to var that
+	 * happen before target node is evaluated.
+	 * if target == null then whole scope should be searched 
 	 */
 	private static NameUsage getLastReachingModIn(IVariableBinding var, ASTNode target, ASTNode scope) {
 		if (ASTUtil.isSimpleNode(scope)) {
@@ -104,11 +106,11 @@ public class VariableTracker {
 			return getLastReachingModInPostfixExp(var, target, (PostfixExpression)scope);
 		}
 		else if (scope instanceof ClassInstanceCreation) { // constructor call
-			// FIXME possible to modify smth in arguments (or expression?)
+			// TODO it's possible to modify smth in arguments (or expression?)
 			return null;
 		}
 		else if (scope instanceof ArrayAccess) {
-			// FIXME possible to modify smth in index or array expression
+			// TODO it's possible to modify smth in index or array expression
 			return null;
 		}
 		else if (scope instanceof Block) {
@@ -232,13 +234,11 @@ public class VariableTracker {
 			
 			int idx = ASTUtil.getParamIndex0(decl, var);
 			assert(idx != -1);
-			/*
-			if (idx == -1) {
-				throw new UnsupportedStringOpEx("Parameter ("
-						+ var+ ") not found in ("
-						+ decl.getName().getFullyQualifiedName() + ")"); 
-			}
-			*/
+//			if (idx == -1) {
+//				throw new UnsupportedStringOpEx("Parameter ("
+//						+ var+ ") not found in ("
+//						+ decl.getName().getFullyQualifiedName() + ")"); 
+//			}
 			return new NameInParameter(decl, idx);
 		}
 	}
@@ -322,23 +322,22 @@ public class VariableTracker {
 			}
 		}
 		
-		// no (preceding) statement modifies var, eg. this block doesn't affect target
+		// no (preceding) statement modifies var, e.g. this block doesn't affect target
 		return null;
 	}
 
 	private static NameUsage getLastReachingModInInv(IVariableBinding var,
 			ASTNode target, MethodInvocation inv) {
 		
-//		// TODO: too bold statement, but speeds up things
-//		if (inv.getName().getIdentifier().equals("toString")) {
-//			return null;
-//		}
-		
 		// optimize for immutable types
 		if (ASTUtil.isString(var.getType())) {
 			return null;
 		}
 		
+//		// TODO: too bold statement, but speeds up things
+//		if (inv.getName().getIdentifier().equals("toString")) {
+//			return null;
+//		}
 		
 		if (target == null) { // check the effect of evaluating the method call
 			// TODO if name is at more than 1 position, then this means trouble (because of aliasing)
@@ -367,8 +366,6 @@ public class VariableTracker {
 					return new NameInArgument(inv, i);
 				}
 			}
-			
-			return null;
 		}
 		
 		// check the effect of evaluating arguments (and TODO method expression)

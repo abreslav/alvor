@@ -114,7 +114,7 @@ CREATE INDEX CollectionContentsIndex ON CollectionContents(index);;;
 
 CREATE TRIGGER DeleteCollectionContentsRow AFTER DELETE
 	ON CollectionContents
-	REFERENCING OLD ROW AS deleted
+	REFERENCING OLD ROW AS d
 	FOR EACH ROW
 begin atomic
 	-- if one piece of a collection is invalidated then the whole collection should be invalidated
