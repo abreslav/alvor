@@ -32,13 +32,16 @@ import com.zeroturnaround.alvor.string.samplegen.SampleGenerator;
 public class JavaElementCheckerTest {
 	JavaElementChecker checker = new JavaElementChecker();
 	IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-	private static final String TEST_FOLDER = 
-		"C:/alvor/ws/com.zeroturnaround.alvor.crawler.tests/tests";
 	
-	private boolean clearCache = false;
+	private boolean clearCache = true;
 	
 	public JavaElementCheckerTest()  {
-		
+		File dir1 = new File (".");
+		try {
+			System.out.println ("Current dir : " + dir1.getCanonicalPath());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 //	@Test
@@ -89,7 +92,8 @@ public class JavaElementCheckerTest {
 		Map<String, Object> options = OptionLoader.getElementSqlCheckerProperties(element);
 		List<INodeDescriptor> hotspots = checker.findHotspots(new IJavaElement[] {element}, options);
 		
-		String filePrefix = TEST_FOLDER + "/" + id;
+		// assuming current folder is folder of the project containing this test
+		String filePrefix = "tests/" + id;
 		File abstractOutputFile = new File(filePrefix + "_found.txt");
 		if (abstractOutputFile.exists()) {
 			abstractOutputFile.delete();
