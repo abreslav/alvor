@@ -72,7 +72,7 @@
 /earved/src/ee/post/earved/dao/archive/InvoiceArchiveDAO.java:30, "select * from (select " " id, ref_invoice, invoice_number, ref_person_code_sale, ref_person_code_buy, is_buy_invoice_archive, file_type, content, signature, created " " from archive_invoice where ref_invoice=? order by created desc) where rownum=1" 
 /earved/src/ee/post/earved/dao/bCardQuery/BCardQueryDAO.java:73, "SELECT representation_right_id, representation_role_id, dom_base, role_id FROM right_role_state_v " " WHERE ref_person_representative = ? AND ref_person_represented = ?" 
 /earved/src/ee/post/earved/dao/campaignCode/CampaignCodeDAO.java:141, "SELECT code from (SELECT cc.code, ccp.date_activated FROM campaign_code_person ccp " " INNER JOIN campaign_code cc ON (cc.id = ccp.ref_campaign_code) " " WHERE ref_person=? ORDER BY ccp.date_activated DESC) where rownum = 1" 
-/earved/src/ee/post/earved/dao/channelBank/ChannelBankDAO.java:50, " select cb.id, cb.ref_dom_bank, dv.name, cb.bank_account_code, cb.is_supported from channel_bank cb " " join domain_v dv on cb.ref_dom_bank=dv.code " " where is_supported=1 and bank_account_code like ? ESCAPE '\\' and rownum=1" 
+/earved/src/ee/post/earved/dao/channelBank/ChannelBankDAO.java:57, "select cb.id, cb.ref_dom_bank, dv.name, cb.bank_account_code, cb.is_supported from channel_bank cb " " join domain_v dv on cb.ref_dom_bank=dv.code " " where is_supported=1 and bank_account_code like ? ESCAPE '\\' and rownum=1" 
 /earved/src/ee/post/earved/dao/client/ClientRegisterAccountDAO.java:57, "select account_number from client_register_account where last_used=1 and ref_client_register in (select id from client_register where ref_person=? and reg_number=?) and rownum=1"
 /earved/src/ee/post/earved/dao/client/ClientRegisterDAO.java:102, "select " " id, name, ref_person, reg_number, supplier_code, client_code " " from client_register where id = ? " 
 /earved/src/ee/post/earved/dao/client/ClientRegisterDAO.java:118, "select " " id, name, ref_person, reg_number, supplier_code, client_code " " from client_register where ref_person = ? and reg_number = ? and supplier_code is not null " 
@@ -218,9 +218,9 @@
 /earved/src/ee/post/earved/dao/bankAccount/BankAccountDAO.java:67, "SELECT " "id, ref_dom_bank, account_no, ref_person, iban" " FROM bank_account WHERE ref_person=?" 
 /earved/src/ee/post/earved/dao/bankAccount/BankAccountDAO.java:81, "SELECT " "id, ref_dom_bank, account_no, ref_person, iban" " FROM bank_account WHERE ref_person=? and REF_DOM_BANK in " " (?, ?, ?)" 
 /earved/src/ee/post/earved/dao/bankAccount/BankDAO.java:18, unsupported: No declarations found for: DomainEnum.BANK.name()
-/earved/src/ee/post/earved/dao/channelBank/ChannelBankDAO.java:23, "select cb.id, cb.ref_dom_bank, dv.name, cb.bank_account_code, cb.is_supported from channel_bank cb " " join domain_v dv on cb.ref_dom_bank=dv.code where cb.is_supported=1" 
-/earved/src/ee/post/earved/dao/channelBank/ChannelBankDAO.java:29, "select name from domain_v where code in (select ref_dom_bank from channel_bank where is_supported=1) order by name"
-/earved/src/ee/post/earved/dao/channelBank/ChannelBankDAO.java:34, "select bank_code from channel_bank where is_supported=1"
+/earved/src/ee/post/earved/dao/channelBank/ChannelBankDAO.java:30, "select cb.id, cb.ref_dom_bank, dv.name, cb.bank_account_code, cb.is_supported from channel_bank cb " " join domain_v dv on cb.ref_dom_bank=dv.code where cb.is_supported=1" 
+/earved/src/ee/post/earved/dao/channelBank/ChannelBankDAO.java:36, "select name from domain_v where code in (select ref_dom_bank from channel_bank where is_supported=1) order by name"
+/earved/src/ee/post/earved/dao/channelBank/ChannelBankDAO.java:41, "select bank_code from channel_bank where is_supported=1"
 /earved/src/ee/post/earved/dao/client/ClientRegisterAccountDAO.java:22, "select id, name, account_number,last_used from client_register_account where ref_client_register in (select id from client_register where ref_person=? and reg_number=?)"
 /earved/src/ee/post/earved/dao/client/ClientRegisterDAO.java:138, "select " " id, name, ref_person, reg_number, supplier_code, client_code " " from client_register where ref_person = ? and reg_number in "  " (?, ?, ?)" 
 /earved/src/ee/post/earved/dao/client/ClientRegisterDAO.java:218, "select " " id, name, ref_person, reg_number, supplier_code, client_code " " from client_register " "where ref_person=? and (UPPER(name) like ? ESCAPE '\\' or UPPER(reg_number) like ? ESCAPE '\\') and rownum<=?" 
@@ -236,7 +236,7 @@
 /earved/src/ee/post/earved/dao/dimension/DimensionDataConnectionDAO.java:80, "select connection_id, REF_DIMENSIONS_FROM, REF_DIMENSIONS_TO, REF_DIMENSION_DATA_FROM, REF_DIMENSION_DATA_TO, " "dimension_data_to_id, dimension_data_to_code, dimension_data_to_name, DIMENSION_NAME from " "dimens_data_connection_list_v where REF_DIMENSIONS_FROM=? and REF_DIMENSION_DATA_FROM=?" 
 /earved/src/ee/post/earved/dao/dimension/DimensionDataConnectionDAO.java:89, "select REF_DIMENSIONS_FROM from dimens_data_connection_list_v " "where REF_DIMENSIONS_TO=?" 
 /earved/src/ee/post/earved/dao/dimension/DimensionDataConnectionDAO.java:102, "select ref_dimensions_to from dimension_data_conn_invalid_v " "where ref_dimensions_from=? and ref_dimension_data_from=?" 
-/earved/src/ee/post/earved/dao/dimension/DimensionDataConnectionDAO.java:182, "select id, REF_DIMENSIONS_FROM, REF_DIMENSIONS_TO, REF_DIMENSION_DATA_FROM, REF_DIMENSION_DATA_TO " "from DIMENSION_DATA_CONNECTIONS where (REF_DIMENSIONS_FROM, REF_DIMENSION_DATA_FROM, REF_DIMENSIONS_TO) in " " ((?, ?), (?, ?))" 
+/earved/src/ee/post/earved/dao/dimension/DimensionDataConnectionDAO.java:182, "select id, REF_DIMENSIONS_FROM, REF_DIMENSIONS_TO, REF_DIMENSION_DATA_FROM, REF_DIMENSION_DATA_TO " "from DIMENSION_DATA_CONNECTIONS where (REF_DIMENSIONS_FROM, REF_DIMENSION_DATA_FROM, REF_DIMENSIONS_TO) in " " (?, ?, ?)" 
 /earved/src/ee/post/earved/dao/dimension/DimensionDataConnectionDAO.java:230, "select " " ref_person, error_msg, import_error_code, dimensions_from_name, dimensions_to_name, dimension_data_from_code, dimension_data_to_code " " from dimension_conn_import_error where import_group_id=?" 
 /earved/src/ee/post/earved/dao/dimension/DimensionDataDAO.java:79, "SELECT id FROM DIMENSION_DATA WHERE ref_dimensions = ?"
 /earved/src/ee/post/earved/dao/dimension/DimensionDataDAO.java:122, unsupported: unsupported modification scheme in loop
@@ -318,7 +318,7 @@
 /earved/src/ee/post/earved/dao/invoice/InvoiceSendingFailedDAO.java:199, "select ref_invoice, error from invoice_sending_failed where ref_invoice in " " (?, ?, ?)"  " and client_informed = 1" 
 /earved/src/ee/post/earved/dao/invoice/InvoiceSumGroupDAO.java:25, "select * from invoice_sum_group where ref_invoice = ?"
 /earved/src/ee/post/earved/dao/journal/JournalEntryDAO.java:48, "select id, cost_objective, cost_objective_dimension_code, cost_objective_dimension_name, order_id " "from journal_entry where ref_invoice_item = ? order by order_id asc" 
-/earved/src/ee/post/earved/dao/journal/JournalEntryDAO.java:169, "select dimension.dimension_name, dim_data.code from dimensions dimension join dimension_data dim_data on dimension.ref_person = ? and dim_data.ref_dimensions = dimension.id where " {"dimension.id = ? and ", ""}  "(dimension.dimension_name, dim_data.code) in "  " ((?, ?), (?, ?))" 
+/earved/src/ee/post/earved/dao/journal/JournalEntryDAO.java:169, "select dimension.dimension_name, dim_data.code from dimensions dimension join dimension_data dim_data on dimension.ref_person = ? and dim_data.ref_dimensions = dimension.id where " {"dimension.id = ? and ", ""}  "(dimension.dimension_name, dim_data.code) in "  " (?, ?, ?)" 
 /earved/src/ee/post/earved/dao/notification/NotificationDAO.java:50, "SELECT heading, notification FROM notifications WHERE trunc(sysdate) >= trunc(start_date) AND trunc(sysdate) <= trunc(end_date) AND" " (billing_plan IS NULL OR billing_plan = ?) AND (legal_person IS NULL OR legal_person = ?)" 
 /earved/src/ee/post/earved/dao/person/BillingPlanDAO.java:66, "SELECT id, code, name FROM billing_plan"
 /earved/src/ee/post/earved/dao/person/BillingPlanDAO.java:71, "SELECT id, code, name FROM billing_plan where code != ?"
@@ -448,7 +448,7 @@
 /earved/src/ee/post/earved/dao/invoice/ConfirmDAO.java:656, "update confirm set SENT_TO_CONFIRM_TIME=sysdate where id=? and rownum=1"
 /earved/src/ee/post/earved/dao/invoice/ConfirmDAO.java:662, "update confirm set ref_dom_confirm_decision=?, decision_time=sysdate, decision_comment=? where id=?"
 /earved/src/ee/post/earved/dao/invoice/ConfirmDAO.java:668, "update confirm set ref_dom_confirm_decision=?, decision_comment=? where id=?"
-/earved/src/ee/post/earved/dao/invoice/ConfirmDAO.java:786, "delete from invoice_confirm_late where (ref_invoice, ref_confirm) not in " " ((?, ?), (?, ?))" 
+/earved/src/ee/post/earved/dao/invoice/ConfirmDAO.java:786, "delete from invoice_confirm_late where (ref_invoice, ref_confirm) not in " " (?, ?, ?)" 
 /earved/src/ee/post/earved/dao/invoice/ConfirmDAO.java:823, "update confirm set previous=(case when id in " " (?, ?, ?)"  " then 1 else 0 end) where ref_invoice=?" 
 /earved/src/ee/post/earved/dao/invoice/ConfirmDAO.java:835, unsupported: unsupported modification scheme in loop
 /earved/src/ee/post/earved/dao/invoice/ConfirmDAO.java:847, unsupported: unsupported modification scheme in loop

@@ -1,4 +1,3 @@
- select cb.id, cb.ref_dom_bank, dv.name, cb.bank_account_code, cb.is_supported from channel_bank cb  join domain_v dv on cb.ref_dom_bank=dv.code  where is_supported=1 and bank_account_code like ? ESCAPE '\' and rownum=1
 DELETE FROM BANK_ACCOUNT WHERE ID = ?
 DELETE FROM VAT_CODES WHERE ID = ?
 DELETE FROM VAT_CODE_PERSON WHERE ID = ?
@@ -537,7 +536,7 @@ delete from invoice_channel_additional where id =?
 delete from invoice_channel_additional where id in (select ref_invoice_channel_additional from invoice_channel where ref_invoice=? and ref_invoice_automatic is not null)
 delete from invoice_channel_additional where id in (select ref_invoice_channel_additional where id in  (?, ?, ?))
 delete from invoice_channel_preferences where id = ? 
-delete from invoice_confirm_late where (ref_invoice, ref_confirm) not in  ((?, ?), (?, ?))
+delete from invoice_confirm_late where (ref_invoice, ref_confirm) not in  (?, ?, ?)
 delete from invoice_email_white_list where ref_person=? and email=?
 delete from invoice_emails where id=?
 delete from invoice_item where id = ?
@@ -703,6 +702,7 @@ select account_number from account_info where ref_invoice_party = ? and rownum=1
 select account_number from client_register_account where last_used=1 and ref_client_register in (select id from client_register where ref_person=? and reg_number=?) and rownum=1
 select account_number, bank_name from account_info where ref_invoice_party = ? order by id
 select bank_code from channel_bank where is_supported=1
+select cb.id, cb.ref_dom_bank, dv.name, cb.bank_account_code, cb.is_supported from channel_bank cb  join domain_v dv on cb.ref_dom_bank=dv.code  where is_supported=1 and bank_account_code like ? ESCAPE '\' and rownum=1
 select cb.id, cb.ref_dom_bank, dv.name, cb.bank_account_code, cb.is_supported from channel_bank cb  join domain_v dv on cb.ref_dom_bank=dv.code where cb.is_supported=1
 select code from person where id=?
 select code, name from dimension_data where code in  (?, ?, ?)
@@ -715,8 +715,8 @@ select count(*) from buy_invoice_awaiting_verif_v where ref_person_code_buy = ? 
 select count(*) from invoice_channel_preferences where ref_person_owner = ? and preference_type=0 
 select count(invoice_number) from invoice where ref_person_code_sale=? and UPPER(invoice_number) like ? ESCAPE '\'
 select creator_id from (select c.ref_invoice, c.created_by as creator_id from confirm c where c.canceled=0 and ref_invoice=? order by c.created,c.id) where rownum=1 
-select dimension.dimension_name, dim_data.code from dimensions dimension join dimension_data dim_data on dimension.ref_person = ? and dim_data.ref_dimensions = dimension.id where (dimension.dimension_name, dim_data.code) in  ((?, ?), (?, ?))
-select dimension.dimension_name, dim_data.code from dimensions dimension join dimension_data dim_data on dimension.ref_person = ? and dim_data.ref_dimensions = dimension.id where dimension.id = ? and (dimension.dimension_name, dim_data.code) in  ((?, ?), (?, ?))
+select dimension.dimension_name, dim_data.code from dimensions dimension join dimension_data dim_data on dimension.ref_person = ? and dim_data.ref_dimensions = dimension.id where (dimension.dimension_name, dim_data.code) in  (?, ?, ?)
+select dimension.dimension_name, dim_data.code from dimensions dimension join dimension_data dim_data on dimension.ref_person = ? and dim_data.ref_dimensions = dimension.id where dimension.id = ? and (dimension.dimension_name, dim_data.code) in  (?, ?, ?)
 select distinct deputy_person_id, deputy_full_name, has_deputies, code, position from deputies_deputies_v where representative_id=? and represented_id=? order by deputy_full_name asc
 select distinct invoice_number from invoice where ref_person_code_sale=? and add_months(created, (select value from SYS_PARAM where code=?)) >= sysdate and UPPER(invoice_number) like ? ESCAPE '\' and invoice_number >= ? order by invoice_number
 select distinct item_id from pattern_item_ids where 
@@ -779,7 +779,7 @@ select id, REF_ACCOUNT_PATTERN, COST_OBJECTIVE_DIMENSION_NAME, ITEM_DESCRIPTION,
 select id, REF_ACCOUNT_PATTERN, COST_OBJECTIVE_DIMENSION_NAME, ITEM_DESCRIPTION, SELLER_PRODUCT_ID from pattern_item where ref_account_pattern=? and UPPER(ITEM_DESCRIPTION)=? and COST_OBJECTIVE_DIMENSION_NAME is null and UPPER(SELLER_PRODUCT_ID)=? and rownum=1
 select id, REF_ACCOUNT_PATTERN, COST_OBJECTIVE_DIMENSION_NAME, ITEM_DESCRIPTION, SELLER_PRODUCT_ID from pattern_item where ref_account_pattern=? and UPPER(ITEM_DESCRIPTION)=? and UPPER(COST_OBJECTIVE_DIMENSION_NAME)=? and SELLER_PRODUCT_ID is null and rownum=1
 select id, REF_ACCOUNT_PATTERN, COST_OBJECTIVE_DIMENSION_NAME, ITEM_DESCRIPTION, SELLER_PRODUCT_ID from pattern_item where ref_account_pattern=? and UPPER(ITEM_DESCRIPTION)=? and UPPER(COST_OBJECTIVE_DIMENSION_NAME)=? and UPPER(SELLER_PRODUCT_ID)=? and rownum=1
-select id, REF_DIMENSIONS_FROM, REF_DIMENSIONS_TO, REF_DIMENSION_DATA_FROM, REF_DIMENSION_DATA_TO from DIMENSION_DATA_CONNECTIONS where (REF_DIMENSIONS_FROM, REF_DIMENSION_DATA_FROM, REF_DIMENSIONS_TO) in  ((?, ?), (?, ?))
+select id, REF_DIMENSIONS_FROM, REF_DIMENSIONS_TO, REF_DIMENSION_DATA_FROM, REF_DIMENSION_DATA_TO from DIMENSION_DATA_CONNECTIONS where (REF_DIMENSIONS_FROM, REF_DIMENSION_DATA_FROM, REF_DIMENSIONS_TO) in  (?, ?, ?)
 select id, REF_PATTERN_ITEM, REF_ACCOUNT_PATTERN, REF_PATTERN_EXTRA, ACCOUNTING_ACCOUNT_NAME, ACCOUNTING_ACCOUNT_CODE, ACCOUNTING_OPPOSITE_ACCOUNT from pattern_account where REF_ACCOUNT_PATTERN=? and rownum=1
 select id, REF_PATTERN_ITEM, REF_ACCOUNT_PATTERN, REF_PATTERN_EXTRA, ACCOUNTING_ACCOUNT_NAME, ACCOUNTING_ACCOUNT_CODE, ACCOUNTING_OPPOSITE_ACCOUNT from pattern_account where REF_PATTERN_EXTRA in  (?, ?, ?)
 select id, REF_PATTERN_ITEM, REF_ACCOUNT_PATTERN, REF_PATTERN_EXTRA, ACCOUNTING_ACCOUNT_NAME, ACCOUNTING_ACCOUNT_CODE, ACCOUNTING_OPPOSITE_ACCOUNT from pattern_account where REF_PATTERN_EXTRA=? and rownum=1
