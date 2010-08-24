@@ -1,10 +1,10 @@
-package ee.stacc.productivity.edsl.cache;
+package com.zeroturnaround.alvor.cache;
 
 import java.util.Collection;
 import java.util.Set;
 
-import ee.stacc.productivity.edsl.string.IAbstractString;
-import ee.stacc.productivity.edsl.string.IPosition;
+import com.zeroturnaround.alvor.string.IAbstractString;
+import com.zeroturnaround.alvor.string.IPosition;
 
 public interface ICacheService {
 

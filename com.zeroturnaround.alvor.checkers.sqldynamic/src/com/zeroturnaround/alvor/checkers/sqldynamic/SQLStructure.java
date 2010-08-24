@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.checkers.sqldynamic;
+package com.zeroturnaround.alvor.checkers.sqldynamic;
 import java.sql.ParameterMetaData;
 import java.sql.ResultSetMetaData;
 

@@ -1,6 +1,6 @@
-package ee.stacc.productivity.edsl.crawler;
+package com.zeroturnaround.alvor.crawler;
 
-import ee.stacc.productivity.edsl.string.IPosition;
+import com.zeroturnaround.alvor.string.IPosition;
 
 public class UnsupportedNodeDescriptor extends NodeDescriptor {
 	private String problemMessage;

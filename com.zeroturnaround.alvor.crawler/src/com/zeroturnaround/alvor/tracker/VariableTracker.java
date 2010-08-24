@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.tracker;
+package com.zeroturnaround.alvor.tracker;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ArrayAccess;
@@ -26,8 +26,8 @@ import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
-import ee.stacc.productivity.edsl.cache.UnsupportedStringOpEx;
-import ee.stacc.productivity.edsl.crawler.ASTUtil;
+import com.zeroturnaround.alvor.cache.UnsupportedStringOpEx;
+import com.zeroturnaround.alvor.crawler.ASTUtil;
 
 /*
  * getLastReachingModIn* methods stay in given scope

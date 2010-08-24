@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.parser;
+package com.zeroturnaround.alvor.parser;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -8,9 +8,9 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import ee.stacc.productivity.edsl.sqlparser.ParserSimulator;
-import ee.stacc.productivity.edsl.string.IAbstractString;
-import ee.stacc.productivity.edsl.string.parser.AbstractStringParser;
+import com.zeroturnaround.alvor.sqlparser.ParserSimulator;
+import com.zeroturnaround.alvor.string.IAbstractString;
+import com.zeroturnaround.alvor.string.parser.AbstractStringParser;
 
 
 public class ParserPerformanceTest {

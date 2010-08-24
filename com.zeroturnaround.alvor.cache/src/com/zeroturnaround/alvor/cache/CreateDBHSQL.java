@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.cache;
+package com.zeroturnaround.alvor.cache;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -9,8 +9,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import ee.stacc.productivity.edsl.common.logging.ILog;
-import ee.stacc.productivity.edsl.common.logging.Logs;
+import com.zeroturnaround.alvor.common.logging.ILog;
+import com.zeroturnaround.alvor.common.logging.Logs;
 
 public class CreateDBHSQL {
 

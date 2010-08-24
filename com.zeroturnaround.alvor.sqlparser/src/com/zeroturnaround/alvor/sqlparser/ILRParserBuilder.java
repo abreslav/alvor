@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.sqlparser;
+package com.zeroturnaround.alvor.sqlparser;
 
 /**
  * A builder interface to construct parsers from Bison XML format (see the Builder pattern in GoF)

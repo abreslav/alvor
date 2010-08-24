@@ -1,20 +1,20 @@
-package ee.stacc.productivity.edsl.checkers.sqlstatic;
+package com.zeroturnaround.alvor.checkers.sqlstatic;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
-import ee.stacc.productivity.edsl.lexer.alphabet.ISequence;
-import ee.stacc.productivity.edsl.lexer.alphabet.Token;
-import ee.stacc.productivity.edsl.lexer.alphabet.ISequence.IFoldFunction;
-import ee.stacc.productivity.edsl.lexer.automata.CharacterUtil;
-import ee.stacc.productivity.edsl.lexer.automata.State;
-import ee.stacc.productivity.edsl.lexer.automata.StringToAutomatonConverter;
-import ee.stacc.productivity.edsl.string.IAbstractString;
-import ee.stacc.productivity.edsl.string.IPosition;
-import ee.stacc.productivity.edsl.string.Position;
+import com.zeroturnaround.alvor.lexer.alphabet.IAbstractInputItem;
+import com.zeroturnaround.alvor.lexer.alphabet.ISequence;
+import com.zeroturnaround.alvor.lexer.alphabet.Token;
+import com.zeroturnaround.alvor.lexer.alphabet.ISequence.IFoldFunction;
+import com.zeroturnaround.alvor.lexer.automata.CharacterUtil;
+import com.zeroturnaround.alvor.lexer.automata.State;
+import com.zeroturnaround.alvor.lexer.automata.StringToAutomatonConverter;
+import com.zeroturnaround.alvor.string.IAbstractString;
+import com.zeroturnaround.alvor.string.IPosition;
+import com.zeroturnaround.alvor.string.Position;
 
 /**
  * Implements miscellaneous functions on positioned characters

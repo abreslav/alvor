@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.lexer.automata;
+package com.zeroturnaround.alvor.lexer.automata;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -15,18 +15,18 @@ import java.util.Map.Entry;
 
 import org.junit.Test;
 
-import ee.stacc.productivity.edsl.checkers.sqlstatic.SyntacticalSQLChecker;
-import ee.stacc.productivity.edsl.lexer.sql.SQLLexer;
-import ee.stacc.productivity.edsl.string.IAbstractString;
-import ee.stacc.productivity.edsl.string.IAbstractStringVisitor;
-import ee.stacc.productivity.edsl.string.StringCharacterSet;
-import ee.stacc.productivity.edsl.string.StringChoice;
-import ee.stacc.productivity.edsl.string.StringConstant;
-import ee.stacc.productivity.edsl.string.StringParameter;
-import ee.stacc.productivity.edsl.string.StringRepetition;
-import ee.stacc.productivity.edsl.string.StringSequence;
-import ee.stacc.productivity.edsl.string.parser.AbstractStringParser;
-import ee.stacc.productivity.edsl.tests.util.TestUtil;
+import com.zeroturnaround.alvor.checkers.sqlstatic.SyntacticalSQLChecker;
+import com.zeroturnaround.alvor.lexer.sql.SQLLexer;
+import com.zeroturnaround.alvor.string.IAbstractString;
+import com.zeroturnaround.alvor.string.IAbstractStringVisitor;
+import com.zeroturnaround.alvor.string.StringCharacterSet;
+import com.zeroturnaround.alvor.string.StringChoice;
+import com.zeroturnaround.alvor.string.StringConstant;
+import com.zeroturnaround.alvor.string.StringParameter;
+import com.zeroturnaround.alvor.string.StringRepetition;
+import com.zeroturnaround.alvor.string.StringSequence;
+import com.zeroturnaround.alvor.string.parser.AbstractStringParser;
+import com.zeroturnaround.alvor.tests.util.TestUtil;
 
 
 public class LexerPerformanceTest {

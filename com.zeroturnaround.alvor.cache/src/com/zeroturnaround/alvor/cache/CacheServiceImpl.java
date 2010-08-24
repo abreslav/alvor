@@ -1,7 +1,7 @@
 /**
  * 
  */
-package ee.stacc.productivity.edsl.cache;
+package com.zeroturnaround.alvor.cache;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -16,19 +16,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ee.stacc.productivity.edsl.common.logging.ILog;
-import ee.stacc.productivity.edsl.common.logging.Logs;
-import ee.stacc.productivity.edsl.string.AbstractStringCollection;
-import ee.stacc.productivity.edsl.string.IAbstractString;
-import ee.stacc.productivity.edsl.string.IAbstractStringVisitor;
-import ee.stacc.productivity.edsl.string.IPosition;
-import ee.stacc.productivity.edsl.string.Position;
-import ee.stacc.productivity.edsl.string.StringCharacterSet;
-import ee.stacc.productivity.edsl.string.StringChoice;
-import ee.stacc.productivity.edsl.string.StringConstant;
-import ee.stacc.productivity.edsl.string.StringParameter;
-import ee.stacc.productivity.edsl.string.StringRepetition;
-import ee.stacc.productivity.edsl.string.StringSequence;
+import com.zeroturnaround.alvor.common.logging.ILog;
+import com.zeroturnaround.alvor.common.logging.Logs;
+import com.zeroturnaround.alvor.string.AbstractStringCollection;
+import com.zeroturnaround.alvor.string.IAbstractString;
+import com.zeroturnaround.alvor.string.IAbstractStringVisitor;
+import com.zeroturnaround.alvor.string.IPosition;
+import com.zeroturnaround.alvor.string.Position;
+import com.zeroturnaround.alvor.string.StringCharacterSet;
+import com.zeroturnaround.alvor.string.StringChoice;
+import com.zeroturnaround.alvor.string.StringConstant;
+import com.zeroturnaround.alvor.string.StringParameter;
+import com.zeroturnaround.alvor.string.StringRepetition;
+import com.zeroturnaround.alvor.string.StringSequence;
 
 public final class CacheServiceImpl implements ICacheService {
 	private static interface StringTypes {

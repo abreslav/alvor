@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.lexer.alphabet;
+package com.zeroturnaround.alvor.lexer.alphabet;
 
 /**
  * A token (code + text) as an input character for an automaton/transducer.

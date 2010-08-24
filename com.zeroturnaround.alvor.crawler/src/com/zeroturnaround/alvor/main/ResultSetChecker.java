@@ -1,10 +1,10 @@
-package ee.stacc.productivity.edsl.main;
+package com.zeroturnaround.alvor.main;
 
 import java.util.List;
 
 import org.eclipse.jdt.core.IJavaElement;
 
-import ee.stacc.productivity.edsl.crawler.NodeSearchEngine;
+import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
 
 public class ResultSetChecker {
 	public static void checkUsages(IJavaElement[] scope) {

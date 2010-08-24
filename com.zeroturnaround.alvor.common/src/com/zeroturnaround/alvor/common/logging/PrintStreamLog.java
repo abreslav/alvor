@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.common.logging;
+package com.zeroturnaround.alvor.common.logging;
 
 import java.io.PrintStream;
 

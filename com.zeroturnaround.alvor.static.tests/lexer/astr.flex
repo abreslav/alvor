@@ -1,6 +1,6 @@
-package ee.stacc.productivity.edsl.string.parser;
+package com.zeroturnaround.alvor.string.parser;
 
-import static ee.stacc.productivity.edsl.string.parser.TokenType.*;
+import static com.zeroturnaround.alvor.string.parser.TokenType.*;
 
 @SuppressWarnings("unused")
 

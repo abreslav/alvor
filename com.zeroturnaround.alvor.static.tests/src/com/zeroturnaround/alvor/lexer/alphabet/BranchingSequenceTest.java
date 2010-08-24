@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.lexer.alphabet;
+package com.zeroturnaround.alvor.lexer.alphabet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -8,7 +8,7 @@ import java.util.HashSet;
 
 import org.junit.Test;
 
-import ee.stacc.productivity.edsl.lexer.alphabet.ISequence.IFoldFunction;
+import com.zeroturnaround.alvor.lexer.alphabet.ISequence.IFoldFunction;
 
 
 public class BranchingSequenceTest {

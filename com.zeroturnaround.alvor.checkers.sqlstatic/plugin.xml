@@ -2,9 +2,9 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
-         point="ee.stacc.productivity.edsl.checkers.checkers">
+         point="com.zeroturnaround.alvor.checkers.checkers">
       <checker
-            class="ee.stacc.productivity.edsl.checkers.sqlstatic.SyntacticalSQLChecker">
+            class="com.zeroturnaround.alvor.checkers.sqlstatic.SyntacticalSQLChecker">
       </checker>
    </extension>
 

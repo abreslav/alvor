@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.sqlparser;
+package com.zeroturnaround.alvor.sqlparser;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -14,7 +14,7 @@ import java.util.Map.Entry;
 
 import org.jdom.JDOMException;
 
-import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
+import com.zeroturnaround.alvor.lexer.alphabet.IAbstractInputItem;
 
 /**
  * Represents an LR-parser as a static structure (or states and actions) and a set of processing rules.

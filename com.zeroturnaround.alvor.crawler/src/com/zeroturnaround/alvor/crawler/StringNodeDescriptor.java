@@ -1,8 +1,8 @@
-package ee.stacc.productivity.edsl.crawler;
+package com.zeroturnaround.alvor.crawler;
 
-import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
-import ee.stacc.productivity.edsl.string.IAbstractString;
-import ee.stacc.productivity.edsl.string.IPosition;
+import com.zeroturnaround.alvor.checkers.IStringNodeDescriptor;
+import com.zeroturnaround.alvor.string.IAbstractString;
+import com.zeroturnaround.alvor.string.IPosition;
 
 public class StringNodeDescriptor extends NodeDescriptor implements IStringNodeDescriptor {
 

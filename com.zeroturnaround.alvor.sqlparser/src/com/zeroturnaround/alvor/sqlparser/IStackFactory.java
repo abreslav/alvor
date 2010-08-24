@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.sqlparser;
+package com.zeroturnaround.alvor.sqlparser;
 
 /**
  * Produces parsing stacks

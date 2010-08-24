@@ -1,13 +1,13 @@
-package ee.stacc.productivity.edsl.crawler;
+package com.zeroturnaround.alvor.crawler;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import ee.stacc.productivity.edsl.string.IAbstractString;
-import ee.stacc.productivity.edsl.string.StringChoice;
-import ee.stacc.productivity.edsl.string.StringConstant;
-import ee.stacc.productivity.edsl.string.StringSequence;
+import com.zeroturnaround.alvor.string.IAbstractString;
+import com.zeroturnaround.alvor.string.StringChoice;
+import com.zeroturnaround.alvor.string.StringConstant;
+import com.zeroturnaround.alvor.string.StringSequence;
 
 
 public class StringConverterTest {

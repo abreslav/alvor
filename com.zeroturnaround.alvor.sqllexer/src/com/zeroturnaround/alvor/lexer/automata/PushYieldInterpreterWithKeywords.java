@@ -1,16 +1,16 @@
-package ee.stacc.productivity.edsl.lexer.automata;
+package com.zeroturnaround.alvor.lexer.automata;
 
 import java.util.List;
 
-import ee.stacc.productivity.edsl.lexer.alphabet.BranchingSequence;
-import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
-import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractOutputItem;
-import ee.stacc.productivity.edsl.lexer.alphabet.ISequence;
-import ee.stacc.productivity.edsl.lexer.alphabet.PushInput;
-import ee.stacc.productivity.edsl.lexer.alphabet.Token;
-import ee.stacc.productivity.edsl.lexer.alphabet.Yield;
-import ee.stacc.productivity.edsl.lexer.sql.SQLLexer;
-import ee.stacc.productivity.edsl.sqllexer.SQLLexerData;
+import com.zeroturnaround.alvor.lexer.alphabet.BranchingSequence;
+import com.zeroturnaround.alvor.lexer.alphabet.IAbstractInputItem;
+import com.zeroturnaround.alvor.lexer.alphabet.IAbstractOutputItem;
+import com.zeroturnaround.alvor.lexer.alphabet.ISequence;
+import com.zeroturnaround.alvor.lexer.alphabet.PushInput;
+import com.zeroturnaround.alvor.lexer.alphabet.Token;
+import com.zeroturnaround.alvor.lexer.alphabet.Yield;
+import com.zeroturnaround.alvor.lexer.sql.SQLLexer;
+import com.zeroturnaround.alvor.sqllexer.SQLLexerData;
 
 /**
  * This interpreter supports {@link PushInput} and {@link Yield}, and creates keyword tokens

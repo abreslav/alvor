@@ -1,23 +1,23 @@
-package ee.stacc.productivity.edsl.checkers.sqlstatic;
+package com.zeroturnaround.alvor.checkers.sqlstatic;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import ee.stacc.productivity.edsl.checkers.IAbstractStringChecker;
-import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
-import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
-import ee.stacc.productivity.edsl.common.logging.ILog;
-import ee.stacc.productivity.edsl.common.logging.Logs;
-import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
-import ee.stacc.productivity.edsl.lexer.alphabet.Token;
-import ee.stacc.productivity.edsl.lexer.automata.State;
-import ee.stacc.productivity.edsl.sqlparser.IParseErrorHandler;
-import ee.stacc.productivity.edsl.sqlparser.ParserSimulator;
-import ee.stacc.productivity.edsl.string.IAbstractString;
-import ee.stacc.productivity.edsl.string.IPosition;
-import ee.stacc.productivity.edsl.string.StringChoice;
-import ee.stacc.productivity.edsl.string.util.AbstractStringSizeCounter;
+import com.zeroturnaround.alvor.checkers.IAbstractStringChecker;
+import com.zeroturnaround.alvor.checkers.ISQLErrorHandler;
+import com.zeroturnaround.alvor.checkers.IStringNodeDescriptor;
+import com.zeroturnaround.alvor.common.logging.ILog;
+import com.zeroturnaround.alvor.common.logging.Logs;
+import com.zeroturnaround.alvor.lexer.alphabet.IAbstractInputItem;
+import com.zeroturnaround.alvor.lexer.alphabet.Token;
+import com.zeroturnaround.alvor.lexer.automata.State;
+import com.zeroturnaround.alvor.sqlparser.IParseErrorHandler;
+import com.zeroturnaround.alvor.sqlparser.ParserSimulator;
+import com.zeroturnaround.alvor.string.IAbstractString;
+import com.zeroturnaround.alvor.string.IPosition;
+import com.zeroturnaround.alvor.string.StringChoice;
+import com.zeroturnaround.alvor.string.util.AbstractStringSizeCounter;
 
 /**
  * Performs syntax checking for abstract strings containing SQL statements

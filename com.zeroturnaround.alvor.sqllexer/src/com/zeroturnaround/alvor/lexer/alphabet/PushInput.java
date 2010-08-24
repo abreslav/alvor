@@ -1,6 +1,6 @@
-package ee.stacc.productivity.edsl.lexer.alphabet;
+package com.zeroturnaround.alvor.lexer.alphabet;
 
-import ee.stacc.productivity.edsl.lexer.automata.IOutputItemInterpreter;
+import com.zeroturnaround.alvor.lexer.automata.IOutputItemInterpreter;
 
 /**
  * An "output command" for transducer: tells the interpreter ({@link IOutputItemInterpreter}) 

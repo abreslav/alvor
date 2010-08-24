@@ -1,11 +1,11 @@
-package ee.stacc.productivity.edsl.parser;
+package com.zeroturnaround.alvor.parser;
 
 import java.io.File;
 import java.io.IOException;
 
 import org.jdom.JDOMException;
 
-import ee.stacc.productivity.edsl.sqlparser.LRParser;
+import com.zeroturnaround.alvor.sqlparser.LRParser;
 
 public class TestParsers {
 

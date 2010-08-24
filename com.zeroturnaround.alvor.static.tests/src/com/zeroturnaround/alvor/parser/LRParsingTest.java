@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.parser;
+package com.zeroturnaround.alvor.parser;
 
 import static org.junit.Assert.assertEquals;
 
@@ -13,11 +13,11 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import ee.stacc.productivity.edsl.sqlparser.BoundedStack;
-import ee.stacc.productivity.edsl.sqlparser.ILRParser;
-import ee.stacc.productivity.edsl.sqlparser.IParserStack;
-import ee.stacc.productivity.edsl.sqlparser.IStackFactory;
-import ee.stacc.productivity.edsl.sqlparser.Parsers;
+import com.zeroturnaround.alvor.sqlparser.BoundedStack;
+import com.zeroturnaround.alvor.sqlparser.ILRParser;
+import com.zeroturnaround.alvor.sqlparser.IParserStack;
+import com.zeroturnaround.alvor.sqlparser.IStackFactory;
+import com.zeroturnaround.alvor.sqlparser.Parsers;
 
 @RunWith(Parameterized.class)
 public class LRParsingTest {

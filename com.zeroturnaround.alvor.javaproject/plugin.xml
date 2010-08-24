@@ -11,7 +11,7 @@
             hasNature="true"
             isConfigurable="true">
          <run
-               class="ee.stacc.productivity.edsl.javaproject.builder.ESQLBuilder">
+               class="com.zeroturnaround.alvor.javaproject.builder.ESQLBuilder">
          </run>
       </builder>
    </extension>
@@ -21,11 +21,11 @@
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
-               class="ee.stacc.productivity.edsl.javaproject.builder.ESQLNature">
+               class="com.zeroturnaround.alvor.javaproject.builder.ESQLNature">
          </run>
       </runtime>
       <builder
-            id="ee.stacc.productivity.edsl.javaproject.esqlBuilder">
+            id="com.zeroturnaround.alvor.javaproject.esqlBuilder">
       </builder>
    </extension>
    <extension
@@ -34,13 +34,13 @@
             adaptable="true"
             objectClass="org.eclipse.core.resources.IProject"
             nameFilter="*"
-            id="ee.stacc.productivity.edsl.javaproject.contribution1">
+            id="com.zeroturnaround.alvor.javaproject.contribution1">
          <action
                label="Add/Remove ESQL Nature"
-               class="ee.stacc.productivity.edsl.javaproject.builder.ToggleNatureAction"
+               class="com.zeroturnaround.alvor.javaproject.builder.ToggleNatureAction"
                menubarPath="additions"
                enablesFor="+"
-               id="ee.stacc.productivity.edsl.javaproject.addRemoveNatureAction">
+               id="com.zeroturnaround.alvor.javaproject.addRemoveNatureAction">
          </action>
       </objectContribution>
    </extension>

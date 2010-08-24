@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.tests.util;
+package com.zeroturnaround.alvor.tests.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -9,12 +9,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import ee.stacc.productivity.edsl.lexer.automata.AbstractCharacterMapper;
-import ee.stacc.productivity.edsl.lexer.automata.AutomataUtils;
-import ee.stacc.productivity.edsl.lexer.automata.ICharacterMapper;
-import ee.stacc.productivity.edsl.lexer.automata.IInputToString;
-import ee.stacc.productivity.edsl.lexer.automata.State;
-import ee.stacc.productivity.edsl.lexer.automata.AutomataUtils.IOutput;
+import com.zeroturnaround.alvor.lexer.automata.AbstractCharacterMapper;
+import com.zeroturnaround.alvor.lexer.automata.AutomataUtils;
+import com.zeroturnaround.alvor.lexer.automata.ICharacterMapper;
+import com.zeroturnaround.alvor.lexer.automata.IInputToString;
+import com.zeroturnaround.alvor.lexer.automata.State;
+import com.zeroturnaround.alvor.lexer.automata.AutomataUtils.IOutput;
 
 public class TestUtil {
 

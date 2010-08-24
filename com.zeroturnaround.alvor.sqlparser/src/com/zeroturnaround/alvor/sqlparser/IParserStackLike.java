@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.sqlparser;
+package com.zeroturnaround.alvor.sqlparser;
 
 /**
  * A common super-interface for simple LR-parsing stacks ({@link IParserStack}) and GLR-like multi-stacks.

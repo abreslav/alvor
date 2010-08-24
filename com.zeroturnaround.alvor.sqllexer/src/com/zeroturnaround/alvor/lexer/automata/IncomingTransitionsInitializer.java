@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.lexer.automata;
+package com.zeroturnaround.alvor.lexer.automata;
 
 import java.util.ArrayList;
 import java.util.HashSet;

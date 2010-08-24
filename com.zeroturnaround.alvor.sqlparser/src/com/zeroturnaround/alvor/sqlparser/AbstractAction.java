@@ -1,7 +1,7 @@
 /**
  * 
  */
-package ee.stacc.productivity.edsl.sqlparser;
+package com.zeroturnaround.alvor.sqlparser;
 
 /**
  * A base class for actions (might have been called ActionAdapter, in Swing style) 

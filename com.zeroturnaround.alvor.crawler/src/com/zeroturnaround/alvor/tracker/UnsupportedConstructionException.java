@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.tracker;
+package com.zeroturnaround.alvor.tracker;
 
 public class UnsupportedConstructionException extends
 		UnsupportedOperationException {

@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.cache;
+package com.zeroturnaround.alvor.cache;
 
 import java.sql.Connection;
 import java.sql.SQLException;

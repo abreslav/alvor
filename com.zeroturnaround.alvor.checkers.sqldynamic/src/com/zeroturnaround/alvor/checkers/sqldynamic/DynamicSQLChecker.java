@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.checkers.sqldynamic;
+package com.zeroturnaround.alvor.checkers.sqldynamic;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import ee.stacc.productivity.edsl.checkers.IAbstractStringChecker;
-import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
-import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
-import ee.stacc.productivity.edsl.common.logging.ILog;
-import ee.stacc.productivity.edsl.common.logging.Logs;
-import ee.stacc.productivity.edsl.string.samplegen.SampleGenerator;
-import ee.stacc.productivity.edsl.string.util.AbstractStringSizeCounter;
+import com.zeroturnaround.alvor.checkers.IAbstractStringChecker;
+import com.zeroturnaround.alvor.checkers.ISQLErrorHandler;
+import com.zeroturnaround.alvor.checkers.IStringNodeDescriptor;
+import com.zeroturnaround.alvor.common.logging.ILog;
+import com.zeroturnaround.alvor.common.logging.Logs;
+import com.zeroturnaround.alvor.string.samplegen.SampleGenerator;
+import com.zeroturnaround.alvor.string.util.AbstractStringSizeCounter;
 
 public class DynamicSQLChecker implements IAbstractStringChecker {
 	private static final ILog LOG = Logs.getLog(DynamicSQLChecker.class);

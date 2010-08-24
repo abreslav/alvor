@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.javaproject.builder;
+package com.zeroturnaround.alvor.javaproject.builder;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,14 +19,14 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaCore;
 
-import ee.stacc.productivity.edsl.cache.CacheService;
-import ee.stacc.productivity.edsl.common.logging.ILog;
-import ee.stacc.productivity.edsl.common.logging.Logs;
-import ee.stacc.productivity.edsl.common.logging.Timer;
-import ee.stacc.productivity.edsl.crawler.NodeSearchEngine;
-import ee.stacc.productivity.edsl.crawler.PositionUtil;
-import ee.stacc.productivity.edsl.gui.CheckProjectHandler;
-import ee.stacc.productivity.edsl.string.IPosition;
+import com.zeroturnaround.alvor.cache.CacheService;
+import com.zeroturnaround.alvor.common.logging.ILog;
+import com.zeroturnaround.alvor.common.logging.Logs;
+import com.zeroturnaround.alvor.common.logging.Timer;
+import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
+import com.zeroturnaround.alvor.crawler.PositionUtil;
+import com.zeroturnaround.alvor.gui.CheckProjectHandler;
+import com.zeroturnaround.alvor.string.IPosition;
 
 public class ESQLBuilder extends IncrementalProjectBuilder {
 	
@@ -72,7 +72,7 @@ public class ESQLBuilder extends IncrementalProjectBuilder {
 		};
 	}
 
-	public static final String BUILDER_ID = "ee.stacc.productivity.edsl.javaproject.esqlBuilder";
+	public static final String BUILDER_ID = "com.zeroturnaround.alvor.javaproject.esqlBuilder";
 
 	@SuppressWarnings("rawtypes")
 	@Override

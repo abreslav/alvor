@@ -4,21 +4,21 @@
    <extension
          point="org.eclipse.ui.popupMenus">
       <viewerContribution
-            id="ee.stacc.productivity.edsl.gui.ShowAbstractValueContribution"
+            id="com.zeroturnaround.alvor.gui.ShowAbstractValueContribution"
             targetID="#CompilationUnitEditorContext">
       	<action
-               class="ee.stacc.productivity.edsl.gui.AbstractStringPrinter"
+               class="com.zeroturnaround.alvor.gui.AbstractStringPrinter"
                menubarPath="ContextMenu"
-               id="ee.stacc.eclipsesql.ShowAbstractValue"
+               id="com.zeroturnaround.alvor.ShowAbstractValue"
                label="Show abstract value">
          </action>
       </viewerContribution>
       <viewerContribution
-            id="ee.stacc.productivity.edsl.gui.ShowConnSourceContribution"
+            id="com.zeroturnaround.alvor.gui.ShowConnSourceContribution"
             targetID="#CompilationUnitEditorContext">
          <action
-               class="ee.stacc.productivity.edsl.gui.ConnectionSourceFinder"
-               id="ee.stacc.eclipsesql.ShowConnSource"
+               class="com.zeroturnaround.alvor.gui.ConnectionSourceFinder"
+               id="com.zeroturnaround.alvor.ShowConnSource"
                label="Show connection source"
                menubarPath="_ContextMenu">
          </action>
@@ -45,23 +45,23 @@
          point="org.eclipse.ui.commands">
       <command
             categoryId="org.eclipse.jdt.ui.category.source"
-            defaultHandler="ee.stacc.productivity.edsl.gui.CheckProjectHandler"
+            defaultHandler="com.zeroturnaround.alvor.gui.CheckProjectHandler"
             description="Checks SQL usage in active project"
-            id="ee.stacc.eclipsesql.plugin.CheckProject"
+            id="com.zeroturnaround.alvor.plugin.CheckProject"
             name="Check SQL in project">
       </command>
       <command
             categoryId="org.eclipse.jdt.ui.category.source"
-            defaultHandler="ee.stacc.productivity.edsl.gui.ClearCacheHandler"
+            defaultHandler="com.zeroturnaround.alvor.gui.ClearCacheHandler"
             description="Clears cache for the selected project"
-            id="ee.stacc.productivity.edsl.gui.clearCache"
+            id="com.zeroturnaround.alvor.gui.clearCache"
             name="Clear project cache">
       </command>
       <command
             categoryId="org.eclipse.jdt.ui.category.source"
-            defaultHandler="ee.stacc.productivity.edsl.gui.CheckResultSetsHandler"
+            defaultHandler="com.zeroturnaround.alvor.gui.CheckResultSetsHandler"
             description="Checks ResultSet-s"
-            id="ee.stacc.productivity.edsl.gui.checkResultSets"
+            id="com.zeroturnaround.alvor.gui.checkResultSets"
             name="Check ResultSet-s">
       </command>
    </extension>
@@ -70,12 +70,12 @@
       <menuContribution
             locationURI="popup:org.eclipse.jdt.ui.PackageExplorer?after=additions">
          <command
-               commandId="ee.stacc.eclipsesql.plugin.CheckProject"
+               commandId="com.zeroturnaround.alvor.plugin.CheckProject"
                label="Check SQL in selected elements"
                style="push">
          </command>
          <command
-               commandId="ee.stacc.productivity.edsl.gui.clearCache"
+               commandId="com.zeroturnaround.alvor.gui.clearCache"
                label="Clear SQL Analyzer Cache"
                style="push">
          </command>
@@ -110,10 +110,10 @@
          <type
              name="sqlhotspot"
              super="org.eclipse.ui.workbench.texteditor.info"
-             markerType="ee.stacc.productivity.edsl.gui.sqlhotspot">
+             markerType="com.zeroturnaround.alvor.gui.sqlhotspot">
          </type>
          <type
-               markerType="ee.stacc.productivity.edsl.gui.sqlstring"
+               markerType="com.zeroturnaround.alvor.gui.sqlstring"
                name="sqlstring">
          </type>
    </extension>
@@ -183,7 +183,7 @@
          <type
              name="unsupported"
              super="org.eclipse.ui.workbench.texteditor.info"
-             markerType="ee.stacc.productivity.edsl.gui.unsupported">
+             markerType="com.zeroturnaround.alvor.gui.unsupported">
          </type>
    </extension>
 
@@ -210,7 +210,7 @@
    <extension
          point="org.eclipse.ui.startup">
       <startup
-            class="ee.stacc.productivity.edsl.gui.EdslGuiStartup">
+            class="com.zeroturnaround.alvor.gui.AlvorGuiStartup">
       </startup>
    </extension>
 

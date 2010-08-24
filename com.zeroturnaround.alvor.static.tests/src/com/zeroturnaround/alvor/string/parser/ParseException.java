@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.string.parser;
+package com.zeroturnaround.alvor.string.parser;
 
 public class ParseException extends RuntimeException {
 

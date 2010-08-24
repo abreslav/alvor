@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Gui
-Bundle-SymbolicName: ee.stacc.productivity.edsl.gui;singleton:=true
+Bundle-SymbolicName: com.zeroturnaround.alvor.gui;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: org.eclipse.core.commands,
@@ -17,9 +17,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jdt.core;bundle-version="3.5.1",
  org.eclipse.core.resources;bundle-version="3.5.1",
  org.eclipse.ui.editors;bundle-version="3.5.0",
- ee.stacc.productivity.edsl.model;bundle-version="1.0.0",
- ee.stacc.productivity.edsl.checkers;bundle-version="1.0.0",
- ee.stacc.productivity.edsl.crawler;bundle-version="1.0.0",
- ee.stacc.productivity.edsl.common;bundle-version="1.0.0",
- ee.stacc.productivity.edsl.cache;bundle-version="1.0.0"
-Export-Package: ee.stacc.productivity.edsl.gui
+ com.zeroturnaround.alvor.model;bundle-version="1.0.0",
+ com.zeroturnaround.alvor.checkers;bundle-version="1.0.0",
+ com.zeroturnaround.alvor.crawler;bundle-version="1.0.0",
+ com.zeroturnaround.alvor.common;bundle-version="1.0.0",
+ com.zeroturnaround.alvor.cache;bundle-version="1.0.0"
+Export-Package: com.zeroturnaround.alvor.gui

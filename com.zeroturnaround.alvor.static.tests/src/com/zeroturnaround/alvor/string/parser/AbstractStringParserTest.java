@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.string.parser;
+package com.zeroturnaround.alvor.string.parser;
 
 import static org.junit.Assert.assertEquals;
 
@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import ee.stacc.productivity.edsl.string.IAbstractString;
+import com.zeroturnaround.alvor.string.IAbstractString;
 
 
 public class AbstractStringParserTest {

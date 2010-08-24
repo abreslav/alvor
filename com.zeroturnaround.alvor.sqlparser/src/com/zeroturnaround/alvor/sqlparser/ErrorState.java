@@ -1,9 +1,9 @@
-package ee.stacc.productivity.edsl.sqlparser;
+package com.zeroturnaround.alvor.sqlparser;
 
 import java.util.Collection;
 import java.util.Collections;
 
-import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
+import com.zeroturnaround.alvor.lexer.alphabet.IAbstractInputItem;
 
 /**
  * Error parsing state. Means that there was a parsing error. 

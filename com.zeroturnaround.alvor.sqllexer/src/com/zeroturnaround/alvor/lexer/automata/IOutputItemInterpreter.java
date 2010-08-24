@@ -1,10 +1,10 @@
-package ee.stacc.productivity.edsl.lexer.automata;
+package com.zeroturnaround.alvor.lexer.automata;
 
 import java.util.List;
 
-import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
-import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractOutputItem;
-import ee.stacc.productivity.edsl.lexer.alphabet.ISequence;
+import com.zeroturnaround.alvor.lexer.alphabet.IAbstractInputItem;
+import com.zeroturnaround.alvor.lexer.alphabet.IAbstractOutputItem;
+import com.zeroturnaround.alvor.lexer.alphabet.ISequence;
 
 /**
  * Executes commands emitted by a transducer as output items. 

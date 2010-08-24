@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.gui;
+package com.zeroturnaround.alvor.gui;
 
 import org.eclipse.jdt.core.ITypeRoot;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -13,11 +13,11 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorPart;
 
-import ee.stacc.productivity.edsl.cache.CacheService;
-import ee.stacc.productivity.edsl.common.logging.ILog;
-import ee.stacc.productivity.edsl.common.logging.Logs;
-import ee.stacc.productivity.edsl.crawler.NewASE;
-import ee.stacc.productivity.edsl.crawler.NodeSearchEngine;
+import com.zeroturnaround.alvor.cache.CacheService;
+import com.zeroturnaround.alvor.common.logging.ILog;
+import com.zeroturnaround.alvor.common.logging.Logs;
+import com.zeroturnaround.alvor.crawler.NewASE;
+import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
 
 public class AbstractStringPrinter implements IEditorActionDelegate{
 	

@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.common.logging;
+package com.zeroturnaround.alvor.common.logging;
 
 public class Measurements {
 	static public SumTimer methodDeclSearchTimer = new SumTimer("Search method decl");

@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.main;
+package com.zeroturnaround.alvor.main;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,19 +7,19 @@ import java.util.Map;
 
 import org.eclipse.jdt.core.IJavaElement;
 
-import ee.stacc.productivity.edsl.checkers.IAbstractStringChecker;
-import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
-import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
-import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
-import ee.stacc.productivity.edsl.common.logging.ILog;
-import ee.stacc.productivity.edsl.common.logging.Logs;
-import ee.stacc.productivity.edsl.common.logging.Measurements;
-import ee.stacc.productivity.edsl.common.logging.Timer;
-import ee.stacc.productivity.edsl.crawler.NewASE;
-import ee.stacc.productivity.edsl.crawler.NodeRequest;
-import ee.stacc.productivity.edsl.crawler.NodeSearchEngine;
-import ee.stacc.productivity.edsl.crawler.PositionUtil;
-import ee.stacc.productivity.edsl.crawler.UnsupportedNodeDescriptor;
+import com.zeroturnaround.alvor.checkers.IAbstractStringChecker;
+import com.zeroturnaround.alvor.checkers.INodeDescriptor;
+import com.zeroturnaround.alvor.checkers.ISQLErrorHandler;
+import com.zeroturnaround.alvor.checkers.IStringNodeDescriptor;
+import com.zeroturnaround.alvor.common.logging.ILog;
+import com.zeroturnaround.alvor.common.logging.Logs;
+import com.zeroturnaround.alvor.common.logging.Measurements;
+import com.zeroturnaround.alvor.common.logging.Timer;
+import com.zeroturnaround.alvor.crawler.NewASE;
+import com.zeroturnaround.alvor.crawler.NodeRequest;
+import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
+import com.zeroturnaround.alvor.crawler.PositionUtil;
+import com.zeroturnaround.alvor.crawler.UnsupportedNodeDescriptor;
 
 /**
  * This is main class

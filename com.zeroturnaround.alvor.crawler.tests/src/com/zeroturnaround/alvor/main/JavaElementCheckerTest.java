@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.main;
+package com.zeroturnaround.alvor.main;
 
 import static org.junit.Assert.assertTrue;
 
@@ -21,19 +21,19 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.junit.Test;
 
-import ee.stacc.productivity.edsl.cache.CacheService;
-import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
-import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
-import ee.stacc.productivity.edsl.crawler.PositionUtil;
-import ee.stacc.productivity.edsl.crawler.UnsupportedNodeDescriptor;
-import ee.stacc.productivity.edsl.string.IAbstractString;
-import ee.stacc.productivity.edsl.string.samplegen.SampleGenerator;
+import com.zeroturnaround.alvor.cache.CacheService;
+import com.zeroturnaround.alvor.checkers.INodeDescriptor;
+import com.zeroturnaround.alvor.checkers.IStringNodeDescriptor;
+import com.zeroturnaround.alvor.crawler.PositionUtil;
+import com.zeroturnaround.alvor.crawler.UnsupportedNodeDescriptor;
+import com.zeroturnaround.alvor.string.IAbstractString;
+import com.zeroturnaround.alvor.string.samplegen.SampleGenerator;
 
 public class JavaElementCheckerTest {
 	JavaElementChecker checker = new JavaElementChecker();
 	IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 	private static final String TEST_FOLDER = 
-		"C:/alvor/ws/ee.stacc.productivity.edsl.crawler.tests/tests";
+		"C:/alvor/ws/com.zeroturnaround.alvor.crawler.tests/tests";
 	
 	private boolean clearCache = false;
 	
@@ -42,8 +42,8 @@ public class JavaElementCheckerTest {
 	}
 	
 //	@Test
-//	public void testEDSLTestProjectStrings() throws IOException, CoreException {
-//		testJavaElementAbstractStrings("EDSLTestProject", "");
+//	public void testAlvorTestProjectStrings() throws IOException, CoreException {
+//		testJavaElementAbstractStrings("AlvorTestProject", "");
 //	}
 	
 	@Test

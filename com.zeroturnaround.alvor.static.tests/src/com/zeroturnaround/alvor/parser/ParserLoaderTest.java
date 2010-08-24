@@ -1,15 +1,15 @@
-package ee.stacc.productivity.edsl.parser;
+package com.zeroturnaround.alvor.parser;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import ee.stacc.productivity.edsl.sqlparser.BoundedStack;
-import ee.stacc.productivity.edsl.sqlparser.ILRParser;
-import ee.stacc.productivity.edsl.sqlparser.IParserStack;
-import ee.stacc.productivity.edsl.sqlparser.IParserState;
-import ee.stacc.productivity.edsl.sqlparser.LRParser;
-import ee.stacc.productivity.edsl.sqlparser.Parsers;
+import com.zeroturnaround.alvor.sqlparser.BoundedStack;
+import com.zeroturnaround.alvor.sqlparser.ILRParser;
+import com.zeroturnaround.alvor.sqlparser.IParserStack;
+import com.zeroturnaround.alvor.sqlparser.IParserState;
+import com.zeroturnaround.alvor.sqlparser.LRParser;
+import com.zeroturnaround.alvor.sqlparser.Parsers;
 
 
 public class ParserLoaderTest {

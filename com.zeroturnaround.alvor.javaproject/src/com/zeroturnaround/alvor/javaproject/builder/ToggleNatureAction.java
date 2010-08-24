@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.javaproject.builder;
+package com.zeroturnaround.alvor.javaproject.builder;
 
 import java.util.Iterator;
 

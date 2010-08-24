@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="project" default="default">
-	<property name="lexerProject" value="../ee.stacc.productivity.edsl.sqllexer"></property>
+	<property name="lexerProject" value="../com.zeroturnaround.alvor.sqllexer"></property>
 	<taskdef classname="JFlex.anttask.JFlexTask" name="jflex" classpath="${lexerProject}/lib/JFlex.jar"/>
 
 	<target name="default" depends="generateLexer" description="description">
@@ -11,7 +11,7 @@
 		<!-- Old LR-parser -->
     	<java 
     		classpath="bin" 
-    		classname="ee.stacc.productivity.edsl.sqlparser.SpecGeneratorMain"
+    		classname="com.zeroturnaround.alvor.sqlparser.SpecGeneratorMain"
     	>
     		<arg value="grammar/sql.lr.bgtemplate"/>
     		<arg value="generated/sql.lr.bg"/>
@@ -20,7 +20,7 @@
     		<arg value="sql.keywords"/>
     	</java>
 		<exec executable="bison" dir="${basedir}">
-			<arg value="--xml=src/ee/stacc/productivity/edsl/sqlparser/sql.lr.xml"/>
+			<arg value="--xml=src/com/zeroturnaround/alvor/sqlparser/sql.lr.xml"/>
 			<arg value="--report=state,lookahead,itemset"/>
 			<arg value="--report-file=generated/sql.lr.report"/>
 			<arg value="generated/sql.lr.bg"/>
@@ -30,7 +30,7 @@
 		<!-- New GLR-parser -->
     	<java 
     		classpath="bin" 
-    		classname="ee.stacc.productivity.edsl.sqlparser.SpecGeneratorMain"
+    		classname="com.zeroturnaround.alvor.sqlparser.SpecGeneratorMain"
     	>
     		<arg value="grammar/sql.bgtemplate"/>
     		<arg value="generated/sql.bg"/>
@@ -43,7 +43,7 @@
 			<arg value="- -debug"/>
 			<arg value="- -output=generated/SQLParser.java"/> -->
 		<exec executable="bison" dir="${basedir}">
-			<arg value="--xml=src/ee/stacc/productivity/edsl/sqlparser/sql.xml"/>
+			<arg value="--xml=src/com/zeroturnaround/alvor/sqlparser/sql.xml"/>
 			<arg value="--report=state,lookahead,itemset"/>
 			<arg value="--report-file=generated/sql.report"/>
 			<arg value="generated/sql.bg"/>
@@ -75,12 +75,12 @@
     		destdir="${lexerProject}/bin">
     	</javac>
 		<!-- Run the compiled class and store the results as a *.java file -->
-    	<mkdir dir="${lexerProject}/src/ee/stacc/productivity/edsl/sqllexer"/>
+    	<mkdir dir="${lexerProject}/src/com/zeroturnaround/alvor/sqllexer"/>
     	<java 
     		classpath="${lexerProject}/bin" 
     		classname="SQLLexerGen" 
-    		output="${lexerProject}/src/ee/stacc/productivity/edsl/sqllexer/SQLLexerData.java">
-    		<arg value="ee.stacc.productivity.edsl.sqllexer"/>
+    		output="${lexerProject}/src/com/zeroturnaround/alvor/sqllexer/SQLLexerData.java">
+    		<arg value="com.zeroturnaround.alvor.sqllexer"/>
     		<arg value="SQLLexerData"/>
     	</java>
 	</target>	

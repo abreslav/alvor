@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.parser;
+package com.zeroturnaround.alvor.parser;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -13,17 +13,17 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import ee.stacc.productivity.edsl.lexer.automata.AutomataParser;
-import ee.stacc.productivity.edsl.lexer.automata.IAlphabetConverter;
-import ee.stacc.productivity.edsl.lexer.automata.State;
-import ee.stacc.productivity.edsl.sqlparser.BoundedStack;
-import ee.stacc.productivity.edsl.sqlparser.ILRParser;
-import ee.stacc.productivity.edsl.sqlparser.IParserStack;
-import ee.stacc.productivity.edsl.sqlparser.IStackFactory;
-import ee.stacc.productivity.edsl.sqlparser.ParserSimulator;
-import ee.stacc.productivity.edsl.sqlparser.Parsers;
-import ee.stacc.productivity.edsl.string.IAbstractString;
-import ee.stacc.productivity.edsl.string.parser.AbstractStringParser;
+import com.zeroturnaround.alvor.lexer.automata.AutomataParser;
+import com.zeroturnaround.alvor.lexer.automata.IAlphabetConverter;
+import com.zeroturnaround.alvor.lexer.automata.State;
+import com.zeroturnaround.alvor.sqlparser.BoundedStack;
+import com.zeroturnaround.alvor.sqlparser.ILRParser;
+import com.zeroturnaround.alvor.sqlparser.IParserStack;
+import com.zeroturnaround.alvor.sqlparser.IStackFactory;
+import com.zeroturnaround.alvor.sqlparser.ParserSimulator;
+import com.zeroturnaround.alvor.sqlparser.Parsers;
+import com.zeroturnaround.alvor.string.IAbstractString;
+import com.zeroturnaround.alvor.string.parser.AbstractStringParser;
 
 @RunWith(Parameterized.class)
 public class FixpointParsingTest {

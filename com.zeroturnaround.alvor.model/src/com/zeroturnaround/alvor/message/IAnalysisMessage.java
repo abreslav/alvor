@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.message;
+package com.zeroturnaround.alvor.message;
 
 public interface IAnalysisMessage {
 

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package ee.stacc.productivity.edsl.sqlparser;
+package com.zeroturnaround.alvor.sqlparser;
 
 import java.util.Collection;
 

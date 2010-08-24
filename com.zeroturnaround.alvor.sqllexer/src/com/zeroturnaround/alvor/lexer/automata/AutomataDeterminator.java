@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.lexer.automata;
+package com.zeroturnaround.alvor.lexer.automata;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,7 +10,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import ee.stacc.productivity.edsl.lexer.alphabet.SimpleCharacter;
+import com.zeroturnaround.alvor.lexer.alphabet.SimpleCharacter;
 
 public class AutomataDeterminator {
 	

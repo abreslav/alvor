@@ -1,9 +1,9 @@
 /**
  * 
  */
-package ee.stacc.productivity.edsl.lexer.automata;
+package com.zeroturnaround.alvor.lexer.automata;
 
-import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
+import com.zeroturnaround.alvor.lexer.alphabet.IAbstractInputItem;
 
 public interface IInputToString {
 	String toString(IAbstractInputItem item);

@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.sqllexer;
+package com.zeroturnaround.alvor.sqllexer;
 
 public class SQLLexerData{
 /** Char classes (char - class (char)) */

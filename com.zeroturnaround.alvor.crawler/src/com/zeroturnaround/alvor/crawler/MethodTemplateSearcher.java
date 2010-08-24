@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.crawler;
+package com.zeroturnaround.alvor.crawler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,9 +7,9 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
-import ee.stacc.productivity.edsl.cache.CacheService;
-import ee.stacc.productivity.edsl.cache.MethodInvocationDescriptor;
-import ee.stacc.productivity.edsl.string.IAbstractString;
+import com.zeroturnaround.alvor.cache.CacheService;
+import com.zeroturnaround.alvor.cache.MethodInvocationDescriptor;
+import com.zeroturnaround.alvor.string.IAbstractString;
 
 public class MethodTemplateSearcher extends CachedSearcher<MethodInvocationDescriptor, IAbstractString> {
 	private NewASE evaluator;

@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.gui;
+package com.zeroturnaround.alvor.gui;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,34 +15,34 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
-import ee.stacc.productivity.edsl.checkers.AbstractStringCheckerManager;
-import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
-import ee.stacc.productivity.edsl.checkers.ISQLErrorHandler;
-import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
-import ee.stacc.productivity.edsl.common.logging.ILog;
-import ee.stacc.productivity.edsl.common.logging.Logs;
-import ee.stacc.productivity.edsl.common.logging.Timer;
-import ee.stacc.productivity.edsl.crawler.NodeSearchEngine;
-import ee.stacc.productivity.edsl.crawler.UnsupportedNodeDescriptor;
-import ee.stacc.productivity.edsl.main.JavaElementChecker;
-import ee.stacc.productivity.edsl.main.OptionLoader;
-import ee.stacc.productivity.edsl.string.IAbstractString;
-import ee.stacc.productivity.edsl.string.IAbstractStringVisitor;
-import ee.stacc.productivity.edsl.string.IPosition;
-import ee.stacc.productivity.edsl.string.StringCharacterSet;
-import ee.stacc.productivity.edsl.string.StringChoice;
-import ee.stacc.productivity.edsl.string.StringConstant;
-import ee.stacc.productivity.edsl.string.StringParameter;
-import ee.stacc.productivity.edsl.string.StringRepetition;
-import ee.stacc.productivity.edsl.string.StringSequence;
-import ee.stacc.productivity.edsl.string.util.AbstractStringOptimizer;
+import com.zeroturnaround.alvor.checkers.AbstractStringCheckerManager;
+import com.zeroturnaround.alvor.checkers.INodeDescriptor;
+import com.zeroturnaround.alvor.checkers.ISQLErrorHandler;
+import com.zeroturnaround.alvor.checkers.IStringNodeDescriptor;
+import com.zeroturnaround.alvor.common.logging.ILog;
+import com.zeroturnaround.alvor.common.logging.Logs;
+import com.zeroturnaround.alvor.common.logging.Timer;
+import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
+import com.zeroturnaround.alvor.crawler.UnsupportedNodeDescriptor;
+import com.zeroturnaround.alvor.main.JavaElementChecker;
+import com.zeroturnaround.alvor.main.OptionLoader;
+import com.zeroturnaround.alvor.string.IAbstractString;
+import com.zeroturnaround.alvor.string.IAbstractStringVisitor;
+import com.zeroturnaround.alvor.string.IPosition;
+import com.zeroturnaround.alvor.string.StringCharacterSet;
+import com.zeroturnaround.alvor.string.StringChoice;
+import com.zeroturnaround.alvor.string.StringConstant;
+import com.zeroturnaround.alvor.string.StringParameter;
+import com.zeroturnaround.alvor.string.StringRepetition;
+import com.zeroturnaround.alvor.string.StringSequence;
+import com.zeroturnaround.alvor.string.util.AbstractStringOptimizer;
 
 public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHandler {
-	public static final String ERROR_MARKER_ID = "ee.stacc.productivity.edsl.gui.sqlerror";
-	public static final String WARNING_MARKER_ID = "ee.stacc.productivity.edsl.gui.sqlwarning";
-	public static final String HOTSPOT_MARKER_ID = "ee.stacc.productivity.edsl.gui.sqlhotspot";
-	public static final String UNSUPPORTED_MARKER_ID = "ee.stacc.productivity.edsl.gui.unsupported";
-	public static final String STRING_MARKER_ID = "ee.stacc.productivity.edsl.gui.sqlstring";
+	public static final String ERROR_MARKER_ID = "com.zeroturnaround.alvor.gui.sqlerror";
+	public static final String WARNING_MARKER_ID = "com.zeroturnaround.alvor.gui.sqlwarning";
+	public static final String HOTSPOT_MARKER_ID = "com.zeroturnaround.alvor.gui.sqlhotspot";
+	public static final String UNSUPPORTED_MARKER_ID = "com.zeroturnaround.alvor.gui.unsupported";
+	public static final String STRING_MARKER_ID = "com.zeroturnaround.alvor.gui.sqlstring";
 
 	private static final ILog LOG = Logs.getLog(CheckProjectHandler.class);
 	

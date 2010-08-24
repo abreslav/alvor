@@ -1,11 +1,11 @@
-package ee.stacc.productivity.edsl.lexer.automata;
+package com.zeroturnaround.alvor.lexer.automata;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
-import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractOutputItem;
+import com.zeroturnaround.alvor.lexer.alphabet.IAbstractInputItem;
+import com.zeroturnaround.alvor.lexer.alphabet.IAbstractOutputItem;
 
 /**
  * Represents a transition in an automaton of transducer

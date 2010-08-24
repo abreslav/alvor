@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.tracker;
+package com.zeroturnaround.alvor.tracker;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.MethodInvocation;

@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="ee.stacc.productivity.edsl.checkers" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="com.zeroturnaround.alvor.checkers" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="ee.stacc.productivity.edsl.checkers" id="checker" name="Abstract String Checker"/>
+         <meta.schema plugin="com.zeroturnaround.alvor.checkers" id="checker" name="Abstract String Checker"/>
       </appinfo>
       <documentation>
          Checkers to run on found Abstract Strings
@@ -55,7 +55,7 @@
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":ee.stacc.productivity.edsl.checkers.IAbstractStringChecker"/>
+                  <meta.attribute kind="java" basedOn=":com.zeroturnaround.alvor.checkers.IAbstractStringChecker"/>
                </appinfo>
             </annotation>
          </attribute>

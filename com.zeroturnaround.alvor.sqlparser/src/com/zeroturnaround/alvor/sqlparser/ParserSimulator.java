@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.sqlparser;
+package com.zeroturnaround.alvor.sqlparser;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,17 +8,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
-import ee.stacc.productivity.edsl.lexer.alphabet.Token;
-import ee.stacc.productivity.edsl.lexer.automata.AutomataTransduction;
-import ee.stacc.productivity.edsl.lexer.automata.EmptyTransitionEliminator;
-import ee.stacc.productivity.edsl.lexer.automata.IAlphabetConverter;
-import ee.stacc.productivity.edsl.lexer.automata.State;
-import ee.stacc.productivity.edsl.lexer.automata.StringToAutomatonConverter;
-import ee.stacc.productivity.edsl.lexer.automata.Transition;
-import ee.stacc.productivity.edsl.lexer.automata.EmptyTransitionEliminator.IEmptinessExpert;
-import ee.stacc.productivity.edsl.lexer.sql.SQLLexer;
-import ee.stacc.productivity.edsl.string.IAbstractString;
+import com.zeroturnaround.alvor.lexer.alphabet.IAbstractInputItem;
+import com.zeroturnaround.alvor.lexer.alphabet.Token;
+import com.zeroturnaround.alvor.lexer.automata.AutomataTransduction;
+import com.zeroturnaround.alvor.lexer.automata.EmptyTransitionEliminator;
+import com.zeroturnaround.alvor.lexer.automata.IAlphabetConverter;
+import com.zeroturnaround.alvor.lexer.automata.State;
+import com.zeroturnaround.alvor.lexer.automata.StringToAutomatonConverter;
+import com.zeroturnaround.alvor.lexer.automata.Transition;
+import com.zeroturnaround.alvor.lexer.automata.EmptyTransitionEliminator.IEmptinessExpert;
+import com.zeroturnaround.alvor.lexer.sql.SQLLexer;
+import com.zeroturnaround.alvor.string.IAbstractString;
 
 /**
  * Interpreter that performs the abstract parsing.

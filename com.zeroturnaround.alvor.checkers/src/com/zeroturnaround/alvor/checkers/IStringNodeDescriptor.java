@@ -1,6 +1,6 @@
-package ee.stacc.productivity.edsl.checkers;
+package com.zeroturnaround.alvor.checkers;
 
-import ee.stacc.productivity.edsl.string.IAbstractString;
+import com.zeroturnaround.alvor.string.IAbstractString;
 
 public interface IStringNodeDescriptor extends INodeDescriptor {
 

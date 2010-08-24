@@ -3,12 +3,12 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="generated"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ee.stacc.productivity.edsl.model"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ee.stacc.productivity.edsl.sqllexer"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/com.zeroturnaround.alvor.model"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/com.zeroturnaround.alvor.sqllexer"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ee.stacc.productivity.edsl.sqlparser"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ee.stacc.productivity.edsl.checkers.sqlstatic"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ee.stacc.productivity.edsl.checkers"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ee.stacc.productivity.edsl.common"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/com.zeroturnaround.alvor.sqlparser"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/com.zeroturnaround.alvor.checkers.sqlstatic"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/com.zeroturnaround.alvor.checkers"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/com.zeroturnaround.alvor.common"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

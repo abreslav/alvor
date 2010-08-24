@@ -1,7 +1,7 @@
-package ee.stacc.productivity.edsl.crawler;
+package com.zeroturnaround.alvor.crawler;
 
-import ee.stacc.productivity.edsl.string.AbstractStringEqualsVisitor;
-import ee.stacc.productivity.edsl.string.IAbstractString;
+import com.zeroturnaround.alvor.string.AbstractStringEqualsVisitor;
+import com.zeroturnaround.alvor.string.IAbstractString;
 
 public class AbstractStringEqualsVisitorExtended extends AbstractStringEqualsVisitor implements IAbstractStringVisitorExtended<Boolean, IAbstractString> {
 

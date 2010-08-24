@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.parser;
+package com.zeroturnaround.alvor.parser;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -10,13 +10,13 @@ import java.util.List;
 import org.jdom.JDOMException;
 import org.junit.Test;
 
-import ee.stacc.productivity.edsl.sqlparser.GLRParser;
-import ee.stacc.productivity.edsl.sqlparser.GLRStack;
-import ee.stacc.productivity.edsl.sqlparser.ILRParser;
-import ee.stacc.productivity.edsl.sqlparser.ParserSimulator;
-import ee.stacc.productivity.edsl.string.IAbstractString;
-import ee.stacc.productivity.edsl.string.StringConstant;
-import ee.stacc.productivity.edsl.string.parser.AbstractStringParser;
+import com.zeroturnaround.alvor.sqlparser.GLRParser;
+import com.zeroturnaround.alvor.sqlparser.GLRStack;
+import com.zeroturnaround.alvor.sqlparser.ILRParser;
+import com.zeroturnaround.alvor.sqlparser.ParserSimulator;
+import com.zeroturnaround.alvor.string.IAbstractString;
+import com.zeroturnaround.alvor.string.StringConstant;
+import com.zeroturnaround.alvor.string.parser.AbstractStringParser;
 
 
 public class GLRParserTest {

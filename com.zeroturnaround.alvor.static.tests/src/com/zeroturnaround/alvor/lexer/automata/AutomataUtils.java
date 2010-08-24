@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.lexer.automata;
+package com.zeroturnaround.alvor.lexer.automata;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -6,11 +6,11 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
-import ee.stacc.productivity.edsl.lexer.alphabet.SimpleCharacter;
-import ee.stacc.productivity.edsl.lexer.alphabet.Token;
-import ee.stacc.productivity.edsl.lexer.sql.SQLLexer;
-import ee.stacc.productivity.edsl.sqllexer.SQLLexerData;
+import com.zeroturnaround.alvor.lexer.alphabet.IAbstractInputItem;
+import com.zeroturnaround.alvor.lexer.alphabet.SimpleCharacter;
+import com.zeroturnaround.alvor.lexer.alphabet.Token;
+import com.zeroturnaround.alvor.lexer.sql.SQLLexer;
+import com.zeroturnaround.alvor.sqllexer.SQLLexerData;
 
 public class AutomataUtils {
 
