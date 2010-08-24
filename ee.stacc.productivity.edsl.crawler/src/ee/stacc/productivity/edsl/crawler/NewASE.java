@@ -692,7 +692,6 @@ public class NewASE {
 		else {
 			MethodDeclaration method = usage.getMethodDecl();
 			String methodName = method.getName().toString();
-			// TODO: hack, to be cleaned
 			methodName += ASTUtil.getArgumentTypesString(method.resolveBinding());
 			
 			List<INodeDescriptor> descList = evaluateMethodArgumentAtCallSites(

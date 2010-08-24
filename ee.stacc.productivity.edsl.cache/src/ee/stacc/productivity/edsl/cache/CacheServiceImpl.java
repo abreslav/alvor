@@ -227,7 +227,8 @@ public final class CacheServiceImpl implements ICacheService {
 			if (position == null || position.equals(abstractString.getPosition())) {
 				return idByPosition;
 			}
-			// TODO: why? 
+			// same is used when different ASTNode-s have same abstract string
+			// (eg. a variable used in different places)
 			return createSame(idByPosition, position);
 		}
 		
