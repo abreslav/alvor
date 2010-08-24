@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
+import com.zeroturnaround.alvor.cache.CacheService;
 import com.zeroturnaround.alvor.checkers.AbstractStringCheckerManager;
 import com.zeroturnaround.alvor.checkers.INodeDescriptor;
 import com.zeroturnaround.alvor.checkers.ISQLErrorHandler;
@@ -50,7 +51,6 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 	
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		//CacheService.getCacheService().setNocache(true);
 		
 		Runtime.getRuntime().gc();
 		System.out.println("MEM: totalMemory() == " + Runtime.getRuntime().totalMemory());
@@ -59,6 +59,7 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 		System.out.println("MEM: used memory == " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
 		
 		NodeSearchEngine.clearCache();
+		CacheService.getCacheService().clearAll();
 		Timer timer = new Timer();
 		timer.start("TIMER: whole process");
 		assert LOG.message("CheckProjectHandler.execute");
