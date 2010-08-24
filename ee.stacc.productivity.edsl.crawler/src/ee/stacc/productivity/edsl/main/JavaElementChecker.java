@@ -17,7 +17,6 @@ import ee.stacc.productivity.edsl.common.logging.Measurements;
 import ee.stacc.productivity.edsl.common.logging.Timer;
 import ee.stacc.productivity.edsl.crawler.NewASE;
 import ee.stacc.productivity.edsl.crawler.NodeRequest;
-import ee.stacc.productivity.edsl.crawler.NodeSearchEngine;
 import ee.stacc.productivity.edsl.crawler.PositionUtil;
 import ee.stacc.productivity.edsl.crawler.UnsupportedNodeDescriptor;
 
@@ -36,7 +35,7 @@ public class JavaElementChecker {
 
 	/*
 	 * The map must contain an entry 
-	 * hotspots=classname,methodname,index;classname,methodname,index;...
+	 * hotspots=className,methodName,index;className,methodName,index;...
 	 * E.g.:
 	 * hotspots=java.util.Connection,prepareStatement,1;blah.blah.Blah,blah,5
 	 * Trailing ';' is not required 
@@ -50,9 +49,8 @@ public class JavaElementChecker {
 		timer.start("TIMER: string construction");
 		List<NodeRequest> requests = parseNodeRequests(options);
 		if (requests.isEmpty()) {
-			throw new IllegalArgumentException("No hotspots found");
+			throw new IllegalArgumentException("No hotspot definitions found in options");
 		}
-//		return AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(requests, scope, 0);
 		List<INodeDescriptor> result = NewASE.evaluateMethodArgumentAtCallSites(requests, scope, 0);
 		timer.printTime(); // String construction
 		
@@ -119,13 +117,13 @@ public class JavaElementChecker {
 			List<IAbstractStringChecker> checkers, 
 			Map<String, Object> options) {
 	
-		assert LOG.message("Abstract strings:");
-
-		for (INodeDescriptor descriptor : hotspots) {
-			if (descriptor instanceof IStringNodeDescriptor) {
-//				LOG.message(((IStringNodeDescriptor)descriptor).getAbstractValue());
-			}
-		}
+//		assert LOG.message("Abstract strings:");
+//
+//		for (INodeDescriptor descriptor : hotspots) {
+//			if (descriptor instanceof IStringNodeDescriptor) {
+//				assert LOG.message(((IStringNodeDescriptor)descriptor).getAbstractValue());
+//			}
+//		}
 		
 		for (IAbstractStringChecker checker : checkers) {
 			timer.start("TIMER checker=" + checker.getClass().getName());
