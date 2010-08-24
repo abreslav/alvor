@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.lexer.automata;
+package com.zeroturnaround.alvor.lexer.automata;
 
 import static org.junit.Assert.assertEquals;
 
@@ -6,10 +6,10 @@ import java.util.List;
 
 import org.junit.Test;
 
-import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractOutputItem;
-import ee.stacc.productivity.edsl.lexer.alphabet.Yield;
-import ee.stacc.productivity.edsl.lexer.sql.SQLLexer;
-import ee.stacc.productivity.edsl.sqllexer.SQLLexerData;
+import com.zeroturnaround.alvor.lexer.alphabet.IAbstractOutputItem;
+import com.zeroturnaround.alvor.lexer.alphabet.Yield;
+import com.zeroturnaround.alvor.lexer.sql.SQLLexer;
+import com.zeroturnaround.alvor.sqllexer.SQLLexerData;
 
 
 public class AutomataConverterTest {

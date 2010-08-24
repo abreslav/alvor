@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.crawler;
+package com.zeroturnaround.alvor.crawler;
 
 public class ParseException extends Exception {
 

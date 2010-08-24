@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.crawler;
+package com.zeroturnaround.alvor.crawler;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -30,28 +30,28 @@ import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.TagElement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
-import ee.stacc.productivity.edsl.cache.CacheService;
-import ee.stacc.productivity.edsl.cache.UnsupportedStringOpEx;
-import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
-import ee.stacc.productivity.edsl.checkers.IStringNodeDescriptor;
-import ee.stacc.productivity.edsl.common.logging.ILog;
-import ee.stacc.productivity.edsl.common.logging.Logs;
-import ee.stacc.productivity.edsl.string.IAbstractString;
-import ee.stacc.productivity.edsl.string.IPosition;
-import ee.stacc.productivity.edsl.string.StringChoice;
-import ee.stacc.productivity.edsl.string.StringConstant;
-import ee.stacc.productivity.edsl.string.StringParameter;
-import ee.stacc.productivity.edsl.string.StringRandomInteger;
-import ee.stacc.productivity.edsl.string.StringSequence;
-import ee.stacc.productivity.edsl.string.util.ArgumentApplier;
-import ee.stacc.productivity.edsl.tracker.NameAssignment;
-import ee.stacc.productivity.edsl.tracker.NameInArgument;
-import ee.stacc.productivity.edsl.tracker.NameInMethodCallExpression;
-import ee.stacc.productivity.edsl.tracker.NameInParameter;
-import ee.stacc.productivity.edsl.tracker.NameUsage;
-import ee.stacc.productivity.edsl.tracker.NameUsageChoice;
-import ee.stacc.productivity.edsl.tracker.NameUsageLoopChoice;
-import ee.stacc.productivity.edsl.tracker.VariableTracker;
+import com.zeroturnaround.alvor.cache.CacheService;
+import com.zeroturnaround.alvor.cache.UnsupportedStringOpEx;
+import com.zeroturnaround.alvor.checkers.INodeDescriptor;
+import com.zeroturnaround.alvor.checkers.IStringNodeDescriptor;
+import com.zeroturnaround.alvor.common.logging.ILog;
+import com.zeroturnaround.alvor.common.logging.Logs;
+import com.zeroturnaround.alvor.string.IAbstractString;
+import com.zeroturnaround.alvor.string.IPosition;
+import com.zeroturnaround.alvor.string.StringChoice;
+import com.zeroturnaround.alvor.string.StringConstant;
+import com.zeroturnaround.alvor.string.StringParameter;
+import com.zeroturnaround.alvor.string.StringRandomInteger;
+import com.zeroturnaround.alvor.string.StringSequence;
+import com.zeroturnaround.alvor.string.util.ArgumentApplier;
+import com.zeroturnaround.alvor.tracker.NameAssignment;
+import com.zeroturnaround.alvor.tracker.NameInArgument;
+import com.zeroturnaround.alvor.tracker.NameInMethodCallExpression;
+import com.zeroturnaround.alvor.tracker.NameInParameter;
+import com.zeroturnaround.alvor.tracker.NameUsage;
+import com.zeroturnaround.alvor.tracker.NameUsageChoice;
+import com.zeroturnaround.alvor.tracker.NameUsageLoopChoice;
+import com.zeroturnaround.alvor.tracker.VariableTracker;
 
 
 

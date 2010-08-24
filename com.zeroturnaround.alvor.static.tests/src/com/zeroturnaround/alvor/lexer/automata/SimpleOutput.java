@@ -1,6 +1,6 @@
-package ee.stacc.productivity.edsl.lexer.automata;
+package com.zeroturnaround.alvor.lexer.automata;
 
-import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractOutputItem;
+import com.zeroturnaround.alvor.lexer.alphabet.IAbstractOutputItem;
 
 public class SimpleOutput implements IAbstractOutputItem {
 	private final char c;

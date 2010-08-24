@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.lexer.automata;
+package com.zeroturnaround.alvor.lexer.automata;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractOutputItem;
-import ee.stacc.productivity.edsl.lexer.alphabet.SimpleCharacter;
+import com.zeroturnaround.alvor.lexer.alphabet.IAbstractOutputItem;
+import com.zeroturnaround.alvor.lexer.alphabet.SimpleCharacter;
 
 
 public class AutomataParser {

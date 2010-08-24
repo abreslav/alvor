@@ -1,6 +1,6 @@
-package ee.stacc.productivity.edsl.crawler;
+package com.zeroturnaround.alvor.crawler;
 
-import ee.stacc.productivity.edsl.string.IAbstractStringVisitor;
+import com.zeroturnaround.alvor.string.IAbstractStringVisitor;
 
 public interface IAbstractStringVisitorExtended<R, D> extends IAbstractStringVisitor<R, D> {
 

@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.parser;
+package com.zeroturnaround.alvor.parser;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -16,13 +16,13 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import ee.stacc.productivity.edsl.checkers.sqlstatic.SyntacticalSQLChecker;
-import ee.stacc.productivity.edsl.sqlparser.ParserSimulator;
-import ee.stacc.productivity.edsl.string.IAbstractString;
-import ee.stacc.productivity.edsl.string.StringConstant;
-import ee.stacc.productivity.edsl.string.parser.AbstractStringParser;
-import ee.stacc.productivity.edsl.string.util.AbstractStringOptimizer;
-import ee.stacc.productivity.edsl.string.util.AbstractStringSizeCounter;
+import com.zeroturnaround.alvor.checkers.sqlstatic.SyntacticalSQLChecker;
+import com.zeroturnaround.alvor.sqlparser.ParserSimulator;
+import com.zeroturnaround.alvor.string.IAbstractString;
+import com.zeroturnaround.alvor.string.StringConstant;
+import com.zeroturnaround.alvor.string.parser.AbstractStringParser;
+import com.zeroturnaround.alvor.string.util.AbstractStringOptimizer;
+import com.zeroturnaround.alvor.string.util.AbstractStringSizeCounter;
 
 
 @RunWith(Parameterized.class)

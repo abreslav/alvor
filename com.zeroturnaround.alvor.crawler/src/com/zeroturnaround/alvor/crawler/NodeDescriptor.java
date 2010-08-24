@@ -1,7 +1,7 @@
-package ee.stacc.productivity.edsl.crawler;
+package com.zeroturnaround.alvor.crawler;
 
-import ee.stacc.productivity.edsl.checkers.INodeDescriptor;
-import ee.stacc.productivity.edsl.string.IPosition;
+import com.zeroturnaround.alvor.checkers.INodeDescriptor;
+import com.zeroturnaround.alvor.string.IPosition;
 
 public class NodeDescriptor implements INodeDescriptor {
 	private final IPosition position;

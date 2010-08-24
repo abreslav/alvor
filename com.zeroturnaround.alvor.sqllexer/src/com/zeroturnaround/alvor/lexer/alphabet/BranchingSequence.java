@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.lexer.alphabet;
+package com.zeroturnaround.alvor.lexer.alphabet;
 
 /**
  * Simple implementation of an immutable sequence.

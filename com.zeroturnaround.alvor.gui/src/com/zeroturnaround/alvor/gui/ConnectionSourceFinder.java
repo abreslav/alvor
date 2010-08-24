@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.gui;
+package com.zeroturnaround.alvor.gui;
 
 import org.eclipse.jdt.core.ITypeRoot;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -13,11 +13,11 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorPart;
 
-import ee.stacc.productivity.edsl.common.logging.ILog;
-import ee.stacc.productivity.edsl.common.logging.Logs;
-import ee.stacc.productivity.edsl.conntracker.ConnectionDescriptor;
-import ee.stacc.productivity.edsl.conntracker.ConnectionTracker;
-import ee.stacc.productivity.edsl.crawler.PositionUtil;
+import com.zeroturnaround.alvor.common.logging.ILog;
+import com.zeroturnaround.alvor.common.logging.Logs;
+import com.zeroturnaround.alvor.conntracker.ConnectionDescriptor;
+import com.zeroturnaround.alvor.conntracker.ConnectionTracker;
+import com.zeroturnaround.alvor.crawler.PositionUtil;
 
 public class ConnectionSourceFinder implements IEditorActionDelegate {
 	private static final ILog LOG = Logs.getLog(ConnectionSourceFinder.class);

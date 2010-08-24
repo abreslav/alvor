@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.string.parser;
+package com.zeroturnaround.alvor.string.parser;
 
 public class Token {
 	public static final Token OPEN_CURLY = new Token(TokenType.OPEN_CURLY);

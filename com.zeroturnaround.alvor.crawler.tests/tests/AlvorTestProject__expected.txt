@@ -1,23 +1,23 @@
-/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/Interprocedural.java:14, {"select * from tab" " WHERE a > b" }
-/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/LoopTests.java:10, "select * from tab where id in " " (?, ?)" 
-/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/Overloading.java:27, {"int version"}
-/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/Overloading.java:28, {"int version"}
-/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/Overloading.java:29, {"str version"}
-/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/Overloading.java:31, {"int,String version"}
-/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/Overloading.java:32, {"int,int version"}
-/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/SomeSubclass.java:13, unsupported: Unsupported SQL construction: Non-final fields are not supported at /EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/SomeSubclass.java:13
-/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/SomeSubclass.java:24, {{"SomeSubclass.getSomeStr()"}, {"SomeSuperclass.getSomeStr()"}}
-/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/SomeSubclass.java:25, {{"SomeSubclass.getSomeStr()"}, {"SomeSuperclass.getSomeStr()"}}
-/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/SomeSubclass.java:26, {{"SomeSubclass.getSomeStr()"}, {"SomeSuperclass.getSomeStr()"}}
-/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/SomeSubclass.java:27, {{"SomeSubclass.getSomeStr()"}, {"SomeSuperclass.getSomeStr()"}}
-/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/SomeSubclass.java:29, {{"SomeSubclass.getSomeStr(int i)"}, {"SomeSuperclass.getSomeStr(int i)"}}
-/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/SomeSubclass.java:42, {"tere"}
-/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/TestProjectMain.java:42, "select * from dual where id > " "666" 
-/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/TestProjectMain.java:56, "select * from dual"
-/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/TestProjectMain.java:71, unsupported: Unsupported SQL construction: Possible problem, no callsites found for: testArguments at /EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/TestProjectMain.java:71
-/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/TestProjectMain.java:76, "select ad_org_id, name from ad_org " {"where createds is null"} 
-/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/TestProjectMain.java:95, "a" "b" 
-/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/TestProjectMain.java:114, {"select id, name " "from customers "  "where id is not null" , "select id, name " "from customers " }
-/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/TestProjectMain.java:121, "a" "urraa"  "b"  "c" 
-/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/TestProjectMain.java:131, "a" "x"  "urraa"  "b"  "c" 
-/EDSLTestProject/src/ee/stacc/productivity/edsl/testproject/TestProjectMain.java:138, "" "x"  "urraa"  "b"  "c" 
+/AlvorTestProject/src/com/zeroturnaround/alvor/testproject/Interprocedural.java:14, {"select * from tab" " WHERE a > b" }
+/AlvorTestProject/src/com/zeroturnaround/alvor/testproject/LoopTests.java:10, "select * from tab where id in " " (?, ?)" 
+/AlvorTestProject/src/com/zeroturnaround/alvor/testproject/Overloading.java:27, {"int version"}
+/AlvorTestProject/src/com/zeroturnaround/alvor/testproject/Overloading.java:28, {"int version"}
+/AlvorTestProject/src/com/zeroturnaround/alvor/testproject/Overloading.java:29, {"str version"}
+/AlvorTestProject/src/com/zeroturnaround/alvor/testproject/Overloading.java:31, {"int,String version"}
+/AlvorTestProject/src/com/zeroturnaround/alvor/testproject/Overloading.java:32, {"int,int version"}
+/AlvorTestProject/src/com/zeroturnaround/alvor/testproject/SomeSubclass.java:13, unsupported: Unsupported SQL construction: Non-final fields are not supported at /AlvorTestProject/src/com/zeroturnaround/alvor/testproject/SomeSubclass.java:13
+/AlvorTestProject/src/com/zeroturnaround/alvor/testproject/SomeSubclass.java:24, {{"SomeSubclass.getSomeStr()"}, {"SomeSuperclass.getSomeStr()"}}
+/AlvorTestProject/src/com/zeroturnaround/alvor/testproject/SomeSubclass.java:25, {{"SomeSubclass.getSomeStr()"}, {"SomeSuperclass.getSomeStr()"}}
+/AlvorTestProject/src/com/zeroturnaround/alvor/testproject/SomeSubclass.java:26, {{"SomeSubclass.getSomeStr()"}, {"SomeSuperclass.getSomeStr()"}}
+/AlvorTestProject/src/com/zeroturnaround/alvor/testproject/SomeSubclass.java:27, {{"SomeSubclass.getSomeStr()"}, {"SomeSuperclass.getSomeStr()"}}
+/AlvorTestProject/src/com/zeroturnaround/alvor/testproject/SomeSubclass.java:29, {{"SomeSubclass.getSomeStr(int i)"}, {"SomeSuperclass.getSomeStr(int i)"}}
+/AlvorTestProject/src/com/zeroturnaround/alvor/testproject/SomeSubclass.java:42, {"tere"}
+/AlvorTestProject/src/com/zeroturnaround/alvor/testproject/TestProjectMain.java:42, "select * from dual where id > " "666" 
+/AlvorTestProject/src/com/zeroturnaround/alvor/testproject/TestProjectMain.java:56, "select * from dual"
+/AlvorTestProject/src/com/zeroturnaround/alvor/testproject/TestProjectMain.java:71, unsupported: Unsupported SQL construction: Possible problem, no callsites found for: testArguments at /AlvorTestProject/src/com/zeroturnaround/alvor/testproject/TestProjectMain.java:71
+/AlvorTestProject/src/com/zeroturnaround/alvor/testproject/TestProjectMain.java:76, "select ad_org_id, name from ad_org " {"where createds is null"} 
+/AlvorTestProject/src/com/zeroturnaround/alvor/testproject/TestProjectMain.java:95, "a" "b" 
+/AlvorTestProject/src/com/zeroturnaround/alvor/testproject/TestProjectMain.java:114, {"select id, name " "from customers "  "where id is not null" , "select id, name " "from customers " }
+/AlvorTestProject/src/com/zeroturnaround/alvor/testproject/TestProjectMain.java:121, "a" "urraa"  "b"  "c" 
+/AlvorTestProject/src/com/zeroturnaround/alvor/testproject/TestProjectMain.java:131, "a" "x"  "urraa"  "b"  "c" 
+/AlvorTestProject/src/com/zeroturnaround/alvor/testproject/TestProjectMain.java:138, "" "x"  "urraa"  "b"  "c" 

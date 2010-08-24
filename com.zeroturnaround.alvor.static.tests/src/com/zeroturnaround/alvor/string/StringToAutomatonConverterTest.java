@@ -1,10 +1,10 @@
-package ee.stacc.productivity.edsl.string;
+package com.zeroturnaround.alvor.string;
 
 import org.junit.Test;
 
-import ee.stacc.productivity.edsl.lexer.automata.State;
-import ee.stacc.productivity.edsl.lexer.automata.StringToAutomatonConverter;
-import ee.stacc.productivity.edsl.tests.util.TestUtil;
+import com.zeroturnaround.alvor.lexer.automata.State;
+import com.zeroturnaround.alvor.lexer.automata.StringToAutomatonConverter;
+import com.zeroturnaround.alvor.tests.util.TestUtil;
 
 
 public class StringToAutomatonConverterTest {

@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.common.logging;
+package com.zeroturnaround.alvor.common.logging;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -35,7 +35,7 @@ public class Logs {
 				
 				String logRootDirStr = properties.getProperty("$log.root.dir", ".");
 				if (Platform.isRunning()) {
-					logRootDirStr = logRootDirStr.replace("$workspace", EDSLCommonPlugin.getDefault().getStateLocation().toOSString());
+					logRootDirStr = logRootDirStr.replace("$workspace", AlvorCommonPlugin.getDefault().getStateLocation().toOSString());
 //					logRootDirStr = logRootDirStr.replace("$workspace", ResourcesPlugin.getWorkspace().getRoot().getLocation().toPortableString());
 				}
 				File logRootDir = new File(logRootDirStr);

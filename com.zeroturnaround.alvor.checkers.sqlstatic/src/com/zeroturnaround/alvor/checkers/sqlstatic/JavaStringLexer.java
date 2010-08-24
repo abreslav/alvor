@@ -1,7 +1,7 @@
-package ee.stacc.productivity.edsl.checkers.sqlstatic;
+package com.zeroturnaround.alvor.checkers.sqlstatic;
 
-import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
-import ee.stacc.productivity.edsl.string.IPosition;
+import com.zeroturnaround.alvor.lexer.alphabet.IAbstractInputItem;
+import com.zeroturnaround.alvor.string.IPosition;
 
 /**
  * Lexical analyzer to break up Java string literal into individual characters.

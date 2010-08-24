@@ -1,15 +1,15 @@
-package ee.stacc.productivity.edsl.parser;
+package com.zeroturnaround.alvor.parser;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Map;
 
-import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
-import ee.stacc.productivity.edsl.sqlparser.ErrorState;
-import ee.stacc.productivity.edsl.sqlparser.IParserStack;
-import ee.stacc.productivity.edsl.sqlparser.IParserState;
-import ee.stacc.productivity.edsl.sqlparser.IStackFactory;
-import ee.stacc.productivity.edsl.sqlparser.LRParser;
+import com.zeroturnaround.alvor.lexer.alphabet.IAbstractInputItem;
+import com.zeroturnaround.alvor.sqlparser.ErrorState;
+import com.zeroturnaround.alvor.sqlparser.IParserStack;
+import com.zeroturnaround.alvor.sqlparser.IParserState;
+import com.zeroturnaround.alvor.sqlparser.IStackFactory;
+import com.zeroturnaround.alvor.sqlparser.LRParser;
 
 public class LRInterpreter {
 

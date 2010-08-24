@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.checkers;
+package com.zeroturnaround.alvor.checkers;
 
 import java.util.List;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.crawler;
+package com.zeroturnaround.alvor.crawler;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,13 +37,13 @@ import org.eclipse.jdt.core.search.SearchParticipant;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
 
-import ee.stacc.productivity.edsl.cache.CacheService;
-import ee.stacc.productivity.edsl.cache.ICacheService;
-import ee.stacc.productivity.edsl.cache.UnsupportedStringOpEx;
-import ee.stacc.productivity.edsl.common.logging.ILog;
-import ee.stacc.productivity.edsl.common.logging.Logs;
-import ee.stacc.productivity.edsl.common.logging.Measurements;
-import ee.stacc.productivity.edsl.string.IPosition;
+import com.zeroturnaround.alvor.cache.CacheService;
+import com.zeroturnaround.alvor.cache.ICacheService;
+import com.zeroturnaround.alvor.cache.UnsupportedStringOpEx;
+import com.zeroturnaround.alvor.common.logging.ILog;
+import com.zeroturnaround.alvor.common.logging.Logs;
+import com.zeroturnaround.alvor.common.logging.Measurements;
+import com.zeroturnaround.alvor.string.IPosition;
 
 /**
  * Implements some Java searches + Node searches required by AbstractStringEvaluator

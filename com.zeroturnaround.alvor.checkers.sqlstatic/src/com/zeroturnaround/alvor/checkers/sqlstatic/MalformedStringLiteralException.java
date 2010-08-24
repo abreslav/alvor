@@ -1,9 +1,9 @@
 /**
  * 
  */
-package ee.stacc.productivity.edsl.checkers.sqlstatic;
+package com.zeroturnaround.alvor.checkers.sqlstatic;
 
-import ee.stacc.productivity.edsl.string.IPosition;
+import com.zeroturnaround.alvor.string.IPosition;
 
 /**
  * Thrown is a string literal is not a proper Java string literal

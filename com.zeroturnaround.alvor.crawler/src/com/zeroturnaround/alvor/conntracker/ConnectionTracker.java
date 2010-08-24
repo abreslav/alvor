@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.conntracker;
+package com.zeroturnaround.alvor.conntracker;
 
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Expression;
@@ -7,13 +7,13 @@ import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 
-import ee.stacc.productivity.edsl.crawler.NodeSearchEngine;
-import ee.stacc.productivity.edsl.crawler.PositionUtil;
-import ee.stacc.productivity.edsl.string.IPosition;
-import ee.stacc.productivity.edsl.tracker.NameAssignment;
-import ee.stacc.productivity.edsl.tracker.NameInParameter;
-import ee.stacc.productivity.edsl.tracker.NameUsage;
-import ee.stacc.productivity.edsl.tracker.VariableTracker;
+import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
+import com.zeroturnaround.alvor.crawler.PositionUtil;
+import com.zeroturnaround.alvor.string.IPosition;
+import com.zeroturnaround.alvor.tracker.NameAssignment;
+import com.zeroturnaround.alvor.tracker.NameInParameter;
+import com.zeroturnaround.alvor.tracker.NameUsage;
+import com.zeroturnaround.alvor.tracker.VariableTracker;
 
 public class ConnectionTracker {
 	public static ConnectionDescriptor getConnectionDescriptorForHotspot(IPosition pos) {

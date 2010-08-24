@@ -1,7 +1,7 @@
 /**
  * 
  */
-package ee.stacc.productivity.edsl.string;
+package com.zeroturnaround.alvor.string;
 
 public class StringConstant extends PositionedString {
 	private final String constant;

@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.javaproject.builder;
+package com.zeroturnaround.alvor.javaproject.builder;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
@@ -11,7 +11,7 @@ public class ESQLNature implements IProjectNature {
 	/**
 	 * ID of this project nature
 	 */
-	public static final String NATURE_ID = "ee.stacc.productivity.edsl.javaproject.esqlNature";
+	public static final String NATURE_ID = "com.zeroturnaround.alvor.javaproject.esqlNature";
 
 	private IProject project;
 

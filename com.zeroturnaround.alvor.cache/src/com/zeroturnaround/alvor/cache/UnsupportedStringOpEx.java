@@ -1,6 +1,6 @@
-package ee.stacc.productivity.edsl.cache;
+package com.zeroturnaround.alvor.cache;
 
-import ee.stacc.productivity.edsl.string.IPosition;
+import com.zeroturnaround.alvor.string.IPosition;
 
 public class UnsupportedStringOpEx extends UnsupportedOperationException {
 

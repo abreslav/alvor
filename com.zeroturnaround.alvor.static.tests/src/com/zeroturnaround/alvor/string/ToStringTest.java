@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.string;
+package com.zeroturnaround.alvor.string;
 
 import static org.junit.Assert.assertEquals;
 

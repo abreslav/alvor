@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="Compile ee.stacc.productivity.edsl.feature" default="main">
+<project name="Compile com.zeroturnaround.alvor.feature" default="main">
 	<target name="main">
-		<ant antfile="build.xml" dir="../ee.stacc.productivity.edsl.model" target="build.jars"/>
-		<ant antfile="build.xml" dir="../ee.stacc.productivity.edsl.common" target="build.jars"/>
-		<ant antfile="build.xml" dir="../ee.stacc.productivity.edsl.sqllexer" target="build.jars"/>
-		<ant antfile="build.xml" dir="../ee.stacc.productivity.edsl.sqlparser" target="build.jars"/>
-		<ant antfile="build.xml" dir="../ee.stacc.productivity.edsl.checkers" target="build.jars"/>
-		<ant antfile="build.xml" dir="../ee.stacc.productivity.edsl.checkers.sqlstatic" target="build.jars"/>
-		<ant antfile="build.xml" dir="../ee.stacc.productivity.edsl.checkers.sqldynamic" target="build.jars"/>
-		<ant antfile="build.xml" dir="../ee.stacc.productivity.edsl.cache" target="build.jars"/>
-		<ant antfile="build.xml" dir="../ee.stacc.productivity.edsl.crawler" target="build.jars"/>
-		<ant antfile="build.xml" dir="../ee.stacc.productivity.edsl.gui" target="build.jars"/>
-		<ant antfile="build.xml" dir="../ee.stacc.productivity.edsl.javaproject" target="build.jars"/>
+		<ant antfile="build.xml" dir="../com.zeroturnaround.alvor.model" target="build.jars"/>
+		<ant antfile="build.xml" dir="../com.zeroturnaround.alvor.common" target="build.jars"/>
+		<ant antfile="build.xml" dir="../com.zeroturnaround.alvor.sqllexer" target="build.jars"/>
+		<ant antfile="build.xml" dir="../com.zeroturnaround.alvor.sqlparser" target="build.jars"/>
+		<ant antfile="build.xml" dir="../com.zeroturnaround.alvor.checkers" target="build.jars"/>
+		<ant antfile="build.xml" dir="../com.zeroturnaround.alvor.checkers.sqlstatic" target="build.jars"/>
+		<ant antfile="build.xml" dir="../com.zeroturnaround.alvor.checkers.sqldynamic" target="build.jars"/>
+		<ant antfile="build.xml" dir="../com.zeroturnaround.alvor.cache" target="build.jars"/>
+		<ant antfile="build.xml" dir="../com.zeroturnaround.alvor.crawler" target="build.jars"/>
+		<ant antfile="build.xml" dir="../com.zeroturnaround.alvor.gui" target="build.jars"/>
+		<ant antfile="build.xml" dir="../com.zeroturnaround.alvor.javaproject" target="build.jars"/>
 	</target>
 </project>

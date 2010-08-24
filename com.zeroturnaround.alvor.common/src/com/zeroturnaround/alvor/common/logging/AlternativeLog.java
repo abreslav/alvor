@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.common.logging;
+package com.zeroturnaround.alvor.common.logging;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,7 +15,7 @@ public class AlternativeLog implements ILog {
 	
 	public AlternativeLog(Class<?> clazz) {
 		IPath wsPath = Platform.isRunning()? ResourcesPlugin.getWorkspace().getRoot().getLocation() : new Path(".");
-		IPath logFolder = wsPath.append(".metadata/.plugins/ee.stacc.productivity.edsl.common/");
+		IPath logFolder = wsPath.append(".metadata/.plugins/com.zeroturnaround.alvor.common/");
 		File f = logFolder.append(clazz.getCanonicalName() + ".log").toFile();
 		
 		try {

@@ -1,8 +1,8 @@
-package ee.stacc.productivity.edsl.lexer.automata;
+package com.zeroturnaround.alvor.lexer.automata;
 
-import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
-import ee.stacc.productivity.edsl.lexer.alphabet.ISequence;
-import ee.stacc.productivity.edsl.lexer.alphabet.ISequence.IFoldFunction;
+import com.zeroturnaround.alvor.lexer.alphabet.IAbstractInputItem;
+import com.zeroturnaround.alvor.lexer.alphabet.ISequence;
+import com.zeroturnaround.alvor.lexer.alphabet.ISequence.IFoldFunction;
 
 public class CharacterUtil {
 

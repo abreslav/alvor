@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.lexer.automata;
+package com.zeroturnaround.alvor.lexer.automata;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -9,14 +9,14 @@ import java.util.List;
 
 import org.junit.Test;
 
-import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
-import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractOutputItem;
-import ee.stacc.productivity.edsl.lexer.alphabet.ISequence;
-import ee.stacc.productivity.edsl.lexer.alphabet.SimpleCharacter;
-import ee.stacc.productivity.edsl.lexer.sql.SQLLexer;
-import ee.stacc.productivity.edsl.string.IAbstractString;
-import ee.stacc.productivity.edsl.string.parser.AbstractStringParser;
-import ee.stacc.productivity.edsl.tests.util.TestUtil;
+import com.zeroturnaround.alvor.lexer.alphabet.IAbstractInputItem;
+import com.zeroturnaround.alvor.lexer.alphabet.IAbstractOutputItem;
+import com.zeroturnaround.alvor.lexer.alphabet.ISequence;
+import com.zeroturnaround.alvor.lexer.alphabet.SimpleCharacter;
+import com.zeroturnaround.alvor.lexer.sql.SQLLexer;
+import com.zeroturnaround.alvor.string.IAbstractString;
+import com.zeroturnaround.alvor.string.parser.AbstractStringParser;
+import com.zeroturnaround.alvor.tests.util.TestUtil;
 
 public class AutomataInclusionTest {
 

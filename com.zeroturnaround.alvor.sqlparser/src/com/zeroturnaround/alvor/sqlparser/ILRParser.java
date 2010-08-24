@@ -1,8 +1,8 @@
-package ee.stacc.productivity.edsl.sqlparser;
+package com.zeroturnaround.alvor.sqlparser;
 
 import java.util.Map;
 
-import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
+import com.zeroturnaround.alvor.lexer.alphabet.IAbstractInputItem;
 
 /**
  * Represents an LRParser which can process tokens and modify state stacks according to its tables 

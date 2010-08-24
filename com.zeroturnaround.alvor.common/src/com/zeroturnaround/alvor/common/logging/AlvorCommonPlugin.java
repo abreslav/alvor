@@ -1,15 +1,15 @@
-package ee.stacc.productivity.edsl.common.logging;
+package com.zeroturnaround.alvor.common.logging;
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
 
 
-public class EDSLCommonPlugin extends Plugin {
+public class AlvorCommonPlugin extends Plugin {
 
-	public static final String ID = "ee.stacc.productivity.edsl.common";
+	public static final String ID = "com.zeroturnaround.alvor.common";
 	
-	private static EDSLCommonPlugin defaultInstance;
+	private static AlvorCommonPlugin defaultInstance;
 	
-	public EDSLCommonPlugin() {
+	public AlvorCommonPlugin() {
 	}
 
 	@Override
@@ -24,7 +24,7 @@ public class EDSLCommonPlugin extends Plugin {
 		super.stop(context);
 	}
 	
-	public static EDSLCommonPlugin getDefault() {
+	public static AlvorCommonPlugin getDefault() {
 		return defaultInstance;
 	}
 

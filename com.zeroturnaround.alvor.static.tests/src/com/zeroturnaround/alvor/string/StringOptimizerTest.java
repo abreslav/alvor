@@ -1,11 +1,11 @@
-package ee.stacc.productivity.edsl.string;
+package com.zeroturnaround.alvor.string;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import ee.stacc.productivity.edsl.string.parser.AbstractStringParser;
-import ee.stacc.productivity.edsl.string.util.AbstractStringOptimizer;
+import com.zeroturnaround.alvor.string.parser.AbstractStringParser;
+import com.zeroturnaround.alvor.string.util.AbstractStringOptimizer;
 
 
 public class StringOptimizerTest {

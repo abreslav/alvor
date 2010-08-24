@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.sqlparser;
+package com.zeroturnaround.alvor.sqlparser;
 
 import java.io.IOException;
 
@@ -22,7 +22,7 @@ public class Parsers {
 	public static ILRParser<IParserStack> getLALRParserForSQL() {
 		if (SQL_LALR_PARSER == null) {
 			try {
-				SQL_LALR_PARSER = LRParser.build(Parsers.class.getClassLoader().getResource("ee/stacc/productivity/edsl/sqlparser/sql.lr.xml"));
+				SQL_LALR_PARSER = LRParser.build(Parsers.class.getClassLoader().getResource("com/zeroturnaround/alvor/sqlparser/sql.lr.xml"));
 			} catch (JDOMException e) {
 				throw new IllegalStateException(e);
 			} catch (IOException e) {
@@ -38,7 +38,7 @@ public class Parsers {
 	public static ILRParser<GLRStack> getGLRParserForSQL() {
 		if (SQL_GLR_PARSER == null) {
 			try {
-				SQL_GLR_PARSER = GLRParser.build(Parsers.class.getClassLoader().getResource("ee/stacc/productivity/edsl/sqlparser/sql.xml"));
+				SQL_GLR_PARSER = GLRParser.build(Parsers.class.getClassLoader().getResource("com/zeroturnaround/alvor/sqlparser/sql.xml"));
 			} catch (JDOMException e) {
 				throw new IllegalStateException(e);
 			} catch (IOException e) {

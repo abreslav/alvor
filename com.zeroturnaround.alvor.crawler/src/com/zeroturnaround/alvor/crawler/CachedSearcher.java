@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.crawler;
+package com.zeroturnaround.alvor.crawler;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -10,7 +10,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaCore;
 
-import ee.stacc.productivity.edsl.cache.IScopedCache;
+import com.zeroturnaround.alvor.cache.IScopedCache;
 
 public abstract class CachedSearcher<K, V> {
 	

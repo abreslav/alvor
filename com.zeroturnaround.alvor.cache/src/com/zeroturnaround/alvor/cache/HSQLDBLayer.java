@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.cache;
+package com.zeroturnaround.alvor.cache;
 
 import java.io.File;
 import java.sql.Connection;
@@ -42,7 +42,7 @@ public class HSQLDBLayer implements IDBLayer {
 
 	
 	protected String getPath() {
-		return EDSLCachePlugin.getDefault().getStateLocation().append("/cache").toPortableString();
+		return AlvorCachePlugin.getDefault().getStateLocation().append("/cache").toPortableString();
 	}
 
 	@Override

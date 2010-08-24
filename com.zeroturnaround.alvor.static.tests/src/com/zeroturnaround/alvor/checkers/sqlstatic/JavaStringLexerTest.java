@@ -1,10 +1,10 @@
-package ee.stacc.productivity.edsl.checkers.sqlstatic;
+package com.zeroturnaround.alvor.checkers.sqlstatic;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import ee.stacc.productivity.edsl.lexer.alphabet.IAbstractInputItem;
+import com.zeroturnaround.alvor.lexer.alphabet.IAbstractInputItem;
 
 
 public class JavaStringLexerTest {

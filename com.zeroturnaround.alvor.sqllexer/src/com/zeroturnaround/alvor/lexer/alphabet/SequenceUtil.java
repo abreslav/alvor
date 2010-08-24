@@ -1,6 +1,6 @@
-package ee.stacc.productivity.edsl.lexer.alphabet;
+package com.zeroturnaround.alvor.lexer.alphabet;
 
-import ee.stacc.productivity.edsl.lexer.alphabet.ISequence.IFoldFunction;
+import com.zeroturnaround.alvor.lexer.alphabet.ISequence.IFoldFunction;
 
 public class SequenceUtil {
 

@@ -1,15 +1,15 @@
-package ee.stacc.productivity.edsl.cache;
+package com.zeroturnaround.alvor.cache;
 
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
 
-public class EDSLCachePlugin extends Plugin {
+public class AlvorCachePlugin extends Plugin {
 
-	public static final String ID = "ee.stacc.productivity.edsl.cache";
+	public static final String ID = "com.zeroturnaround.alvor.cache";
 	
-	private static EDSLCachePlugin defaultInstance;
+	private static AlvorCachePlugin defaultInstance;
 	
-	public EDSLCachePlugin() {
+	public AlvorCachePlugin() {
 	}
 
 	@Override
@@ -25,7 +25,7 @@ public class EDSLCachePlugin extends Plugin {
 		super.stop(context);
 	}
 	
-	public static EDSLCachePlugin getDefault() {
+	public static AlvorCachePlugin getDefault() {
 		return defaultInstance;
 	}
 	

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package ee.stacc.productivity.edsl.string;
+package com.zeroturnaround.alvor.string;
 
 import java.util.Iterator;
 import java.util.List;

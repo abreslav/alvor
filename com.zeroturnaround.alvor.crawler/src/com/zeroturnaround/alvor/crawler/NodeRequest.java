@@ -1,6 +1,6 @@
-package ee.stacc.productivity.edsl.crawler;
+package com.zeroturnaround.alvor.crawler;
 
-import ee.stacc.productivity.edsl.cache.IHotspotPattern;
+import com.zeroturnaround.alvor.cache.IHotspotPattern;
 
 /**
  * Tells {@link NodeSearchEngine} which methods to look for and which arguments to process for each method

@@ -1,6 +1,6 @@
-package ee.stacc.productivity.edsl.conntracker;
+package com.zeroturnaround.alvor.conntracker;
 
-import ee.stacc.productivity.edsl.string.IPosition;
+import com.zeroturnaround.alvor.string.IPosition;
 
 
 public class ConnectionDescriptor {

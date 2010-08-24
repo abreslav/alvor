@@ -1,16 +1,16 @@
-package ee.stacc.productivity.edsl.string.util;
+package com.zeroturnaround.alvor.string.util;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import ee.stacc.productivity.edsl.string.IAbstractString;
-import ee.stacc.productivity.edsl.string.IAbstractStringVisitor;
-import ee.stacc.productivity.edsl.string.StringCharacterSet;
-import ee.stacc.productivity.edsl.string.StringChoice;
-import ee.stacc.productivity.edsl.string.StringConstant;
-import ee.stacc.productivity.edsl.string.StringRepetition;
-import ee.stacc.productivity.edsl.string.StringSequence;
-import ee.stacc.productivity.edsl.string.StringParameter;
+import com.zeroturnaround.alvor.string.IAbstractString;
+import com.zeroturnaround.alvor.string.IAbstractStringVisitor;
+import com.zeroturnaround.alvor.string.StringCharacterSet;
+import com.zeroturnaround.alvor.string.StringChoice;
+import com.zeroturnaround.alvor.string.StringConstant;
+import com.zeroturnaround.alvor.string.StringRepetition;
+import com.zeroturnaround.alvor.string.StringSequence;
+import com.zeroturnaround.alvor.string.StringParameter;
 
 public class ArgumentApplier {
 	public static final IAbstractStringVisitor<IAbstractString, List<IAbstractString>> 

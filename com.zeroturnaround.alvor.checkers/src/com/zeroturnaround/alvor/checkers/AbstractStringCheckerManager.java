@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.checkers;
+package com.zeroturnaround.alvor.checkers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,13 +7,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 
-import ee.stacc.productivity.edsl.common.logging.ILog;
-import ee.stacc.productivity.edsl.common.logging.Logs;
+import com.zeroturnaround.alvor.common.logging.ILog;
+import com.zeroturnaround.alvor.common.logging.Logs;
 
 public class AbstractStringCheckerManager {
 
 	public static final AbstractStringCheckerManager INSTANCE = new AbstractStringCheckerManager();
-	private static final String CHECKERS_ID = "ee.stacc.productivity.edsl.checkers.checkers";
+	private static final String CHECKERS_ID = "com.zeroturnaround.alvor.checkers.checkers";
 	private static final ILog LOG = Logs.getLog(AbstractStringCheckerManager.class); 
 	
 	private List<IAbstractStringChecker> checkers = null;

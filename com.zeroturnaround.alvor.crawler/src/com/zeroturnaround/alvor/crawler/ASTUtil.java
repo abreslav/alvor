@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.crawler;
+package com.zeroturnaround.alvor.crawler;
 
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
@@ -40,7 +40,7 @@ import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
-import ee.stacc.productivity.edsl.cache.UnsupportedStringOpEx;
+import com.zeroturnaround.alvor.cache.UnsupportedStringOpEx;
 
 public class ASTUtil {
 	public static TypeDeclaration getContainingTypeDeclaration(ASTNode node) {

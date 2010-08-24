@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.parser;
+package com.zeroturnaround.alvor.parser;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
@@ -7,11 +7,11 @@ import java.util.Collection;
 
 import org.junit.Test;
 
-import ee.stacc.productivity.edsl.sqlparser.BoundedStack;
-import ee.stacc.productivity.edsl.sqlparser.IAction;
-import ee.stacc.productivity.edsl.sqlparser.IParserStack;
-import ee.stacc.productivity.edsl.sqlparser.IParserState;
-import ee.stacc.productivity.edsl.sqlparser.IStackFactory;
+import com.zeroturnaround.alvor.sqlparser.BoundedStack;
+import com.zeroturnaround.alvor.sqlparser.IAction;
+import com.zeroturnaround.alvor.sqlparser.IParserStack;
+import com.zeroturnaround.alvor.sqlparser.IParserState;
+import com.zeroturnaround.alvor.sqlparser.IStackFactory;
 
 
 public class BoundedStackTest {

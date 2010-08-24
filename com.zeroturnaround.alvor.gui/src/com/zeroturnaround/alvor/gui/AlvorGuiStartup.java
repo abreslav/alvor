@@ -1,10 +1,10 @@
-package ee.stacc.productivity.edsl.gui;
+package com.zeroturnaround.alvor.gui;
 
 import org.eclipse.ui.IStartup;
 
-import ee.stacc.productivity.edsl.common.logging.Logs;
+import com.zeroturnaround.alvor.common.logging.Logs;
 
-public class EdslGuiStartup implements IStartup {
+public class AlvorGuiStartup implements IStartup {
 
 	@Override
 	public void earlyStartup() {
