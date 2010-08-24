@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="project" default="default">
+	<taskdef classname="JFlex.anttask.JFlexTask" name="jflex" classpath="../ee.stacc.productivity.edsl.sqllexer/lib/JFlex.jar"/>
+	
+    <target name="default" depends="depends" description="description">
+        
+    </target>
+
+    <target name="depends">  
+		<!-- Simple lexer : used for experimentation -->
+    	<jflex
+			file="lexer/astr.flex"
+    		destdir="generated"
+			time="on"
+    		nobak="on"
+		/>
+		<exec executable="bison" dir="${basedir}">
+			<arg value="--xml=data/arith.xml"/>
+			<arg value="--report=state,lookahead,itemset"/>
+			<arg value="--report-file=generated/arith.report"/>
+			<arg value="--output=generated/ArithParser.java"/>
+			<arg value="--language=Java"/>
+			<arg value="--debug"/>
+			<arg value="grammar/arith.bg"/>
+		</exec>	
+		<exec executable="bison" dir="${basedir}">
+			<arg value="--xml=data/binexp.xml"/>
+			<arg value="--report=state,lookahead,itemset"/>
+			<arg value="--report-file=generated/binexp.report"/>
+			<arg value="--output=generated/BinExpParser.java"/>
+			<arg value="--language=Java"/>
+			<arg value="--debug"/>
+			<arg value="grammar/binexp.bg"/>
+		</exec>	
+		<exec executable="bison" dir="${basedir}">
+			<arg value="--xml=src/glr.xml"/>
+			<arg value="--report=state,lookahead,itemset"/>
+			<arg value="--report-file=generated/glr.report"/>
+			<arg value="grammar/glr.bg"/>
+		</exec>	
+    	<delete file="glr.tab.bg"></delete>
+		<exec executable="bison" dir="${basedir}">
+			<arg value="--xml=grammar/sql.xml"/>
+			<arg value="--report=state,lookahead,itemset"/>
+			<arg value="--report-file=grammar/sql.report"/>
+			<arg value="--output=grammar/SQLParser.java"/>
+			<arg value="--language=Java"/>
+			<arg value="--debug"/>
+			<arg value="grammar/openlink.bg"/>
+		</exec>	
+	</target>
+
+</project>

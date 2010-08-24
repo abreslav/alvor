@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="ee.stacc.productivity.edsl.feature"
+      label="SQL Checker"
+      version="0.3">
+
+   <description url="http://barclay.stacc.ee/edsl">
+      Embedded SQL checker
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      [Enter Copyright Description here.]
+   </copyright>
+
+   <license url="http://www.example.com/license">
+      [Enter License Description here.]
+   </license>
+
+   <requires>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.jdt.core" version="3.5.2" match="greaterOrEqual"/>
+      <import plugin="ee.stacc.productivity.edsl.model" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="ee.stacc.productivity.edsl.common" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.resources" version="3.5.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.jdt.core" version="3.5.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.runtime" version="3.5.0" match="greaterOrEqual"/>
+      <import plugin="ee.stacc.productivity.edsl.checkers" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="ee.stacc.productivity.edsl.sqllexer" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="ee.stacc.productivity.edsl.sqlparser" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="ee.stacc.productivity.edsl.cache" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.ui.editors" version="3.5.0" match="greaterOrEqual"/>
+      <import plugin="ee.stacc.productivity.edsl.crawler" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.commands"/>
+      <import plugin="org.eclipse.jdt.ui"/>
+      <import plugin="org.eclipse.jface"/>
+      <import plugin="org.eclipse.jface.text"/>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="ee.stacc.productivity.edsl.gui" version="1.0.0" match="greaterOrEqual"/>
+   </requires>
+
+   <plugin
+         id="ee.stacc.productivity.edsl.cache"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="ee.stacc.productivity.edsl.checkers"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="ee.stacc.productivity.edsl.checkers.sqldynamic"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="ee.stacc.productivity.edsl.checkers.sqlstatic"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="ee.stacc.productivity.edsl.common"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="ee.stacc.productivity.edsl.crawler"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="ee.stacc.productivity.edsl.gui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="ee.stacc.productivity.edsl.javaproject"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="ee.stacc.productivity.edsl.model"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="ee.stacc.productivity.edsl.sqllexer"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="ee.stacc.productivity.edsl.sqlparser"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

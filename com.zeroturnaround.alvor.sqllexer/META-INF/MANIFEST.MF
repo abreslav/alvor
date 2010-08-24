@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Sqllexer
+Bundle-SymbolicName: ee.stacc.productivity.edsl.sqllexer
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: ee.stacc.productivity.edsl.model;bundle-version="1.0.0",
+ ee.stacc.productivity.edsl.common;bundle-version="1.0.0"
+Export-Package: ee.stacc.productivity.edsl.lexer.alphabet,
+ ee.stacc.productivity.edsl.lexer.automata,
+ ee.stacc.productivity.edsl.lexer.sql
