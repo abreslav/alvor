@@ -4,10 +4,18 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
+import org.eclipse.jface.viewers.CheckboxTreeViewer;
+import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -21,17 +29,30 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.eclipse.ui.forms.SectionPart;
+import org.eclipse.ui.model.WorkbenchLabelProvider;
+
 import ee.stacc.productivity.edsl.main.OptionLoader;
+
+import org.eclipse.pde.core.IModelChangedEvent;
+import org.eclipse.pde.core.IModelChangedListener;
+import org.eclipse.pde.internal.core.project.PDEProject;
+import org.eclipse.pde.internal.ui.editor.FormLayoutFactory;
+import org.eclipse.pde.internal.ui.editor.build.BuildContentsSection.TreeContentProvider;
 
 public class AlvorPropertiesEditor extends FormEditor {
 //	private boolean isDirty = false;
 	private Map<String, Object> props = null;
-
-	private class AlvorPropertiesSection extends SectionPart {
+	
+	
+	
+	
+	private class AlvorPropertiesSection extends SectionPart implements IModelChangedListener {
+		
 		AlvorPropertiesSection(Composite parent,
 				FormToolkit toolkit,
 				int style) {
@@ -42,10 +63,56 @@ public class AlvorPropertiesEditor extends FormEditor {
 			section.setDescription("This is the description that goes "+
 			"below the title");
 
+			getBuildModel().addModelChangedListener(this);
+			createClient(getSection(), page.getManagedForm().getToolkit());
+		
 			Composite sectionClient = toolkit.createComposite(section);
 			TableWrapLayout layout = new TableWrapLayout();
 			layout.numColumns = 2;
 			sectionClient.setLayout(layout);
+		}
+
+
+		public void createClient(final Section section, FormToolkit toolkit) {
+			//				Composite container = createClientContainer(section, 2, toolkit);
+			//				fBuildModel = getBuildModel();
+			//				if (fBuildModel.getUnderlyingResource() != null)
+			//					fBundleRoot = PDEProject.getBundleRoot(fBuildModel.getUnderlyingResource().getProject());
+			//
+			//				fTreeViewer = new CheckboxTreeViewer(toolkit.createTree(container, SWT.CHECK));
+			//				fTreeViewer.setContentProvider(new TreeContentProvider());
+			//				fTreeViewer.setLabelProvider(new WorkbenchLabelProvider());
+			//				fTreeViewer.setAutoExpandLevel(0);
+			//				fTreeViewer.addCheckStateListener(new ICheckStateListener() {
+			//
+			//					public void checkStateChanged(final CheckStateChangedEvent event) {
+			//						final Object element = event.getElement();
+			//						BusyIndicator.showWhile(section.getDisplay(), new Runnable() {
+			//
+			//							public void run() {
+			//								if (element instanceof IFile) {
+			//									IFile file = (IFile) event.getElement();
+			//									handleCheckStateChanged(file, event.getChecked());
+			//								} else if (element instanceof IFolder) {
+			//									IFolder folder = (IFolder) event.getElement();
+			//									handleCheckStateChanged(folder, event.getChecked());
+			//								}
+			//							}
+			//						});
+			//					}
+			//				});
+			//				GridData gd = new GridData(GridData.FILL_BOTH);
+			//				gd.heightHint = 100;
+			//				gd.widthHint = 100;
+			//				fTreeViewer.getTree().setLayoutData(gd);
+			//				initialize();
+			//				toolkit.paintBordersFor(container);
+			//				createViewerPartControl(container, SWT.FULL_SELECTION, 2, toolkit);
+			//				section.setLayout(FormLayoutFactory.createClearGridLayout(false, 1));
+			//				section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			//				section.setClient(container);
+
+
 
 			Label label = toolkit.createLabel(sectionClient, "barbar"); //$NON-NLS-1$
 			TableWrapData td = new TableWrapData(TableWrapData.FILL_GRAB);
@@ -62,26 +129,47 @@ public class AlvorPropertiesEditor extends FormEditor {
 				td = new TableWrapData(TableWrapData.FILL_GRAB);
 				Text text = toolkit.createText(sectionClient, entry.getValue().toString()); //$NON-NLS-1$
 				text.setLayoutData(td);
-//				text.addModifyListener(new ModifyListener() {
-//					public void modifyText(ModifyEvent e) {
+				//				text.addModifyListener(new ModifyListener() {
+				//					public void modifyText(ModifyEvent e) {
 //						setDirty(true);
 //					}
 //				});
 			}
 		}
+
+		@Override
+		public void modelChanged(IModelChangedEvent event) {
+			// TODO Auto-generated method stub
+			
+		}
 	}
+	
+	
+	
 	
 	private class AlvorPropertiesPage extends FormPage {
 		public static final String PAGE_ID = "properties"; //$NON-NLS-1$
-
+//		private BuildClasspathSection fClasspathSection;
+//		private BuildContentsSection fSrcSection;
+//		private BuildContentsSection fBinSection;
+//		private RuntimeInfoSection fRuntimeSection;
+		
 		public AlvorPropertiesPage(FormEditor editor) {
 			super(editor, PAGE_ID, "Alvor configuration");
 		}
 
 		protected void createFormContent(IManagedForm managedForm) {
-			FormToolkit toolkit = managedForm.getToolkit();
-			Composite composite = managedForm.getForm().getBody();
-			composite.setLayout(new TableWrapLayout());
+			super.createFormContent(managedForm);
+
+//			FormToolkit toolkit = mform.getToolkit();
+//			ScrolledForm form = mform.getForm();
+
+//			form.setImage(PDEPlugin.getDefault().getLabelProvider().get(PDEPluginImages.DESC_BUILD_EXEC));
+//			form.setText(PDEUIMessages.BuildEditor_BuildPage_title);
+//			form.getBody().setLayout(FormLayoutFactory.createFormGridLayout(true, 2));
+
+//			Composite composite = managedForm.getForm().getBody();
+//			composite.setLayout(new TableWrapLayout());
 
 			Label label = toolkit.createLabel(composite, "foobar"); //$NON-NLS-1$
 			label.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
@@ -98,6 +186,22 @@ public class AlvorPropertiesEditor extends FormEditor {
 				
 			managedForm.addPart(section);
 			
+
+//			fRuntimeSection = new RuntimeInfoSection(this, form.getBody());
+//
+//			fBinSection = new BinSection(this, form.getBody());
+//			fBinSection.getSection().setLayoutData(new GridData(GridData.FILL_BOTH));
+//
+//			fSrcSection = new SrcSection(this, form.getBody());
+//			fSrcSection.getSection().setLayoutData(new GridData(GridData.FILL_BOTH));
+//
+//			fClasspathSection = new BuildClasspathSection(this, form.getBody());
+//
+//			mform.addPart(fRuntimeSection);
+//			mform.addPart(fSrcSection);
+//			mform.addPart(fBinSection);
+//			mform.addPart(fClasspathSection);
+			
 			//TODO Later
 			//// assuming 'editorPart' is an instance of an org.eclipse.ui.IEditorPart
 //			ITextEditor editor = (ITextEditor) editorPart.getAdapter(ITextEditor.class):
@@ -108,6 +212,8 @@ public class AlvorPropertiesEditor extends FormEditor {
 		}
 	}
 
+	
+	
 	private Map<String, Object> loadPropertiesFromEditorInput() {
 	
 		try {
@@ -138,7 +244,6 @@ public class AlvorPropertiesEditor extends FormEditor {
 		return props;
 	}
 	
-
 	@Override
 	protected void addPages() {
 		try {
