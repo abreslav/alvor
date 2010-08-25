@@ -90,7 +90,8 @@ public class JavaElementChecker {
 				assert LOG.message("UNSUPPORTED node desc, file=" + PositionUtil.getLineString(hotspot.getPosition())
 						+ ", msg=" + ((UnsupportedNodeDescriptor) hotspot).getProblemMessage());
 				unsupportedCount++;
-				errorHandler.handleSQLWarning(((UnsupportedNodeDescriptor)hotspot).getProblemMessage(),
+				errorHandler.handleSQLWarning(
+						"Unsupported SQL construction: " + ((UnsupportedNodeDescriptor)hotspot).getProblemMessage(),
 						hotspot.getPosition());
 			}
 			else {

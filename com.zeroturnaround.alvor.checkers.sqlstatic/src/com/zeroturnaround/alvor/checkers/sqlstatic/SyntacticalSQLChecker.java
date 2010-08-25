@@ -59,10 +59,10 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 						}
 					}
 					if (hasBigSubstrings) {
-						errorHandler.handleSQLWarning("Abstract string is too big" + (hasSmallSubstrings ? ". Only some parts checked" : ""), descriptor.getPosition());
+						errorHandler.handleSQLWarning("SQL syntax checker: Abstract string is too big" + (hasSmallSubstrings ? ". Only some parts checked" : ""), descriptor.getPosition());
 					}
 				} else {
-					errorHandler.handleSQLWarning("Abstract string is too big", descriptor.getPosition());
+					errorHandler.handleSQLWarning("SQL syntax checker: Abstract string is too big", descriptor.getPosition());
 				}
 			} else {
 				try {
@@ -89,18 +89,18 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 				public void unexpectedItem(IAbstractInputItem item) {
 					Collection<IPosition> markerPositions = PositionedCharacterUtil.getMarkerPositions(((Token) item).getText());
 					for (IPosition pos : markerPositions) {
-						errorHandler.handleSQLError("Unexpected token: " + PositionedCharacterUtil.render(item), pos);
+						errorHandler.handleSQLError("SQL syntax checker: Unexpected token: " + PositionedCharacterUtil.render(item), pos);
 					}
 				}
 
 				@Override
 				public void other() {
-					errorHandler.handleSQLError("SQL syntax error. Most likely, unfinished query", descriptor.getPosition());
+					errorHandler.handleSQLError("SQL syntax checker: Syntax error. Most likely, unfinished query", descriptor.getPosition());
 				}
 
 				@Override
 				public void overabstraction() {
-					errorHandler.handleSQLError("Syntactic analysis failed: nesting is too deep in this sentence", descriptor.getPosition());
+					errorHandler.handleSQLError("SQL syntax checker: Syntactic analysis failed: nesting is too deep in this sentence", descriptor.getPosition());
 				}
 			});
 		} catch (MalformedStringLiteralException e) {
@@ -108,13 +108,13 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 			if (errorPosition == null) {
 				errorPosition = descriptor.getPosition(); 
 			}
-			errorHandler.handleSQLError("Malformed literal: " + e.getMessage(), errorPosition);
+			errorHandler.handleSQLError("SQL syntax checker: Malformed literal: " + e.getMessage(), errorPosition);
 		} catch (StackOverflowError e) {  
 			// TODO: This hack is no good (see the method above)
 			throw e;
 		} catch (Throwable e) {
 			LOG.exception(e);
-			errorHandler.handleSQLError("Static checker internal error: " + e.toString(), descriptor.getPosition());
+			errorHandler.handleSQLError("SQL syntax checker: internal error: " + e.toString(), descriptor.getPosition());
 		}
 	}
 

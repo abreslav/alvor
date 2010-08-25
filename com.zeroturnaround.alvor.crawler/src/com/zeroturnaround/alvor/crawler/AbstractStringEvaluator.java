@@ -63,7 +63,7 @@ import com.zeroturnaround.alvor.tracker.VariableTracker;
  */
 public class AbstractStringEvaluator {
 	private int maxLevel = 4;
-	private boolean supportLoops = true;
+	private boolean supportLoops = false;
 	private boolean supportInvocations = true;
 	private boolean optimizeChoice = true;
 	
