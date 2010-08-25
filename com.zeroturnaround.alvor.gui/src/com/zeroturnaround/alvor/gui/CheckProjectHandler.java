@@ -77,7 +77,7 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 
 	/**
 	 * NB! Before calling this you should take care that NodeSearchEngine's ASTCache doesn't
-	 * contain old stuff (either clear it completely or remove updated AST-s)
+	 * contain old stuff (either clear it completely or remove expired AST-s)
 	 */
 	public void performCheck(IJavaElement optionsFrom, IJavaElement[] scope)
 			throws ExecutionException {
@@ -125,6 +125,7 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 
 	public static void createMarker(String message, String markerType,
 			IPosition pos, Map<String, Comparable<?>> map) {
+		// dummy positions are created in string conversion when no actual position fits
 		if (pos.getPath().equals("__dummy__")) {
 			return;
 		}
@@ -142,14 +143,8 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 //				+ ", charStart=" + charStart + ", charEnd=" + charEnd + ", type=" + markerType);
 		
 		String finalMessage = message;
-		if (message.length() > 500) {
-			finalMessage = message.substring(0, 500) + "...";
-		}
-		if (markerType.equals(WARNING_MARKER_ID)) {
-			finalMessage = "Unsupported SQL construction: " + message;
-		}
-		else if (markerType.equals(ERROR_MARKER_ID)) {
-			finalMessage = "SQL checker: " + message;
+		if (message.length() > 800) {
+			finalMessage = message.substring(0, 800) + "...";
 		}
 		
 		MarkerUtilities.setMessage(map, finalMessage);

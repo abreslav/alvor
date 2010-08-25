@@ -35,7 +35,7 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 				options.get("DBPassword").toString());
 		} catch (Exception e) {
 			// for position use first pos from the list
-			errorHandler.handleSQLError("can't connect with database schema: "
+			errorHandler.handleSQLError("Dynamic SQL checker: can't connect with database schema: "
 					+ e.getMessage(), descriptors.get(0).getPosition());
 			return;
 		}
@@ -49,7 +49,7 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 			assert LOG.message("ABS: " + nodeDesc.getAbstractValue());
 			
 			if (AbstractStringSizeCounter.size(nodeDesc.getAbstractValue()) > SIZE_LIMIT) {
-				errorHandler.handleSQLWarning("Testing facility: abstract string is too big", 
+				errorHandler.handleSQLWarning("Dynamic SQL checker: abstract string is too big", 
 						nodeDesc.getPosition());
 				continue;
 			}
@@ -96,7 +96,7 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 				String message = entry.getKey().trim() + "\nSQL: \n" 
 						+ entry.getValue();
 				//message = message.substring(0, Math.min(200, message.length()));
-				errorHandler.handleSQLError(message, nodeDesc.getPosition());
+				errorHandler.handleSQLError("SQL engine: " + message, nodeDesc.getPosition());
 			}
 
 			
@@ -108,5 +108,4 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 		LOG.message("TOTAL CONCRETE COUNT: " + totalConcrete);
 		LOG.message("DIFFERENT CONCRETE COUNT: " + concretes.size());
 	}
-
 }

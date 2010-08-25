@@ -16,7 +16,7 @@ import org.eclipse.ui.IEditorPart;
 import com.zeroturnaround.alvor.cache.CacheService;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
-import com.zeroturnaround.alvor.crawler.NewASE;
+import com.zeroturnaround.alvor.crawler.AbstractStringEvaluator;
 import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
 
 public class AbstractStringPrinter implements IEditorActionDelegate{
@@ -59,7 +59,7 @@ public class AbstractStringPrinter implements IEditorActionDelegate{
 			
 			NodeSearchEngine.clearCache();
 			CacheService.getCacheService().clearAll();
-			LOG.message(NewASE.evaluateExpression
+			LOG.message(AbstractStringEvaluator.evaluateExpression
 					((Expression)node).toString());
 		} 
 		else {
