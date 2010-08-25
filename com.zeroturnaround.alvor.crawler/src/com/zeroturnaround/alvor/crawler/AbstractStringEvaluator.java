@@ -61,7 +61,7 @@ import com.zeroturnaround.alvor.tracker.VariableTracker;
  * evaluateExpression is static counterpart for eval
  * eval is doEval plus cache handling
  */
-public class NewASE {
+public class AbstractStringEvaluator {
 	private int maxLevel = 4;
 	private boolean supportLoops = true;
 	private boolean supportInvocations = true;
@@ -72,10 +72,10 @@ public class NewASE {
 	private boolean templateConstructionMode; // means: don't evaluate parameters, leave them as StringParameter-s 
 	
 	private static final String RESULT_FOR_SQL_CHECKER = "@ResultForSQLChecker";
-	private static final ILog LOG = Logs.getLog(NewASE.class);
+	private static final ILog LOG = Logs.getLog(AbstractStringEvaluator.class);
 
 	
-	private NewASE(int level, IJavaElement[] scope, boolean templateConstructionMode) {
+	private AbstractStringEvaluator(int level, IJavaElement[] scope, boolean templateConstructionMode) {
 		if (level > maxLevel) {
 			throw new UnsupportedStringOpEx("Analysis level (" + level + ") too deep");
 		}
@@ -88,7 +88,7 @@ public class NewASE {
 	 * Used for debugging
 	 */
 	public static IAbstractString evaluateExpression(Expression node) {
-		NewASE evaluator = new NewASE(0, new IJavaElement[] {ASTUtil.getNodeProject(node)}, false);
+		AbstractStringEvaluator evaluator = new AbstractStringEvaluator(0, new IJavaElement[] {ASTUtil.getNodeProject(node)}, false);
 		return evaluator.eval(node);
 	}
 	
@@ -100,7 +100,7 @@ public class NewASE {
 		}
 		
 		Collection<IPosition> argumentPositions = NodeSearchEngine.findArgumentNodes(scope, requests);
-		NewASE evaluator = new NewASE(level, scope, false);
+		AbstractStringEvaluator evaluator = new AbstractStringEvaluator(level, scope, false);
 		List<INodeDescriptor> result = new ArrayList<INodeDescriptor>();
 		for (IPosition pos: argumentPositions) {
 			try {
@@ -339,7 +339,7 @@ public class NewASE {
 			throw new UnsupportedStringOpEx("No declarations found for: " + inv.toString());
 		}
 		
-		NewASE argEvaluator = new NewASE(this.level+1, this.scope, this.templateConstructionMode);
+		AbstractStringEvaluator argEvaluator = new AbstractStringEvaluator(this.level+1, this.scope, this.templateConstructionMode);
 		
 		// evaluate argumets
 		List<IAbstractString> arguments = new ArrayList<IAbstractString>();
@@ -400,7 +400,7 @@ public class NewASE {
 		
 		// get choice out of different return expressions
 		// Need new evaluator because mode changes to template construction
-		NewASE evaluator = new NewASE(level+1, scope, true);
+		AbstractStringEvaluator evaluator = new AbstractStringEvaluator(level+1, scope, true);
 		
 		List<IAbstractString> options = new ArrayList<IAbstractString>();
 		for (ReturnStatement ret: returnStmts) {
@@ -424,7 +424,7 @@ public class NewASE {
 				(IVariableBinding)paramName.resolveBinding(), decl);
 
 		// need new evaluator because mode changes to template construction
-		NewASE evaluator = new NewASE(level+1, scope, true);
+		AbstractStringEvaluator evaluator = new AbstractStringEvaluator(level+1, scope, true);
 		return evaluator.evalNameAfterUsage(paramName, lastMod);
 	}
 
