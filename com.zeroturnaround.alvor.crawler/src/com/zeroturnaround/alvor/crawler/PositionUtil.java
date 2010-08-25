@@ -20,7 +20,7 @@ import com.zeroturnaround.alvor.string.IPosition;
 import com.zeroturnaround.alvor.string.Position;
 
 public class PositionUtil {
-	private static final ILog LOG = Logs.getLog(NewASE.class);
+	private static final ILog LOG = Logs.getLog(AbstractStringEvaluator.class);
 
 	public static IFile getFile(ASTNode node) {
 		try {

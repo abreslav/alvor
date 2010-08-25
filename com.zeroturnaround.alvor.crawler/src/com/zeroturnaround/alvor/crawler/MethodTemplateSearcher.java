@@ -12,9 +12,9 @@ import com.zeroturnaround.alvor.cache.MethodInvocationDescriptor;
 import com.zeroturnaround.alvor.string.IAbstractString;
 
 public class MethodTemplateSearcher extends CachedSearcher<MethodInvocationDescriptor, IAbstractString> {
-	private NewASE evaluator;
+	private AbstractStringEvaluator evaluator;
 	
-	public MethodTemplateSearcher(NewASE evaluator) {
+	public MethodTemplateSearcher(AbstractStringEvaluator evaluator) {
 		// needs existing evaluator to keep track of current analysis level
 		this.evaluator = evaluator;
 	}

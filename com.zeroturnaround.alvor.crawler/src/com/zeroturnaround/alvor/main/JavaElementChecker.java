@@ -15,7 +15,7 @@ import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.common.logging.Measurements;
 import com.zeroturnaround.alvor.common.logging.Timer;
-import com.zeroturnaround.alvor.crawler.NewASE;
+import com.zeroturnaround.alvor.crawler.AbstractStringEvaluator;
 import com.zeroturnaround.alvor.crawler.NodeRequest;
 import com.zeroturnaround.alvor.crawler.PositionUtil;
 import com.zeroturnaround.alvor.crawler.UnsupportedNodeDescriptor;
@@ -51,7 +51,7 @@ public class JavaElementChecker {
 		if (requests.isEmpty()) {
 			throw new IllegalArgumentException("No hotspot definitions found in options");
 		}
-		List<INodeDescriptor> result = NewASE.evaluateMethodArgumentAtCallSites(requests, scope, 0);
+		List<INodeDescriptor> result = AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(requests, scope, 0);
 		timer.printTime(); // String construction
 		
 		LOG.message(Measurements.parseTimer);
