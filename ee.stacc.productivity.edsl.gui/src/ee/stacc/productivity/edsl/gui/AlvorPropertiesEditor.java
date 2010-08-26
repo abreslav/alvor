@@ -40,15 +40,16 @@ import ee.stacc.productivity.edsl.main.OptionLoader;
 
 import org.eclipse.pde.core.IModelChangedEvent;
 import org.eclipse.pde.core.IModelChangedListener;
+import org.eclipse.pde.core.build.IBuildModel;
 import org.eclipse.pde.internal.core.project.PDEProject;
 import org.eclipse.pde.internal.ui.editor.FormLayoutFactory;
+import org.eclipse.pde.internal.ui.editor.build.BuildInputContext;
 import org.eclipse.pde.internal.ui.editor.build.BuildContentsSection.TreeContentProvider;
+import org.eclipse.pde.internal.ui.editor.context.InputContext;
 
 public class AlvorPropertiesEditor extends FormEditor {
 //	private boolean isDirty = false;
 	private Map<String, Object> props = null;
-	
-	
 	
 	
 	private class AlvorPropertiesSection extends SectionPart implements IModelChangedListener {
@@ -57,23 +58,30 @@ public class AlvorPropertiesEditor extends FormEditor {
 				FormToolkit toolkit,
 				int style) {
 			super(parent, toolkit, style);
-			Section section = getSection();
-			
-			section.setText("Section title");
-			section.setDescription("This is the description that goes "+
-			"below the title");
+			getSection().setText("Section title");
+			getSection().setDescription("This is the description that goes below the title");
 
-			getBuildModel().addModelChangedListener(this);
-			createClient(getSection(), page.getManagedForm().getToolkit());
-		
-			Composite sectionClient = toolkit.createComposite(section);
+//			getBuildModel().addModelChangedListener(this);
+			createClient(getSection(), toolkit);
+		}
+	
+//		This has to be implemented without InputContext
+//		private IBuildModel getBuildModel() {
+//			InputContext context = getPage().getPDEEditor().getContextManager().findContext(BuildInputContext.CONTEXT_ID);
+//			if (context == null)
+//				return null;
+//			return (IBuildModel) context.getModel();
+//		}
+
+		public void createClient(final Section section, FormToolkit toolkit) {
+			Composite container = toolkit.createComposite(section);
+			container.setLayout(FormLayoutFactory.createSectionClientGridLayout(false, 2));
+			
+			Composite sectionClient = toolkit.createComposite(getSection());
 			TableWrapLayout layout = new TableWrapLayout();
 			layout.numColumns = 2;
 			sectionClient.setLayout(layout);
-		}
 
-
-		public void createClient(final Section section, FormToolkit toolkit) {
 			//				Composite container = createClientContainer(section, 2, toolkit);
 			//				fBuildModel = getBuildModel();
 			//				if (fBuildModel.getUnderlyingResource() != null)
