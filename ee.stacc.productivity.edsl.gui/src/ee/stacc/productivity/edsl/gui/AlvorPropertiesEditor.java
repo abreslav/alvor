@@ -16,6 +16,7 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 //import org.eclipse.swt.events.ModifyEvent;
 //import org.eclipse.swt.events.ModifyListener;
 //import org.eclipse.swt.layout.GridData;
+
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -72,74 +73,43 @@ public class AlvorPropertiesEditor extends FormEditor {
 
 		public void createClient(final Section section, FormToolkit toolkit) {
 			Composite container = toolkit.createComposite(section);
-//			container.setLayout(FormLayoutFactory.createSectionClientGridLayout(false, 2));
-			
-			Composite sectionClient = toolkit.createComposite(getSection());
 			TableWrapLayout layout = new TableWrapLayout();
 			layout.numColumns = 2;
-			sectionClient.setLayout(layout);
-
-			//				Composite container = createClientContainer(section, 2, toolkit);
+			container.setLayout(layout);
+			
 			//				fBuildModel = getBuildModel();
-			//				if (fBuildModel.getUnderlyingResource() != null)
-			//					fBundleRoot = PDEProject.getBundleRoot(fBuildModel.getUnderlyingResource().getProject());
-			//
-			//				fTreeViewer = new CheckboxTreeViewer(toolkit.createTree(container, SWT.CHECK));
-			//				fTreeViewer.setContentProvider(new TreeContentProvider());
-			//				fTreeViewer.setLabelProvider(new WorkbenchLabelProvider());
-			//				fTreeViewer.setAutoExpandLevel(0);
-			//				fTreeViewer.addCheckStateListener(new ICheckStateListener() {
-			//
-			//					public void checkStateChanged(final CheckStateChangedEvent event) {
-			//						final Object element = event.getElement();
-			//						BusyIndicator.showWhile(section.getDisplay(), new Runnable() {
-			//
-			//							public void run() {
-			//								if (element instanceof IFile) {
-			//									IFile file = (IFile) event.getElement();
-			//									handleCheckStateChanged(file, event.getChecked());
-			//								} else if (element instanceof IFolder) {
-			//									IFolder folder = (IFolder) event.getElement();
-			//									handleCheckStateChanged(folder, event.getChecked());
-			//								}
-			//							}
-			//						});
-			//					}
-			//				});
-			//				GridData gd = new GridData(GridData.FILL_BOTH);
-			//				gd.heightHint = 100;
-			//				gd.widthHint = 100;
-			//				fTreeViewer.getTree().setLayoutData(gd);
-			//				initialize();
-			//				toolkit.paintBordersFor(container);
-			//				createViewerPartControl(container, SWT.FULL_SELECTION, 2, toolkit);
-			//				section.setLayout(FormLayoutFactory.createClearGridLayout(false, 1));
-			//				section.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-			//				section.setClient(container);
 
-
-
-			Label label = toolkit.createLabel(sectionClient, "barbar"); //$NON-NLS-1$
+			Label label = toolkit.createLabel(container, "barbar"); //$NON-NLS-1$
 			TableWrapData td = new TableWrapData(TableWrapData.FILL_GRAB);
 			td.colspan = 2;
 			label.setLayoutData(td);
 
-			Map<String, Object> props = loadPropertiesFromEditorInput();
+			label = toolkit.createLabel(container, "epan:"); //$NON-NLS-1$
+			td = new TableWrapData(TableWrapData.FILL_GRAB|TableWrapData.RIGHT);
+			label.setLayoutData(td);
 
-			for (Map.Entry<String, Object> entry : props.entrySet()) {
-				td = new TableWrapData(TableWrapData.FILL_GRAB);
-				label = toolkit.createLabel(sectionClient, entry.getKey() +":"); //$NON-NLS-1$
-				td = new TableWrapData(TableWrapData.RIGHT);
-				label.setLayoutData(td);
-				td = new TableWrapData(TableWrapData.FILL_GRAB);
-				Text text = toolkit.createText(sectionClient, entry.getValue().toString()); //$NON-NLS-1$
-				text.setLayoutData(td);
-				//				text.addModifyListener(new ModifyListener() {
-				//					public void modifyText(ModifyEvent e) {
+			Text text = toolkit.createText(container, "bepan"); //$NON-NLS-1$
+			td = new TableWrapData(TableWrapData.FILL_GRAB);
+			text.setLayoutData(td);			
+			
+//			Map<String, Object> props = loadPropertiesFromEditorInput();
+//
+//			for (Map.Entry<String, Object> entry : props.entrySet()) {
+//				label = toolkit.createLabel(sectionClient, entry.getKey() +":"); //$NON-NLS-1$
+//				td = new TableWrapData(TableWrapData.FILL_GRAB|TableWrapData.RIGHT);
+//				label.setLayoutData(td);
+//				Text text = toolkit.createText(sectionClient, entry.getValue().toString()); //$NON-NLS-1$
+//				td = new TableWrapData(TableWrapData.FILL_GRAB);
+//				text.setLayoutData(td);
+//			/*	text.addModifyListener(new ModifyListener() {
+//					public void modifyText(ModifyEvent e) {
 //						setDirty(true);
 //					}
-//				});
-			}
+//				});*/
+//			}
+
+			section.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+			section.setClient(container);
 		}
 
 		@Override
@@ -154,7 +124,7 @@ public class AlvorPropertiesEditor extends FormEditor {
 	
 	private class AlvorPropertiesPage extends FormPage {
 		public static final String PAGE_ID = "properties"; //$NON-NLS-1$
-		private AlvorPropertiesSection section;
+		private AlvorPropertiesEditor.AlvorPropertiesSection section;
 
 		public AlvorPropertiesPage(FormEditor editor) {
 			super(editor, PAGE_ID, "Alvor configuration");
@@ -164,14 +134,13 @@ public class AlvorPropertiesEditor extends FormEditor {
 			super.createFormContent(mform);
 			FormToolkit toolkit = mform.getToolkit();
 			ScrolledForm form = mform.getForm();
-
+			form.getBody().setLayout(new TableWrapLayout());	
 //			form.setText(PDEUIMessages.BuildEditor_BuildPage_title);
-//			form.getBody().setLayout(FormLayoutFactory.createFormGridLayout(true, 2));
 
 			Label label = toolkit.createLabel(form.getBody(), "foobar"); //$NON-NLS-1$
 			label.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
 						
-			section = new AlvorPropertiesSection(this, form.getBody());
+			section = new AlvorPropertiesEditor.AlvorPropertiesSection(this, form.getBody());
 			
 			// TODO: We want to keep it expanded all the time...
 			//			section.addExpansionListener(new ExpansionAdapter() {
@@ -227,16 +196,18 @@ public class AlvorPropertiesEditor extends FormEditor {
 	protected void addPages() {
 		try {
 			addPage(new AlvorPropertiesPage(this));
-//			editor = new TextEditor();
-//			int index = addPage(editor, getEditorInput());
-//			setPageText(index, editor.getTitle());
 		} catch  (PartInitException e) {
-//			ErrorDialog.openError(
-//					getSite().getShell(),
-//					"Error creating nested text editor",
-//					null,
-//					e.getStatus());
+			//			ErrorDialog.openError(
+			//					getSite().getShell(),
+			//					"Error creating nested text editor",
+			//					null,
+			//					e.getStatus());
 		}
+
+		// TODO: May put this editor back if it makes sense later...
+		//			editor = new TextEditor();
+		//			int index = addPage(editor, getEditorInput());
+		//			setPageText(index, editor.getTitle());
 	}
 	
 	@Override
@@ -259,10 +230,10 @@ public class AlvorPropertiesEditor extends FormEditor {
 		return true;
 	}
 
-	private void setDirty(boolean dirty) {
+//	private void setDirty(boolean dirty) {
 //		this.isDirty = dirty;
-		firePropertyChange(PROP_DIRTY);
-	}
+//		firePropertyChange(PROP_DIRTY);
+//	}
 
 //	public boolean isDirty() {
 //		return this.isDirty;
