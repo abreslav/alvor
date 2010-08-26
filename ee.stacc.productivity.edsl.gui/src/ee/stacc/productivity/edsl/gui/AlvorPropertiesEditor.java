@@ -4,18 +4,18 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
+//import org.eclipse.core.resources.IFile;
+//import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ErrorDialog;
-import org.eclipse.jface.viewers.CheckStateChangedEvent;
-import org.eclipse.jface.viewers.CheckboxTreeViewer;
-import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.layout.GridData;
+//import org.eclipse.jface.viewers.CheckStateChangedEvent;
+//import org.eclipse.jface.viewers.CheckboxTreeViewer;
+//import org.eclipse.jface.viewers.ICheckStateListener;
+//import org.eclipse.swt.SWT;
+//import org.eclipse.swt.custom.BusyIndicator;
+//import org.eclipse.swt.events.ModifyEvent;
+//import org.eclipse.swt.events.ModifyListener;
+//import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -26,26 +26,21 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.editor.FormPage;
-import org.eclipse.ui.forms.events.ExpansionAdapter;
-import org.eclipse.ui.forms.events.ExpansionEvent;
+//import org.eclipse.ui.forms.events.ExpansionAdapter;
+//import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.eclipse.ui.forms.SectionPart;
-import org.eclipse.ui.model.WorkbenchLabelProvider;
+//import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 import ee.stacc.productivity.edsl.main.OptionLoader;
 
 import org.eclipse.pde.core.IModelChangedEvent;
 import org.eclipse.pde.core.IModelChangedListener;
-import org.eclipse.pde.core.build.IBuildModel;
-import org.eclipse.pde.internal.core.project.PDEProject;
-import org.eclipse.pde.internal.ui.editor.FormLayoutFactory;
-import org.eclipse.pde.internal.ui.editor.build.BuildInputContext;
-import org.eclipse.pde.internal.ui.editor.build.BuildContentsSection.TreeContentProvider;
-import org.eclipse.pde.internal.ui.editor.context.InputContext;
+//import org.eclipse.pde.core.build.IBuildModel;
 
 public class AlvorPropertiesEditor extends FormEditor {
 //	private boolean isDirty = false;
@@ -53,18 +48,20 @@ public class AlvorPropertiesEditor extends FormEditor {
 	
 	
 	private class AlvorPropertiesSection extends SectionPart implements IModelChangedListener {
+		private FormPage page;
 		
-		AlvorPropertiesSection(Composite parent,
-				FormToolkit toolkit,
-				int style) {
-			super(parent, toolkit, style);
+		AlvorPropertiesSection(FormPage page, Composite parent) {
+			super(parent, page.getManagedForm().getToolkit(), Section.DESCRIPTION|Section.TITLE_BAR|Section.TWISTIE|Section.EXPANDED);
+			this.page = page;
+			
 			getSection().setText("Section title");
 			getSection().setDescription("This is the description that goes below the title");
 
 //			getBuildModel().addModelChangedListener(this);
-			createClient(getSection(), toolkit);
+			createClient(getSection(), page.getManagedForm().getToolkit());
 		}
 	
+//		,
 //		This has to be implemented without InputContext
 //		private IBuildModel getBuildModel() {
 //			InputContext context = getPage().getPDEEditor().getContextManager().findContext(BuildInputContext.CONTEXT_ID);
@@ -75,7 +72,7 @@ public class AlvorPropertiesEditor extends FormEditor {
 
 		public void createClient(final Section section, FormToolkit toolkit) {
 			Composite container = toolkit.createComposite(section);
-			container.setLayout(FormLayoutFactory.createSectionClientGridLayout(false, 2));
+//			container.setLayout(FormLayoutFactory.createSectionClientGridLayout(false, 2));
 			
 			Composite sectionClient = toolkit.createComposite(getSection());
 			TableWrapLayout layout = new TableWrapLayout();
@@ -157,73 +154,47 @@ public class AlvorPropertiesEditor extends FormEditor {
 	
 	private class AlvorPropertiesPage extends FormPage {
 		public static final String PAGE_ID = "properties"; //$NON-NLS-1$
-//		private BuildClasspathSection fClasspathSection;
-//		private BuildContentsSection fSrcSection;
-//		private BuildContentsSection fBinSection;
-//		private RuntimeInfoSection fRuntimeSection;
-		
+		private AlvorPropertiesSection section;
+
 		public AlvorPropertiesPage(FormEditor editor) {
 			super(editor, PAGE_ID, "Alvor configuration");
 		}
 
-		protected void createFormContent(IManagedForm managedForm) {
-			super.createFormContent(managedForm);
+		protected void createFormContent(IManagedForm mform) {
+			super.createFormContent(mform);
+			FormToolkit toolkit = mform.getToolkit();
+			ScrolledForm form = mform.getForm();
 
-//			FormToolkit toolkit = mform.getToolkit();
-//			ScrolledForm form = mform.getForm();
-
-//			form.setImage(PDEPlugin.getDefault().getLabelProvider().get(PDEPluginImages.DESC_BUILD_EXEC));
 //			form.setText(PDEUIMessages.BuildEditor_BuildPage_title);
 //			form.getBody().setLayout(FormLayoutFactory.createFormGridLayout(true, 2));
 
-//			Composite composite = managedForm.getForm().getBody();
-//			composite.setLayout(new TableWrapLayout());
-
-			Label label = toolkit.createLabel(composite, "foobar"); //$NON-NLS-1$
+			Label label = toolkit.createLabel(form.getBody(), "foobar"); //$NON-NLS-1$
 			label.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+						
+			section = new AlvorPropertiesSection(this, form.getBody());
 			
-			AlvorPropertiesSection section = new AlvorPropertiesSection(composite, toolkit,
-					Section.DESCRIPTION|Section.TITLE_BAR|Section.TWISTIE|Section.EXPANDED);
-			section.getSection().setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
-			
-//			section.addExpansionListener(new ExpansionAdapter() {
-				//				public void expansionStateChanged(ExpansionEvent e) {
-				//					this.managedForm.reflow(true);
-				//				}
-				//			});
-				
-			managedForm.addPart(section);
-			
+			// TODO: We want to keep it expanded all the time...
+			//			section.addExpansionListener(new ExpansionAdapter() {
+			//				public void expansionStateChanged(ExpansionEvent e) {
+			//					this.managedForm.reflow(true);
+			//				}
+			//			});		
 
-//			fRuntimeSection = new RuntimeInfoSection(this, form.getBody());
-//
-//			fBinSection = new BinSection(this, form.getBody());
-//			fBinSection.getSection().setLayoutData(new GridData(GridData.FILL_BOTH));
-//
-//			fSrcSection = new SrcSection(this, form.getBody());
-//			fSrcSection.getSection().setLayoutData(new GridData(GridData.FILL_BOTH));
-//
-//			fClasspathSection = new BuildClasspathSection(this, form.getBody());
-//
-//			mform.addPart(fRuntimeSection);
-//			mform.addPart(fSrcSection);
-//			mform.addPart(fBinSection);
-//			mform.addPart(fClasspathSection);
+			mform.addPart(section);
 			
-			//TODO Later
+			// TODO IDocument management later
 			//// assuming 'editorPart' is an instance of an org.eclipse.ui.IEditorPart
-//			ITextEditor editor = (ITextEditor) editorPart.getAdapter(ITextEditor.class):
-//			if (editor != null) {
-//			  IDocumentProvider provider = editor.getDocumentProvider();
-//			  IDocument document = provider.getDocument(editor.getEditorInput());
-//			}
+			//			ITextEditor editor = (ITextEditor) editorPart.getAdapter(ITextEditor.class):
+			//			if (editor != null) {
+			//			  IDocumentProvider provider = editor.getDocumentProvider();
+			//			  IDocument document = provider.getDocument(editor.getEditorInput());
+			//			}
 		}
 	}
 
 	
 	
 	private Map<String, Object> loadPropertiesFromEditorInput() {
-	
 		try {
 			// TODO We should use something like this to init this page?
 			//			public void init(IEditorSite site, IEditorInput editorInput)
