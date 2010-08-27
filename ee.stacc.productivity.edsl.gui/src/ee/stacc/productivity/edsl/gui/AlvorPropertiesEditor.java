@@ -2,10 +2,14 @@ package ee.stacc.productivity.edsl.gui;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 
 //import org.eclipse.core.resources.IFile;
 //import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -19,8 +23,10 @@ import org.eclipse.jface.viewers.StructuredSelection;
 //import org.eclipse.swt.events.ModifyListener;
 //import org.eclipse.swt.layout.GridData;
 
+import org.eclipse.pde.core.IModel;
 import org.eclipse.pde.core.IModelChangedEvent;
 import org.eclipse.pde.core.IModelChangedListener;
+import org.eclipse.pde.core.IWritable;
 import org.eclipse.pde.core.build.IBuildEntry;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -50,6 +56,100 @@ public class AlvorPropertiesEditor extends FormEditor {
 	//	private boolean isDirty = false;
 	private Map<String, Object> props = null;
 
+	public class AlvorPropertiesModel implements IModel {
+		private boolean fDirty;
+		private boolean fEditable = true;
+		private IFile fUnderlyingResource;
+
+		@Override
+		public void dispose() {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public boolean isDisposed() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public boolean isEditable() {
+			// TODO Auto-generated method stub
+			return fEditable;
+		}
+
+		@Override
+		public boolean isValid() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public Object getAdapter(Class adapter) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public String getResourceString(String key) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public IResource getUnderlyingResource() {
+			// TODO Auto-generated method stub
+			return fUnderlyingResource;
+		}
+
+		@Override
+		public boolean isLoaded() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public boolean isInSync() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
+		@Override
+		public long getTimeStamp() {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+
+		@Override
+		public void load() throws CoreException {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void load(InputStream source, boolean outOfSync)
+				throws CoreException {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void reload(InputStream source, boolean outOfSync)
+				throws CoreException {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public boolean isReconcilingModel() {
+			// TODO Auto-generated method stub
+			return false;
+		}	
+	}
+	
+	
+	
 	public class AlvorPropertiesSection extends SectionPart implements IModelChangedListener {
 		private FormPage page;
 
