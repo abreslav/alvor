@@ -3,7 +3,9 @@ package ee.stacc.productivity.edsl.gui;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 //import org.eclipse.core.resources.IFile;
 //import org.eclipse.core.resources.IFolder;
@@ -12,6 +14,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 //import org.eclipse.jface.viewers.CheckStateChangedEvent;
@@ -45,22 +48,123 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
+import org.eclipse.ui.part.EditorPart;
+import org.eclipse.ui.texteditor.IDocumentProvider;
+import org.eclipse.ui.texteditor.ITextEditor;
 //import org.eclipse.ui.forms.events.ExpansionAdapter;
 //import org.eclipse.ui.forms.events.ExpansionEvent;
 //import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 import ee.stacc.productivity.edsl.main.OptionLoader;
 
+/*
+ * These are the component of current sqlchecker.properties to deal with:
+ * 
+ * In future, we may have multiple instances of DB*:
+ * DBDriverName=oracle.jdbc.OracleDriver
+ * DBDriverName=org.hsqldb.jdbc.JDBCDriver
+ *     - this is a class which can be selected from somewhere... ?
+ * DBUrl=jdbc:oracle:thin:@localhost:1521:xe
+ * DBUrl=jdbc:hsqldb:file:/Users/cj/Documents/Workspaces/EmbSQL-tests/SampleProject/db/sample_db;shutdown=true;ifexists=true
+ * - what is a reasonable way to build a DBUrl, or should it just be typed in... ?
+ * DBUsername=compiere
+ * DBUsername=sa
+ * DBPassword=password
+ * DBPassword=
+ * - user/password may be empty, password should be *'ed? 
+ *
+ * hotspots=java.sql.Connection,prepareStatement,1
+ * hotspots=java.sql.Connection,prepareStatement,1;\
+ * java.sql.Connection,prepareCall,1;\
+ * java.sql.Statement,execute,1;\
+ * java.sql.Statement,executeQuery,1;\
+ * java.sql.Statement,executeUpdate,1;\
+ * com.missiondata.oss.sqlprocessor.SQLProcessor,new,2;
+ * - this is class, method and argument number containing the sql string
+ * - will they be common between datasources? Not an immediate concern
+*/
 
 public class AlvorPropertiesEditor extends FormEditor {
 	//	private boolean isDirty = false;
-	private Map<String, Object> props = null;
-
+	private AlvorPropertiesModel model;
+	
 	public class AlvorPropertiesModel implements IModel {
+		public class Hotspot {
+			public String pkg;
+			public String method;
+			public int argnr; // 1-indexed?
+			
+			Hotspot(String pkg, String method, int argnr) {
+				this.pkg = pkg;
+				this.method = method;
+				this.argnr = argnr;
+			}
+			
+			Hotspot(String commaseparated) {
+				// ...
+			}
+		}
+		
 		private boolean fDirty;
 		private boolean fEditable = true;
 		private IFile fUnderlyingResource;
+		private EditorPart editorPart;
+		private IDocument document;
+		
+		private String dbdrivername = null;
+		private String dburl = null;
+		private String dbusername = null;
+//		private List<Hotspot> hotspots = null;
+		private String hotspots = null;
+		
+		public String getDbdrivername() {
+			return dbdrivername;
+		}
+		
+		public AlvorPropertiesModel(EditorPart editorPart) {
+			// Do we maybe need this for later, signalling or something?
+			this.editorPart = editorPart;
 
+			ITextEditor editor = (ITextEditor) editorPart.getAdapter(ITextEditor.class);
+
+			if (editor != null) {
+				IDocumentProvider provider = editor.getDocumentProvider();
+				IDocument document = provider.getDocument(editor.getEditorInput());
+			}
+
+		}
+		
+		public String getDburl() {
+			return dburl;
+		}
+		
+		public String getDbusername() {
+			return dbusername;		
+		}
+		
+//		public List<Hotspot> getHotspots() {
+		public String getHotspots() {
+			return hotspots;
+		}
+		
+		// TODO: Need to also set document here, which will mark things dirty?
+		public void setDbdrivername(String dbdrivername) {
+			this.dbdrivername = dbdrivername;
+		}
+		
+		public void setDburl(String dburl) {
+			this.dburl = dburl;
+		}
+		
+		public void getDbusername(String dbusername) {
+			this.dbusername = dbusername;		
+		}
+		
+//		public void setHotspots(List<Hotspot> hotspots) {
+		public void setHotspots(String hotspots) {
+			this.hotspots = hotspots;
+		}
+		
 		@Override
 		public void dispose() {
 			// TODO Auto-generated method stub
@@ -130,7 +234,13 @@ public class AlvorPropertiesEditor extends FormEditor {
 		@Override
 		public void load(InputStream source, boolean outOfSync)
 				throws CoreException {
-			// TODO Auto-generated method stub
+			try {
+				Map<String, Object> props = OptionLoader.getStreamSqlCheckerProperties(source);
+			}
+			catch (IOException e) {
+//				throw new CoreException(e);
+			}
+			
 			
 		}
 
@@ -302,21 +412,27 @@ public class AlvorPropertiesEditor extends FormEditor {
 			//			});		
 
 			mform.addPart(section);
-
-			// TODO IDocument management later
-			//// assuming 'editorPart' is an instance of an org.eclipse.ui.IEditorPart
-			//			ITextEditor editor = (ITextEditor) editorPart.getAdapter(ITextEditor.class):
-			//			if (editor != null) {
-			//			  IDocumentProvider provider = editor.getDocumentProvider();
-			//			  IDocument document = provider.getDocument(editor.getEditorInput());
-			//			}
 		}
 	}
 
-
-
-	private Map<String, Object> loadPropertiesFromEditorInput() {
-		try {
+	
+	
+	protected void createPages() {
+		// Create model management context here
+		model = new AlvorPropertiesModel(this);
+		
+		// We need to create the model before creating pages
+		super.createPages();
+		
+		
+	/*	
+	 * 
+		// TODO IDocument management later
+		//// assuming 'editorPart' is an instance of an org.eclipse.ui.IEditorPart
+		//			
+		 * 
+		 * 
+		 * try {
 			// TODO We should use something like this to init this page?
 			//			public void init(IEditorSite site, IEditorInput editorInput)
 			//				throws PartInitException {
@@ -341,9 +457,11 @@ public class AlvorPropertiesEditor extends FormEditor {
 			e.printStackTrace();
 		}
 
-		return props;
-	}
+		return props;*/
 
+		
+	}
+	
 	@Override
 	protected void addPages() {
 		try {

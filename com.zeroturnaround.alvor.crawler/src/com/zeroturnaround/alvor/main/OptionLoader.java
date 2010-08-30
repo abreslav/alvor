@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
 
@@ -30,12 +31,18 @@ public class OptionLoader {
 			throws FileNotFoundException, IOException {
 		
 		FileInputStream in = new FileInputStream(propsFile);
+		
+		return getStreamSqlCheckerProperties(in);
+	}
+	
+	public static Map<String, Object> getStreamSqlCheckerProperties(InputStream in) throws IOException {
 		Properties props = new Properties();
 		props.load(in);
 		@SuppressWarnings({ "rawtypes", "unchecked" })
 		Map<String, Object> result = (Map)props;
 		return result;
 	}
+
 	
 	public static File getElementSqlCheckerPropertiesFile(IJavaProject project) {
 		File propsFile = project.getResource().getLocation().append(
