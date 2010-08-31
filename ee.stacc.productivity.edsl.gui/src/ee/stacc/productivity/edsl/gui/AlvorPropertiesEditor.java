@@ -1,43 +1,21 @@
 package ee.stacc.productivity.edsl.gui;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
-//import org.eclipse.core.resources.IFile;
-//import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
-//import org.eclipse.jface.viewers.CheckStateChangedEvent;
-//import org.eclipse.jface.viewers.CheckboxTreeViewer;
-//import org.eclipse.jface.viewers.ICheckStateListener;
-//import org.eclipse.swt.SWT;
-//import org.eclipse.swt.custom.BusyIndicator;
-//import org.eclipse.swt.events.ModifyEvent;
-//import org.eclipse.swt.events.ModifyListener;
-//import org.eclipse.swt.layout.GridData;
 
-import org.eclipse.pde.core.IModel;
-import org.eclipse.pde.core.IModelChangedEvent;
-import org.eclipse.pde.core.IModelChangedListener;
-import org.eclipse.pde.core.IWritable;
-import org.eclipse.pde.core.build.IBuildEntry;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.SectionPart;
@@ -51,9 +29,6 @@ import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
-//import org.eclipse.ui.forms.events.ExpansionAdapter;
-//import org.eclipse.ui.forms.events.ExpansionEvent;
-//import org.eclipse.ui.model.WorkbenchLabelProvider;
 
 import ee.stacc.productivity.edsl.main.OptionLoader;
 
@@ -88,7 +63,8 @@ public class AlvorPropertiesEditor extends FormEditor {
 	//	private boolean isDirty = false;
 	private AlvorPropertiesModel model;
 	
-	public class AlvorPropertiesModel implements IModel {
+	public class AlvorPropertiesModel {
+
 		public class Hotspot {
 			public String pkg;
 			public String method;
@@ -105,9 +81,6 @@ public class AlvorPropertiesEditor extends FormEditor {
 			}
 		}
 		
-		private boolean fDirty;
-		private boolean fEditable = true;
-		private IFile fUnderlyingResource;
 		private EditorPart editorPart;
 		private IDocument document;
 		
@@ -122,7 +95,7 @@ public class AlvorPropertiesEditor extends FormEditor {
 		}
 		
 		public AlvorPropertiesModel(EditorPart editorPart) {
-			// Do we maybe need this for later, signalling or something?
+			// Do we maybe need this for later, signaling or something?
 			this.editorPart = editorPart;
 
 			ITextEditor editor = (ITextEditor) editorPart.getAdapter(ITextEditor.class);
@@ -130,8 +103,8 @@ public class AlvorPropertiesEditor extends FormEditor {
 			if (editor != null) {
 				IDocumentProvider provider = editor.getDocumentProvider();
 				IDocument document = provider.getDocument(editor.getEditorInput());
+//				 ...
 			}
-
 		}
 		
 		public String getDburl() {
@@ -165,102 +138,23 @@ public class AlvorPropertiesEditor extends FormEditor {
 			this.hotspots = hotspots;
 		}
 		
-		@Override
-		public void dispose() {
-			// TODO Auto-generated method stub
-			
-		}
 
-		@Override
-		public boolean isDisposed() {
-			// TODO Auto-generated method stub
-			return false;
-		}
 
-		@Override
-		public boolean isEditable() {
-			// TODO Auto-generated method stub
-			return fEditable;
-		}
-
-		@Override
-		public boolean isValid() {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		@Override
-		public Object getAdapter(Class adapter) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public String getResourceString(String key) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public IResource getUnderlyingResource() {
-			// TODO Auto-generated method stub
-			return fUnderlyingResource;
-		}
-
-		@Override
-		public boolean isLoaded() {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		@Override
-		public boolean isInSync() {
-			// TODO Auto-generated method stub
-			return false;
-		}
-
-		@Override
-		public long getTimeStamp() {
-			// TODO Auto-generated method stub
-			return 0;
-		}
-
-		@Override
-		public void load() throws CoreException {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public void load(InputStream source, boolean outOfSync)
+		private void load(InputStream source, boolean outOfSync)
 				throws CoreException {
 			try {
 				Map<String, Object> props = OptionLoader.getStreamSqlCheckerProperties(source);
+				// ...
 			}
 			catch (IOException e) {
 //				throw new CoreException(e);
 			}
-			
-			
 		}
-
-		@Override
-		public void reload(InputStream source, boolean outOfSync)
-				throws CoreException {
-			// TODO Auto-generated method stub
-			
-		}
-
-		@Override
-		public boolean isReconcilingModel() {
-			// TODO Auto-generated method stub
-			return false;
-		}	
 	}
 	
 	
 	
-	public class AlvorPropertiesSection extends SectionPart implements IModelChangedListener {
+	public class AlvorPropertiesSection extends SectionPart {
 		private FormPage page;
 
 		AlvorPropertiesSection(FormPage page, Composite parent) {
@@ -270,12 +164,13 @@ public class AlvorPropertiesEditor extends FormEditor {
 			getSection().setText("Section title");
 			getSection().setDescription("This is the description that goes below the title");
 
-			//			getBuildModel().addModelChangedListener(this);
+//			TODO: How would I do this... ?
+//			 getPropertiesModel().addModelChangedListener(this);
 			createClient(getSection(), page.getManagedForm().getToolkit());
 		}
 
-		//		,
-		//		This has to be implemented without InputContext
+		//		TODO: This has to be implemented without InputContext
+		// 
 		//		private IBuildModel getBuildModel() {
 		//			InputContext context = getPage().getPDEEditor().getContextManager().findContext(BuildInputContext.CONTEXT_ID);
 		//			if (context == null)
@@ -283,6 +178,18 @@ public class AlvorPropertiesEditor extends FormEditor {
 		//			return (IBuildModel) context.getModel();
 		//		}
 
+		private AlvorPropertiesModel getPropertiesModel() {
+			FormEditor editor = getPage().getEditor();
+			if (editor instanceof AlvorPropertiesEditor)
+				return ((AlvorPropertiesEditor) editor).getPropertiesModel();
+			else
+				return null;
+		}
+		
+		private FormPage getPage() {
+			return page;
+		}
+		
 		public void createClient(final Section section, FormToolkit toolkit) {
 			Composite container = toolkit.createComposite(section);
 			TableWrapLayout layout = new TableWrapLayout();
@@ -324,11 +231,11 @@ public class AlvorPropertiesEditor extends FormEditor {
 
 
 
-		public void modelChanged(IModelChangedEvent event) {
-			if (event.getChangeType() == IModelChangedEvent.WORLD_CHANGED)
-				markStale();
-			Object changeObject = event.getChangedObjects()[0];
-			String keyName = event.getChangedProperty();
+//		public void modelChanged(IModelChangedEvent event) {
+//			if (event.getChangeType() == IModelChangedEvent.WORLD_CHANGED)
+//				markStale();
+//			Object changeObject = event.getChangedObjects()[0];
+//			String keyName = event.getChangedProperty();
 			//
 			//			// check if model change applies to this section
 			//			if (!(changeObject instanceof IBuildEntry))
@@ -378,7 +285,7 @@ public class AlvorPropertiesEditor extends FormEditor {
 			//
 			//				fLibraryViewer.refresh();
 			//				updateDirectionalButtons();
-		}
+//		}
 	}
 
 
@@ -387,11 +294,11 @@ public class AlvorPropertiesEditor extends FormEditor {
 	public class AlvorPropertiesPage extends FormPage {
 		public static final String PAGE_ID = "properties"; //$NON-NLS-1$
 		private AlvorPropertiesSection section;
-
+		
 		public AlvorPropertiesPage(FormEditor editor) {
 			super(editor, PAGE_ID, "Alvor configuration");
 		}
-
+		
 		protected void createFormContent(IManagedForm mform) {
 			super.createFormContent(mform);
 			FormToolkit toolkit = mform.getToolkit();
@@ -508,6 +415,10 @@ public class AlvorPropertiesEditor extends FormEditor {
 	//	public boolean isDirty() {
 	//		return this.isDirty;
 	//	}
+	
+	public AlvorPropertiesModel getModel() {
+		return model;
+	}
 }
 
 
