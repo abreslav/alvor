@@ -1,7 +1,9 @@
 package ee.stacc.productivity.edsl.gui;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -65,7 +67,7 @@ public class AlvorPropertiesEditor extends FormEditor {
 	
 	public class AlvorPropertiesModel {
 
-		public class Hotspot {
+/*		public class Hotspot {
 			public String pkg;
 			public String method;
 			public int argnr; // 1-indexed?
@@ -80,7 +82,7 @@ public class AlvorPropertiesEditor extends FormEditor {
 				// ...
 			}
 		}
-		
+*/		
 		private EditorPart editorPart;
 		private IDocument document;
 		
@@ -96,15 +98,54 @@ public class AlvorPropertiesEditor extends FormEditor {
 		
 		public AlvorPropertiesModel(EditorPart editorPart) {
 			// Do we maybe need this for later, signaling or something?
-			this.editorPart = editorPart;
+			this.editorPart = editorPart;	
+			refresh();
+		}
 
+		public void refresh() {
+			Properties props = loadProps();
+				
+			// (getProperty defaults to null)
+			dbdrivername = props.getProperty("dbdrivername");
+			dburl = props.getProperty("dburl");
+			dbusername = props.getProperty("dbusername");
+			hotspots = props.getProperty("hotspots");
+		}
+
+		private Properties loadProps() {
 			ITextEditor editor = (ITextEditor) editorPart.getAdapter(ITextEditor.class);
 
-			if (editor != null) {
-				IDocumentProvider provider = editor.getDocumentProvider();
-				IDocument document = provider.getDocument(editor.getEditorInput());
-//				 ...
+			IDocumentProvider provider = editor.getDocumentProvider();
+			IDocument document = provider.getDocument(editor.getEditorInput());
+
+			Properties props = new Properties();
+			try {
+				props.load(new ByteArrayInputStream(document.get().getBytes("UTF-8")));
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
+			
+			return props;
+		}
+		
+		private void saveProps(Properties props) {
+			ITextEditor editor = (ITextEditor) editorPart.getAdapter(ITextEditor.class);
+
+			IDocumentProvider provider = editor.getDocumentProvider();
+			IDocument document = provider.getDocument(editor.getEditorInput());
+
+			document.set();
+		}
+		
+		private void setProp(String key, String value) {
+			Properties props = loadProps();
+			props.setProperty(key, value);
+			props
+			
 		}
 		
 		public String getDburl() {
@@ -123,6 +164,7 @@ public class AlvorPropertiesEditor extends FormEditor {
 		// TODO: Need to also set document here, which will mark things dirty?
 		public void setDbdrivername(String dbdrivername) {
 			this.dbdrivername = dbdrivername;
+			loadProps().
 		}
 		
 		public void setDburl(String dburl) {
@@ -136,19 +178,6 @@ public class AlvorPropertiesEditor extends FormEditor {
 //		public void setHotspots(List<Hotspot> hotspots) {
 		public void setHotspots(String hotspots) {
 			this.hotspots = hotspots;
-		}
-		
-
-
-		private void load(InputStream source, boolean outOfSync)
-				throws CoreException {
-			try {
-				Map<String, Object> props = OptionLoader.getStreamSqlCheckerProperties(source);
-				// ...
-			}
-			catch (IOException e) {
-//				throw new CoreException(e);
-			}
 		}
 	}
 	
@@ -181,7 +210,7 @@ public class AlvorPropertiesEditor extends FormEditor {
 		private AlvorPropertiesModel getPropertiesModel() {
 			FormEditor editor = getPage().getEditor();
 			if (editor instanceof AlvorPropertiesEditor)
-				return ((AlvorPropertiesEditor) editor).getPropertiesModel();
+				return ((AlvorPropertiesEditor) editor).getModel();
 			else
 				return null;
 		}
