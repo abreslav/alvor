@@ -1,6 +1,7 @@
 package ee.stacc.productivity.edsl.gui;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -66,7 +67,12 @@ public class AlvorPropertiesEditor extends FormEditor {
 	private AlvorPropertiesModel model;
 	
 	public class AlvorPropertiesModel {
-
+		public final String sdbdrivername =	"DBDriverName";
+		public final String sdburl = "DBUrl";
+		public final String sdbusername = "DBUsername";
+		public final String sdbpassword = "DBPassword"; 
+		public final String shotspots = "hotspots";
+		
 /*		public class Hotspot {
 			public String pkg;
 			public String method;
@@ -84,7 +90,6 @@ public class AlvorPropertiesEditor extends FormEditor {
 		}
 */		
 		private EditorPart editorPart;
-		private IDocument document;
 		
 		private String dbdrivername = null;
 		private String dburl = null;
@@ -106,10 +111,10 @@ public class AlvorPropertiesEditor extends FormEditor {
 			Properties props = loadProps();
 				
 			// (getProperty defaults to null)
-			dbdrivername = props.getProperty("dbdrivername");
-			dburl = props.getProperty("dburl");
-			dbusername = props.getProperty("dbusername");
-			hotspots = props.getProperty("hotspots");
+			dbdrivername = props.getProperty(sdbdrivername);
+			dburl = props.getProperty(sdburl);
+			dbusername = props.getProperty(sdbusername);
+			hotspots = props.getProperty(shotspots);
 		}
 
 		private Properties loadProps() {
@@ -138,14 +143,20 @@ public class AlvorPropertiesEditor extends FormEditor {
 			IDocumentProvider provider = editor.getDocumentProvider();
 			IDocument document = provider.getDocument(editor.getEditorInput());
 
-			document.set();
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			try {
+				props.store(baos, null);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			document.set(baos.toString());
 		}
 		
-		private void setProp(String key, String value) {
+		private void setProperty(String key, String value) {
 			Properties props = loadProps();
 			props.setProperty(key, value);
-			props
-			
+			saveProps(props);
 		}
 		
 		public String getDburl() {
@@ -164,20 +175,24 @@ public class AlvorPropertiesEditor extends FormEditor {
 		// TODO: Need to also set document here, which will mark things dirty?
 		public void setDbdrivername(String dbdrivername) {
 			this.dbdrivername = dbdrivername;
-			loadProps().
+			// TODO: Can also check if they are actually changed...
+			setProperty(sdbdrivername, dbdrivername);
 		}
 		
 		public void setDburl(String dburl) {
 			this.dburl = dburl;
+			setProperty(sdburl, dburl);
 		}
 		
 		public void getDbusername(String dbusername) {
-			this.dbusername = dbusername;		
+			this.dbusername = dbusername;
+			setProperty(sdbusername, dbusername);
 		}
 		
 //		public void setHotspots(List<Hotspot> hotspots) {
 		public void setHotspots(String hotspots) {
 			this.hotspots = hotspots;
+			setProperty(shotspots, hotspots);
 		}
 	}
 	
