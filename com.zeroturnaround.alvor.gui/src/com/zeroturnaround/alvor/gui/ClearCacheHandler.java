@@ -11,7 +11,7 @@ public class ClearCacheHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		NodeSearchEngine.clearCache();
+		NodeSearchEngine.clearASTCache();
 		CacheService.getCacheService().clearAll();
 		return null;
 	}

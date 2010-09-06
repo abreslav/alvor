@@ -1,12 +1,11 @@
 package com.zeroturnaround.alvor.gui;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -15,15 +14,12 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
-import com.zeroturnaround.alvor.cache.CacheService;
 import com.zeroturnaround.alvor.checkers.AbstractStringCheckerManager;
 import com.zeroturnaround.alvor.checkers.INodeDescriptor;
 import com.zeroturnaround.alvor.checkers.ISQLErrorHandler;
 import com.zeroturnaround.alvor.checkers.IStringNodeDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
-import com.zeroturnaround.alvor.common.logging.Timer;
-import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
 import com.zeroturnaround.alvor.crawler.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.main.JavaElementChecker;
 import com.zeroturnaround.alvor.main.OptionLoader;
@@ -38,50 +34,29 @@ import com.zeroturnaround.alvor.string.StringRepetition;
 import com.zeroturnaround.alvor.string.StringSequence;
 import com.zeroturnaround.alvor.string.util.AbstractStringOptimizer;
 
-public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHandler {
+public class GuiChecker implements ISQLErrorHandler {
 	public static final String ERROR_MARKER_ID = "com.zeroturnaround.alvor.gui.sqlerror";
 	public static final String WARNING_MARKER_ID = "com.zeroturnaround.alvor.gui.sqlwarning";
 	public static final String HOTSPOT_MARKER_ID = "com.zeroturnaround.alvor.gui.sqlhotspot";
 	public static final String UNSUPPORTED_MARKER_ID = "com.zeroturnaround.alvor.gui.unsupported";
 	public static final String STRING_MARKER_ID = "com.zeroturnaround.alvor.gui.sqlstring";
 
-	private static final ILog LOG = Logs.getLog(CheckProjectHandler.class);
+	private static final ILog LOG = Logs.getLog(GuiChecker.class);
 	
 	private JavaElementChecker projectChecker = new JavaElementChecker();
 	
-	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-		
-		Runtime.getRuntime().gc();
-		System.out.println("MEM: totalMemory() == " + Runtime.getRuntime().totalMemory());
-		System.out.println("MEM: maxMemory() == " + Runtime.getRuntime().maxMemory());
-		System.out.println("MEM: freeMemory() == " + Runtime.getRuntime().freeMemory());
-		System.out.println("MEM: used memory == " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
-		
-		NodeSearchEngine.clearCache();
-		CacheService.getCacheService().clearAll();
-		Timer timer = new Timer();
-		timer.start("TIMER: whole process");
-		assert LOG.message("CheckProjectHandler.execute");
-		List<IJavaElement> selectedJavaElements = GuiUtil.getSelectedJavaElements();
-		for (IJavaElement element : selectedJavaElements) {
-			try {
-				performCheck(element, new IJavaElement[] {element});
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		timer.printTime();
-		return null; // Must be null
-	}
-
 	/**
 	 * NB! Before calling this you should take care that NodeSearchEngine's ASTCache doesn't
 	 * contain old stuff (either clear it completely or remove expired AST-s)
 	 */
-	public void performCheck(IJavaElement optionsFrom, IJavaElement[] scope)
-			throws ExecutionException {
+	public List<INodeDescriptor> performCheck(IJavaElement optionsFrom, IJavaElement[] scope) {
+		
+		if (scope.length == 0) {
+			return new ArrayList<INodeDescriptor>();
+		}
+		
 		cleanMarkers(scope);
+		
 		try {
 			Map<String, Object> options = OptionLoader.getElementSqlCheckerProperties(optionsFrom);
 			List<INodeDescriptor> hotspots = projectChecker.findHotspots(scope, options);
@@ -91,11 +66,15 @@ public class CheckProjectHandler extends AbstractHandler implements ISQLErrorHan
 					AbstractStringCheckerManager.INSTANCE.getCheckers(),
 					options
 			);
-		} catch (Throwable e) {
+			
+			return hotspots;
+		}
+		catch (IOException e) {
 			LOG.exception(e);
-			throw new ExecutionException("Error during checking: " + e.getMessage(), e);
+			return new ArrayList<INodeDescriptor>();
 		}
 	}
+
 	
 	private void cleanMarkers(IJavaElement[] scope) {
 		try {

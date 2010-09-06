@@ -25,10 +25,12 @@ import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.common.logging.Timer;
 import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
 import com.zeroturnaround.alvor.crawler.PositionUtil;
-import com.zeroturnaround.alvor.gui.CheckProjectHandler;
+import com.zeroturnaround.alvor.gui.CleanCheckProjectHandler;
+import com.zeroturnaround.alvor.gui.GuiChecker;
 import com.zeroturnaround.alvor.string.IPosition;
 
 public class ESQLBuilder extends IncrementalProjectBuilder {
+	GuiChecker checker = new GuiChecker();
 	
 	private static ILog LOG = Logs.getLog(ESQLBuilder.class);
 	private Set<IFile> invalidatedFiles = new HashSet<IFile>();
@@ -99,7 +101,7 @@ public class ESQLBuilder extends IncrementalProjectBuilder {
 		assert LOG.message("==============================");
 		assert LOG.message("Clean build on " + getProject());
 		clearCache();
-		NodeSearchEngine.clearCache();
+		NodeSearchEngine.clearASTCache();
 		checkResources(new IJavaElement[] {JavaCore.create(getProject())});
 	}
 
@@ -130,7 +132,7 @@ public class ESQLBuilder extends IncrementalProjectBuilder {
 			filesToRemove.add(PositionUtil.getFileString(f));
 			NodeSearchEngine.removeASTFromCache(f);
 		}
-		System.out.println("!!! Strs to remove: " + filesToRemove);
+		System.out.println("!!! Files to invalidate (directly): " + filesToRemove);
 		CacheService.getCacheService().removeFiles(filesToRemove);
 		
 		t.printTime();
@@ -168,7 +170,7 @@ public class ESQLBuilder extends IncrementalProjectBuilder {
 
 	private void checkResources(IJavaElement[] elements) {
 		try {
-			new CheckProjectHandler().performCheck(JavaCore.create(getProject()), elements);
+			checker.performCheck(JavaCore.create(getProject()), elements);
 		} catch (Throwable e) {
 			LOG.error(e);
 		} 

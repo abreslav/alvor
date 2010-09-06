@@ -67,7 +67,7 @@ public class NodeSearchEngine {
 	private static Map<ICompilationUnit, ASTNode> astCache = 
 		new WeakHashMap<ICompilationUnit, ASTNode>();
 	
-	public static void clearCache() {
+	public static void clearASTCache() {
 		astCache.clear();
 	}
 	
