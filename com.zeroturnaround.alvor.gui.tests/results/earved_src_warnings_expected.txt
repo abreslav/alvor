@@ -1,0 +1,29 @@
+Unsupported SQL construction: No declarations found for: DomainEnum.BANK.name()
+Unsupported SQL construction: No declarations found for: DomainValueEnum.INVOICE_EVENT_SENDING.name()
+Unsupported SQL construction: No declarations found for: DomainValueEnum.INVOICE_EVENT_VIEWING.name()
+Unsupported SQL construction: No declarations found for: DomainValueEnum.INVOICE_PARTY_TYPE_DELIVERER.name()
+Unsupported SQL construction: No declarations found for: DomainValueEnum.INVOICE_PARTY_TYPE_DELIVERER.name()
+Unsupported SQL construction: No declarations found for: DomainValueEnum.INVOICE_TYPE_DEBT.name()
+Unsupported SQL construction: No declarations found for: StringUtils.join(dimensionDataIds,",")
+Unsupported SQL construction: No declarations found for: StringUtils.join(dimensionIds,",")
+Unsupported SQL construction: No declarations found for: StringUtils.join(invoiceIds,',')
+Unsupported SQL construction: Possible problem, no callsites found in current project for: ee.post.earved.dao.accountCard.AccountCardDAO.getAccountCardCodesForAdding(String)
+Unsupported SQL construction: Unsupported type: java.util.Set<java.lang.Long>
+Unsupported SQL construction: unsupported modification scheme in loop
+Unsupported SQL construction: unsupported modification scheme in loop
+Unsupported SQL construction: unsupported modification scheme in loop
+Unsupported SQL construction: unsupported modification scheme in loop
+Unsupported SQL construction: unsupported modification scheme in loop
+Unsupported SQL construction: unsupported modification scheme in loop
+Unsupported SQL construction: unsupported modification scheme in loop
+Unsupported SQL construction: unsupported modification scheme in loop
+Unsupported SQL construction: unsupported modification scheme in loop
+Unsupported SQL construction: unsupported modification scheme in loop
+Unsupported SQL construction: unsupported modification scheme in loop
+Unsupported SQL construction: unsupported modification scheme in loop
+Unsupported SQL construction: unsupported modification scheme in loop
+Unsupported SQL construction: unsupported modification scheme in loop
+Unsupported SQL construction: unsupported modification scheme in loop
+Unsupported SQL construction: unsupported modification scheme in loop
+Unsupported SQL construction: unsupported modification scheme in loop
+Unsupported SQL construction: unsupported modification scheme in loop
