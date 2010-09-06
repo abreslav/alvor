@@ -3,15 +3,8 @@ package ee.stacc.productivity.edsl.gui;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.IDocument;
 
@@ -20,6 +13,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.SectionPart;
 import org.eclipse.ui.forms.editor.FormEditor;
@@ -32,8 +26,6 @@ import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
-
-import ee.stacc.productivity.edsl.main.OptionLoader;
 
 /*
  * These are the component of current sqlchecker.properties to deal with:
@@ -65,6 +57,7 @@ import ee.stacc.productivity.edsl.main.OptionLoader;
 public class AlvorPropertiesEditor extends FormEditor {
 	//	private boolean isDirty = false;
 	private AlvorPropertiesModel model;
+	private TextEditor texteditor;
 	
 	public class AlvorPropertiesModel {
 		public final String sdbdrivername =	"DBDriverName";
@@ -73,38 +66,21 @@ public class AlvorPropertiesEditor extends FormEditor {
 		public final String sdbpassword = "DBPassword"; 
 		public final String shotspots = "hotspots";
 		
-/*		public class Hotspot {
-			public String pkg;
-			public String method;
-			public int argnr; // 1-indexed?
-			
-			Hotspot(String pkg, String method, int argnr) {
-				this.pkg = pkg;
-				this.method = method;
-				this.argnr = argnr;
-			}
-			
-			Hotspot(String commaseparated) {
-				// ...
-			}
-		}
-*/		
-		private EditorPart editorPart;
+		private AlvorPropertiesEditor editor;
 		
 		private String dbdrivername = null;
 		private String dburl = null;
 		private String dbusername = null;
-//		private List<Hotspot> hotspots = null;
+		private String dbpassword = null;
 		private String hotspots = null;
 		
 		public String getDbdrivername() {
 			return dbdrivername;
 		}
 		
-		public AlvorPropertiesModel(EditorPart editorPart) {
+		public AlvorPropertiesModel(AlvorPropertiesEditor editor) {
 			// Do we maybe need this for later, signaling or something?
-			this.editorPart = editorPart;	
-			refresh();
+			this.editor = editor;
 		}
 
 		public void refresh() {
@@ -114,34 +90,39 @@ public class AlvorPropertiesEditor extends FormEditor {
 			dbdrivername = props.getProperty(sdbdrivername);
 			dburl = props.getProperty(sdburl);
 			dbusername = props.getProperty(sdbusername);
+			dbpassword = props.getProperty(sdbpassword);
 			hotspots = props.getProperty(shotspots);
 		}
 
 		private Properties loadProps() {
-			ITextEditor editor = (ITextEditor) editorPart.getAdapter(ITextEditor.class);
-
-			IDocumentProvider provider = editor.getDocumentProvider();
-			IDocument document = provider.getDocument(editor.getEditorInput());
-
+			TextEditor texteditor = editor.getTextEditor();
 			Properties props = new Properties();
-			try {
-				props.load(new ByteArrayInputStream(document.get().getBytes("UTF-8")));
-			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			
+			if (null == editor)
+				System.err.println("DEBUG: failed to load model due to editor not available!");
+			else {
+				IDocumentProvider provider = texteditor.getDocumentProvider();
+				IDocument document = provider.getDocument(texteditor.getEditorInput());
+
+				try {
+					props.load(new ByteArrayInputStream(document.get().getBytes("UTF-8")));
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			
 			return props;
 		}
 		
 		private void saveProps(Properties props) {
-			ITextEditor editor = (ITextEditor) editorPart.getAdapter(ITextEditor.class);
-
-			IDocumentProvider provider = editor.getDocumentProvider();
-			IDocument document = provider.getDocument(editor.getEditorInput());
+			TextEditor texteditor = editor.getTextEditor();
+			
+			IDocumentProvider provider = texteditor.getDocumentProvider();
+			IDocument document = provider.getDocument(texteditor.getEditorInput());
 
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			try {
@@ -160,15 +141,28 @@ public class AlvorPropertiesEditor extends FormEditor {
 		}
 		
 		public String getDburl() {
+			if (dburl == null)
+				refresh();
 			return dburl;
 		}
 		
 		public String getDbusername() {
+			if (dbusername == null)
+				refresh();
 			return dbusername;		
+		}
+		
+
+		public String getDbpassword() {
+			if (dbpassword == null)
+				refresh();
+			return dbpassword;		
 		}
 		
 //		public List<Hotspot> getHotspots() {
 		public String getHotspots() {
+			if (hotspots == null)
+				refresh();
 			return hotspots;
 		}
 		
@@ -184,9 +178,14 @@ public class AlvorPropertiesEditor extends FormEditor {
 			setProperty(sdburl, dburl);
 		}
 		
-		public void getDbusername(String dbusername) {
+		public void setDbusername(String dbusername) {
 			this.dbusername = dbusername;
 			setProperty(sdbusername, dbusername);
+		}
+
+		public void setDbpassword(String dbpassword) {
+			this.dbpassword = dbpassword;
+			setProperty(sdbpassword, dbpassword);
 		}
 		
 //		public void setHotspots(List<Hotspot> hotspots) {
@@ -205,8 +204,8 @@ public class AlvorPropertiesEditor extends FormEditor {
 			super(parent, page.getManagedForm().getToolkit(), Section.DESCRIPTION|Section.TITLE_BAR|Section.TWISTIE|Section.EXPANDED);
 			this.page = page;
 
-			getSection().setText("Section title");
-			getSection().setDescription("This is the description that goes below the title");
+			getSection().setText("SQL checker configuration");
+//			getSection().setDescription("This is the description that goes below the title");
 
 //			TODO: How would I do this... ?
 //			 getPropertiesModel().addModelChangedListener(this);
@@ -235,101 +234,48 @@ public class AlvorPropertiesEditor extends FormEditor {
 		}
 		
 		public void createClient(final Section section, FormToolkit toolkit) {
+			AlvorPropertiesModel model = getPropertiesModel();
+			Label label = null;
+			Text text = null;
+			TableWrapData td = null;
+			
 			Composite container = toolkit.createComposite(section);
 			TableWrapLayout layout = new TableWrapLayout();
 			layout.numColumns = 2;
 			container.setLayout(layout);
 
-			//				fBuildModel = getBuildModel();
-
-			Label label = toolkit.createLabel(container, "barbar"); //$NON-NLS-1$
-			TableWrapData td = new TableWrapData(TableWrapData.FILL_GRAB);
+			// Make this a section more?
+			label = toolkit.createLabel(container, "Dynamic testing database");
+			td = new TableWrapData(TableWrapData.FILL_GRAB);
 			td.colspan = 2;
 			label.setLayoutData(td);
 
-			label = toolkit.createLabel(container, "epan:"); //$NON-NLS-1$
-			label.setLayoutData(new TableWrapData());
-
-			Text text = toolkit.createText(container, "bepan"); //$NON-NLS-1$
-			text.setLayoutData(new TableWrapData());			
-
-			//			Map<String, Object> props = loadPropertiesFromEditorInput();
-			//
-			//			for (Map.Entry<String, Object> entry : props.entrySet()) {
-			//				label = toolkit.createLabel(sectionClient, entry.getKey() +":"); //$NON-NLS-1$
-			//				td = new TableWrapData(TableWrapData.FILL_GRAB|TableWrapData.RIGHT);
-			//				label.setLayoutData(td);
-			//				Text text = toolkit.createText(sectionClient, entry.getValue().toString()); //$NON-NLS-1$
-			//				td = new TableWrapData(TableWrapData.FILL_GRAB);
-			//				text.setLayoutData(td);
+			label = toolkit.createLabel(container, "Database URL:");
+			label.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+			text = toolkit.createText(container, model.getDburl());
+			text.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+			label = toolkit.createLabel(container, "Database username:");
+			label.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+			text = toolkit.createText(container, model.getDbusername());
+			text.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+			label = toolkit.createLabel(container, "Database password:");
+			label.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+			text = toolkit.createText(container, model.getDbpassword());
+			text.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+			label = toolkit.createLabel(container, "SQL string methods (hotspots):");
+			label.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+			text = toolkit.createText(container, model.getHotspots());			
+			text.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+			
 			//			/*	text.addModifyListener(new ModifyListener() {
 			//					public void modifyText(ModifyEvent e) {
 			//						setDirty(true);
 			//					}
 			//				});*/
-			//			}
-
+			
 			section.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
 			section.setClient(container);
 		}
-
-
-
-//		public void modelChanged(IModelChangedEvent event) {
-//			if (event.getChangeType() == IModelChangedEvent.WORLD_CHANGED)
-//				markStale();
-//			Object changeObject = event.getChangedObjects()[0];
-//			String keyName = event.getChangedProperty();
-			//
-			//			// check if model change applies to this section
-			//			if (!(changeObject instanceof IBuildEntry))
-			//				return;
-			//			IBuildEntry entry = (IBuildEntry) changeObject;
-			//			String entryName = entry.getName();
-			//			if (!entryName.startsWith(IBuildEntry.JAR_PREFIX) && !entryName.equals(PROPERTY_JAR_ORDER) && !entryName.equals(PROPERTY_BIN_INCLUDES))
-			//				return;
-			//
-			//			if (entryName.equals(PROPERTY_BIN_INCLUDES))
-			//				return;
-			//
-			//			int type = event.getChangeType();
-			//
-			//			// account for new key
-			//			if (entry.getName().startsWith(PROPERTY_SOURCE_PREFIX)) {
-			//				IStructuredSelection newSel = null;
-			//				if (type == IModelChangedEvent.INSERT) {
-			//					fLibraryViewer.add(entry);
-			//					newSel = new StructuredSelection(entry);
-			//				} else if (type == IModelChangedEvent.REMOVE) {
-			//					int index = fLibraryViewer.getTable().getSelectionIndex();
-			//					fLibraryViewer.remove(entry);
-			//					Table table = fLibraryViewer.getTable();
-			//					int itemCount = table.getItemCount();
-			//					if (itemCount != 0) {
-			//						index = index < itemCount ? index : itemCount - 1;
-			//						newSel = new StructuredSelection(table.getItem(index).getData());
-			//					}
-			//				} else if (keyName != null && keyName.startsWith(IBuildEntry.JAR_PREFIX)) {
-			//					// modification to source.{libname}.jar
-			//					if (event.getOldValue() != null && event.getNewValue() != null)
-			//						// renaming token
-			//						fLibraryViewer.update(entry, null);
-			//
-			//					newSel = new StructuredSelection(entry);
-			//				}
-			//				fLibraryViewer.setSelection(newSel);
-			//			} else if (keyName != null && keyName.equals(PROPERTY_JAR_ORDER)) {
-			//				// account for change in jars compile order
-			//				if (event.getNewValue() == null && event.getOldValue() != null)
-			//					// removing token from jars compile order : do nothing
-			//					return;
-			//				if (event.getOldValue() != null && event.getNewValue() != null)
-			//					// renaming token from jars compile order : do nothing
-			//					return;
-			//
-			//				fLibraryViewer.refresh();
-			//				updateDirectionalButtons();
-//		}
 	}
 
 
@@ -345,13 +291,11 @@ public class AlvorPropertiesEditor extends FormEditor {
 		
 		protected void createFormContent(IManagedForm mform) {
 			super.createFormContent(mform);
-			FormToolkit toolkit = mform.getToolkit();
+//			FormToolkit toolkit = mform.getToolkit();
 			ScrolledForm form = mform.getForm();
 			form.getBody().setLayout(new TableWrapLayout());	
 			//			form.setText(PDEUIMessages.BuildEditor_BuildPage_title);
 
-			Label label = toolkit.createLabel(form.getBody(), "foobar"); //$NON-NLS-1$
-			label.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
 
 			section = new AlvorPropertiesSection(this, form.getBody());
 
@@ -368,55 +312,25 @@ public class AlvorPropertiesEditor extends FormEditor {
 
 	
 	
+	
+	
+	
 	protected void createPages() {
 		// Create model management context here
 		model = new AlvorPropertiesModel(this);
 		
-		// We need to create the model before creating pages
-		super.createPages();
-		
-		
-	/*	
-	 * 
-		// TODO IDocument management later
-		//// assuming 'editorPart' is an instance of an org.eclipse.ui.IEditorPart
-		//			
-		 * 
-		 * 
-		 * try {
-			// TODO We should use something like this to init this page?
-			//			public void init(IEditorSite site, IEditorInput editorInput)
-			//				throws PartInitException {
-			IEditorInput editorInput = getEditorInput();
-			if (!(editorInput instanceof IFileEditorInput))
-				throw new PartInitException("Invalid Input: Must be IFileEditorInput");
-
-			java.io.File propFile = ((IFileEditorInput) editorInput).getFile().getLocation().toFile();	
-			props = OptionLoader.getFileSqlCheckerProperties(propFile);
-
-		} catch (PartInitException e) {
-			ErrorDialog.openError(
-					getSite().getShell(),
-					"Error creating nested text editor",
-					null,
-					e.getStatus());
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		return props;*/
-
-		
+		super.createPages();	
 	}
 	
 	@Override
 	protected void addPages() {
 		try {
-			addPage(new AlvorPropertiesPage(this));
+			texteditor = new TextEditor();
+			int index = addPage(texteditor, getEditorInput());
+			setPageText(index, texteditor.getTitle());
+			
+			// This is added after the texteditor to avoid a round trip to the model
+			addPage(0, new AlvorPropertiesPage(this));			
 		} catch  (PartInitException e) {
 			//			ErrorDialog.openError(
 			//					getSite().getShell(),
@@ -424,11 +338,6 @@ public class AlvorPropertiesEditor extends FormEditor {
 			//					null,
 			//					e.getStatus());
 		}
-
-		// TODO: May put this editor back if it makes sense later...
-		//			editor = new TextEditor();
-		//			int index = addPage(editor, getEditorInput());
-		//			setPageText(index, editor.getTitle());
 	}
 
 	@Override
@@ -462,6 +371,10 @@ public class AlvorPropertiesEditor extends FormEditor {
 	
 	public AlvorPropertiesModel getModel() {
 		return model;
+	}
+	
+	public TextEditor getTextEditor() {
+		return texteditor;
 	}
 }
 

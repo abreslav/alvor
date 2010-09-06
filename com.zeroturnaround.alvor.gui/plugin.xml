@@ -222,6 +222,17 @@
             id="ee.stacc.productivity.edsl.gui.AlvorPropertiesEditor"
             name="Alvor Properties Editor">
       </editor>
+      <editor
+            class="ee.stacc.productivity.edsl.gui.editors.MultiPageEditor"
+            contributorClass="ee.stacc.productivity.edsl.gui.editors.MultiPageEditorContributor"
+            extensions="mpe"
+            icon="icons/sample.gif"
+            id="ee.stacc.productivity.edsl.gui.editors.MultiPageEditor"
+            name="Sample Multi-page Editor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
    </extension>
 <!--
    <extension
