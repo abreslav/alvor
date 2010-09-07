@@ -215,13 +215,14 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
+	        default="true"
             class="ee.stacc.productivity.edsl.gui.AlvorPropertiesEditor"
             contributorClass="ee.stacc.productivity.edsl.gui.AlvorPropertiesEditorContributor"
-            extensions="mpe"
             icon="icons/sample.gif"
             id="ee.stacc.productivity.edsl.gui.AlvorPropertiesEditor"
             name="Alvor Properties Editor">
       </editor>
+<!-- //This is not needed now
       <editor
             class="ee.stacc.productivity.edsl.gui.editors.MultiPageEditor"
             contributorClass="ee.stacc.productivity.edsl.gui.editors.MultiPageEditorContributor"
@@ -229,60 +230,35 @@
             icon="icons/sample.gif"
             id="ee.stacc.productivity.edsl.gui.editors.MultiPageEditor"
             name="Sample Multi-page Editor">
-      </editor>
+      </editor> //-->
    </extension>
    <extension
          point="org.eclipse.ui.editors">
    </extension>
-<!--
-<objectContribution
+   
+   <objectContribution
             objectClass="org.eclipse.core.resources.IFile"
-            nameFilter="build.properties"
+            nameFilter="sqlchecker.properties"
             id="org.eclipse.pde.ui.buildPropertiesFeatureToolSet">
-         <menu
-               label="%org.eclipse.pde.ui.tools"
+            <menu
+               label="PDE Tools"
                id="org.eclipse.pde.ui.build.feature.tools">
-            <separator
+               <separator
                   name="group0">
-            </separator>
-         </menu>
-         <filter
+               </separator>
+            </menu>
+            <filter
                name="projectNature"
-               value="org.eclipse.pde.FeatureNature">
-         </filter>
-         <action
-               label="%popupMenus.buildPlugin.label"
+               value="ee.stacc.productivity.edsl.javaproject.esqlNature">
+            </filter>
+            <action
+               label="Create Ant Build File"
                helpContextId="org.eclipse.pde.doc.user.create_feature_jars"
                class="org.eclipse.pde.internal.ui.build.BuildFeatureAction"
                menubarPath="org.eclipse.pde.ui.build.feature.tools/group0"
                enablesFor="1"
                id="org.eclipse.pde.ui.BuildFeatureJar2">
-         </action>
-      </objectContribution>
-      <objectContribution
-            objectClass="org.eclipse.core.resources.IFile"
-            nameFilter="build.properties"
-            id="org.eclipse.pde.ui.buildPropertiesPluginToolSet">
-         <menu
-               label="%org.eclipse.pde.ui.tools"
-               id="org.eclipse.pde.ui.build.plugin.tools">
-            <separator
-                  name="group0">
-            </separator>
-         </menu>
-         <filter
-               name="projectNature"
-               value="org.eclipse.pde.PluginNature">
-         </filter>
-         <action
-               label="%popupMenus.buildPlugin.label"
-               helpContextId="org.eclipse.pde.doc.user.create_plugin_jars"
-               class="org.eclipse.pde.internal.ui.build.BuildPluginAction"
-               menubarPath="org.eclipse.pde.ui.build.plugin.tools/group0"
-               enablesFor="1"
-               id="org.eclipse.pde.ui.BuildPluginAction3">
-         </action>
-      </objectContribution>
-//-->      
+            </action>
+   </objectContribution>
 </plugin>
 
