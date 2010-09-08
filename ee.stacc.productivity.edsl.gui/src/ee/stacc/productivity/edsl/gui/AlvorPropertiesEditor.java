@@ -23,9 +23,7 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
-import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.texteditor.IDocumentProvider;
-import org.eclipse.ui.texteditor.ITextEditor;
 
 /*
  * These are the component of current sqlchecker.properties to deal with:
@@ -204,8 +202,8 @@ public class AlvorPropertiesEditor extends FormEditor {
 			super(parent, page.getManagedForm().getToolkit(), Section.DESCRIPTION|Section.TITLE_BAR|Section.TWISTIE|Section.EXPANDED);
 			this.page = page;
 
-			getSection().setText("SQL checker configuration");
-//			getSection().setDescription("This is the description that goes below the title");
+			getSection().setText("General information");
+			getSection().setDescription("This describes the basic information necessary for the Alvor SQL checker");
 
 //			TODO: How would I do this... ?
 //			 getPropertiesModel().addModelChangedListener(this);
@@ -241,19 +239,27 @@ public class AlvorPropertiesEditor extends FormEditor {
 			
 			Composite container = toolkit.createComposite(section);
 			TableWrapLayout layout = new TableWrapLayout();
-			layout.numColumns = 2;
+			layout.numColumns = 3;
 			container.setLayout(layout);
 
 			// Make this a section more?
-			label = toolkit.createLabel(container, "Dynamic testing database");
-			td = new TableWrapData(TableWrapData.FILL_GRAB);
-			td.colspan = 2;
-			label.setLayoutData(td);
+//			label = toolkit.createLabel(container, "Dynamic testing database");
+//			td = new TableWrapData(TableWrapData.FILL_GRAB);
+//			td.colspan = 2;
+//			label.setLayoutData(td);
 
 			label = toolkit.createLabel(container, "Database URL:");
 			label.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
 			text = toolkit.createText(container, model.getDburl());
 			text.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+			
+			label = toolkit.createLabel(container, "This is the information required to access the" +
+					"(optional) database for dynamic testing. Currently Alvor " +
+					"supports accessing only one database per project being checked");
+			td = new TableWrapData(TableWrapData.FILL_GRAB);
+			td.rowspan = 3;
+			label.setLayoutData(td);
+
 			label = toolkit.createLabel(container, "Database username:");
 			label.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
 			text = toolkit.createText(container, model.getDbusername());
@@ -262,10 +268,63 @@ public class AlvorPropertiesEditor extends FormEditor {
 			label.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
 			text = toolkit.createText(container, model.getDbpassword());
 			text.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
-			label = toolkit.createLabel(container, "SQL string methods (hotspots):");
+			label = toolkit.createLabel(container, "Hotspots:");
 			label.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
 			text = toolkit.createText(container, model.getHotspots());			
 			text.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+			
+			label = toolkit.createLabel(container, "Hotspots define the entry points in code for SQL strings to be checked. For now, hotspots should be given as a semicolon-separated list of entries as such: \"<package>,<method>,<argument number>\" ");
+			label.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+
+//			OverviewPage_extensionContent=<form>\
+//			<p>This plug-in may define extensions and extension points:</p>\
+//			<li style="image" value="page" bindent="5"><a href="extensions">Extensions</a>: declares contributions this plug-in makes to the platform.</li>\
+//			<li style="image" value="page" bindent="5"><a href="ex-points">Extension Points</a>: declares new function points this plug-in adds to the platform.</li>\
+//			</form>
+
+//			private void createExtensionSection(IManagedForm managedForm, Composite parent, FormToolkit toolkit) {
+//				String sectionTitle = PDEUIMessages.ManifestEditor_ExtensionSection_title;
+//				Section section = createStaticSection(toolkit, parent, sectionTitle);
+//
+//				Composite container = createStaticSectionClient(toolkit, section);
+//
+//				FormText text = createClient(container, isFragment() ? PDEUIMessages.OverviewPage_fExtensionContent : PDEUIMessages.OverviewPage_extensionContent, toolkit);
+//				PDELabelProvider lp = PDEPlugin.getDefault().getLabelProvider();
+//				text.setImage("page", lp.get(PDEPluginImages.DESC_PAGE_OBJ, SharedLabelProvider.F_EDIT)); //$NON-NLS-1$
+//
+//				section.setClient(container);
+//			}
+
+
+//			private void fillBody(IManagedForm managedForm, FormToolkit toolkit) {
+//				Composite body = managedForm.getForm().getBody();
+//				body.setLayout(FormLayoutFactory.createFormTableWrapLayout(true, 2));
+//
+//				Composite left = toolkit.createComposite(body);
+//				left.setLayout(FormLayoutFactory.createFormPaneTableWrapLayout(false, 1));
+//				left.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+//				if (isFragment())
+//					fInfoSection = new FragmentGeneralInfoSection(this, left);
+//				else
+//					fInfoSection = new PluginGeneralInfoSection(this, left);
+//				managedForm.addPart(fInfoSection);
+//				if (isBundle())
+//					managedForm.addPart(new ExecutionEnvironmentSection(this, left));
+//
+//				Composite right = toolkit.createComposite(body);
+//				right.setLayout(FormLayoutFactory.createFormPaneTableWrapLayout(false, 1));
+//				right.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+//				createContentSection(managedForm, right, toolkit);
+//				if (isEditable() || getPDEEditor().hasInputContext(PluginInputContext.CONTEXT_ID))
+//					createExtensionSection(managedForm, right, toolkit);
+//				if (isEditable()) {
+//					createTestingSection(managedForm, isBundle() ? right : left, toolkit);
+//				}
+//				if (isEditable())
+//					createExportingSection(managedForm, right, toolkit);
+//			}
+
+			
 			
 			//			/*	text.addModifyListener(new ModifyListener() {
 			//					public void modifyText(ModifyEvent e) {
@@ -273,7 +332,7 @@ public class AlvorPropertiesEditor extends FormEditor {
 			//					}
 			//				});*/
 			
-			section.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+			section.setLayoutData(new TableWrapData());
 			section.setClient(container);
 		}
 	}
