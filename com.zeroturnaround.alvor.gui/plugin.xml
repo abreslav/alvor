@@ -216,10 +216,10 @@
          point="org.eclipse.ui.editors">
       <editor
 	        default="true"
-            class="ee.stacc.productivity.edsl.gui.AlvorPropertiesEditor"
-            contributorClass="ee.stacc.productivity.edsl.gui.AlvorPropertiesEditorContributor"
+            class="com.zeroturnaround.alvor.gui.AlvorPropertiesEditor"
+            contributorClass="com.zeroturnaround.alvor.gui.AlvorPropertiesEditorContributor"
             icon="icons/sample.gif"
-            id="ee.stacc.productivity.edsl.gui.AlvorPropertiesEditor"
+            id="com.zeroturnaround.alvor.gui.AlvorPropertiesEditor"
             name="Alvor Properties Editor">
       </editor>
 <!-- //This is not needed now
@@ -249,7 +249,7 @@
             </menu>
             <filter
                name="projectNature"
-               value="ee.stacc.productivity.edsl.javaproject.esqlNature">
+               value="com.zeroturnaround.alvor.javaproject.esqlNature">
             </filter>
             <action
                label="Create Ant Build File"

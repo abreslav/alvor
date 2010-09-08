@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.gui;
+package com.zeroturnaround.alvor.gui;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

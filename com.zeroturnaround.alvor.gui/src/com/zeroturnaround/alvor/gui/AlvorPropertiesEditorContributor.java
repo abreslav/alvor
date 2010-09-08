@@ -1,4 +1,4 @@
-package ee.stacc.productivity.edsl.gui;
+package com.zeroturnaround.alvor.gui;
 
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.part.MultiPageEditorActionBarContributor;
