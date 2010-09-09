@@ -90,7 +90,7 @@ public class JavaElementCheckerTest {
 	
 	private void testJavaElementAbstractStrings(IJavaElement element, String id) throws IOException {
 		Map<String, Object> options = OptionLoader.getElementSqlCheckerProperties(element);
-		List<INodeDescriptor> hotspots = checker.findHotspots(new IJavaElement[] {element}, options);
+		List<INodeDescriptor> hotspots = checker.findAndEvaluateHotspots(new IJavaElement[] {element}, options);
 		
 		// assuming current folder is folder of the project containing this test
 		String filePrefix = "tests/" + id;

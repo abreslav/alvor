@@ -44,7 +44,7 @@ public class JavaElementChecker {
 	 * (or markers for unsupported cases)  
 	 * TODO rename?
 	 */
-	public List<INodeDescriptor> findHotspots(IJavaElement[] scope, Map<String, Object> options) {
+	public List<INodeDescriptor> findAndEvaluateHotspots(IJavaElement[] scope, Map<String, Object> options) {
 		Measurements.resetAll();
 		timer.start("TIMER: string construction");
 		List<NodeRequest> requests = parseNodeRequests(options);
