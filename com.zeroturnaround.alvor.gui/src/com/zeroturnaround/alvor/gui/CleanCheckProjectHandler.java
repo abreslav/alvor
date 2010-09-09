@@ -17,10 +17,6 @@ public class CleanCheckProjectHandler extends AbstractHandler {
 	
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		NodeSearchEngine.clearASTCache();
-		CacheService.getCacheService().clearAll();
-		
-		Runtime.getRuntime().gc();
 		System.out.println("MEM: totalMemory() == " + Runtime.getRuntime().totalMemory());
 		System.out.println("MEM: maxMemory() == " + Runtime.getRuntime().maxMemory());
 		System.out.println("MEM: freeMemory() == " + Runtime.getRuntime().freeMemory());
@@ -32,7 +28,7 @@ public class CleanCheckProjectHandler extends AbstractHandler {
 		
 		try {
 			IJavaElement element = GuiUtil.getSingleSelectedJavaElement();
-			checker.performCheck(element, new IJavaElement[] {element});
+			checker.performCleanCheck(element, new IJavaElement[] {element});
 		} 
 		catch (IllegalAccessException e) {
 			GuiUtil.ShowErrorDialog(e.getMessage());

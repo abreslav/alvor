@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -36,58 +37,73 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.junit.Test;
 
 import com.zeroturnaround.alvor.checkers.INodeDescriptor;
 import com.zeroturnaround.alvor.checkers.IStringNodeDescriptor;
+import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
 import com.zeroturnaround.alvor.crawler.PositionUtil;
 import com.zeroturnaround.alvor.crawler.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.samplegen.SampleGenerator;
 
-public class GUITest {
+public abstract class GUITest {
 	IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+	IProject project = null; // to be set in constructor
+	IJavaProject javaProject = null; // to be set in constructor
 	GuiChecker checker = new GuiChecker();
 	
-	@Test
-	public void testEArved() throws JavaModelException, FileNotFoundException {
-		performComplexTestOnJavaElement(getJavaElement("earved", "src")); 
+	protected void setProject(String projectName) {
+		this.project = root.getProject(projectName);
+		
+		try {
+			if (!project.isOpen()) {
+				project.open(null);
+			}
+			
+			this.javaProject = (IJavaProject)project.getNature(JavaCore.NATURE_ID);
+		} catch (CoreException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 	
-	private void performComplexTestOnJavaElement(IJavaElement element) throws FileNotFoundException {
-		List<INodeDescriptor> hotspots = checker.performCheck(element, new IJavaElement[] {element});
+	protected void testAbstractStringsClean(IJavaElement element) throws FileNotFoundException {
+		List<INodeDescriptor> hotspots = checker.performCleanCheck(element, new IJavaElement[] {element});
 		writeAndTestHotspots(hotspots, getElementDescriptor(element));
-		writeAndTestMarkers(element);
 	}
 	
-	private void writeAndTestMarkers(IJavaElement element) throws FileNotFoundException {
-		String testId = getElementDescriptor(element);
+	/*
+	 * Make dummy change in a file and check that resulting markers are same
+	 */
+	protected void makeDummyChange(String filename) throws CoreException, FileNotFoundException {
+		IResource res = project.findMember(filename); 
+		res.touch(null);
+	}
+	
+	protected void writeAndTestMarkers(IJavaElement element, String markerType, String testTitle,
+			boolean includeLocationInfo) throws FileNotFoundException {
 		try {
 			List<String> lines = new ArrayList<String>();
-			
-			IMarker[] errors = element.getResource().findMarkers(GuiChecker.ERROR_MARKER_ID, false, IResource.DEPTH_INFINITE);
-			lines.clear();
+			IMarker[] errors = element.getResource().findMarkers(markerType, false, IResource.DEPTH_INFINITE);
 			for (IMarker err: errors) {
-				lines.add(err.getAttribute(IMarker.MESSAGE, "<no message>"));
+				String line = err.getAttribute(IMarker.MESSAGE, "<no message>");
+				if (includeLocationInfo) {
+					int lineNum = PositionUtil.getLineNumber(
+							(IFile)err.getResource(), 
+							err.getAttribute(IMarker.CHAR_START, 0));
+					line = line + ", at: " 
+							+ err.getAttribute(IMarker.LOCATION, "<no location>")
+							+ ":" + lineNum;
+				}
+				lines.add(line);
 			}
 			Collections.sort(lines);
-			writeAndCompare(lines, testId, "errors");
-			
-			IMarker[] warnings = element.getResource().findMarkers(GuiChecker.WARNING_MARKER_ID, false, IResource.DEPTH_INFINITE);
-			lines.clear();
-			for (IMarker war: warnings) {
-				lines.add(war.getAttribute(IMarker.MESSAGE, "<no message>"));
-			}
-			Collections.sort(lines);
-			writeAndCompare(lines, testId, "warnings");
-			
-			
+			writeAndCompare(lines, getElementDescriptor(element) + "_" + testTitle);
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
 	}
 
-	private void writeAndTestHotspots(List<INodeDescriptor> hotspots, String testId) throws FileNotFoundException {
+	private void writeAndTestHotspots(List<INodeDescriptor> hotspots, String elementId) throws FileNotFoundException {
 		List<String> abstractLines = new ArrayList<String>();
 		List<String> concreteLines = new ArrayList<String>();
 		
@@ -109,43 +125,25 @@ public class GUITest {
 		}
 		
 		Collections.sort(concreteLines);
-		writeAndCompare(concreteLines, testId, "concrete");
-		writeAndCompare(abstractLines, testId, "abstract");
+		writeAndCompare(concreteLines, elementId + "_concrete");
+		writeAndCompare(abstractLines, elementId + "_abstract");
 	}
 	
-	protected IJavaElement getJavaElement(String projectName, String packageFragmentRoot) throws JavaModelException {
-		IJavaProject project = getJavaProject(projectName);
-		if (packageFragmentRoot.isEmpty()) {
-			return project;
-		}
-		else {
-			return project.findPackageFragmentRoot(project.getPath().append(packageFragmentRoot));
-		}
-	}
-	
-	private IJavaProject getJavaProject(String projectName) {
-		IProject project = root.getProject(projectName);
-		
+	public static IJavaElement getSourceFolder(IJavaProject project, String folderName) {
 		try {
-			if (!project.isOpen()) {
-				project.open(null);
-			}
-			
-			return (IJavaProject)project.getNature(JavaCore.NATURE_ID);
-		} catch (CoreException e) {
-			e.printStackTrace();
-			return null;
+			return project.findPackageFragmentRoot(project.getPath().append(folderName));
+		} catch (JavaModelException e) {
+			throw new IllegalArgumentException(e);
 		}
-
 	}
 	
 	private String getElementDescriptor(IJavaElement e) {
 		return (e.getJavaProject().getElementName() + "_" + e.getElementName()).replace('/', '_');
 	}
 	
-	private void writeAndCompare(List<String> items, String testId, String topic) throws FileNotFoundException {
+	private void writeAndCompare(List<String> items, String testId) throws FileNotFoundException {
 		
-		String filePrefix = "results/" + testId + "_" + topic;
+		String filePrefix = "results/" + testId;
 		File outFile = new File(filePrefix + "_found.txt");
 		if (outFile.exists()) {
 			outFile.delete();

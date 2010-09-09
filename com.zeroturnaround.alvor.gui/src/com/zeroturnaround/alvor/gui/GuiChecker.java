@@ -14,12 +14,15 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
+import com.zeroturnaround.alvor.cache.CacheService;
 import com.zeroturnaround.alvor.checkers.AbstractStringCheckerManager;
 import com.zeroturnaround.alvor.checkers.INodeDescriptor;
 import com.zeroturnaround.alvor.checkers.ISQLErrorHandler;
 import com.zeroturnaround.alvor.checkers.IStringNodeDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
+import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
+import com.zeroturnaround.alvor.crawler.PositionUtil;
 import com.zeroturnaround.alvor.crawler.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.main.JavaElementChecker;
 import com.zeroturnaround.alvor.main.OptionLoader;
@@ -45,11 +48,17 @@ public class GuiChecker implements ISQLErrorHandler {
 	
 	private JavaElementChecker projectChecker = new JavaElementChecker();
 	
+	public List<INodeDescriptor> performCleanCheck(IJavaElement optionsFrom, IJavaElement[] scope) {
+		NodeSearchEngine.clearASTCache();
+		CacheService.getCacheService().clearAll();
+		return performIncrementalCheck(optionsFrom, scope);
+	}
+	
 	/**
 	 * NB! Before calling this you should take care that NodeSearchEngine's ASTCache doesn't
 	 * contain old stuff (either clear it completely or remove expired AST-s)
 	 */
-	public List<INodeDescriptor> performCheck(IJavaElement optionsFrom, IJavaElement[] scope) {
+	public List<INodeDescriptor> performIncrementalCheck(IJavaElement optionsFrom, IJavaElement[] scope) {
 		
 		if (scope.length == 0) {
 			return new ArrayList<INodeDescriptor>();
@@ -59,7 +68,7 @@ public class GuiChecker implements ISQLErrorHandler {
 		
 		try {
 			Map<String, Object> options = OptionLoader.getElementSqlCheckerProperties(optionsFrom);
-			List<INodeDescriptor> hotspots = projectChecker.findHotspots(scope, options);
+			List<INodeDescriptor> hotspots = projectChecker.findAndEvaluateHotspots(scope, options);
 			markHotspots(hotspots);
 			
 			projectChecker.processHotspots(hotspots, this,

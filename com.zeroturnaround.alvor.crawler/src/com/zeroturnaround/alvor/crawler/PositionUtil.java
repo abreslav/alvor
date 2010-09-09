@@ -61,9 +61,11 @@ public class PositionUtil {
 	}
 
 	public static int getLineNumber(IPosition position) {
-		IFile file = getFile(position);
+		return getLineNumber(getFile(position), position.getStart());
+	}
+	
+	public static int getLineNumber(IFile file, int start) {
 		Reader contents = null;
-		int start = position.getStart();
 		try {
 			contents = new BufferedReader(new InputStreamReader(file.getContents(true)));
 			boolean cr = false;
