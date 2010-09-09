@@ -12,6 +12,18 @@ package com.zeroturnaround.alvor.cache;
  *   
  *    
  * TODO: instead invalidating files, invalidate source-ranges   
+ * 
+ * What can happen when file is changed:
+ * 	- interprocedural stuff
+ * 		* new call-sites appear to some method in another (unchanged) file containing hotspot ...
+ * 		* ... or such call-sites can disappear
+ * 		* a method called from other files can change:
+ * 			- if it disappears then code breaks and we can expect user to modify other files soon,
+ *            therefore we substitute lost a-string with some dummy string ...
+ *          - ... but if it is an overridden method then you can just remove this option ???
+ *          - it method content changes then only method string in cache should be updated (or invalidated)  
+ *  - intraprocedural stuff, can be resolved by searching and evaluating hotspots in this file 
+ *      * hotspots may appear or disappear
  */
 
 import java.util.Collection;
