@@ -8,6 +8,7 @@ import java.util.Properties;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.IDocument;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -199,7 +200,7 @@ public class AlvorPropertiesEditor extends FormEditor {
 		private FormPage page;
 
 		AlvorPropertiesSection(FormPage page, Composite parent) {
-			super(parent, page.getManagedForm().getToolkit(), Section.DESCRIPTION|Section.TITLE_BAR|Section.TWISTIE|Section.EXPANDED);
+			super(parent, page.getManagedForm().getToolkit(), Section.DESCRIPTION|Section.TITLE_BAR|Section.EXPANDED);
 			this.page = page;
 
 			getSection().setText("General information");
@@ -210,14 +211,6 @@ public class AlvorPropertiesEditor extends FormEditor {
 			createClient(getSection(), page.getManagedForm().getToolkit());
 		}
 
-		//		TODO: This has to be implemented without InputContext
-		// 
-		//		private IBuildModel getBuildModel() {
-		//			InputContext context = getPage().getPDEEditor().getContextManager().findContext(BuildInputContext.CONTEXT_ID);
-		//			if (context == null)
-		//				return null;
-		//			return (IBuildModel) context.getModel();
-		//		}
 
 		private AlvorPropertiesModel getPropertiesModel() {
 			FormEditor editor = getPage().getEditor();
@@ -255,8 +248,8 @@ public class AlvorPropertiesEditor extends FormEditor {
 			
 			label = toolkit.createLabel(container, "This is the information required to access the" +
 					"(optional) database for dynamic testing. Currently Alvor " +
-					"supports accessing only one database per project being checked");
-			td = new TableWrapData(TableWrapData.FILL_GRAB);
+					"supports accessing only one database per project being checked", SWT.WRAP);
+			td = new TableWrapData();
 			td.rowspan = 3;
 			label.setLayoutData(td);
 
@@ -273,8 +266,8 @@ public class AlvorPropertiesEditor extends FormEditor {
 			text = toolkit.createText(container, model.getHotspots());			
 			text.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
 			
-			label = toolkit.createLabel(container, "Hotspots define the entry points in code for SQL strings to be checked. For now, hotspots should be given as a semicolon-separated list of entries as such: \"<package>,<method>,<argument number>\" ");
-			label.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+			label = toolkit.createLabel(container, "Hotspots define the entry points in code for SQL strings to be checked. For now, hotspots should be given as a semicolon-separated list of entries as such: \"<package>,<method>,<argument number>\" ", SWT.WRAP);
+			label.setLayoutData(new TableWrapData());
 
 //			OverviewPage_extensionContent=<form>\
 //			<p>This plug-in may define extensions and extension points:</p>\
@@ -354,7 +347,6 @@ public class AlvorPropertiesEditor extends FormEditor {
 			ScrolledForm form = mform.getForm();
 			form.getBody().setLayout(new TableWrapLayout());	
 			//			form.setText(PDEUIMessages.BuildEditor_BuildPage_title);
-
 
 			section = new AlvorPropertiesSection(this, form.getBody());
 
