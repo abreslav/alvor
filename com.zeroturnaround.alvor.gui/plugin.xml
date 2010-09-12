@@ -218,24 +218,24 @@
 	        default="true"
             class="com.zeroturnaround.alvor.gui.AlvorPropertiesEditor"
             contributorClass="com.zeroturnaround.alvor.gui.AlvorPropertiesEditorContributor"
+            filenames="sqlchecker.properties"
             icon="icons/sample.gif"
             id="com.zeroturnaround.alvor.gui.AlvorPropertiesEditor"
             name="Alvor Properties Editor">
       </editor>
-<!-- //This is not needed now
       <editor
-            class="ee.stacc.productivity.edsl.gui.editors.MultiPageEditor"
-            contributorClass="ee.stacc.productivity.edsl.gui.editors.MultiPageEditorContributor"
+            class="com.zeroturnaround.alvor.gui.editors.MultiPageEditor"
+            contributorClass="com.zeroturnaround.alvor.gui.editors.MultiPageEditorContributor"
             extensions="mpe"
             icon="icons/sample.gif"
-            id="ee.stacc.productivity.edsl.gui.editors.MultiPageEditor"
+            id="com.zeroturnaround.alvor.gui.editors.MultiPageEditor"
             name="Sample Multi-page Editor">
-      </editor> //-->
+      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.editors">
    </extension>
-   
+   <!--
    <objectContribution
             objectClass="org.eclipse.core.resources.IFile"
             nameFilter="sqlchecker.properties"
@@ -260,5 +260,6 @@
                id="org.eclipse.pde.ui.BuildFeatureJar2">
             </action>
    </objectContribution>
+   //-->
 </plugin>
 

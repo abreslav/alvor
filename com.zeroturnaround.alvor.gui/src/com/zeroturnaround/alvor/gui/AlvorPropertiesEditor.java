@@ -9,6 +9,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.IDocument;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -73,12 +75,7 @@ public class AlvorPropertiesEditor extends FormEditor {
 		private String dbpassword = null;
 		private String hotspots = null;
 		
-		public String getDbdrivername() {
-			return dbdrivername;
-		}
-		
 		public AlvorPropertiesModel(AlvorPropertiesEditor editor) {
-			// Do we maybe need this for later, signaling or something?
 			this.editor = editor;
 		}
 
@@ -139,6 +136,12 @@ public class AlvorPropertiesEditor extends FormEditor {
 			saveProps(props);
 		}
 		
+		public String getDbdrivername() {
+			if (dbdrivername == null)
+				refresh();
+			return dbdrivername;
+		}
+		
 		public String getDburl() {
 			if (dburl == null)
 				refresh();
@@ -165,10 +168,9 @@ public class AlvorPropertiesEditor extends FormEditor {
 			return hotspots;
 		}
 		
-		// TODO: Need to also set document here, which will mark things dirty?
 		public void setDbdrivername(String dbdrivername) {
-			this.dbdrivername = dbdrivername;
 			// TODO: Can also check if they are actually changed...
+			this.dbdrivername = dbdrivername;
 			setProperty(sdbdrivername, dbdrivername);
 		}
 		
@@ -198,7 +200,13 @@ public class AlvorPropertiesEditor extends FormEditor {
 	
 	public class AlvorPropertiesSection extends SectionPart {
 		private FormPage page;
-
+		AlvorPropertiesModel model;
+		private Text fdbdrivername;
+		private Text fdburl;
+		private Text fdbusername;
+		private Text fdbpassword;
+		private Text fhotspots;
+		
 		AlvorPropertiesSection(FormPage page, Composite parent) {
 			super(parent, page.getManagedForm().getToolkit(), Section.DESCRIPTION|Section.TITLE_BAR|Section.EXPANDED);
 			this.page = page;
@@ -219,56 +227,84 @@ public class AlvorPropertiesEditor extends FormEditor {
 			else
 				return null;
 		}
+
+		private void dialogChanged() {
+			if (model != null &&
+					fdbdrivername != null && fdburl != null && 
+					fdbusername != null && fdbpassword != null && fhotspots != null) {
+				model.setDbdrivername(fdbdrivername.getText());
+				model.setDburl(fdburl.getText());
+				model.setDbusername(fdbusername.getText());
+				model.setDbpassword(fdbpassword.getText());
+				model.setHotspots(fhotspots.getText());
+			}
+		}
 		
 		private FormPage getPage() {
 			return page;
 		}
 		
 		public void createClient(final Section section, FormToolkit toolkit) {
-			AlvorPropertiesModel model = getPropertiesModel();
+			model = getPropertiesModel();
 			Label label = null;
 			Text text = null;
 			TableWrapData td = null;
+
+			ModifyListener listener = new ModifyListener() {
+				public void modifyText(ModifyEvent e) {
+					dialogChanged();
+				}
+			};
 			
 			Composite container = toolkit.createComposite(section);
 			TableWrapLayout layout = new TableWrapLayout();
 			layout.numColumns = 3;
 			container.setLayout(layout);
-
+			
 			// Make this a section more?
 //			label = toolkit.createLabel(container, "Dynamic testing database");
 //			td = new TableWrapData(TableWrapData.FILL_GRAB);
 //			td.colspan = 2;
 //			label.setLayoutData(td);
 
-			label = toolkit.createLabel(container, "Database URL:");
+			label = toolkit.createLabel(container, "Database driver");
 			label.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
-			text = toolkit.createText(container, model.getDburl());
-			text.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+			fdbdrivername = toolkit.createText(container, model.getDbdrivername());
+			fdbdrivername.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+			fdbdrivername.addModifyListener(listener);
 			
 			label = toolkit.createLabel(container, "This is the information required to access the" +
 					"(optional) database for dynamic testing. Currently Alvor " +
 					"supports accessing only one database per project being checked", SWT.WRAP);
-			td = new TableWrapData();
-			td.rowspan = 3;
+			td = new TableWrapData(); td.rowspan = 4;
 			label.setLayoutData(td);
 
+			label = toolkit.createLabel(container, "Database URL:");
+			label.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+			fdburl = toolkit.createText(container, model.getDburl());
+			fdburl.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+			fdburl.addModifyListener(listener);
 			label = toolkit.createLabel(container, "Database username:");
 			label.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
-			text = toolkit.createText(container, model.getDbusername());
-			text.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+			fdbusername = toolkit.createText(container, model.getDbusername());
+			fdbusername.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+			fdbusername.addModifyListener(listener);
 			label = toolkit.createLabel(container, "Database password:");
 			label.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
-			text = toolkit.createText(container, model.getDbpassword());
-			text.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+			fdbpassword = toolkit.createText(container, model.getDbpassword());
+			fdbpassword.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+			fdbpassword.addModifyListener(listener);
 			label = toolkit.createLabel(container, "Hotspots:");
 			label.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
-			text = toolkit.createText(container, model.getHotspots());			
-			text.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+			fhotspots = toolkit.createText(container, model.getHotspots());			
+			fhotspots.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+			fhotspots.addModifyListener(listener);
 			
 			label = toolkit.createLabel(container, "Hotspots define the entry points in code for SQL strings to be checked. For now, hotspots should be given as a semicolon-separated list of entries as such: \"<package>,<method>,<argument number>\" ", SWT.WRAP);
 			label.setLayoutData(new TableWrapData());
 
+			// These comments are regarding adding styled content in the fashion of the other editors
+			
 //			OverviewPage_extensionContent=<form>\
 //			<p>This plug-in may define extensions and extension points:</p>\
 //			<li style="image" value="page" bindent="5"><a href="extensions">Extensions</a>: declares contributions this plug-in makes to the platform.</li>\
@@ -316,14 +352,6 @@ public class AlvorPropertiesEditor extends FormEditor {
 //				if (isEditable())
 //					createExportingSection(managedForm, right, toolkit);
 //			}
-
-			
-			
-			//			/*	text.addModifyListener(new ModifyListener() {
-			//					public void modifyText(ModifyEvent e) {
-			//						setDirty(true);
-			//					}
-			//				});*/
 			
 			section.setLayoutData(new TableWrapData());
 			section.setClient(container);
