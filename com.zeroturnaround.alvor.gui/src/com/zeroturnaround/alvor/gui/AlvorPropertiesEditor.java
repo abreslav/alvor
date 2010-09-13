@@ -168,6 +168,20 @@ public class AlvorPropertiesEditor extends FormEditor {
 			return hotspots;
 		}
 		
+		public void setAll(String dbdrivername,
+				String dburl,
+				String dbusername,
+				String dbpassword,
+				String hotspots) {
+			
+//			dbdrivername,
+//			String dburl,
+//			String dbusername,
+//			String dbpassword,
+//			String hotspots
+		 //...	
+		}
+		
 		public void setDbdrivername(String dbdrivername) {
 			// TODO: Can also check if they are actually changed...
 			this.dbdrivername = dbdrivername;
