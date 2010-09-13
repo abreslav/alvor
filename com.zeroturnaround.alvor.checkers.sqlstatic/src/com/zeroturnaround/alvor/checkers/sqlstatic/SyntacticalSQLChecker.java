@@ -37,7 +37,7 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 	
 	@Override
 	public void checkAbstractStrings(List<IStringNodeDescriptor> descriptors,
-			final ISQLErrorHandler errorHandler, Map<String, Object> options) {
+			final ISQLErrorHandler errorHandler, Map<String, String> options) {
 		for (final IStringNodeDescriptor descriptor : descriptors) {
 			IAbstractString abstractString = descriptor.getAbstractValue();
 			if (!hasAcceptableSize(abstractString)) {

@@ -4,5 +4,5 @@ import java.util.List;
 import java.util.Map;
 
 public interface IAbstractStringChecker {
-	void checkAbstractStrings(List<IStringNodeDescriptor> descriptors, ISQLErrorHandler errorHandler, Map<String, Object> options);
+	void checkAbstractStrings(List<IStringNodeDescriptor> descriptors, ISQLErrorHandler errorHandler, Map<String, String> options);
 }

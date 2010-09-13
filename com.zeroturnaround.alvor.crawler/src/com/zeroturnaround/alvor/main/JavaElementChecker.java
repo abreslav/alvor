@@ -44,7 +44,7 @@ public class JavaElementChecker {
 	 * (or markers for unsupported cases)  
 	 * TODO rename?
 	 */
-	public List<INodeDescriptor> findAndEvaluateHotspots(IJavaElement[] scope, Map<String, Object> options) {
+	public List<INodeDescriptor> findAndEvaluateHotspots(IJavaElement[] scope, Map<String, String> options) {
 		Measurements.resetAll();
 		timer.start("TIMER: string construction");
 		List<NodeRequest> requests = parseNodeRequests(options);
@@ -65,7 +65,7 @@ public class JavaElementChecker {
 		List<INodeDescriptor> hotspots, 
 		ISQLErrorHandler errorHandler, 
 		List<IAbstractStringChecker> checkers, 
-		Map<String, Object> options) {
+		Map<String, String> options) {
 		
 //		Map<String, Integer> connMap = new Hashtable<String, Integer>();
 		int unsupportedCount = 0;
@@ -116,7 +116,7 @@ public class JavaElementChecker {
 			List<IStringNodeDescriptor> hotspots, 
 			ISQLErrorHandler errorHandler, 
 			List<IAbstractStringChecker> checkers, 
-			Map<String, Object> options) {
+			Map<String, String> options) {
 	
 //		assert LOG.message("Abstract strings:");
 //
@@ -139,7 +139,7 @@ public class JavaElementChecker {
 ////		AbstractStringEvaluator.evaluateExpression(null)
 //	}
 	
-	private List<NodeRequest> parseNodeRequests(Map<String, Object> options) {
+	private List<NodeRequest> parseNodeRequests(Map<String, String> options) {
 		if (options == null) {
 			return Collections.emptyList();
 		}
