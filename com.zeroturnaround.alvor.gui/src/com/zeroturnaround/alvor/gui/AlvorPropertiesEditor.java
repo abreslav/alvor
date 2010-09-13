@@ -58,6 +58,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 public class AlvorPropertiesEditor extends FormEditor {
 	//	private boolean isDirty = false;
 	private AlvorPropertiesModel model;
+	private AlvorPropertiesPage propertiespage;
 	private TextEditor texteditor;
 	
 	public class AlvorPropertiesModel {
@@ -173,13 +174,13 @@ public class AlvorPropertiesEditor extends FormEditor {
 				String dbusername,
 				String dbpassword,
 				String hotspots) {
-			
-//			dbdrivername,
-//			String dburl,
-//			String dbusername,
-//			String dbpassword,
-//			String hotspots
-		 //...	
+			Properties props = loadProps();
+			props.setProperty(sdbdrivername, dbdrivername);
+			props.setProperty(sdburl, dburl);
+			props.setProperty(sdbusername, dbusername);
+			props.setProperty(sdbpassword, dbpassword);
+			props.setProperty(shotspots, hotspots);
+			saveProps(props);
 		}
 		
 		public void setDbdrivername(String dbdrivername) {
@@ -246,12 +247,20 @@ public class AlvorPropertiesEditor extends FormEditor {
 			if (model != null &&
 					fdbdrivername != null && fdburl != null && 
 					fdbusername != null && fdbpassword != null && fhotspots != null) {
-				model.setDbdrivername(fdbdrivername.getText());
-				model.setDburl(fdburl.getText());
-				model.setDbusername(fdbusername.getText());
-				model.setDbpassword(fdbpassword.getText());
-				model.setHotspots(fhotspots.getText());
+				model.setAll(fdbdrivername.getText(), 
+						fdburl.getText(), 
+						fdbusername.getText(),
+						fdbpassword.getText(), 
+						fhotspots.getText()); 
 			}
+		}
+		
+		public void modelChanged() {
+			fdbdrivername.setText(model.getDbdrivername());
+			fdburl.setText(model.getDburl());
+			fdbusername.setText(model.getDbusername());
+			fdbpassword.setText(model.getDbpassword());
+			fhotspots.setText(model.getHotspots());
 		}
 		
 		private FormPage getPage() {
@@ -261,7 +270,6 @@ public class AlvorPropertiesEditor extends FormEditor {
 		public void createClient(final Section section, FormToolkit toolkit) {
 			model = getPropertiesModel();
 			Label label = null;
-			Text text = null;
 			TableWrapData td = null;
 
 			ModifyListener listener = new ModifyListener() {
@@ -282,41 +290,43 @@ public class AlvorPropertiesEditor extends FormEditor {
 //			label.setLayoutData(td);
 
 			label = toolkit.createLabel(container, "Database driver");
-			label.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
-			fdbdrivername = toolkit.createText(container, model.getDbdrivername());
-			fdbdrivername.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+			label.setLayoutData(new TableWrapData());
+			fdbdrivername = toolkit.createText(container, "");
+			fdbdrivername.setLayoutData(new TableWrapData());
 			fdbdrivername.addModifyListener(listener);
 			
 			label = toolkit.createLabel(container, "This is the information required to access the" +
 					"(optional) database for dynamic testing. Currently Alvor " +
 					"supports accessing only one database per project being checked", SWT.WRAP);
-			td = new TableWrapData(); td.rowspan = 4;
+			td = new TableWrapData(TableWrapData.FILL_GRAB); td.rowspan = 4;
 			label.setLayoutData(td);
 
 			label = toolkit.createLabel(container, "Database URL:");
-			label.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
-			fdburl = toolkit.createText(container, model.getDburl());
-			fdburl.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+			label.setLayoutData(new TableWrapData());
+			fdburl = toolkit.createText(container, "");
+			fdburl.setLayoutData(new TableWrapData());
 			fdburl.addModifyListener(listener);
 			label = toolkit.createLabel(container, "Database username:");
-			label.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
-			fdbusername = toolkit.createText(container, model.getDbusername());
-			fdbusername.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+			label.setLayoutData(new TableWrapData());
+			fdbusername = toolkit.createText(container, "");
+			fdbusername.setLayoutData(new TableWrapData());
 			fdbusername.addModifyListener(listener);
 			label = toolkit.createLabel(container, "Database password:");
-			label.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
-			fdbpassword = toolkit.createText(container, model.getDbpassword());
-			fdbpassword.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+			label.setLayoutData(new TableWrapData());
+			fdbpassword = toolkit.createText(container, "");
+			fdbpassword.setLayoutData(new TableWrapData());
 			fdbpassword.addModifyListener(listener);
 			label = toolkit.createLabel(container, "Hotspots:");
-			label.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
-			fhotspots = toolkit.createText(container, model.getHotspots());			
-			fhotspots.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+			label.setLayoutData(new TableWrapData());
+			fhotspots = toolkit.createText(container, "");			
+			fhotspots.setLayoutData(new TableWrapData());
 			fhotspots.addModifyListener(listener);
 			
 			label = toolkit.createLabel(container, "Hotspots define the entry points in code for SQL strings to be checked. For now, hotspots should be given as a semicolon-separated list of entries as such: \"<package>,<method>,<argument number>\" ", SWT.WRAP);
-			label.setLayoutData(new TableWrapData());
+			label.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
 
+			modelChanged();
+			
 			// These comments are regarding adding styled content in the fashion of the other editors
 			
 //			OverviewPage_extensionContent=<form>\
@@ -401,6 +411,11 @@ public class AlvorPropertiesEditor extends FormEditor {
 
 			mform.addPart(section);
 		}
+		
+		public void modelChanged() {
+			if (section != null) 
+				section.modelChanged();
+		}
 	}
 
 	
@@ -423,7 +438,8 @@ public class AlvorPropertiesEditor extends FormEditor {
 			setPageText(index, texteditor.getTitle());
 			
 			// This is added after the texteditor to avoid a round trip to the model
-			addPage(0, new AlvorPropertiesPage(this));			
+			propertiespage = new AlvorPropertiesPage(this);
+			addPage(0, propertiespage);			
 		} catch  (PartInitException e) {
 			//			ErrorDialog.openError(
 			//					getSite().getShell(),
@@ -432,12 +448,20 @@ public class AlvorPropertiesEditor extends FormEditor {
 			//					e.getStatus());
 		}
 	}
+	
+	protected void pageChange(int newPageIndex) {
+		if (newPageIndex == 0 && propertiespage != null) {
+			propertiespage.modelChanged();
+		}
+		
+		super.pageChange(newPageIndex);
+	}
 
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 		commitPages(true);
 		editorDirtyStateChanged();
-		getEditor(1).doSave(monitor);
+		texteditor.doSave(monitor);
 	}
 
 	@Override
