@@ -44,9 +44,8 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 				options.get("DBUsername").toString(),
 				options.get("DBPassword").toString());
 		} catch (Exception e) {
-			// for position use first pos from the list
-			errorHandler.handleSQLError("Dynamic SQL checker: can't connect with database schema: "
-					+ e.getMessage(), descriptors.get(0).getPosition());
+			errorHandler.handleSQLError("SQL checker: can't connect with test database: "
+					+ e.getMessage(), new Position(options.get("SourceFileName"), 0, 0));
 			return;
 		}
 		
