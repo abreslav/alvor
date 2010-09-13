@@ -324,6 +324,7 @@ public class ASTUtil {
 	}
 	
 	public static CompilationUnit getCompilationUnit(ASTNode node) {
+		assert node != null;
 		return (CompilationUnit)node.getRoot();
 	}
 	

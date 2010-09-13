@@ -10,8 +10,10 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
 import com.zeroturnaround.alvor.cache.CacheService;
@@ -65,9 +67,10 @@ public class GuiChecker implements ISQLErrorHandler {
 		}
 		
 		cleanMarkers(scope);
+		cleanConfigurationMarkers(optionsFrom.getJavaProject());
 		
 		try {
-			Map<String, Object> options = OptionLoader.getElementSqlCheckerProperties(optionsFrom);
+			Map<String, String> options = OptionLoader.getElementSqlCheckerProperties(optionsFrom);
 			List<INodeDescriptor> hotspots = projectChecker.findAndEvaluateHotspots(scope, options);
 			markHotspots(hotspots);
 			
@@ -85,6 +88,17 @@ public class GuiChecker implements ISQLErrorHandler {
 	}
 
 	
+	private void cleanConfigurationMarkers(IJavaProject project) {
+		try {
+			OptionLoader.getElementSqlCheckerPropertiesRes(project).deleteMarkers(ERROR_MARKER_ID, 
+					true, IResource.DEPTH_ZERO);
+			OptionLoader.getElementSqlCheckerPropertiesRes(project).deleteMarkers(WARNING_MARKER_ID, 
+					true, IResource.DEPTH_ZERO);
+		} catch (CoreException e) {
+			LOG.error(e);
+		}
+	}
+
 	private void cleanMarkers(IJavaElement[] scope) {
 		try {
 			for (IJavaElement element : scope) {
@@ -136,8 +150,10 @@ public class GuiChecker implements ISQLErrorHandler {
 		}
 		
 		MarkerUtilities.setMessage(map, finalMessage);
-		MarkerUtilities.setCharStart(map, charStart);
-		MarkerUtilities.setCharEnd(map, charEnd);
+		if (charStart > 0 || charEnd > 0) { 
+			MarkerUtilities.setCharStart(map, charStart);
+			MarkerUtilities.setCharEnd(map, charEnd);
+		}
 		map.put(IMarker.LOCATION, file.getFullPath().toString());
 		try {
 			MarkerUtilities.createMarker(file, map, markerType);

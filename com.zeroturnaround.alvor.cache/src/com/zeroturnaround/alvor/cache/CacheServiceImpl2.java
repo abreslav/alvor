@@ -17,7 +17,7 @@ package com.zeroturnaround.alvor.cache;
  * 
  * How to react to file change:
  *  - track down and remember all hotspots which were depending on this file (but don't invalidate them)
- *    Use cache database for this (assume cache is complete representation of all abstract strings),
+ *    Use cache database for this (assume cache is complete representation of all abstract strings,
  *    if cache is disabled, then it's whole another story anyway) 
  *  - delete items rooted in this file (markers, cached AST and cached )
  *  	(parts of abstract-strings positioned in other files can stay in cache)
@@ -26,6 +26,18 @@ package com.zeroturnaround.alvor.cache;
  *  - search and evaluate hotspots in this file
  *  - repair cache representation of abstract strings rooted in other files which were/are depending on this file:
  *      - add options corresponding to call-sites in this file 
+ * 
+ * 
+ * Another take:
+ *     - a file can provide callsite options and method implementation options
+ *     - when file is changed then re-search for calls to "hotspot wrappers" (methods that take
+ *       a string argument that they use as part of hotspot (either directly or not))
+ *     - also search for possible method implementations of "string providers"
+ *       (methods used for constructing some hotspot value)
+ *      
+ *     
+ * 
+ * 
  * 
  * After a file is changed:
  * - remove from cache hotspots of this file and respective abstract strings

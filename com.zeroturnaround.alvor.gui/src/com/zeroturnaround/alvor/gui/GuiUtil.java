@@ -48,10 +48,10 @@ public class GuiUtil {
 		throw new IllegalAccessException("Can't find selected Java element");
 	}
 	
-	public static void ShowErrorDialog(String msg) {
+	public static void ShowErrorDialog(String msg, Throwable e) {
 		IStatus status = new Status(IStatus.ERROR, 
-				"com.zeroturnaround.alvor.gui", 1, "Error", null);
+				"com.zeroturnaround.alvor.gui", 1, "Error", e);
 		ErrorDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
-			      "This is your final warning", null, status);
+			      "Error", msg, status);
 	}
 }

@@ -31,7 +31,12 @@ public class CleanCheckProjectHandler extends AbstractHandler {
 			checker.performCleanCheck(element, new IJavaElement[] {element});
 		} 
 		catch (IllegalAccessException e) {
-			GuiUtil.ShowErrorDialog(e.getMessage());
+			String msg = e.getMessage();
+			Throwable cause = e.getCause();
+			if (cause != null) {
+				msg = cause.getMessage();
+			}
+			GuiUtil.ShowErrorDialog(msg, e);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
