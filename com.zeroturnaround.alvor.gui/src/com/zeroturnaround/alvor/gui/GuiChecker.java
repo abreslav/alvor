@@ -24,7 +24,6 @@ import com.zeroturnaround.alvor.checkers.IStringNodeDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
-import com.zeroturnaround.alvor.crawler.PositionUtil;
 import com.zeroturnaround.alvor.crawler.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.main.JavaElementChecker;
 import com.zeroturnaround.alvor.main.OptionLoader;
@@ -90,9 +89,9 @@ public class GuiChecker implements ISQLErrorHandler {
 	
 	private void cleanConfigurationMarkers(IJavaProject project) {
 		try {
-			OptionLoader.getElementSqlCheckerPropertiesRes(project).deleteMarkers(ERROR_MARKER_ID, 
+			OptionLoader.getElementSqlCheckerPropertiesRes(project.getProject()).deleteMarkers(ERROR_MARKER_ID, 
 					true, IResource.DEPTH_ZERO);
-			OptionLoader.getElementSqlCheckerPropertiesRes(project).deleteMarkers(WARNING_MARKER_ID, 
+			OptionLoader.getElementSqlCheckerPropertiesRes(project.getProject()).deleteMarkers(WARNING_MARKER_ID, 
 					true, IResource.DEPTH_ZERO);
 		} catch (CoreException e) {
 			LOG.error(e);

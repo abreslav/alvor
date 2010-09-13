@@ -16,6 +16,7 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaCore;
 
@@ -25,8 +26,9 @@ import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.common.logging.Timer;
 import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
 import com.zeroturnaround.alvor.crawler.PositionUtil;
-import com.zeroturnaround.alvor.gui.CleanCheckProjectHandler;
 import com.zeroturnaround.alvor.gui.GuiChecker;
+import com.zeroturnaround.alvor.gui.GuiUtil;
+import com.zeroturnaround.alvor.main.OptionLoader;
 import com.zeroturnaround.alvor.string.IPosition;
 
 public class ESQLBuilder extends IncrementalProjectBuilder {
@@ -40,27 +42,34 @@ public class ESQLBuilder extends IncrementalProjectBuilder {
 		
 		public boolean visit(IResourceDelta delta) throws CoreException {
 			IResource resource = delta.getResource();
-			if (resource instanceof IFolder) {
+			if (resource instanceof IFile) {
+				switch (delta.getKind()) {
+				case IResourceDelta.ADDED:
+					addResource(resource);
+					break;
+				case IResourceDelta.REMOVED:
+					removeFromCache(resource);
+					break;
+				case IResourceDelta.CHANGED:
+					removeFromCache(resource);
+					addResource(resource);
+					break;
+				default:
+					throw new IllegalArgumentException("Unexpected kind: " + delta.getKind());
+				}
+				return false; // file doesn't have children
+			}
+			else if (resource instanceof IFolder) {
 				if (JavaCore.create((IFolder) resource) == null) {
-					return false;
+					return false; // don't visit non-source folders
+				}
+				else {
+					return true; // will visit children
 				}
 			}
-			switch (delta.getKind()) {
-			case IResourceDelta.ADDED:
-				addResource(resource);
-				break;
-			case IResourceDelta.REMOVED:
-				removeFromCache(resource);
-				break;
-			case IResourceDelta.CHANGED:
-				removeFromCache(resource);
-				addResource(resource);
-				break;
-			default:
-				throw new IllegalArgumentException("Unexpected kind: " + delta.getKind());
+			else { // project or some other container
+				return true;
 			}
-			//return true to continue visiting children.
-			return true;
 		}
 
 		private void addResource(IResource resource) {
@@ -126,14 +135,31 @@ public class ESQLBuilder extends IncrementalProjectBuilder {
 		DeltaVisitor visitor = new DeltaVisitor();
 		delta.accept(visitor);
 		
-		// it's supposedly more efficient to remove all files together from cache 
-		Set<String> filesToRemove = new HashSet<String>();
-		for (IFile f : invalidatedFiles) {
-			filesToRemove.add(PositionUtil.getFileString(f));
-			NodeSearchEngine.removeASTFromCache(f);
+		// if SQL-checker got modified, then re-check everything
+		// TODO: this should be more graceful 
+		if (invalidatedFiles.contains(OptionLoader.getElementSqlCheckerPropertiesRes(this.getProject()))) {
+			//this.cleanBuild(monitor);
+			GuiUtil.ShowInfoDialog("Please do full analysis after changing SQL checker configuration");
+			return;
 		}
-		System.out.println("!!! Files to invalidate (directly): " + filesToRemove);
-		CacheService.getCacheService().removeFiles(filesToRemove);
+		
+		// it's supposedly more efficient to remove all files together from cache 
+		Set<String> filesToRecheck = new HashSet<String>();
+		for (IFile f : invalidatedFiles) {
+			// react only to changes in java files (in a source folder)
+			if (JavaCore.create(f) instanceof ICompilationUnit) {
+				filesToRecheck.add(PositionUtil.getFileString(f));
+				NodeSearchEngine.removeASTFromCache(f);
+			}
+		}
+		
+//		if (filesToRecheck.isEmpty()) {
+//			assert LOG.message("no compilation units to re-check");
+//			return;
+//		}
+		
+		System.out.println("!!! Files to invalidate (directly): " + filesToRecheck);
+		CacheService.getCacheService().removeFiles(filesToRecheck);
 		
 		t.printTime();
 		
@@ -143,7 +169,7 @@ public class ESQLBuilder extends IncrementalProjectBuilder {
 		
 		List<IJavaElement> elements = new ArrayList<IJavaElement>();
 
-		t.start("Inv HS");
+		t.start("Invalidate Hotspots");
 		Collection<IPosition> hotspots = CacheService.getCacheService().getInvalidatedHotspotPositions();
 		t.printTimeAndStart("Elements");
 		

@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.IJavaElement;
@@ -16,13 +18,12 @@ import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 
 public class OptionLoader {
-
+	public final static String CONF_FILE_NAME = "sqlchecker.properties";
 	private final static ILog LOG = Logs.getLog(OptionLoader.class);
 	
 	public static Map<String, String> getElementSqlCheckerProperties(IJavaElement element)
 			throws FileNotFoundException, IOException {
-		IJavaProject project = element.getJavaProject();
-		IResource propsRes = getElementSqlCheckerPropertiesRes(project); 
+		IResource propsRes = getElementSqlCheckerPropertiesRes(element.getJavaProject().getProject()); 
 		File propsFile = propsRes.getLocation().toFile();
 		assert LOG.message("PROPS_FILE: " + propsFile);
 		FileInputStream in = new FileInputStream(propsFile);
@@ -34,9 +35,9 @@ public class OptionLoader {
 		return result;
 	}
 
-	public static IResource getElementSqlCheckerPropertiesRes(IJavaProject project) {
-		return project.getProject().findMember("/sqlchecker.properties");
-		//return project.getResource().getLocation().append("sqlchecker.properties");
+	public static IFile getElementSqlCheckerPropertiesRes(IProject project) {
+		return (IFile)project.findMember("/" + OptionLoader.CONF_FILE_NAME);
+		//return project.getResource().getLocation().append(OptionLoader.CONF_FILE_NAME);
 	}
 
 }
