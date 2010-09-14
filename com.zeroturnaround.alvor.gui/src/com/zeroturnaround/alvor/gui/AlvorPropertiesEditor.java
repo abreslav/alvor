@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IDocumentListener;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -385,12 +387,20 @@ public class AlvorPropertiesEditor extends FormEditor {
 
 
 
-	public class AlvorPropertiesPage extends FormPage {
+	public class AlvorPropertiesPage extends FormPage implements IDocumentListener {
 		public static final String PAGE_ID = "properties"; //$NON-NLS-1$
 		private AlvorPropertiesSection section;
 		
 		public AlvorPropertiesPage(FormEditor editor) {
 			super(editor, PAGE_ID, "Alvor configuration");
+		}
+		
+		public void documentAboutToBeChanged(DocumentEvent event) {
+			//			
+		}
+		
+		public void documentChanged(DocumentEvent event) {
+			section.modelChanged();
 		}
 		
 		protected void createFormContent(IManagedForm mform) {
@@ -410,11 +420,6 @@ public class AlvorPropertiesEditor extends FormEditor {
 			//			});		
 
 			mform.addPart(section);
-		}
-		
-		public void modelChanged() {
-			if (section != null) 
-				section.modelChanged();
 		}
 	}
 
@@ -439,7 +444,10 @@ public class AlvorPropertiesEditor extends FormEditor {
 			
 			// This is added after the texteditor to avoid a round trip to the model
 			propertiespage = new AlvorPropertiesPage(this);
-			addPage(0, propertiespage);			
+			addPage(0, propertiespage);		
+			
+			texteditor.getDocumentProvider().getDocument(getEditorInput()).addDocumentListener(propertiespage);
+			
 		} catch  (PartInitException e) {
 			//			ErrorDialog.openError(
 			//					getSite().getShell(),
@@ -449,14 +457,6 @@ public class AlvorPropertiesEditor extends FormEditor {
 		}
 	}
 	
-	protected void pageChange(int newPageIndex) {
-		if (newPageIndex == 0 && propertiespage != null) {
-			propertiespage.modelChanged();
-		}
-		
-		super.pageChange(newPageIndex);
-	}
-
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 		commitPages(true);
