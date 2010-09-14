@@ -94,6 +94,7 @@ public class AlvorPropertiesEditor extends FormEditor {
 		}
 
 		private Properties loadProps() {
+			// Maybe it's ugly that I fetch the editor each time here, can keep the IDocument around even?
 			TextEditor texteditor = editor.getTextEditor();
 			Properties props = new Properties();
 			
@@ -231,11 +232,8 @@ public class AlvorPropertiesEditor extends FormEditor {
 			getSection().setText("General information");
 			getSection().setDescription("This describes the basic information necessary for the Alvor SQL checker");
 
-//			TODO: How would I do this... ?
-//			 getPropertiesModel().addModelChangedListener(this);
 			createClient(getSection(), page.getManagedForm().getToolkit());
 		}
-
 
 		private AlvorPropertiesModel getPropertiesModel() {
 			FormEditor editor = getPage().getEditor();
@@ -249,15 +247,16 @@ public class AlvorPropertiesEditor extends FormEditor {
 			if (model != null &&
 					fdbdrivername != null && fdburl != null && 
 					fdbusername != null && fdbpassword != null && fhotspots != null) {
-				model.setAll(fdbdrivername.getText(), 
-						fdburl.getText(), 
-						fdbusername.getText(),
-						fdbpassword.getText(), 
-						fhotspots.getText()); 
+//				model.setAll(fdbdrivername.getText(), 
+//						fdburl.getText(), 
+//						fdbusername.getText(),
+//						fdbpassword.getText(), 
+//						fhotspots.getText()); 
 			}
 		}
 		
 		public void modelChanged() {
+			// This may likely trigger a dialogChanged()...
 			fdbdrivername.setText(model.getDbdrivername());
 			fdburl.setText(model.getDburl());
 			fdbusername.setText(model.getDbusername());
@@ -276,6 +275,7 @@ public class AlvorPropertiesEditor extends FormEditor {
 
 			ModifyListener listener = new ModifyListener() {
 				public void modifyText(ModifyEvent e) {
+					System.out.println(e.toString());
 					dialogChanged();
 				}
 			};
@@ -400,24 +400,16 @@ public class AlvorPropertiesEditor extends FormEditor {
 		}
 		
 		public void documentChanged(DocumentEvent event) {
+			System.out.println("Document changed " + event.toString());
 			section.modelChanged();
 		}
 		
 		protected void createFormContent(IManagedForm mform) {
 			super.createFormContent(mform);
-//			FormToolkit toolkit = mform.getToolkit();
 			ScrolledForm form = mform.getForm();
 			form.getBody().setLayout(new TableWrapLayout());	
-			//			form.setText(PDEUIMessages.BuildEditor_BuildPage_title);
 
 			section = new AlvorPropertiesSection(this, form.getBody());
-
-			// TODO: We want to keep it expanded all the time...
-			//			section.addExpansionListener(new ExpansionAdapter() {
-			//				public void expansionStateChanged(ExpansionEvent e) {
-			//					this.managedForm.reflow(true);
-			//				}
-			//			});		
 
 			mform.addPart(section);
 		}
@@ -444,7 +436,7 @@ public class AlvorPropertiesEditor extends FormEditor {
 			
 			// This is added after the texteditor to avoid a round trip to the model
 			propertiespage = new AlvorPropertiesPage(this);
-			addPage(0, propertiespage);		
+			addPage(0, propertiespage);
 			
 			texteditor.getDocumentProvider().getDocument(getEditorInput()).addDocumentListener(propertiespage);
 			
@@ -477,15 +469,6 @@ public class AlvorPropertiesEditor extends FormEditor {
 		return true;
 	}
 
-	//	private void setDirty(boolean dirty) {
-	//		this.isDirty = dirty;
-	//		firePropertyChange(PROP_DIRTY);
-	//	}
-
-	//	public boolean isDirty() {
-	//		return this.isDirty;
-	//	}
-	
 	public AlvorPropertiesModel getModel() {
 		return model;
 	}
