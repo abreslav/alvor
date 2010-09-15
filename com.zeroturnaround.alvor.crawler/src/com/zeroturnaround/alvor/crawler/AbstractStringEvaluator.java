@@ -268,7 +268,11 @@ public class AbstractStringEvaluator {
 					scope, 
 					var.getDeclaringClass().getErasure().getQualifiedName() 
 					+ "." + var.getName());
-
+		
+		if (frag.getInitializer() == null) {
+			// TODO should check for initializer in constructor
+			throw new UnsupportedStringOpEx("Final fields without initializer are not supported");
+		}
 		return eval(frag.getInitializer());
 	}
 
