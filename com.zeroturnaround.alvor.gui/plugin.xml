@@ -186,7 +186,6 @@
              markerType="com.zeroturnaround.alvor.gui.unsupported">
          </type>
    </extension>
-
    <extension
          point="org.eclipse.ui.editors.markerAnnotationSpecification">
          <specification
@@ -213,5 +212,54 @@
             class="com.zeroturnaround.alvor.gui.AlvorGuiStartup">
       </startup>
    </extension>
-
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+	        default="true"
+            class="com.zeroturnaround.alvor.gui.AlvorPropertiesEditor"
+            contributorClass="com.zeroturnaround.alvor.gui.AlvorPropertiesEditorContributor"
+            filenames="sqlchecker.properties"
+            icon="icons/sample.gif"
+            id="com.zeroturnaround.alvor.gui.AlvorPropertiesEditor"
+            name="Alvor Properties Editor">
+      </editor>
+      <editor
+            class="com.zeroturnaround.alvor.gui.editors.MultiPageEditor"
+            contributorClass="com.zeroturnaround.alvor.gui.editors.MultiPageEditorContributor"
+            extensions="mpe"
+            icon="icons/sample.gif"
+            id="com.zeroturnaround.alvor.gui.editors.MultiPageEditor"
+            name="Sample Multi-page Editor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+   </extension>
+   <!--
+   <objectContribution
+            objectClass="org.eclipse.core.resources.IFile"
+            nameFilter="sqlchecker.properties"
+            id="org.eclipse.pde.ui.buildPropertiesFeatureToolSet">
+            <menu
+               label="PDE Tools"
+               id="org.eclipse.pde.ui.build.feature.tools">
+               <separator
+                  name="group0">
+               </separator>
+            </menu>
+            <filter
+               name="projectNature"
+               value="com.zeroturnaround.alvor.javaproject.esqlNature">
+            </filter>
+            <action
+               label="Create Ant Build File"
+               helpContextId="org.eclipse.pde.doc.user.create_feature_jars"
+               class="org.eclipse.pde.internal.ui.build.BuildFeatureAction"
+               menubarPath="org.eclipse.pde.ui.build.feature.tools/group0"
+               enablesFor="1"
+               id="org.eclipse.pde.ui.BuildFeatureJar2">
+            </action>
+   </objectContribution>
+   //-->
 </plugin>
+
