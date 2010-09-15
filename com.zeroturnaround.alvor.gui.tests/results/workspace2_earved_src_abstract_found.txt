@@ -258,7 +258,7 @@
 /earved/src/ee/post/earved/dao/inbox/InboxAttachmentDAO.java:19, "select id, ref_inbox, file_name, mime_type from inbox_attachment where ref_inbox = ? order by id"
 /earved/src/ee/post/earved/dao/integration/DvkDAO.java:40, "select org_code from dvk_organization"
 /earved/src/ee/post/earved/dao/integration/DvkDAO.java:80, "select " " id, ref_invoice as invoice_id " "," " invoice_xml_part " "," " queued, sent "  ", ref_person_code_buy, invoice_number "  "  from DVK_EXPORT where sent is null and export_state=? and FAILED_ATTEMPTS<?" 
-/earved/src/ee/post/earved/dao/integration/ElektronpostExportDAO.java:40, "SELECT id, ref_attachment AS attachment_id " "  FROM elektronpost_export ex" " WHERE ex.transfered is null " "   AND (ex.attempts is null OR ex.attempts < 3)" " ORDER BY created" 
+/earved/src/ee/post/earved/dao/integration/ElektronpostExportDAO.java:38, "SELECT id, ref_attachment AS attachment_id " "  FROM elektronpost_export ex" " WHERE ex.transfered is null " "   AND (ex.attempts is null OR ex.attempts < 3)" " ORDER BY created" 
 /earved/src/ee/post/earved/dao/integration/UploadDAO.java:257, "SELECT * FROM (" " SELECT u.created, " "  (select dv.name from domain_value dv where dv.value_code=u.ref_dom_upload_status) AS status," "   u.total_count as invoice_count, u.error_count, attachment_count " "   FROM upload u" "  WHERE u.upload_type = 'INVOICE_FILE_TYPE_ERP'" "    AND ref_represented = ?" "    AND created is not null " "  ORDER BY created DESC)" " WHERE rownum <= ?" 
 /earved/src/ee/post/earved/dao/invoice/AdditionDAO.java:41, "select id, add_sum, ref_invoice_item from addition where ref_invoice_item IN " " (?, ?, ?)" 
 /earved/src/ee/post/earved/dao/invoice/AdditionDAO.java:54, unsupported: unsupported modification scheme in loop
@@ -421,8 +421,8 @@
 /earved/src/ee/post/earved/dao/inbox/InboxDAO.java:28, "delete from inbox where id in " " (?, ?, ?)" 
 /earved/src/ee/post/earved/dao/integration/DvkDAO.java:71, unsupported: unsupported modification scheme in loop
 /earved/src/ee/post/earved/dao/integration/DvkDAO.java:110, "delete from dvk_organization"
-/earved/src/ee/post/earved/dao/integration/ElektronpostExportDAO.java:49, "UPDATE elektronpost_export ex " "   SET ex.transfered=:transfered, " "       ex.ftp_session_id = :ftpSessionId " " WHERE ex.id=:id" 
-/earved/src/ee/post/earved/dao/integration/ElektronpostExportDAO.java:77, "UPDATE elektronpost_export ex " "   SET ex.attempts = ex.attempts+1," "       ex.error_log= ex.error_log || ?" " WHERE id = ?" 
+/earved/src/ee/post/earved/dao/integration/ElektronpostExportDAO.java:45, "UPDATE elektronpost_export ex " "   SET ex.transfered=:transfered, " "       ex.ftp_session_id = :ftpSessionId " " WHERE ex.id=:id" 
+/earved/src/ee/post/earved/dao/integration/ElektronpostExportDAO.java:73, "UPDATE elektronpost_export ex " "   SET ex.attempts = ex.attempts+1," "       ex.error_log= ex.error_log || ?" " WHERE id = ?" 
 /earved/src/ee/post/earved/dao/integration/IntegrationItemContentDAO.java:17, "INSERT INTO INTEGRATION_ITEM_CONTENT(id, ref_integration_item, content) VALUES (seq_integration_item_content.nextval,?,?)"
 /earved/src/ee/post/earved/dao/integration/IntegrationItemDAO.java:18, "INSERT INTO INTEGRATION_ITEM(id, type, ref_upload, status, invoice_number, is_sent) VALUES (?,?,?,?,?,?)"
 /earved/src/ee/post/earved/dao/integration/IntegrationItemErrorDAO.java:21, "INSERT INTO INTEGRATION_ERROR(id, ref_integration_item, error_type, error, ref_dom_integration_error) VALUES (seq_integration_error.nextval,?,?,?,?)"
