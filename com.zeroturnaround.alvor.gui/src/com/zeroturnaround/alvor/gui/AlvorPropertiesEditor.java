@@ -119,8 +119,6 @@ public class AlvorPropertiesEditor extends FormEditor {
 		}
 		
 		private void saveProps(Properties props) {
-			System.err.println("DEBUG: Saving document!");
-
 			if (document == null) 
 				loadDocument();
 
@@ -136,14 +134,10 @@ public class AlvorPropertiesEditor extends FormEditor {
 			}
 		}
 		
-		private void loadDocument() {
-			System.err.println("DEBUG: Loading document!");
-			
+		private void loadDocument() {			
 			TextEditor texteditor = editor.getTextEditor();
 			
-			if (null == texteditor)
-				System.err.println("DEBUG: failed to load model due to texteditor not available!");
-			else {
+			if (null != texteditor) {
 				IDocumentProvider provider = texteditor.getDocumentProvider();
 				document = provider.getDocument(texteditor.getEditorInput());
 			}
@@ -168,8 +162,6 @@ public class AlvorPropertiesEditor extends FormEditor {
 			setProperty(sdbusername, dbusername);
 			setProperty(sdbpassword, dbpassword);
 			setProperty(shotspots, hotspots);
-
-			System.err.println("DEBUG: setting private model fields");
 			
 			this.dbdrivername = dbdrivername;
 			this.dburl = dburl;
@@ -258,7 +250,6 @@ public class AlvorPropertiesEditor extends FormEditor {
 		}
 
 		private void dialogChanged() {
-			System.err.println("DEBUG: Dialog changed");
 			AlvorPropertiesModel model = getPropertiesPage().getPropertiesModel();
 			
 			// Do I need these null checks? 
@@ -266,8 +257,6 @@ public class AlvorPropertiesEditor extends FormEditor {
 					fdbdrivername != null && fdburl != null && 
 					fdbusername != null && fdbpassword != null && fhotspots != null) {
 			
-				System.err.println("Setting all in model...");
-				
 				// Model should always be updated, no problem
 				model.setAll(fdbdrivername.getText(), 
 						fdburl.getText(), 
@@ -277,24 +266,16 @@ public class AlvorPropertiesEditor extends FormEditor {
 			}
 		}
 		
-		public void modelChanged() {
-			System.out.println("DEBUG: model changed, updating form!");
-			
+		public void modelChanged() {		
 			AlvorPropertiesModel model = getPropertiesPage().getPropertiesModel();
 			
 			if (model != null) {
 				if (! fdbdrivername.getText().equals(model.getDbdrivername())) {
 					fdbdrivername.setText(model.getDbdrivername());
-					System.out.println("Trying to set drivername");
 				}
 				
 				if (! fdburl.getText().equals(model.getDburl())) {
 					fdburl.setText(model.getDburl());
-					System.out.println("Trying to set dburl");
-				}
-				else {
-					System.out.println("Ignored setting dburl");
-					System.out.println("form: " + fdburl.getText() + " model: " + model.getDburl());
 				}
 
 				if (! fdbusername.getText().equals(model.getDbusername()))
@@ -306,8 +287,6 @@ public class AlvorPropertiesEditor extends FormEditor {
 				if (! fhotspots.getText().equals(model.getHotspots()))
 					fhotspots.setText(model.getHotspots());
 			}
-			else
-				System.out.println("DEBUG: Model changed, but null?");
 		}
 		
 		private AlvorPropertiesPage getPropertiesPage() {
@@ -323,7 +302,6 @@ public class AlvorPropertiesEditor extends FormEditor {
 
 			ModifyListener listener = new ModifyListener() {
 				public void modifyText(ModifyEvent e) {
-					System.out.println(e.toString());
 					dialogChanged();
 				}
 			};
@@ -456,9 +434,7 @@ public class AlvorPropertiesEditor extends FormEditor {
 			//			
 		}
 		
-		public void documentChanged(DocumentEvent event) {
-			System.out.println("Document changed " + event.toString());
-			
+		public void documentChanged(DocumentEvent event) {		
 			// Update model from document
 			getPropertiesModel().refresh();
 			
