@@ -71,6 +71,7 @@ public class AlvorPropertiesEditor extends FormEditor {
 		public final String shotspots = "hotspots";
 		
 		private AlvorPropertiesEditor editor;
+		private IDocument document;
 		
 		private String dbdrivername = null;
 		private String dburl = null;
@@ -94,16 +95,15 @@ public class AlvorPropertiesEditor extends FormEditor {
 		}
 
 		private Properties loadProps() {
-			// Maybe it's ugly that I fetch the editor each time here, can keep the IDocument around even?
-			TextEditor texteditor = editor.getTextEditor();
-			Properties props = new Properties();
+			Properties props = null;
 			
-			if (null == editor)
-				System.err.println("DEBUG: failed to load model due to editor not available!");
-			else {
-				IDocumentProvider provider = texteditor.getDocumentProvider();
-				IDocument document = provider.getDocument(texteditor.getEditorInput());
-
+			if (document == null) 
+				loadDocument();
+			
+			// Only if document has been successfully loaded
+			if (document != null) {
+				props = new Properties();
+				
 				try {
 					props.load(new ByteArrayInputStream(document.get().getBytes("UTF-8")));
 				} catch (UnsupportedEncodingException e) {
@@ -119,26 +119,64 @@ public class AlvorPropertiesEditor extends FormEditor {
 		}
 		
 		private void saveProps(Properties props) {
+			System.err.println("DEBUG: Saving document!");
+
+			if (document == null) 
+				loadDocument();
+
+			if (document != null) {
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				try {
+					props.store(baos, null);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				document.set(baos.toString());
+			}
+		}
+		
+		private void loadDocument() {
+			System.err.println("DEBUG: Loading document!");
+			
 			TextEditor texteditor = editor.getTextEditor();
 			
-			IDocumentProvider provider = texteditor.getDocumentProvider();
-			IDocument document = provider.getDocument(texteditor.getEditorInput());
-
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			try {
-				props.store(baos, null);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if (null == texteditor)
+				System.err.println("DEBUG: failed to load model due to texteditor not available!");
+			else {
+				IDocumentProvider provider = texteditor.getDocumentProvider();
+				document = provider.getDocument(texteditor.getEditorInput());
 			}
-			document.set(baos.toString());
 		}
 		
 		private void setProperty(String key, String value) {
 			Properties props = loadProps();
-			props.setProperty(key, value);
-			saveProps(props);
+			
+			if (! props.getProperty(key).equals(value)) {
+				props.setProperty(key, value);
+				saveProps(props);
+			}
 		}
+		
+		public void setAll(String dbdrivername,
+				String dburl,
+				String dbusername,
+				String dbpassword,
+				String hotspots) {
+			setProperty(sdbdrivername, dbdrivername);
+			setProperty(sdburl, dburl);
+			setProperty(sdbusername, dbusername);
+			setProperty(sdbpassword, dbpassword);
+			setProperty(shotspots, hotspots);
+
+			System.err.println("DEBUG: setting private model fields");
+			
+			this.dbdrivername = dbdrivername;
+			this.dburl = dburl;
+			this.dbusername = dbusername;
+			this.dbpassword = dbpassword;
+			this.hotspots = hotspots;
+		}		
 		
 		public String getDbdrivername() {
 			if (dbdrivername == null)
@@ -172,45 +210,30 @@ public class AlvorPropertiesEditor extends FormEditor {
 			return hotspots;
 		}
 		
-		public void setAll(String dbdrivername,
-				String dburl,
-				String dbusername,
-				String dbpassword,
-				String hotspots) {
-			Properties props = loadProps();
-			props.setProperty(sdbdrivername, dbdrivername);
-			props.setProperty(sdburl, dburl);
-			props.setProperty(sdbusername, dbusername);
-			props.setProperty(sdbpassword, dbpassword);
-			props.setProperty(shotspots, hotspots);
-			saveProps(props);
-		}
-		
 		public void setDbdrivername(String dbdrivername) {
-			// TODO: Can also check if they are actually changed...
-			this.dbdrivername = dbdrivername;
 			setProperty(sdbdrivername, dbdrivername);
+			this.dbdrivername = dbdrivername;
 		}
 		
 		public void setDburl(String dburl) {
-			this.dburl = dburl;
 			setProperty(sdburl, dburl);
+			this.dburl = dburl;
 		}
 		
 		public void setDbusername(String dbusername) {
-			this.dbusername = dbusername;
 			setProperty(sdbusername, dbusername);
+			this.dbusername = dbusername;
 		}
 
 		public void setDbpassword(String dbpassword) {
-			this.dbpassword = dbpassword;
 			setProperty(sdbpassword, dbpassword);
+			this.dbpassword = dbpassword;
 		}
 		
 //		public void setHotspots(List<Hotspot> hotspots) {
 		public void setHotspots(String hotspots) {
-			this.hotspots = hotspots;
 			setProperty(shotspots, hotspots);
+			this.hotspots = hotspots;
 		}
 	}
 	
@@ -218,7 +241,6 @@ public class AlvorPropertiesEditor extends FormEditor {
 	
 	public class AlvorPropertiesSection extends SectionPart {
 		private FormPage page;
-		AlvorPropertiesModel model;
 		private Text fdbdrivername;
 		private Text fdburl;
 		private Text fdbusername;
@@ -235,41 +257,67 @@ public class AlvorPropertiesEditor extends FormEditor {
 			createClient(getSection(), page.getManagedForm().getToolkit());
 		}
 
-		private AlvorPropertiesModel getPropertiesModel() {
-			FormEditor editor = getPage().getEditor();
-			if (editor instanceof AlvorPropertiesEditor)
-				return ((AlvorPropertiesEditor) editor).getModel();
-			else
-				return null;
-		}
-
 		private void dialogChanged() {
+			System.err.println("DEBUG: Dialog changed");
+			AlvorPropertiesModel model = getPropertiesPage().getPropertiesModel();
+			
+			// Do I need these null checks? 
 			if (model != null &&
 					fdbdrivername != null && fdburl != null && 
 					fdbusername != null && fdbpassword != null && fhotspots != null) {
-//				model.setAll(fdbdrivername.getText(), 
-//						fdburl.getText(), 
-//						fdbusername.getText(),
-//						fdbpassword.getText(), 
-//						fhotspots.getText()); 
+			
+				System.err.println("Setting all in model...");
+				
+				// Model should always be updated, no problem
+				model.setAll(fdbdrivername.getText(), 
+						fdburl.getText(), 
+						fdbusername.getText(),
+						fdbpassword.getText(), 
+						fhotspots.getText()); 
 			}
 		}
 		
 		public void modelChanged() {
-			// This may likely trigger a dialogChanged()...
-			fdbdrivername.setText(model.getDbdrivername());
-			fdburl.setText(model.getDburl());
-			fdbusername.setText(model.getDbusername());
-			fdbpassword.setText(model.getDbpassword());
-			fhotspots.setText(model.getHotspots());
+			System.out.println("DEBUG: model changed, updating form!");
+			
+			AlvorPropertiesModel model = getPropertiesPage().getPropertiesModel();
+			
+			if (model != null) {
+				if (! fdbdrivername.getText().equals(model.getDbdrivername())) {
+					fdbdrivername.setText(model.getDbdrivername());
+					System.out.println("Trying to set drivername");
+				}
+				
+				if (! fdburl.getText().equals(model.getDburl())) {
+					fdburl.setText(model.getDburl());
+					System.out.println("Trying to set dburl");
+				}
+				else {
+					System.out.println("Ignored setting dburl");
+					System.out.println("form: " + fdburl.getText() + " model: " + model.getDburl());
+				}
+
+				if (! fdbusername.getText().equals(model.getDbusername()))
+					fdbusername.setText(model.getDbusername());
+
+				if (! fdbpassword.getText().equals(model.getDbpassword()))
+					fdbpassword.setText(model.getDbpassword());
+
+				if (! fhotspots.getText().equals(model.getHotspots()))
+					fhotspots.setText(model.getHotspots());
+			}
+			else
+				System.out.println("DEBUG: Model changed, but null?");
 		}
 		
-		private FormPage getPage() {
-			return page;
+		private AlvorPropertiesPage getPropertiesPage() {
+			if (page instanceof AlvorPropertiesPage)
+				return (AlvorPropertiesPage) page;
+			else
+				return null;
 		}
 		
 		public void createClient(final Section section, FormToolkit toolkit) {
-			model = getPropertiesModel();
 			Label label = null;
 			TableWrapData td = null;
 
@@ -295,7 +343,6 @@ public class AlvorPropertiesEditor extends FormEditor {
 			label.setLayoutData(new TableWrapData());
 			fdbdrivername = toolkit.createText(container, "");
 			fdbdrivername.setLayoutData(new TableWrapData());
-			fdbdrivername.addModifyListener(listener);
 			
 			label = toolkit.createLabel(container, "This is the information required to access the" +
 					"(optional) database for dynamic testing. Currently Alvor " +
@@ -307,78 +354,80 @@ public class AlvorPropertiesEditor extends FormEditor {
 			label.setLayoutData(new TableWrapData());
 			fdburl = toolkit.createText(container, "");
 			fdburl.setLayoutData(new TableWrapData());
-			fdburl.addModifyListener(listener);
 			label = toolkit.createLabel(container, "Database username:");
 			label.setLayoutData(new TableWrapData());
 			fdbusername = toolkit.createText(container, "");
 			fdbusername.setLayoutData(new TableWrapData());
-			fdbusername.addModifyListener(listener);
 			label = toolkit.createLabel(container, "Database password:");
 			label.setLayoutData(new TableWrapData());
 			fdbpassword = toolkit.createText(container, "");
 			fdbpassword.setLayoutData(new TableWrapData());
-			fdbpassword.addModifyListener(listener);
 			label = toolkit.createLabel(container, "Hotspots:");
 			label.setLayoutData(new TableWrapData());
 			fhotspots = toolkit.createText(container, "");			
 			fhotspots.setLayoutData(new TableWrapData());
-			fhotspots.addModifyListener(listener);
 			
 			label = toolkit.createLabel(container, "Hotspots define the entry points in code for SQL strings to be checked. For now, hotspots should be given as a semicolon-separated list of entries as such: \"<package>,<method>,<argument number>\" ", SWT.WRAP);
 			label.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
 
 			modelChanged();
 			
+			fdbdrivername.addModifyListener(listener);
+			fdburl.addModifyListener(listener);
+			fdbusername.addModifyListener(listener);
+			fdbpassword.addModifyListener(listener);
+			fhotspots.addModifyListener(listener);
+
 			// These comments are regarding adding styled content in the fashion of the other editors
-			
-//			OverviewPage_extensionContent=<form>\
-//			<p>This plug-in may define extensions and extension points:</p>\
-//			<li style="image" value="page" bindent="5"><a href="extensions">Extensions</a>: declares contributions this plug-in makes to the platform.</li>\
-//			<li style="image" value="page" bindent="5"><a href="ex-points">Extension Points</a>: declares new function points this plug-in adds to the platform.</li>\
-//			</form>
+			/*
+			OverviewPage_extensionContent=<form>\
+			<p>This plug-in may define extensions and extension points:</p>\
+			<li style="image" value="page" bindent="5"><a href="extensions">Extensions</a>: declares contributions this plug-in makes to the platform.</li>\
+			<li style="image" value="page" bindent="5"><a href="ex-points">Extension Points</a>: declares new function points this plug-in adds to the platform.</li>\
+			</form>
 
-//			private void createExtensionSection(IManagedForm managedForm, Composite parent, FormToolkit toolkit) {
-//				String sectionTitle = PDEUIMessages.ManifestEditor_ExtensionSection_title;
-//				Section section = createStaticSection(toolkit, parent, sectionTitle);
-//
-//				Composite container = createStaticSectionClient(toolkit, section);
-//
-//				FormText text = createClient(container, isFragment() ? PDEUIMessages.OverviewPage_fExtensionContent : PDEUIMessages.OverviewPage_extensionContent, toolkit);
-//				PDELabelProvider lp = PDEPlugin.getDefault().getLabelProvider();
-//				text.setImage("page", lp.get(PDEPluginImages.DESC_PAGE_OBJ, SharedLabelProvider.F_EDIT)); //$NON-NLS-1$
-//
-//				section.setClient(container);
-//			}
+			private void createExtensionSection(IManagedForm managedForm, Composite parent, FormToolkit toolkit) {
+				String sectionTitle = PDEUIMessages.ManifestEditor_ExtensionSection_title;
+				Section section = createStaticSection(toolkit, parent, sectionTitle);
+
+				Composite container = createStaticSectionClient(toolkit, section);
+
+				FormText text = createClient(container, isFragment() ? PDEUIMessages.OverviewPage_fExtensionContent : PDEUIMessages.OverviewPage_extensionContent, toolkit);
+				PDELabelProvider lp = PDEPlugin.getDefault().getLabelProvider();
+				text.setImage("page", lp.get(PDEPluginImages.DESC_PAGE_OBJ, SharedLabelProvider.F_EDIT)); //$NON-NLS-1$
+
+				section.setClient(container);
+			}
 
 
-//			private void fillBody(IManagedForm managedForm, FormToolkit toolkit) {
-//				Composite body = managedForm.getForm().getBody();
-//				body.setLayout(FormLayoutFactory.createFormTableWrapLayout(true, 2));
-//
-//				Composite left = toolkit.createComposite(body);
-//				left.setLayout(FormLayoutFactory.createFormPaneTableWrapLayout(false, 1));
-//				left.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
-//				if (isFragment())
-//					fInfoSection = new FragmentGeneralInfoSection(this, left);
-//				else
-//					fInfoSection = new PluginGeneralInfoSection(this, left);
-//				managedForm.addPart(fInfoSection);
-//				if (isBundle())
-//					managedForm.addPart(new ExecutionEnvironmentSection(this, left));
-//
-//				Composite right = toolkit.createComposite(body);
-//				right.setLayout(FormLayoutFactory.createFormPaneTableWrapLayout(false, 1));
-//				right.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
-//				createContentSection(managedForm, right, toolkit);
-//				if (isEditable() || getPDEEditor().hasInputContext(PluginInputContext.CONTEXT_ID))
-//					createExtensionSection(managedForm, right, toolkit);
-//				if (isEditable()) {
-//					createTestingSection(managedForm, isBundle() ? right : left, toolkit);
-//				}
-//				if (isEditable())
-//					createExportingSection(managedForm, right, toolkit);
-//			}
-			
+			private void fillBody(IManagedForm managedForm, FormToolkit toolkit) {
+				Composite body = managedForm.getForm().getBody();
+				body.setLayout(FormLayoutFactory.createFormTableWrapLayout(true, 2));
+
+				Composite left = toolkit.createComposite(body);
+				left.setLayout(FormLayoutFactory.createFormPaneTableWrapLayout(false, 1));
+				left.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+				if (isFragment())
+					fInfoSection = new FragmentGeneralInfoSection(this, left);
+				else
+					fInfoSection = new PluginGeneralInfoSection(this, left);
+				managedForm.addPart(fInfoSection);
+				if (isBundle())
+					managedForm.addPart(new ExecutionEnvironmentSection(this, left));
+
+				Composite right = toolkit.createComposite(body);
+				right.setLayout(FormLayoutFactory.createFormPaneTableWrapLayout(false, 1));
+				right.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+				createContentSection(managedForm, right, toolkit);
+				if (isEditable() || getPDEEditor().hasInputContext(PluginInputContext.CONTEXT_ID))
+					createExtensionSection(managedForm, right, toolkit);
+				if (isEditable()) {
+					createTestingSection(managedForm, isBundle() ? right : left, toolkit);
+				}
+				if (isEditable())
+					createExportingSection(managedForm, right, toolkit);
+			}
+			*/
 			section.setLayoutData(new TableWrapData());
 			section.setClient(container);
 		}
@@ -395,12 +444,25 @@ public class AlvorPropertiesEditor extends FormEditor {
 			super(editor, PAGE_ID, "Alvor configuration");
 		}
 		
+		private AlvorPropertiesModel getPropertiesModel() {
+			FormEditor editor = getEditor();
+			if (editor instanceof AlvorPropertiesEditor)
+				return ((AlvorPropertiesEditor) editor).getModel();
+			else
+				return null;
+		}
+		
 		public void documentAboutToBeChanged(DocumentEvent event) {
 			//			
 		}
 		
 		public void documentChanged(DocumentEvent event) {
 			System.out.println("Document changed " + event.toString());
+			
+			// Update model from document
+			getPropertiesModel().refresh();
+			
+			// Update form from model
 			section.modelChanged();
 		}
 		
