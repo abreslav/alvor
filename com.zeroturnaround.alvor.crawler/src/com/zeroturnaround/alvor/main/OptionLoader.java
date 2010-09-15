@@ -4,50 +4,39 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IJavaProject;
 
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 
 public class OptionLoader {
+    public final static String CONF_FILE_NAME = "sqlchecker.properties";
+    private final static ILog LOG = Logs.getLog(OptionLoader.class);
+    
+    public static Map<String, String> getElementSqlCheckerProperties(IJavaElement element)
+                    throws FileNotFoundException, IOException {
+            IResource propsRes = getElementSqlCheckerPropertiesRes(element.getJavaProject().getProject()); 
+            File propsFile = propsRes.getLocation().toFile();
+            assert LOG.message("PROPS_FILE: " + propsFile);
+            FileInputStream in = new FileInputStream(propsFile);
+            Properties props = new Properties();
+            props.load(in);
+            @SuppressWarnings({ "rawtypes", "unchecked" })
+            Map<String, String> result = (Map)props;
+            result.put("SourceFileName", propsRes.getFullPath().toPortableString());
+            return result;
+    }
 
-	private final static ILog LOG = Logs.getLog(OptionLoader.class);
-	
-	public static Map<String, Object> getElementSqlCheckerProperties(IJavaElement element)
-			throws FileNotFoundException, IOException {
-		IJavaProject project = element.getJavaProject();
-		File propsFile = getElementSqlCheckerPropertiesFile(project);
-		assert LOG.message("PROPS_FILE: " + propsFile);
-		
-		return getFileSqlCheckerProperties(propsFile);
-	}
+    public static IFile getElementSqlCheckerPropertiesRes(IProject project) {
+            return (IFile)project.findMember("/" + OptionLoader.CONF_FILE_NAME);
+            //return project.getResource().getLocation().append(OptionLoader.CONF_FILE_NAME);
+    }
 
-	public static Map<String, Object> getFileSqlCheckerProperties(File propsFile)
-			throws FileNotFoundException, IOException {
-		
-		FileInputStream in = new FileInputStream(propsFile);
-		
-		return getStreamSqlCheckerProperties(in);
-	}
-	
-	public static Map<String, Object> getStreamSqlCheckerProperties(InputStream in) throws IOException {
-		Properties props = new Properties();
-		props.load(in);
-		@SuppressWarnings({ "rawtypes", "unchecked" })
-		Map<String, Object> result = (Map)props;
-		return result;
-	}
-
-	
-	public static File getElementSqlCheckerPropertiesFile(IJavaProject project) {
-		File propsFile = project.getResource().getLocation().append(
-				"sqlchecker.properties").toFile();
-		return propsFile;
-	}
 
 }

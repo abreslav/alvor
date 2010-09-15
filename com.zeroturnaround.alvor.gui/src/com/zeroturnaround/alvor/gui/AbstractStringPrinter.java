@@ -57,7 +57,7 @@ public class AbstractStringPrinter implements IEditorActionDelegate{
 			assert LOG.message("Selection is : " + node.getClass().getName());
 			assert LOG.message("Abstract value is: ");
 			
-			NodeSearchEngine.clearCache();
+			NodeSearchEngine.clearASTCache();
 			CacheService.getCacheService().clearAll();
 			LOG.message(AbstractStringEvaluator.evaluateExpression
 					((Expression)node).toString());

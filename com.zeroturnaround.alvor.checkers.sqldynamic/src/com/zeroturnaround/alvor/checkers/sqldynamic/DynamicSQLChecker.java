@@ -11,6 +11,7 @@ import com.zeroturnaround.alvor.checkers.ISQLErrorHandler;
 import com.zeroturnaround.alvor.checkers.IStringNodeDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
+import com.zeroturnaround.alvor.string.Position;
 import com.zeroturnaround.alvor.string.samplegen.SampleGenerator;
 import com.zeroturnaround.alvor.string.util.AbstractStringSizeCounter;
 
@@ -20,11 +21,20 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 
 	@Override
 	public void checkAbstractStrings(List<IStringNodeDescriptor> descriptors,
-			ISQLErrorHandler errorHandler, Map<String, Object> options) {
+			ISQLErrorHandler errorHandler, Map<String, String> options) {
 		if (descriptors.size() == 0) {
 			return;
 		}
 		
+		
+		if (options.get("DBDriverName") == null || options.get("DBUrl") == null
+				|| options.get("DBUsername") == null || options.get("DBPassword") == null
+				|| options.get("DBDriverName").toString().isEmpty()
+				|| options.get("DBDriverName").toString().isEmpty()) {
+			errorHandler.handleSQLWarning("SQL checker: Test database configuration is not complete, dynamic checking will be disabled", 
+					new Position(options.get("SourceFileName"), 0, 0));
+			return;
+		}
 		
 		SQLStringAnalyzer analyzer = null;
 		try {
@@ -34,9 +44,8 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 				options.get("DBUsername").toString(),
 				options.get("DBPassword").toString());
 		} catch (Exception e) {
-			// for position use first pos from the list
-			errorHandler.handleSQLError("Dynamic SQL checker: can't connect with database schema: "
-					+ e.getMessage(), descriptors.get(0).getPosition());
+			errorHandler.handleSQLError("SQL checker: can't connect with test database: "
+					+ e.getMessage(), new Position(options.get("SourceFileName"), 0, 0));
 			return;
 		}
 		

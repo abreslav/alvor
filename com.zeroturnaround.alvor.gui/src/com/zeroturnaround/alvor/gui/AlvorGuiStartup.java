@@ -8,7 +8,7 @@ public class AlvorGuiStartup implements IStartup {
 
 	@Override
 	public void earlyStartup() {
-		Logs.configureFromStream(CheckProjectHandler.class.getClassLoader().getResourceAsStream("logging.properties"));
+		Logs.configureFromStream(CleanCheckProjectHandler.class.getClassLoader().getResourceAsStream("logging.properties"));
 	}
 
 }

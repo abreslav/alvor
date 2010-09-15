@@ -45,17 +45,17 @@
          point="org.eclipse.ui.commands">
       <command
             categoryId="org.eclipse.jdt.ui.category.source"
-            defaultHandler="com.zeroturnaround.alvor.gui.CheckProjectHandler"
-            description="Checks SQL usage in active project"
+            defaultHandler="com.zeroturnaround.alvor.gui.CleanCheckProjectHandler"
+            description="Checks SQL usage in selected element"
             id="com.zeroturnaround.alvor.plugin.CheckProject"
-            name="Check SQL in project">
+            name="Check SQL">
       </command>
       <command
             categoryId="org.eclipse.jdt.ui.category.source"
             defaultHandler="com.zeroturnaround.alvor.gui.ClearCacheHandler"
-            description="Clears cache for the selected project"
+            description="Clears SQL checker cache for the workspace"
             id="com.zeroturnaround.alvor.gui.clearCache"
-            name="Clear project cache">
+            name="Clear SQL checher cache">
       </command>
       <command
             categoryId="org.eclipse.jdt.ui.category.source"
