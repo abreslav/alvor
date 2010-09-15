@@ -1,0 +1,4896 @@
+Terminals unused in grammar
+
+   DIGAL_ERR
+   STRING_SQ_ERR
+   UNKNOWN_CHARACTER_ERR
+
+
+Grammatika
+
+    0 $accept: query $end
+
+    1 query: bracketedSelect
+    2      | delete
+    3      | insert
+    4      | update
+    5      | COMMIT
+
+    6 update: UPDATE alias SET assignList where
+
+    7 assignList: assign
+    8           | assignList ',' assign
+
+    9 assign: ident '=' simpleExpr
+   10       | '(' idList ')' '=' simpleExpr
+
+   11 delete: DELETE optFrom alias where
+
+   12 optFrom: FROM
+   13        | /* tühi */
+
+   14 insert: INSERT INTO alias optIdList insertRest
+
+   15 insertRest: VALUES identRest
+   16           | select
+
+   17 optIdList: /* tühi */
+   18          | '(' idList ')'
+
+   19 idList: ID
+   20       | idList ',' ID
+
+   21 bracketedSelect: select
+   22                | '(' select ')'
+
+   23 select: basicSelect where byClauses forUpdate
+   24       | select UNION select
+
+   25 basicSelect: SELECT optDist whatToSelect FROM tableList
+
+   26 where: WHERE whereCond
+   27      | /* tühi */
+
+   28 forUpdate: FOR UPDATE
+   29          | /* tühi */
+
+   30 groupBy: GROUP BY simExList having
+
+   31 optGroupBy: groupBy
+   32           | /* tühi */
+
+   33 having: HAVING condition
+   34       | /* tühi */
+
+   35 orderBy: ORDER BY directionList
+
+   36 optOrderBy: orderBy
+   37           | /* tühi */
+
+   38 byClauses: orderBy optGroupBy
+   39          | groupBy optOrderBy
+   40          | /* tühi */
+
+   41 directionList: direction
+   42              | directionList ',' direction
+
+   43 direction: simpleExpr orderDirection
+
+   44 orderDirection: ASC
+   45               | DESC
+   46               | /* tühi */
+
+   47 optDist: DISTINCT
+   48        | /* tühi */
+
+   49 whatToSelect: selectExpressionList
+
+   50 selectExpression: expression
+   51                 | selectExpression AS id
+   52                 | selectExpression id
+
+   53 id: ID
+
+   54 expression: condition
+   55           | simpleExpr
+
+   56 selectExpressionList: selectExpression
+   57                     | selectExpressionList ',' selectExpression
+
+   58 tableList: table
+   59          | tableList ',' table
+
+   60 table: alias
+   61      | table join alias ON condition
+
+   62 join: JOIN
+   63     | LEFT JOIN
+   64     | outerType OUTER JOIN
+   65     | INNER JOIN
+
+   66 outerType: LEFT
+   67          | RIGHT
+   68          | FULL
+
+   69 alias: tableExpr
+   70      | tableExpr ID
+
+   71 tableExpr: ident
+   72          | TABLE '(' simpleExpr ')'
+   73          | '(' select ')'
+
+   74 ident: ID
+   75      | ID '.' ID
+   76      | ID '.' ID '.' ID
+
+   77 whereCond: condition
+
+   78 condition: condition AND condition
+   79          | condition OR condition
+   80          | condition XOR condition
+   81          | NOT condition
+   82          | '(' condition ')'
+   83          | comparison
+   84          | simpleExpr inExpr '(' simExList ')'
+   85          | simpleExpr inExpr '(' select ')'
+   86          | '(' idList2 ')' inExpr '(' simExList ')'
+   87          | '(' idList2 ')' inExpr '(' select ')'
+   88          | simpleExpr IS optNot NULL
+   89          | simpleExpr optNot LIKE simpleExpr escape
+   90          | EXISTS '(' select ')'
+   91          | simpleExpr optNot BETWEEN simpleExpr AND simpleExpr
+
+   92 idList2: ID ',' ID
+   93        | idList2 ',' ID
+
+   94 comparison: simpleExpr '=' simpleExpr
+   95           | simpleExpr '>' simpleExpr
+   96           | simpleExpr '<' simpleExpr
+   97           | simpleExpr LE simpleExpr
+   98           | simpleExpr NE simpleExpr
+   99           | simpleExpr GE simpleExpr
+
+  100 escape: ESCAPE STRING_SQ
+  101       | /* tühi */
+
+  102 inExpr: optNot IN
+
+  103 optNot: NOT
+  104       | /* tühi */
+
+  105 simpleExpr: NUMBER
+  106           | simpleExpr OUTERJ
+  107           | '-' simpleExpr
+  108           | CASE whenList else END
+  109           | STRING_SQ
+  110           | ident identRest
+  111           | '(' simpleExpr ')'
+  112           | simpleExpr '-' simpleExpr
+  113           | simpleExpr '+' simpleExpr
+  114           | simpleExpr '*' simpleExpr
+  115           | simpleExpr '/' simpleExpr
+  116           | simpleExpr CONCAT simpleExpr
+  117           | simpleExpr OVER partition
+  118           | CAST '(' simpleExpr AS ID optSize ')'
+  119           | '(' select ')'
+  120           | ID '.' '*'
+  121           | '*'
+  122           | '?'
+  123           | NULL
+
+  124 optSize: /* tühi */
+  125        | '(' NUMBER ')'
+
+  126 identRest: '(' simExList ')'
+  127          | /* tühi */
+
+  128 whenList: when
+  129         | when whenList
+
+  130 when: WHEN condition THEN simpleExpr
+
+  131 else: ELSE simpleExpr
+  132     | /* tühi */
+
+  133 simExList: /* tühi */
+  134          | simpleExpr
+  135          | simExList ',' simpleExpr
+
+  136 partition: '(' PARTITION BY ident orderBy ')'
+
+
+Terminalid, koos reeglitega kus nad ilmuvad
+
+$end (0) 0
+'(' (40) 10 18 22 72 73 82 84 85 86 87 90 111 118 119 125 126 136
+')' (41) 10 18 22 72 73 82 84 85 86 87 90 111 118 119 125 126 136
+'*' (42) 114 120 121
+'+' (43) 113
+',' (44) 8 20 42 57 59 92 93 135
+'-' (45) 107 112
+'.' (46) 75 76 120
+'/' (47) 115
+'<' (60) 96
+'=' (61) 9 10 94
+'>' (62) 95
+'?' (63) 122
+error (256)
+PARTITION (258) 136
+DISTINCT (259) 47
+BETWEEN (260) 91
+VALUES (261) 15
+SELECT (262) 25
+DELETE (263) 11
+INSERT (264) 14
+ESCAPE (265) 100
+OVER (266) 117
+UPDATE (267) 6 28
+EXISTS (268) 90
+HAVING (269) 33
+COMMIT (270) 5
+WHERE (271) 26
+TABLE (272) 72
+ORDER (273) 35
+OR (274) 79
+GROUP (275) 30
+RIGHT (276) 67
+INNER (277) 65
+OUTER (278) 64
+UNION (279) 24
+FROM (280) 12 25
+WHEN (281) 130
+THEN (282) 130
+CASE (283) 108
+CAST (284) 118
+ELSE (285) 131
+DESC (286) 45
+LIKE (287) 89
+JOIN (288) 62 63 64 65
+LEFT (289) 63 66
+NULL (290) 88 123
+FULL (291) 68
+INTO (292) 14
+AND (293) 78 91
+SET (294) 6
+END (295) 108
+ASC (296) 44
+XOR (297) 80
+FOR (298) 28
+NOT (299) 81 103
+ON (300) 61
+BY (301) 30 35 136
+AS (302) 51 118
+IN (303) 102
+IS (304) 88
+OUTERJ (305) 106
+NE (306) 98
+LE (307) 97
+GE (308) 99
+CONCAT (309) 116
+DIGAL_ERR (310)
+STRING_SQ (311) 100 109
+STRING_SQ_ERR (312)
+NUMBER (313) 105 125
+ID (314) 19 20 53 70 74 75 76 92 93 118 120
+UNKNOWN_CHARACTER_ERR (315)
+
+
+Mitteterminalid, koos reeglitega kus nad ilmuvad
+
+$accept (73)
+    vasakul: 0
+query (74)
+    vasakul: 1 2 3 4 5, paremal: 0
+update (75)
+    vasakul: 6, paremal: 4
+assignList (76)
+    vasakul: 7 8, paremal: 6 8
+assign (77)
+    vasakul: 9 10, paremal: 7 8
+delete (78)
+    vasakul: 11, paremal: 2
+optFrom (79)
+    vasakul: 12 13, paremal: 11
+insert (80)
+    vasakul: 14, paremal: 3
+insertRest (81)
+    vasakul: 15 16, paremal: 14
+optIdList (82)
+    vasakul: 17 18, paremal: 14
+idList (83)
+    vasakul: 19 20, paremal: 10 18 20
+bracketedSelect (84)
+    vasakul: 21 22, paremal: 1
+select (85)
+    vasakul: 23 24, paremal: 16 21 22 24 73 85 87 90 119
+basicSelect (86)
+    vasakul: 25, paremal: 23
+where (87)
+    vasakul: 26 27, paremal: 6 11 23
+forUpdate (88)
+    vasakul: 28 29, paremal: 23
+groupBy (89)
+    vasakul: 30, paremal: 31 39
+optGroupBy (90)
+    vasakul: 31 32, paremal: 38
+having (91)
+    vasakul: 33 34, paremal: 30
+orderBy (92)
+    vasakul: 35, paremal: 36 38 136
+optOrderBy (93)
+    vasakul: 36 37, paremal: 39
+byClauses (94)
+    vasakul: 38 39 40, paremal: 23
+directionList (95)
+    vasakul: 41 42, paremal: 35 42
+direction (96)
+    vasakul: 43, paremal: 41 42
+orderDirection (97)
+    vasakul: 44 45 46, paremal: 43
+optDist (98)
+    vasakul: 47 48, paremal: 25
+whatToSelect (99)
+    vasakul: 49, paremal: 25
+selectExpression (100)
+    vasakul: 50 51 52, paremal: 51 52 56 57
+id (101)
+    vasakul: 53, paremal: 51 52
+expression (102)
+    vasakul: 54 55, paremal: 50
+selectExpressionList (103)
+    vasakul: 56 57, paremal: 49 57
+tableList (104)
+    vasakul: 58 59, paremal: 25 59
+table (105)
+    vasakul: 60 61, paremal: 58 59 61
+join (106)
+    vasakul: 62 63 64 65, paremal: 61
+outerType (107)
+    vasakul: 66 67 68, paremal: 64
+alias (108)
+    vasakul: 69 70, paremal: 6 11 14 60 61
+tableExpr (109)
+    vasakul: 71 72 73, paremal: 69 70
+ident (110)
+    vasakul: 74 75 76, paremal: 9 71 110 136
+whereCond (111)
+    vasakul: 77, paremal: 26
+condition (112)
+    vasakul: 78 79 80 81 82 83 84 85 86 87 88 89 90 91, paremal: 33
+    54 61 77 78 79 80 81 82 130
+idList2 (113)
+    vasakul: 92 93, paremal: 86 87 93
+comparison (114)
+    vasakul: 94 95 96 97 98 99, paremal: 83
+escape (115)
+    vasakul: 100 101, paremal: 89
+inExpr (116)
+    vasakul: 102, paremal: 84 85 86 87
+optNot (117)
+    vasakul: 103 104, paremal: 88 89 91 102
+simpleExpr (118)
+    vasakul: 105 106 107 108 109 110 111 112 113 114 115 116 117 118
+    119 120 121 122 123, paremal: 9 10 43 55 72 84 85 88 89 91 94 95
+    96 97 98 99 106 107 111 112 113 114 115 116 117 118 130 131 134
+    135
+optSize (119)
+    vasakul: 124 125, paremal: 118
+identRest (120)
+    vasakul: 126 127, paremal: 15 110
+whenList (121)
+    vasakul: 128 129, paremal: 108 129
+when (122)
+    vasakul: 130, paremal: 128 129
+else (123)
+    vasakul: 131 132, paremal: 108
+simExList (124)
+    vasakul: 133 134 135, paremal: 30 84 86 126 135
+partition (125)
+    vasakul: 136, paremal: 117
+
+
+olek 0
+
+    0 $accept: . query $end
+    1 query: . bracketedSelect
+    2      | . delete
+    3      | . insert
+    4      | . update
+    5      | . COMMIT
+    6 update: . UPDATE alias SET assignList where
+   11 delete: . DELETE optFrom alias where
+   14 insert: . INSERT INTO alias optIdList insertRest
+   21 bracketedSelect: . select
+   22                | . '(' select ')'
+   23 select: . basicSelect where byClauses forUpdate
+   24       | . select UNION select
+   25 basicSelect: . SELECT optDist whatToSelect FROM tableList
+
+    SELECT  nihuta ja liigu olekule 1
+    DELETE  nihuta ja liigu olekule 2
+    INSERT  nihuta ja liigu olekule 3
+    UPDATE  nihuta ja liigu olekule 4
+    COMMIT  nihuta ja liigu olekule 5
+    '('     nihuta ja liigu olekule 6
+
+    query            liigu olekule 7
+    update           liigu olekule 8
+    delete           liigu olekule 9
+    insert           liigu olekule 10
+    bracketedSelect  liigu olekule 11
+    select           liigu olekule 12
+    basicSelect      liigu olekule 13
+
+
+olek 1
+
+   25 basicSelect: SELECT . optDist whatToSelect FROM tableList
+   47 optDist: . DISTINCT
+   48        | .  [EXISTS, CASE, CAST, NULL, NOT, STRING_SQ, NUMBER, ID, '-', '*', '(', '?']
+
+    DISTINCT  nihuta ja liigu olekule 14
+
+    $default  redutseerin kasutades reeglit 48 (optDist)
+
+    optDist  liigu olekule 15
+
+
+olek 2
+
+   11 delete: DELETE . optFrom alias where
+   12 optFrom: . FROM
+   13        | .  [TABLE, ID, '(']
+
+    FROM  nihuta ja liigu olekule 16
+
+    $default  redutseerin kasutades reeglit 13 (optFrom)
+
+    optFrom  liigu olekule 17
+
+
+olek 3
+
+   14 insert: INSERT . INTO alias optIdList insertRest
+
+    INTO  nihuta ja liigu olekule 18
+
+
+olek 4
+
+    6 update: UPDATE . alias SET assignList where
+   69 alias: . tableExpr
+   70      | . tableExpr ID
+   71 tableExpr: . ident
+   72          | . TABLE '(' simpleExpr ')'
+   73          | . '(' select ')'
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+
+    TABLE  nihuta ja liigu olekule 19
+    ID     nihuta ja liigu olekule 20
+    '('    nihuta ja liigu olekule 21
+
+    alias      liigu olekule 22
+    tableExpr  liigu olekule 23
+    ident      liigu olekule 24
+
+
+olek 5
+
+    5 query: COMMIT .
+
+    $default  redutseerin kasutades reeglit 5 (query)
+
+
+olek 6
+
+   22 bracketedSelect: '(' . select ')'
+   23 select: . basicSelect where byClauses forUpdate
+   24       | . select UNION select
+   25 basicSelect: . SELECT optDist whatToSelect FROM tableList
+
+    SELECT  nihuta ja liigu olekule 1
+
+    select       liigu olekule 25
+    basicSelect  liigu olekule 13
+
+
+olek 7
+
+    0 $accept: query . $end
+
+    $end  nihuta ja liigu olekule 26
+
+
+olek 8
+
+    4 query: update .
+
+    $default  redutseerin kasutades reeglit 4 (query)
+
+
+olek 9
+
+    2 query: delete .
+
+    $default  redutseerin kasutades reeglit 2 (query)
+
+
+olek 10
+
+    3 query: insert .
+
+    $default  redutseerin kasutades reeglit 3 (query)
+
+
+olek 11
+
+    1 query: bracketedSelect .
+
+    $default  redutseerin kasutades reeglit 1 (query)
+
+
+olek 12
+
+   21 bracketedSelect: select .  [$end]
+   24 select: select . UNION select
+
+    UNION  nihuta ja liigu olekule 27
+
+    $default  redutseerin kasutades reeglit 21 (bracketedSelect)
+
+
+olek 13
+
+   23 select: basicSelect . where byClauses forUpdate
+   26 where: . WHERE whereCond
+   27      | .  [$end, ORDER, GROUP, UNION, FOR, ')']
+
+    WHERE  nihuta ja liigu olekule 28
+
+    $default  redutseerin kasutades reeglit 27 (where)
+
+    where  liigu olekule 29
+
+
+olek 14
+
+   47 optDist: DISTINCT .
+
+    $default  redutseerin kasutades reeglit 47 (optDist)
+
+
+olek 15
+
+   25 basicSelect: SELECT optDist . whatToSelect FROM tableList
+   49 whatToSelect: . selectExpressionList
+   50 selectExpression: . expression
+   51                 | . selectExpression AS id
+   52                 | . selectExpression id
+   54 expression: . condition
+   55           | . simpleExpr
+   56 selectExpressionList: . selectExpression
+   57                     | . selectExpressionList ',' selectExpression
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   78 condition: . condition AND condition
+   79          | . condition OR condition
+   80          | . condition XOR condition
+   81          | . NOT condition
+   82          | . '(' condition ')'
+   83          | . comparison
+   84          | . simpleExpr inExpr '(' simExList ')'
+   85          | . simpleExpr inExpr '(' select ')'
+   86          | . '(' idList2 ')' inExpr '(' simExList ')'
+   87          | . '(' idList2 ')' inExpr '(' select ')'
+   88          | . simpleExpr IS optNot NULL
+   89          | . simpleExpr optNot LIKE simpleExpr escape
+   90          | . EXISTS '(' select ')'
+   91          | . simpleExpr optNot BETWEEN simpleExpr AND simpleExpr
+   94 comparison: . simpleExpr '=' simpleExpr
+   95           | . simpleExpr '>' simpleExpr
+   96           | . simpleExpr '<' simpleExpr
+   97           | . simpleExpr LE simpleExpr
+   98           | . simpleExpr NE simpleExpr
+   99           | . simpleExpr GE simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    EXISTS     nihuta ja liigu olekule 30
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    NOT        nihuta ja liigu olekule 34
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 40
+    '?'        nihuta ja liigu olekule 41
+
+    whatToSelect          liigu olekule 42
+    selectExpression      liigu olekule 43
+    expression            liigu olekule 44
+    selectExpressionList  liigu olekule 45
+    ident                 liigu olekule 46
+    condition             liigu olekule 47
+    comparison            liigu olekule 48
+    simpleExpr            liigu olekule 49
+
+
+olek 16
+
+   12 optFrom: FROM .
+
+    $default  redutseerin kasutades reeglit 12 (optFrom)
+
+
+olek 17
+
+   11 delete: DELETE optFrom . alias where
+   69 alias: . tableExpr
+   70      | . tableExpr ID
+   71 tableExpr: . ident
+   72          | . TABLE '(' simpleExpr ')'
+   73          | . '(' select ')'
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+
+    TABLE  nihuta ja liigu olekule 19
+    ID     nihuta ja liigu olekule 20
+    '('    nihuta ja liigu olekule 21
+
+    alias      liigu olekule 50
+    tableExpr  liigu olekule 23
+    ident      liigu olekule 24
+
+
+olek 18
+
+   14 insert: INSERT INTO . alias optIdList insertRest
+   69 alias: . tableExpr
+   70      | . tableExpr ID
+   71 tableExpr: . ident
+   72          | . TABLE '(' simpleExpr ')'
+   73          | . '(' select ')'
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+
+    TABLE  nihuta ja liigu olekule 19
+    ID     nihuta ja liigu olekule 20
+    '('    nihuta ja liigu olekule 21
+
+    alias      liigu olekule 51
+    tableExpr  liigu olekule 23
+    ident      liigu olekule 24
+
+
+olek 19
+
+   72 tableExpr: TABLE . '(' simpleExpr ')'
+
+    '('  nihuta ja liigu olekule 52
+
+
+olek 20
+
+   74 ident: ID .  [$end, VALUES, SELECT, WHERE, ORDER, GROUP, RIGHT, INNER, UNION, JOIN, LEFT, FULL, SET, FOR, ON, ID, '=', ',', '(', ')']
+   75      | ID . '.' ID
+   76      | ID . '.' ID '.' ID
+
+    '.'  nihuta ja liigu olekule 53
+
+    $default  redutseerin kasutades reeglit 74 (ident)
+
+
+olek 21
+
+   23 select: . basicSelect where byClauses forUpdate
+   24       | . select UNION select
+   25 basicSelect: . SELECT optDist whatToSelect FROM tableList
+   73 tableExpr: '(' . select ')'
+
+    SELECT  nihuta ja liigu olekule 1
+
+    select       liigu olekule 54
+    basicSelect  liigu olekule 13
+
+
+olek 22
+
+    6 update: UPDATE alias . SET assignList where
+
+    SET  nihuta ja liigu olekule 55
+
+
+olek 23
+
+   69 alias: tableExpr .  [$end, VALUES, SELECT, WHERE, ORDER, GROUP, RIGHT, INNER, UNION, JOIN, LEFT, FULL, SET, FOR, ON, ',', '(', ')']
+   70      | tableExpr . ID
+
+    ID  nihuta ja liigu olekule 56
+
+    $default  redutseerin kasutades reeglit 69 (alias)
+
+
+olek 24
+
+   71 tableExpr: ident .
+
+    $default  redutseerin kasutades reeglit 71 (tableExpr)
+
+
+olek 25
+
+   22 bracketedSelect: '(' select . ')'
+   24 select: select . UNION select
+
+    UNION  nihuta ja liigu olekule 27
+    ')'    nihuta ja liigu olekule 57
+
+
+olek 26
+
+    0 $accept: query $end .
+
+    $default  nõustun
+
+
+olek 27
+
+   23 select: . basicSelect where byClauses forUpdate
+   24       | . select UNION select
+   24       | select UNION . select
+   25 basicSelect: . SELECT optDist whatToSelect FROM tableList
+
+    SELECT  nihuta ja liigu olekule 1
+
+    select       liigu olekule 58
+    basicSelect  liigu olekule 13
+
+
+olek 28
+
+   26 where: WHERE . whereCond
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   77 whereCond: . condition
+   78 condition: . condition AND condition
+   79          | . condition OR condition
+   80          | . condition XOR condition
+   81          | . NOT condition
+   82          | . '(' condition ')'
+   83          | . comparison
+   84          | . simpleExpr inExpr '(' simExList ')'
+   85          | . simpleExpr inExpr '(' select ')'
+   86          | . '(' idList2 ')' inExpr '(' simExList ')'
+   87          | . '(' idList2 ')' inExpr '(' select ')'
+   88          | . simpleExpr IS optNot NULL
+   89          | . simpleExpr optNot LIKE simpleExpr escape
+   90          | . EXISTS '(' select ')'
+   91          | . simpleExpr optNot BETWEEN simpleExpr AND simpleExpr
+   94 comparison: . simpleExpr '=' simpleExpr
+   95           | . simpleExpr '>' simpleExpr
+   96           | . simpleExpr '<' simpleExpr
+   97           | . simpleExpr LE simpleExpr
+   98           | . simpleExpr NE simpleExpr
+   99           | . simpleExpr GE simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    EXISTS     nihuta ja liigu olekule 30
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    NOT        nihuta ja liigu olekule 34
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 40
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    whereCond   liigu olekule 59
+    condition   liigu olekule 60
+    comparison  liigu olekule 48
+    simpleExpr  liigu olekule 61
+
+
+olek 29
+
+   23 select: basicSelect where . byClauses forUpdate
+   30 groupBy: . GROUP BY simExList having
+   35 orderBy: . ORDER BY directionList
+   38 byClauses: . orderBy optGroupBy
+   39          | . groupBy optOrderBy
+   40          | .  [$end, UNION, FOR, ')']
+
+    ORDER  nihuta ja liigu olekule 62
+    GROUP  nihuta ja liigu olekule 63
+
+    $default  redutseerin kasutades reeglit 40 (byClauses)
+
+    groupBy    liigu olekule 64
+    orderBy    liigu olekule 65
+    byClauses  liigu olekule 66
+
+
+olek 30
+
+   90 condition: EXISTS . '(' select ')'
+
+    '('  nihuta ja liigu olekule 67
+
+
+olek 31
+
+  108 simpleExpr: CASE . whenList else END
+  128 whenList: . when
+  129         | . when whenList
+  130 when: . WHEN condition THEN simpleExpr
+
+    WHEN  nihuta ja liigu olekule 68
+
+    whenList  liigu olekule 69
+    when      liigu olekule 70
+
+
+olek 32
+
+  118 simpleExpr: CAST . '(' simpleExpr AS ID optSize ')'
+
+    '('  nihuta ja liigu olekule 71
+
+
+olek 33
+
+  123 simpleExpr: NULL .
+
+    $default  redutseerin kasutades reeglit 123 (simpleExpr)
+
+
+olek 34
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   78 condition: . condition AND condition
+   79          | . condition OR condition
+   80          | . condition XOR condition
+   81          | . NOT condition
+   81          | NOT . condition
+   82          | . '(' condition ')'
+   83          | . comparison
+   84          | . simpleExpr inExpr '(' simExList ')'
+   85          | . simpleExpr inExpr '(' select ')'
+   86          | . '(' idList2 ')' inExpr '(' simExList ')'
+   87          | . '(' idList2 ')' inExpr '(' select ')'
+   88          | . simpleExpr IS optNot NULL
+   89          | . simpleExpr optNot LIKE simpleExpr escape
+   90          | . EXISTS '(' select ')'
+   91          | . simpleExpr optNot BETWEEN simpleExpr AND simpleExpr
+   94 comparison: . simpleExpr '=' simpleExpr
+   95           | . simpleExpr '>' simpleExpr
+   96           | . simpleExpr '<' simpleExpr
+   97           | . simpleExpr LE simpleExpr
+   98           | . simpleExpr NE simpleExpr
+   99           | . simpleExpr GE simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    EXISTS     nihuta ja liigu olekule 30
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    NOT        nihuta ja liigu olekule 34
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 40
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    condition   liigu olekule 72
+    comparison  liigu olekule 48
+    simpleExpr  liigu olekule 61
+
+
+olek 35
+
+  109 simpleExpr: STRING_SQ .
+
+    $default  redutseerin kasutades reeglit 109 (simpleExpr)
+
+
+olek 36
+
+  105 simpleExpr: NUMBER .
+
+    $default  redutseerin kasutades reeglit 105 (simpleExpr)
+
+
+olek 37
+
+   74 ident: ID .  [$end, BETWEEN, ESCAPE, OVER, HAVING, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, WHEN, THEN, ELSE, DESC, LIKE, JOIN, LEFT, FULL, AND, END, ASC, XOR, FOR, NOT, AS, IN, IS, OUTERJ, NE, LE, GE, CONCAT, ID, '=', '>', '<', '-', '+', '/', '*', ',', '(', ')']
+   75      | ID . '.' ID
+   76      | ID . '.' ID '.' ID
+  120 simpleExpr: ID . '.' '*'
+
+    '.'  nihuta ja liigu olekule 73
+
+    $default  redutseerin kasutades reeglit 74 (ident)
+
+
+olek 38
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  107           | '-' . simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 75
+
+
+olek 39
+
+  121 simpleExpr: '*' .
+
+    $default  redutseerin kasutades reeglit 121 (simpleExpr)
+
+
+olek 40
+
+   23 select: . basicSelect where byClauses forUpdate
+   24       | . select UNION select
+   25 basicSelect: . SELECT optDist whatToSelect FROM tableList
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   78 condition: . condition AND condition
+   79          | . condition OR condition
+   80          | . condition XOR condition
+   81          | . NOT condition
+   82          | . '(' condition ')'
+   82          | '(' . condition ')'
+   83          | . comparison
+   84          | . simpleExpr inExpr '(' simExList ')'
+   85          | . simpleExpr inExpr '(' select ')'
+   86          | . '(' idList2 ')' inExpr '(' simExList ')'
+   86          | '(' . idList2 ')' inExpr '(' simExList ')'
+   87          | . '(' idList2 ')' inExpr '(' select ')'
+   87          | '(' . idList2 ')' inExpr '(' select ')'
+   88          | . simpleExpr IS optNot NULL
+   89          | . simpleExpr optNot LIKE simpleExpr escape
+   90          | . EXISTS '(' select ')'
+   91          | . simpleExpr optNot BETWEEN simpleExpr AND simpleExpr
+   92 idList2: . ID ',' ID
+   93        | . idList2 ',' ID
+   94 comparison: . simpleExpr '=' simpleExpr
+   95           | . simpleExpr '>' simpleExpr
+   96           | . simpleExpr '<' simpleExpr
+   97           | . simpleExpr LE simpleExpr
+   98           | . simpleExpr NE simpleExpr
+   99           | . simpleExpr GE simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  111           | '(' . simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  119           | '(' . select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    SELECT     nihuta ja liigu olekule 1
+    EXISTS     nihuta ja liigu olekule 30
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    NOT        nihuta ja liigu olekule 34
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 76
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 40
+    '?'        nihuta ja liigu olekule 41
+
+    select       liigu olekule 77
+    basicSelect  liigu olekule 13
+    ident        liigu olekule 46
+    condition    liigu olekule 78
+    idList2      liigu olekule 79
+    comparison   liigu olekule 48
+    simpleExpr   liigu olekule 80
+
+
+olek 41
+
+  122 simpleExpr: '?' .
+
+    $default  redutseerin kasutades reeglit 122 (simpleExpr)
+
+
+olek 42
+
+   25 basicSelect: SELECT optDist whatToSelect . FROM tableList
+
+    FROM  nihuta ja liigu olekule 81
+
+
+olek 43
+
+   51 selectExpression: selectExpression . AS id
+   52                 | selectExpression . id
+   53 id: . ID
+   56 selectExpressionList: selectExpression .  [FROM, ',']
+
+    AS  nihuta ja liigu olekule 82
+    ID  nihuta ja liigu olekule 83
+
+    $default  redutseerin kasutades reeglit 56 (selectExpressionList)
+
+    id  liigu olekule 84
+
+
+olek 44
+
+   50 selectExpression: expression .
+
+    $default  redutseerin kasutades reeglit 50 (selectExpression)
+
+
+olek 45
+
+   49 whatToSelect: selectExpressionList .  [FROM]
+   57 selectExpressionList: selectExpressionList . ',' selectExpression
+
+    ','  nihuta ja liigu olekule 85
+
+    $default  redutseerin kasutades reeglit 49 (whatToSelect)
+
+
+olek 46
+
+  110 simpleExpr: ident . identRest
+  126 identRest: . '(' simExList ')'
+  127          | .  [$end, BETWEEN, ESCAPE, OVER, HAVING, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, WHEN, THEN, ELSE, DESC, LIKE, JOIN, LEFT, FULL, AND, END, ASC, XOR, FOR, NOT, AS, IN, IS, OUTERJ, NE, LE, GE, CONCAT, ID, '=', '>', '<', '-', '+', '/', '*', ',', ')']
+
+    '('  nihuta ja liigu olekule 86
+
+    $default  redutseerin kasutades reeglit 127 (identRest)
+
+    identRest  liigu olekule 87
+
+
+olek 47
+
+   54 expression: condition .  [FROM, AS, ID, ',']
+   78 condition: condition . AND condition
+   79          | condition . OR condition
+   80          | condition . XOR condition
+
+    OR   nihuta ja liigu olekule 88
+    AND  nihuta ja liigu olekule 89
+    XOR  nihuta ja liigu olekule 90
+
+    $default  redutseerin kasutades reeglit 54 (expression)
+
+
+olek 48
+
+   83 condition: comparison .
+
+    $default  redutseerin kasutades reeglit 83 (condition)
+
+
+olek 49
+
+   55 expression: simpleExpr .  [FROM, AS, ID, ',']
+   84 condition: simpleExpr . inExpr '(' simExList ')'
+   85          | simpleExpr . inExpr '(' select ')'
+   88          | simpleExpr . IS optNot NULL
+   89          | simpleExpr . optNot LIKE simpleExpr escape
+   91          | simpleExpr . optNot BETWEEN simpleExpr AND simpleExpr
+   94 comparison: simpleExpr . '=' simpleExpr
+   95           | simpleExpr . '>' simpleExpr
+   96           | simpleExpr . '<' simpleExpr
+   97           | simpleExpr . LE simpleExpr
+   98           | simpleExpr . NE simpleExpr
+   99           | simpleExpr . GE simpleExpr
+  102 inExpr: . optNot IN
+  103 optNot: . NOT
+  104       | .  [BETWEEN, LIKE, IN]
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    nihuta ja liigu olekule 91
+    NOT     nihuta ja liigu olekule 92
+    IS      nihuta ja liigu olekule 93
+    OUTERJ  nihuta ja liigu olekule 94
+    NE      nihuta ja liigu olekule 95
+    LE      nihuta ja liigu olekule 96
+    GE      nihuta ja liigu olekule 97
+    CONCAT  nihuta ja liigu olekule 98
+    '='     nihuta ja liigu olekule 99
+    '>'     nihuta ja liigu olekule 100
+    '<'     nihuta ja liigu olekule 101
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
+
+    BETWEEN   redutseerin kasutades reeglit 104 (optNot)
+    LIKE      redutseerin kasutades reeglit 104 (optNot)
+    IN        redutseerin kasutades reeglit 104 (optNot)
+    $default  redutseerin kasutades reeglit 55 (expression)
+
+    inExpr  liigu olekule 106
+    optNot  liigu olekule 107
+
+
+olek 50
+
+   11 delete: DELETE optFrom alias . where
+   26 where: . WHERE whereCond
+   27      | .  [$end]
+
+    WHERE  nihuta ja liigu olekule 28
+
+    $default  redutseerin kasutades reeglit 27 (where)
+
+    where  liigu olekule 108
+
+
+olek 51
+
+   14 insert: INSERT INTO alias . optIdList insertRest
+   17 optIdList: .  [VALUES, SELECT]
+   18          | . '(' idList ')'
+
+    '('  nihuta ja liigu olekule 109
+
+    $default  redutseerin kasutades reeglit 17 (optIdList)
+
+    optIdList  liigu olekule 110
+
+
+olek 52
+
+   72 tableExpr: TABLE '(' . simpleExpr ')'
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 111
+
+
+olek 53
+
+   75 ident: ID '.' . ID
+   76      | ID '.' . ID '.' ID
+
+    ID  nihuta ja liigu olekule 112
+
+
+olek 54
+
+   24 select: select . UNION select
+   73 tableExpr: '(' select . ')'
+
+    UNION  nihuta ja liigu olekule 27
+    ')'    nihuta ja liigu olekule 113
+
+
+olek 55
+
+    6 update: UPDATE alias SET . assignList where
+    7 assignList: . assign
+    8           | . assignList ',' assign
+    9 assign: . ident '=' simpleExpr
+   10       | . '(' idList ')' '=' simpleExpr
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+
+    ID   nihuta ja liigu olekule 20
+    '('  nihuta ja liigu olekule 114
+
+    assignList  liigu olekule 115
+    assign      liigu olekule 116
+    ident       liigu olekule 117
+
+
+olek 56
+
+   70 alias: tableExpr ID .
+
+    $default  redutseerin kasutades reeglit 70 (alias)
+
+
+olek 57
+
+   22 bracketedSelect: '(' select ')' .
+
+    $default  redutseerin kasutades reeglit 22 (bracketedSelect)
+
+
+olek 58
+
+   24 select: select . UNION select
+   24       | select UNION select .  [$end, UNION, ')']
+
+    $default  redutseerin kasutades reeglit 24 (select)
+
+
+olek 59
+
+   26 where: WHERE whereCond .
+
+    $default  redutseerin kasutades reeglit 26 (where)
+
+
+olek 60
+
+   77 whereCond: condition .  [$end, ORDER, GROUP, UNION, FOR, ')']
+   78 condition: condition . AND condition
+   79          | condition . OR condition
+   80          | condition . XOR condition
+
+    OR   nihuta ja liigu olekule 88
+    AND  nihuta ja liigu olekule 89
+    XOR  nihuta ja liigu olekule 90
+
+    $default  redutseerin kasutades reeglit 77 (whereCond)
+
+
+olek 61
+
+   84 condition: simpleExpr . inExpr '(' simExList ')'
+   85          | simpleExpr . inExpr '(' select ')'
+   88          | simpleExpr . IS optNot NULL
+   89          | simpleExpr . optNot LIKE simpleExpr escape
+   91          | simpleExpr . optNot BETWEEN simpleExpr AND simpleExpr
+   94 comparison: simpleExpr . '=' simpleExpr
+   95           | simpleExpr . '>' simpleExpr
+   96           | simpleExpr . '<' simpleExpr
+   97           | simpleExpr . LE simpleExpr
+   98           | simpleExpr . NE simpleExpr
+   99           | simpleExpr . GE simpleExpr
+  102 inExpr: . optNot IN
+  103 optNot: . NOT
+  104       | .  [BETWEEN, LIKE, IN]
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    nihuta ja liigu olekule 91
+    NOT     nihuta ja liigu olekule 92
+    IS      nihuta ja liigu olekule 93
+    OUTERJ  nihuta ja liigu olekule 94
+    NE      nihuta ja liigu olekule 95
+    LE      nihuta ja liigu olekule 96
+    GE      nihuta ja liigu olekule 97
+    CONCAT  nihuta ja liigu olekule 98
+    '='     nihuta ja liigu olekule 99
+    '>'     nihuta ja liigu olekule 100
+    '<'     nihuta ja liigu olekule 101
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
+
+    $default  redutseerin kasutades reeglit 104 (optNot)
+
+    inExpr  liigu olekule 106
+    optNot  liigu olekule 107
+
+
+olek 62
+
+   35 orderBy: ORDER . BY directionList
+
+    BY  nihuta ja liigu olekule 118
+
+
+olek 63
+
+   30 groupBy: GROUP . BY simExList having
+
+    BY  nihuta ja liigu olekule 119
+
+
+olek 64
+
+   35 orderBy: . ORDER BY directionList
+   36 optOrderBy: . orderBy
+   37           | .  [$end, UNION, FOR, ')']
+   39 byClauses: groupBy . optOrderBy
+
+    ORDER  nihuta ja liigu olekule 62
+
+    $default  redutseerin kasutades reeglit 37 (optOrderBy)
+
+    orderBy     liigu olekule 120
+    optOrderBy  liigu olekule 121
+
+
+olek 65
+
+   30 groupBy: . GROUP BY simExList having
+   31 optGroupBy: . groupBy
+   32           | .  [$end, UNION, FOR, ')']
+   38 byClauses: orderBy . optGroupBy
+
+    GROUP  nihuta ja liigu olekule 63
+
+    $default  redutseerin kasutades reeglit 32 (optGroupBy)
+
+    groupBy     liigu olekule 122
+    optGroupBy  liigu olekule 123
+
+
+olek 66
+
+   23 select: basicSelect where byClauses . forUpdate
+   28 forUpdate: . FOR UPDATE
+   29          | .  [$end, UNION, ')']
+
+    FOR  nihuta ja liigu olekule 124
+
+    $default  redutseerin kasutades reeglit 29 (forUpdate)
+
+    forUpdate  liigu olekule 125
+
+
+olek 67
+
+   23 select: . basicSelect where byClauses forUpdate
+   24       | . select UNION select
+   25 basicSelect: . SELECT optDist whatToSelect FROM tableList
+   90 condition: EXISTS '(' . select ')'
+
+    SELECT  nihuta ja liigu olekule 1
+
+    select       liigu olekule 126
+    basicSelect  liigu olekule 13
+
+
+olek 68
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   78 condition: . condition AND condition
+   79          | . condition OR condition
+   80          | . condition XOR condition
+   81          | . NOT condition
+   82          | . '(' condition ')'
+   83          | . comparison
+   84          | . simpleExpr inExpr '(' simExList ')'
+   85          | . simpleExpr inExpr '(' select ')'
+   86          | . '(' idList2 ')' inExpr '(' simExList ')'
+   87          | . '(' idList2 ')' inExpr '(' select ')'
+   88          | . simpleExpr IS optNot NULL
+   89          | . simpleExpr optNot LIKE simpleExpr escape
+   90          | . EXISTS '(' select ')'
+   91          | . simpleExpr optNot BETWEEN simpleExpr AND simpleExpr
+   94 comparison: . simpleExpr '=' simpleExpr
+   95           | . simpleExpr '>' simpleExpr
+   96           | . simpleExpr '<' simpleExpr
+   97           | . simpleExpr LE simpleExpr
+   98           | . simpleExpr NE simpleExpr
+   99           | . simpleExpr GE simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+  130 when: WHEN . condition THEN simpleExpr
+
+    EXISTS     nihuta ja liigu olekule 30
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    NOT        nihuta ja liigu olekule 34
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 40
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    condition   liigu olekule 127
+    comparison  liigu olekule 48
+    simpleExpr  liigu olekule 61
+
+
+olek 69
+
+  108 simpleExpr: CASE whenList . else END
+  131 else: . ELSE simpleExpr
+  132     | .  [END]
+
+    ELSE  nihuta ja liigu olekule 128
+
+    $default  redutseerin kasutades reeglit 132 (else)
+
+    else  liigu olekule 129
+
+
+olek 70
+
+  128 whenList: . when
+  128         | when .  [ELSE, END]
+  129         | . when whenList
+  129         | when . whenList
+  130 when: . WHEN condition THEN simpleExpr
+
+    WHEN  nihuta ja liigu olekule 68
+
+    $default  redutseerin kasutades reeglit 128 (whenList)
+
+    whenList  liigu olekule 130
+    when      liigu olekule 70
+
+
+olek 71
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  118           | CAST '(' . simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 131
+
+
+olek 72
+
+   78 condition: condition . AND condition
+   79          | condition . OR condition
+   80          | condition . XOR condition
+   81          | NOT condition .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, AND, XOR, FOR, AS, ID, ',', ')']
+
+    $default  redutseerin kasutades reeglit 81 (condition)
+
+
+olek 73
+
+   75 ident: ID '.' . ID
+   76      | ID '.' . ID '.' ID
+  120 simpleExpr: ID '.' . '*'
+
+    ID   nihuta ja liigu olekule 112
+    '*'  nihuta ja liigu olekule 132
+
+
+olek 74
+
+   23 select: . basicSelect where byClauses forUpdate
+   24       | . select UNION select
+   25 basicSelect: . SELECT optDist whatToSelect FROM tableList
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  111           | '(' . simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  119           | '(' . select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    SELECT     nihuta ja liigu olekule 1
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
+
+    select       liigu olekule 77
+    basicSelect  liigu olekule 13
+    ident        liigu olekule 46
+    simpleExpr   liigu olekule 133
+
+
+olek 75
+
+  106 simpleExpr: simpleExpr . OUTERJ
+  107           | '-' simpleExpr .  [$end, BETWEEN, ESCAPE, OVER, HAVING, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, WHEN, THEN, ELSE, DESC, LIKE, JOIN, LEFT, FULL, AND, END, ASC, XOR, FOR, NOT, AS, IN, IS, NE, LE, GE, ID, '=', '>', '<', '-', '+', ',', ')']
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
+
+    $default  redutseerin kasutades reeglit 107 (simpleExpr)
+
+
+olek 76
+
+   74 ident: ID .  [BETWEEN, OVER, LIKE, NOT, IN, IS, OUTERJ, NE, LE, GE, CONCAT, '=', '>', '<', '-', '+', '/', '*', '(', ')']
+   75      | ID . '.' ID
+   76      | ID . '.' ID '.' ID
+   92 idList2: ID . ',' ID
+  120 simpleExpr: ID . '.' '*'
+
+    ','  nihuta ja liigu olekule 134
+    '.'  nihuta ja liigu olekule 73
+
+    $default  redutseerin kasutades reeglit 74 (ident)
+
+
+olek 77
+
+   24 select: select . UNION select
+  119 simpleExpr: '(' select . ')'
+
+    UNION  nihuta ja liigu olekule 27
+    ')'    nihuta ja liigu olekule 135
+
+
+olek 78
+
+   78 condition: condition . AND condition
+   79          | condition . OR condition
+   80          | condition . XOR condition
+   82          | '(' condition . ')'
+
+    OR   nihuta ja liigu olekule 88
+    AND  nihuta ja liigu olekule 89
+    XOR  nihuta ja liigu olekule 90
+    ')'  nihuta ja liigu olekule 136
+
+
+olek 79
+
+   86 condition: '(' idList2 . ')' inExpr '(' simExList ')'
+   87          | '(' idList2 . ')' inExpr '(' select ')'
+   93 idList2: idList2 . ',' ID
+
+    ','  nihuta ja liigu olekule 137
+    ')'  nihuta ja liigu olekule 138
+
+
+olek 80
+
+   84 condition: simpleExpr . inExpr '(' simExList ')'
+   85          | simpleExpr . inExpr '(' select ')'
+   88          | simpleExpr . IS optNot NULL
+   89          | simpleExpr . optNot LIKE simpleExpr escape
+   91          | simpleExpr . optNot BETWEEN simpleExpr AND simpleExpr
+   94 comparison: simpleExpr . '=' simpleExpr
+   95           | simpleExpr . '>' simpleExpr
+   96           | simpleExpr . '<' simpleExpr
+   97           | simpleExpr . LE simpleExpr
+   98           | simpleExpr . NE simpleExpr
+   99           | simpleExpr . GE simpleExpr
+  102 inExpr: . optNot IN
+  103 optNot: . NOT
+  104       | .  [BETWEEN, LIKE, IN]
+  106 simpleExpr: simpleExpr . OUTERJ
+  111           | '(' simpleExpr . ')'
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    nihuta ja liigu olekule 91
+    NOT     nihuta ja liigu olekule 92
+    IS      nihuta ja liigu olekule 93
+    OUTERJ  nihuta ja liigu olekule 94
+    NE      nihuta ja liigu olekule 95
+    LE      nihuta ja liigu olekule 96
+    GE      nihuta ja liigu olekule 97
+    CONCAT  nihuta ja liigu olekule 98
+    '='     nihuta ja liigu olekule 99
+    '>'     nihuta ja liigu olekule 100
+    '<'     nihuta ja liigu olekule 101
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
+    ')'     nihuta ja liigu olekule 139
+
+    $default  redutseerin kasutades reeglit 104 (optNot)
+
+    inExpr  liigu olekule 106
+    optNot  liigu olekule 107
+
+
+olek 81
+
+   25 basicSelect: SELECT optDist whatToSelect FROM . tableList
+   58 tableList: . table
+   59          | . tableList ',' table
+   60 table: . alias
+   61      | . table join alias ON condition
+   69 alias: . tableExpr
+   70      | . tableExpr ID
+   71 tableExpr: . ident
+   72          | . TABLE '(' simpleExpr ')'
+   73          | . '(' select ')'
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+
+    TABLE  nihuta ja liigu olekule 19
+    ID     nihuta ja liigu olekule 20
+    '('    nihuta ja liigu olekule 21
+
+    tableList  liigu olekule 140
+    table      liigu olekule 141
+    alias      liigu olekule 142
+    tableExpr  liigu olekule 23
+    ident      liigu olekule 24
+
+
+olek 82
+
+   51 selectExpression: selectExpression AS . id
+   53 id: . ID
+
+    ID  nihuta ja liigu olekule 83
+
+    id  liigu olekule 143
+
+
+olek 83
+
+   53 id: ID .
+
+    $default  redutseerin kasutades reeglit 53 (id)
+
+
+olek 84
+
+   52 selectExpression: selectExpression id .
+
+    $default  redutseerin kasutades reeglit 52 (selectExpression)
+
+
+olek 85
+
+   50 selectExpression: . expression
+   51                 | . selectExpression AS id
+   52                 | . selectExpression id
+   54 expression: . condition
+   55           | . simpleExpr
+   57 selectExpressionList: selectExpressionList ',' . selectExpression
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   78 condition: . condition AND condition
+   79          | . condition OR condition
+   80          | . condition XOR condition
+   81          | . NOT condition
+   82          | . '(' condition ')'
+   83          | . comparison
+   84          | . simpleExpr inExpr '(' simExList ')'
+   85          | . simpleExpr inExpr '(' select ')'
+   86          | . '(' idList2 ')' inExpr '(' simExList ')'
+   87          | . '(' idList2 ')' inExpr '(' select ')'
+   88          | . simpleExpr IS optNot NULL
+   89          | . simpleExpr optNot LIKE simpleExpr escape
+   90          | . EXISTS '(' select ')'
+   91          | . simpleExpr optNot BETWEEN simpleExpr AND simpleExpr
+   94 comparison: . simpleExpr '=' simpleExpr
+   95           | . simpleExpr '>' simpleExpr
+   96           | . simpleExpr '<' simpleExpr
+   97           | . simpleExpr LE simpleExpr
+   98           | . simpleExpr NE simpleExpr
+   99           | . simpleExpr GE simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    EXISTS     nihuta ja liigu olekule 30
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    NOT        nihuta ja liigu olekule 34
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 40
+    '?'        nihuta ja liigu olekule 41
+
+    selectExpression  liigu olekule 144
+    expression        liigu olekule 44
+    ident             liigu olekule 46
+    condition         liigu olekule 47
+    comparison        liigu olekule 48
+    simpleExpr        liigu olekule 49
+
+
+olek 86
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+  126 identRest: '(' . simExList ')'
+  133 simExList: .  [',', ')']
+  134          | . simpleExpr
+  135          | . simExList ',' simpleExpr
+
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
+
+    $default  redutseerin kasutades reeglit 133 (simExList)
+
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 145
+    simExList   liigu olekule 146
+
+
+olek 87
+
+  110 simpleExpr: ident identRest .
+
+    $default  redutseerin kasutades reeglit 110 (simpleExpr)
+
+
+olek 88
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   78 condition: . condition AND condition
+   79          | . condition OR condition
+   79          | condition OR . condition
+   80          | . condition XOR condition
+   81          | . NOT condition
+   82          | . '(' condition ')'
+   83          | . comparison
+   84          | . simpleExpr inExpr '(' simExList ')'
+   85          | . simpleExpr inExpr '(' select ')'
+   86          | . '(' idList2 ')' inExpr '(' simExList ')'
+   87          | . '(' idList2 ')' inExpr '(' select ')'
+   88          | . simpleExpr IS optNot NULL
+   89          | . simpleExpr optNot LIKE simpleExpr escape
+   90          | . EXISTS '(' select ')'
+   91          | . simpleExpr optNot BETWEEN simpleExpr AND simpleExpr
+   94 comparison: . simpleExpr '=' simpleExpr
+   95           | . simpleExpr '>' simpleExpr
+   96           | . simpleExpr '<' simpleExpr
+   97           | . simpleExpr LE simpleExpr
+   98           | . simpleExpr NE simpleExpr
+   99           | . simpleExpr GE simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    EXISTS     nihuta ja liigu olekule 30
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    NOT        nihuta ja liigu olekule 34
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 40
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    condition   liigu olekule 147
+    comparison  liigu olekule 48
+    simpleExpr  liigu olekule 61
+
+
+olek 89
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   78 condition: . condition AND condition
+   78          | condition AND . condition
+   79          | . condition OR condition
+   80          | . condition XOR condition
+   81          | . NOT condition
+   82          | . '(' condition ')'
+   83          | . comparison
+   84          | . simpleExpr inExpr '(' simExList ')'
+   85          | . simpleExpr inExpr '(' select ')'
+   86          | . '(' idList2 ')' inExpr '(' simExList ')'
+   87          | . '(' idList2 ')' inExpr '(' select ')'
+   88          | . simpleExpr IS optNot NULL
+   89          | . simpleExpr optNot LIKE simpleExpr escape
+   90          | . EXISTS '(' select ')'
+   91          | . simpleExpr optNot BETWEEN simpleExpr AND simpleExpr
+   94 comparison: . simpleExpr '=' simpleExpr
+   95           | . simpleExpr '>' simpleExpr
+   96           | . simpleExpr '<' simpleExpr
+   97           | . simpleExpr LE simpleExpr
+   98           | . simpleExpr NE simpleExpr
+   99           | . simpleExpr GE simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    EXISTS     nihuta ja liigu olekule 30
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    NOT        nihuta ja liigu olekule 34
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 40
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    condition   liigu olekule 148
+    comparison  liigu olekule 48
+    simpleExpr  liigu olekule 61
+
+
+olek 90
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   78 condition: . condition AND condition
+   79          | . condition OR condition
+   80          | . condition XOR condition
+   80          | condition XOR . condition
+   81          | . NOT condition
+   82          | . '(' condition ')'
+   83          | . comparison
+   84          | . simpleExpr inExpr '(' simExList ')'
+   85          | . simpleExpr inExpr '(' select ')'
+   86          | . '(' idList2 ')' inExpr '(' simExList ')'
+   87          | . '(' idList2 ')' inExpr '(' select ')'
+   88          | . simpleExpr IS optNot NULL
+   89          | . simpleExpr optNot LIKE simpleExpr escape
+   90          | . EXISTS '(' select ')'
+   91          | . simpleExpr optNot BETWEEN simpleExpr AND simpleExpr
+   94 comparison: . simpleExpr '=' simpleExpr
+   95           | . simpleExpr '>' simpleExpr
+   96           | . simpleExpr '<' simpleExpr
+   97           | . simpleExpr LE simpleExpr
+   98           | . simpleExpr NE simpleExpr
+   99           | . simpleExpr GE simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    EXISTS     nihuta ja liigu olekule 30
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    NOT        nihuta ja liigu olekule 34
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 40
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    condition   liigu olekule 149
+    comparison  liigu olekule 48
+    simpleExpr  liigu olekule 61
+
+
+olek 91
+
+  117 simpleExpr: simpleExpr OVER . partition
+  136 partition: . '(' PARTITION BY ident orderBy ')'
+
+    '('  nihuta ja liigu olekule 150
+
+    partition  liigu olekule 151
+
+
+olek 92
+
+  103 optNot: NOT .
+
+    $default  redutseerin kasutades reeglit 103 (optNot)
+
+
+olek 93
+
+   88 condition: simpleExpr IS . optNot NULL
+  103 optNot: . NOT
+  104       | .  [NULL]
+
+    NOT  nihuta ja liigu olekule 92
+
+    $default  redutseerin kasutades reeglit 104 (optNot)
+
+    optNot  liigu olekule 152
+
+
+olek 94
+
+  106 simpleExpr: simpleExpr OUTERJ .
+
+    $default  redutseerin kasutades reeglit 106 (simpleExpr)
+
+
+olek 95
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   98 comparison: simpleExpr NE . simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 153
+
+
+olek 96
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   97 comparison: simpleExpr LE . simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 154
+
+
+olek 97
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   99 comparison: simpleExpr GE . simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 155
+
+
+olek 98
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  116           | simpleExpr CONCAT . simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 156
+
+
+olek 99
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   94 comparison: simpleExpr '=' . simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 157
+
+
+olek 100
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   95 comparison: simpleExpr '>' . simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 158
+
+
+olek 101
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   96 comparison: simpleExpr '<' . simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 159
+
+
+olek 102
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  112           | simpleExpr '-' . simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 160
+
+
+olek 103
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  113           | simpleExpr '+' . simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 161
+
+
+olek 104
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  115           | simpleExpr '/' . simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 162
+
+
+olek 105
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  114           | simpleExpr '*' . simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 163
+
+
+olek 106
+
+   84 condition: simpleExpr inExpr . '(' simExList ')'
+   85          | simpleExpr inExpr . '(' select ')'
+
+    '('  nihuta ja liigu olekule 164
+
+
+olek 107
+
+   89 condition: simpleExpr optNot . LIKE simpleExpr escape
+   91          | simpleExpr optNot . BETWEEN simpleExpr AND simpleExpr
+  102 inExpr: optNot . IN
+
+    BETWEEN  nihuta ja liigu olekule 165
+    LIKE     nihuta ja liigu olekule 166
+    IN       nihuta ja liigu olekule 167
+
+
+olek 108
+
+   11 delete: DELETE optFrom alias where .
+
+    $default  redutseerin kasutades reeglit 11 (delete)
+
+
+olek 109
+
+   18 optIdList: '(' . idList ')'
+   19 idList: . ID
+   20       | . idList ',' ID
+
+    ID  nihuta ja liigu olekule 168
+
+    idList  liigu olekule 169
+
+
+olek 110
+
+   14 insert: INSERT INTO alias optIdList . insertRest
+   15 insertRest: . VALUES identRest
+   16           | . select
+   23 select: . basicSelect where byClauses forUpdate
+   24       | . select UNION select
+   25 basicSelect: . SELECT optDist whatToSelect FROM tableList
+
+    VALUES  nihuta ja liigu olekule 170
+    SELECT  nihuta ja liigu olekule 1
+
+    insertRest   liigu olekule 171
+    select       liigu olekule 172
+    basicSelect  liigu olekule 13
+
+
+olek 111
+
+   72 tableExpr: TABLE '(' simpleExpr . ')'
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
+    ')'     nihuta ja liigu olekule 173
+
+
+olek 112
+
+   75 ident: ID '.' ID .  [$end, BETWEEN, VALUES, SELECT, ESCAPE, OVER, HAVING, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, WHEN, THEN, ELSE, DESC, LIKE, JOIN, LEFT, FULL, AND, SET, END, ASC, XOR, FOR, NOT, ON, AS, IN, IS, OUTERJ, NE, LE, GE, CONCAT, ID, '=', '>', '<', '-', '+', '/', '*', ',', '(', ')']
+   76      | ID '.' ID . '.' ID
+
+    '.'  nihuta ja liigu olekule 174
+
+    $default  redutseerin kasutades reeglit 75 (ident)
+
+
+olek 113
+
+   73 tableExpr: '(' select ')' .
+
+    $default  redutseerin kasutades reeglit 73 (tableExpr)
+
+
+olek 114
+
+   10 assign: '(' . idList ')' '=' simpleExpr
+   19 idList: . ID
+   20       | . idList ',' ID
+
+    ID  nihuta ja liigu olekule 168
+
+    idList  liigu olekule 175
+
+
+olek 115
+
+    6 update: UPDATE alias SET assignList . where
+    8 assignList: assignList . ',' assign
+   26 where: . WHERE whereCond
+   27      | .  [$end]
+
+    WHERE  nihuta ja liigu olekule 28
+    ','    nihuta ja liigu olekule 176
+
+    $default  redutseerin kasutades reeglit 27 (where)
+
+    where  liigu olekule 177
+
+
+olek 116
+
+    7 assignList: assign .
+
+    $default  redutseerin kasutades reeglit 7 (assignList)
+
+
+olek 117
+
+    9 assign: ident . '=' simpleExpr
+
+    '='  nihuta ja liigu olekule 178
+
+
+olek 118
+
+   35 orderBy: ORDER BY . directionList
+   41 directionList: . direction
+   42              | . directionList ',' direction
+   43 direction: . simpleExpr orderDirection
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
+
+    directionList  liigu olekule 179
+    direction      liigu olekule 180
+    ident          liigu olekule 46
+    simpleExpr     liigu olekule 181
+
+
+olek 119
+
+   30 groupBy: GROUP BY . simExList having
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+  133 simExList: .  [$end, HAVING, ORDER, UNION, FOR, ',', ')']
+  134          | . simpleExpr
+  135          | . simExList ',' simpleExpr
+
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
+
+    $default  redutseerin kasutades reeglit 133 (simExList)
+
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 145
+    simExList   liigu olekule 182
+
+
+olek 120
+
+   36 optOrderBy: orderBy .
+
+    $default  redutseerin kasutades reeglit 36 (optOrderBy)
+
+
+olek 121
+
+   39 byClauses: groupBy optOrderBy .
+
+    $default  redutseerin kasutades reeglit 39 (byClauses)
+
+
+olek 122
+
+   31 optGroupBy: groupBy .
+
+    $default  redutseerin kasutades reeglit 31 (optGroupBy)
+
+
+olek 123
+
+   38 byClauses: orderBy optGroupBy .
+
+    $default  redutseerin kasutades reeglit 38 (byClauses)
+
+
+olek 124
+
+   28 forUpdate: FOR . UPDATE
+
+    UPDATE  nihuta ja liigu olekule 183
+
+
+olek 125
+
+   23 select: basicSelect where byClauses forUpdate .
+
+    $default  redutseerin kasutades reeglit 23 (select)
+
+
+olek 126
+
+   24 select: select . UNION select
+   90 condition: EXISTS '(' select . ')'
+
+    UNION  nihuta ja liigu olekule 27
+    ')'    nihuta ja liigu olekule 184
+
+
+olek 127
+
+   78 condition: condition . AND condition
+   79          | condition . OR condition
+   80          | condition . XOR condition
+  130 when: WHEN condition . THEN simpleExpr
+
+    OR    nihuta ja liigu olekule 88
+    THEN  nihuta ja liigu olekule 185
+    AND   nihuta ja liigu olekule 89
+    XOR   nihuta ja liigu olekule 90
+
+
+olek 128
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+  131 else: ELSE . simpleExpr
+
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 186
+
+
+olek 129
+
+  108 simpleExpr: CASE whenList else . END
+
+    END  nihuta ja liigu olekule 187
+
+
+olek 130
+
+  129 whenList: when whenList .
+
+    $default  redutseerin kasutades reeglit 129 (whenList)
+
+
+olek 131
+
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+  118           | CAST '(' simpleExpr . AS ID optSize ')'
+
+    OVER    nihuta ja liigu olekule 91
+    AS      nihuta ja liigu olekule 188
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
+
+
+olek 132
+
+  120 simpleExpr: ID '.' '*' .
+
+    $default  redutseerin kasutades reeglit 120 (simpleExpr)
+
+
+olek 133
+
+  106 simpleExpr: simpleExpr . OUTERJ
+  111           | '(' simpleExpr . ')'
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
+    ')'     nihuta ja liigu olekule 139
+
+
+olek 134
+
+   92 idList2: ID ',' . ID
+
+    ID  nihuta ja liigu olekule 189
+
+
+olek 135
+
+  119 simpleExpr: '(' select ')' .
+
+    $default  redutseerin kasutades reeglit 119 (simpleExpr)
+
+
+olek 136
+
+   82 condition: '(' condition ')' .
+
+    $default  redutseerin kasutades reeglit 82 (condition)
+
+
+olek 137
+
+   93 idList2: idList2 ',' . ID
+
+    ID  nihuta ja liigu olekule 190
+
+
+olek 138
+
+   86 condition: '(' idList2 ')' . inExpr '(' simExList ')'
+   87          | '(' idList2 ')' . inExpr '(' select ')'
+  102 inExpr: . optNot IN
+  103 optNot: . NOT
+  104       | .  [IN]
+
+    NOT  nihuta ja liigu olekule 92
+
+    $default  redutseerin kasutades reeglit 104 (optNot)
+
+    inExpr  liigu olekule 191
+    optNot  liigu olekule 192
+
+
+olek 139
+
+  111 simpleExpr: '(' simpleExpr ')' .
+
+    $default  redutseerin kasutades reeglit 111 (simpleExpr)
+
+
+olek 140
+
+   25 basicSelect: SELECT optDist whatToSelect FROM tableList .  [$end, WHERE, ORDER, GROUP, UNION, FOR, ')']
+   59 tableList: tableList . ',' table
+
+    ','  nihuta ja liigu olekule 193
+
+    $default  redutseerin kasutades reeglit 25 (basicSelect)
+
+
+olek 141
+
+   58 tableList: table .  [$end, WHERE, ORDER, GROUP, UNION, FOR, ',', ')']
+   61 table: table . join alias ON condition
+   62 join: . JOIN
+   63     | . LEFT JOIN
+   64     | . outerType OUTER JOIN
+   65     | . INNER JOIN
+   66 outerType: . LEFT
+   67          | . RIGHT
+   68          | . FULL
+
+    RIGHT  nihuta ja liigu olekule 194
+    INNER  nihuta ja liigu olekule 195
+    JOIN   nihuta ja liigu olekule 196
+    LEFT   nihuta ja liigu olekule 197
+    FULL   nihuta ja liigu olekule 198
+
+    $default  redutseerin kasutades reeglit 58 (tableList)
+
+    join       liigu olekule 199
+    outerType  liigu olekule 200
+
+
+olek 142
+
+   60 table: alias .
+
+    $default  redutseerin kasutades reeglit 60 (table)
+
+
+olek 143
+
+   51 selectExpression: selectExpression AS id .
+
+    $default  redutseerin kasutades reeglit 51 (selectExpression)
+
+
+olek 144
+
+   51 selectExpression: selectExpression . AS id
+   52                 | selectExpression . id
+   53 id: . ID
+   57 selectExpressionList: selectExpressionList ',' selectExpression .  [FROM, ',']
+
+    AS  nihuta ja liigu olekule 82
+    ID  nihuta ja liigu olekule 83
+
+    $default  redutseerin kasutades reeglit 57 (selectExpressionList)
+
+    id  liigu olekule 84
+
+
+olek 145
+
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+  134 simExList: simpleExpr .  [$end, HAVING, ORDER, UNION, FOR, ',', ')']
+
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
+
+    $default  redutseerin kasutades reeglit 134 (simExList)
+
+
+olek 146
+
+  126 identRest: '(' simExList . ')'
+  135 simExList: simExList . ',' simpleExpr
+
+    ','  nihuta ja liigu olekule 201
+    ')'  nihuta ja liigu olekule 202
+
+
+olek 147
+
+   78 condition: condition . AND condition
+   79          | condition . OR condition
+   79          | condition OR condition .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, XOR, FOR, AS, ID, ',', ')']
+   80          | condition . XOR condition
+
+    AND  nihuta ja liigu olekule 89
+
+    $default  redutseerin kasutades reeglit 79 (condition)
+
+
+olek 148
+
+   78 condition: condition . AND condition
+   78          | condition AND condition .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, AND, XOR, FOR, AS, ID, ',', ')']
+   79          | condition . OR condition
+   80          | condition . XOR condition
+
+    $default  redutseerin kasutades reeglit 78 (condition)
+
+
+olek 149
+
+   78 condition: condition . AND condition
+   79          | condition . OR condition
+   80          | condition . XOR condition
+   80          | condition XOR condition .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, XOR, FOR, AS, ID, ',', ')']
+
+    AND  nihuta ja liigu olekule 89
+
+    $default  redutseerin kasutades reeglit 80 (condition)
+
+
+olek 150
+
+  136 partition: '(' . PARTITION BY ident orderBy ')'
+
+    PARTITION  nihuta ja liigu olekule 203
+
+
+olek 151
+
+  117 simpleExpr: simpleExpr OVER partition .
+
+    $default  redutseerin kasutades reeglit 117 (simpleExpr)
+
+
+olek 152
+
+   88 condition: simpleExpr IS optNot . NULL
+
+    NULL  nihuta ja liigu olekule 204
+
+
+olek 153
+
+   98 comparison: simpleExpr NE simpleExpr .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, AND, XOR, FOR, AS, ID, ',', ')']
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
+
+    $default  redutseerin kasutades reeglit 98 (comparison)
+
+
+olek 154
+
+   97 comparison: simpleExpr LE simpleExpr .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, AND, XOR, FOR, AS, ID, ',', ')']
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
+
+    $default  redutseerin kasutades reeglit 97 (comparison)
+
+
+olek 155
+
+   99 comparison: simpleExpr GE simpleExpr .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, AND, XOR, FOR, AS, ID, ',', ')']
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
+
+    $default  redutseerin kasutades reeglit 99 (comparison)
+
+
+olek 156
+
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  116           | simpleExpr CONCAT simpleExpr .  [$end, BETWEEN, ESCAPE, OVER, HAVING, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, WHEN, THEN, ELSE, DESC, LIKE, JOIN, LEFT, FULL, AND, END, ASC, XOR, FOR, NOT, AS, IN, IS, OUTERJ, NE, LE, GE, CONCAT, ID, '=', '>', '<', '-', '+', '/', '*', ',', ')']
+  117           | simpleExpr . OVER partition
+
+    $default  redutseerin kasutades reeglit 116 (simpleExpr)
+
+
+olek 157
+
+   94 comparison: simpleExpr '=' simpleExpr .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, AND, XOR, FOR, AS, ID, ',', ')']
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
+
+    $default  redutseerin kasutades reeglit 94 (comparison)
+
+
+olek 158
+
+   95 comparison: simpleExpr '>' simpleExpr .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, AND, XOR, FOR, AS, ID, ',', ')']
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
+
+    $default  redutseerin kasutades reeglit 95 (comparison)
+
+
+olek 159
+
+   96 comparison: simpleExpr '<' simpleExpr .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, AND, XOR, FOR, AS, ID, ',', ')']
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
+
+    $default  redutseerin kasutades reeglit 96 (comparison)
+
+
+olek 160
+
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  112           | simpleExpr '-' simpleExpr .  [$end, BETWEEN, ESCAPE, OVER, HAVING, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, WHEN, THEN, ELSE, DESC, LIKE, JOIN, LEFT, FULL, AND, END, ASC, XOR, FOR, NOT, AS, IN, IS, NE, LE, GE, ID, '=', '>', '<', '-', '+', ',', ')']
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
+
+    $default  redutseerin kasutades reeglit 112 (simpleExpr)
+
+
+olek 161
+
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  113           | simpleExpr '+' simpleExpr .  [$end, BETWEEN, ESCAPE, OVER, HAVING, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, WHEN, THEN, ELSE, DESC, LIKE, JOIN, LEFT, FULL, AND, END, ASC, XOR, FOR, NOT, AS, IN, IS, NE, LE, GE, ID, '=', '>', '<', '-', '+', ',', ')']
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
+
+    $default  redutseerin kasutades reeglit 113 (simpleExpr)
+
+
+olek 162
+
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  115           | simpleExpr '/' simpleExpr .  [$end, BETWEEN, ESCAPE, OVER, HAVING, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, WHEN, THEN, ELSE, DESC, LIKE, JOIN, LEFT, FULL, AND, END, ASC, XOR, FOR, NOT, AS, IN, IS, OUTERJ, NE, LE, GE, CONCAT, ID, '=', '>', '<', '-', '+', '/', '*', ',', ')']
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    $default  redutseerin kasutades reeglit 115 (simpleExpr)
+
+
+olek 163
+
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  114           | simpleExpr '*' simpleExpr .  [$end, BETWEEN, ESCAPE, OVER, HAVING, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, WHEN, THEN, ELSE, DESC, LIKE, JOIN, LEFT, FULL, AND, END, ASC, XOR, FOR, NOT, AS, IN, IS, OUTERJ, NE, LE, GE, CONCAT, ID, '=', '>', '<', '-', '+', '/', '*', ',', ')']
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    $default  redutseerin kasutades reeglit 114 (simpleExpr)
+
+
+olek 164
+
+   23 select: . basicSelect where byClauses forUpdate
+   24       | . select UNION select
+   25 basicSelect: . SELECT optDist whatToSelect FROM tableList
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   84 condition: simpleExpr inExpr '(' . simExList ')'
+   85          | simpleExpr inExpr '(' . select ')'
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+  133 simExList: .  [',', ')']
+  134          | . simpleExpr
+  135          | . simExList ',' simpleExpr
+
+    SELECT     nihuta ja liigu olekule 1
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
+
+    $default  redutseerin kasutades reeglit 133 (simExList)
+
+    select       liigu olekule 205
+    basicSelect  liigu olekule 13
+    ident        liigu olekule 46
+    simpleExpr   liigu olekule 145
+    simExList    liigu olekule 206
+
+
+olek 165
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   91 condition: simpleExpr optNot BETWEEN . simpleExpr AND simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 207
+
+
+olek 166
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   89 condition: simpleExpr optNot LIKE . simpleExpr escape
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 208
+
+
+olek 167
+
+  102 inExpr: optNot IN .
+
+    $default  redutseerin kasutades reeglit 102 (inExpr)
+
+
+olek 168
+
+   19 idList: ID .
+
+    $default  redutseerin kasutades reeglit 19 (idList)
+
+
+olek 169
+
+   18 optIdList: '(' idList . ')'
+   20 idList: idList . ',' ID
+
+    ','  nihuta ja liigu olekule 209
+    ')'  nihuta ja liigu olekule 210
+
+
+olek 170
+
+   15 insertRest: VALUES . identRest
+  126 identRest: . '(' simExList ')'
+  127          | .  [$end]
+
+    '('  nihuta ja liigu olekule 86
+
+    $default  redutseerin kasutades reeglit 127 (identRest)
+
+    identRest  liigu olekule 211
+
+
+olek 171
+
+   14 insert: INSERT INTO alias optIdList insertRest .
+
+    $default  redutseerin kasutades reeglit 14 (insert)
+
+
+olek 172
+
+   16 insertRest: select .  [$end]
+   24 select: select . UNION select
+
+    UNION  nihuta ja liigu olekule 27
+
+    $default  redutseerin kasutades reeglit 16 (insertRest)
+
+
+olek 173
+
+   72 tableExpr: TABLE '(' simpleExpr ')' .
+
+    $default  redutseerin kasutades reeglit 72 (tableExpr)
+
+
+olek 174
+
+   76 ident: ID '.' ID '.' . ID
+
+    ID  nihuta ja liigu olekule 212
+
+
+olek 175
+
+   10 assign: '(' idList . ')' '=' simpleExpr
+   20 idList: idList . ',' ID
+
+    ','  nihuta ja liigu olekule 209
+    ')'  nihuta ja liigu olekule 213
+
+
+olek 176
+
+    8 assignList: assignList ',' . assign
+    9 assign: . ident '=' simpleExpr
+   10       | . '(' idList ')' '=' simpleExpr
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+
+    ID   nihuta ja liigu olekule 20
+    '('  nihuta ja liigu olekule 114
+
+    assign  liigu olekule 214
+    ident   liigu olekule 117
+
+
+olek 177
+
+    6 update: UPDATE alias SET assignList where .
+
+    $default  redutseerin kasutades reeglit 6 (update)
+
+
+olek 178
+
+    9 assign: ident '=' . simpleExpr
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 215
+
+
+olek 179
+
+   35 orderBy: ORDER BY directionList .  [$end, GROUP, UNION, FOR, ')']
+   42 directionList: directionList . ',' direction
+
+    ','  nihuta ja liigu olekule 216
+
+    $default  redutseerin kasutades reeglit 35 (orderBy)
+
+
+olek 180
+
+   41 directionList: direction .
+
+    $default  redutseerin kasutades reeglit 41 (directionList)
+
+
+olek 181
+
+   43 direction: simpleExpr . orderDirection
+   44 orderDirection: . ASC
+   45               | . DESC
+   46               | .  [$end, GROUP, UNION, FOR, ',', ')']
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    nihuta ja liigu olekule 91
+    DESC    nihuta ja liigu olekule 217
+    ASC     nihuta ja liigu olekule 218
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
+
+    $default  redutseerin kasutades reeglit 46 (orderDirection)
+
+    orderDirection  liigu olekule 219
+
+
+olek 182
+
+   30 groupBy: GROUP BY simExList . having
+   33 having: . HAVING condition
+   34       | .  [$end, ORDER, UNION, FOR, ')']
+  135 simExList: simExList . ',' simpleExpr
+
+    HAVING  nihuta ja liigu olekule 220
+    ','     nihuta ja liigu olekule 201
+
+    $default  redutseerin kasutades reeglit 34 (having)
+
+    having  liigu olekule 221
+
+
+olek 183
+
+   28 forUpdate: FOR UPDATE .
+
+    $default  redutseerin kasutades reeglit 28 (forUpdate)
+
+
+olek 184
+
+   90 condition: EXISTS '(' select ')' .
+
+    $default  redutseerin kasutades reeglit 90 (condition)
+
+
+olek 185
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+  130 when: WHEN condition THEN . simpleExpr
+
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 222
+
+
+olek 186
+
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+  131 else: ELSE simpleExpr .  [END]
+
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
+
+    $default  redutseerin kasutades reeglit 131 (else)
+
+
+olek 187
+
+  108 simpleExpr: CASE whenList else END .
+
+    $default  redutseerin kasutades reeglit 108 (simpleExpr)
+
+
+olek 188
+
+  118 simpleExpr: CAST '(' simpleExpr AS . ID optSize ')'
+
+    ID  nihuta ja liigu olekule 223
+
+
+olek 189
+
+   92 idList2: ID ',' ID .
+
+    $default  redutseerin kasutades reeglit 92 (idList2)
+
+
+olek 190
+
+   93 idList2: idList2 ',' ID .
+
+    $default  redutseerin kasutades reeglit 93 (idList2)
+
+
+olek 191
+
+   86 condition: '(' idList2 ')' inExpr . '(' simExList ')'
+   87          | '(' idList2 ')' inExpr . '(' select ')'
+
+    '('  nihuta ja liigu olekule 224
+
+
+olek 192
+
+  102 inExpr: optNot . IN
+
+    IN  nihuta ja liigu olekule 167
+
+
+olek 193
+
+   59 tableList: tableList ',' . table
+   60 table: . alias
+   61      | . table join alias ON condition
+   69 alias: . tableExpr
+   70      | . tableExpr ID
+   71 tableExpr: . ident
+   72          | . TABLE '(' simpleExpr ')'
+   73          | . '(' select ')'
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+
+    TABLE  nihuta ja liigu olekule 19
+    ID     nihuta ja liigu olekule 20
+    '('    nihuta ja liigu olekule 21
+
+    table      liigu olekule 225
+    alias      liigu olekule 142
+    tableExpr  liigu olekule 23
+    ident      liigu olekule 24
+
+
+olek 194
+
+   67 outerType: RIGHT .
+
+    $default  redutseerin kasutades reeglit 67 (outerType)
+
+
+olek 195
+
+   65 join: INNER . JOIN
+
+    JOIN  nihuta ja liigu olekule 226
+
+
+olek 196
+
+   62 join: JOIN .
+
+    $default  redutseerin kasutades reeglit 62 (join)
+
+
+olek 197
+
+   63 join: LEFT . JOIN
+   66 outerType: LEFT .  [OUTER]
+
+    JOIN  nihuta ja liigu olekule 227
+
+    $default  redutseerin kasutades reeglit 66 (outerType)
+
+
+olek 198
+
+   68 outerType: FULL .
+
+    $default  redutseerin kasutades reeglit 68 (outerType)
+
+
+olek 199
+
+   61 table: table join . alias ON condition
+   69 alias: . tableExpr
+   70      | . tableExpr ID
+   71 tableExpr: . ident
+   72          | . TABLE '(' simpleExpr ')'
+   73          | . '(' select ')'
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+
+    TABLE  nihuta ja liigu olekule 19
+    ID     nihuta ja liigu olekule 20
+    '('    nihuta ja liigu olekule 21
+
+    alias      liigu olekule 228
+    tableExpr  liigu olekule 23
+    ident      liigu olekule 24
+
+
+olek 200
+
+   64 join: outerType . OUTER JOIN
+
+    OUTER  nihuta ja liigu olekule 229
+
+
+olek 201
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+  135 simExList: simExList ',' . simpleExpr
+
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 230
+
+
+olek 202
+
+  126 identRest: '(' simExList ')' .
+
+    $default  redutseerin kasutades reeglit 126 (identRest)
+
+
+olek 203
+
+  136 partition: '(' PARTITION . BY ident orderBy ')'
+
+    BY  nihuta ja liigu olekule 231
+
+
+olek 204
+
+   88 condition: simpleExpr IS optNot NULL .
+
+    $default  redutseerin kasutades reeglit 88 (condition)
+
+
+olek 205
+
+   24 select: select . UNION select
+   85 condition: simpleExpr inExpr '(' select . ')'
+
+    UNION  nihuta ja liigu olekule 27
+    ')'    nihuta ja liigu olekule 232
+
+
+olek 206
+
+   84 condition: simpleExpr inExpr '(' simExList . ')'
+  135 simExList: simExList . ',' simpleExpr
+
+    ','  nihuta ja liigu olekule 201
+    ')'  nihuta ja liigu olekule 233
+
+
+olek 207
+
+   91 condition: simpleExpr optNot BETWEEN simpleExpr . AND simpleExpr
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    nihuta ja liigu olekule 91
+    AND     nihuta ja liigu olekule 234
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
+
+
+olek 208
+
+   89 condition: simpleExpr optNot LIKE simpleExpr . escape
+  100 escape: . ESCAPE STRING_SQ
+  101       | .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, AND, XOR, FOR, AS, ID, ',', ')']
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    ESCAPE  nihuta ja liigu olekule 235
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
+
+    $default  redutseerin kasutades reeglit 101 (escape)
+
+    escape  liigu olekule 236
+
+
+olek 209
+
+   20 idList: idList ',' . ID
+
+    ID  nihuta ja liigu olekule 237
+
+
+olek 210
+
+   18 optIdList: '(' idList ')' .
+
+    $default  redutseerin kasutades reeglit 18 (optIdList)
+
+
+olek 211
+
+   15 insertRest: VALUES identRest .
+
+    $default  redutseerin kasutades reeglit 15 (insertRest)
+
+
+olek 212
+
+   76 ident: ID '.' ID '.' ID .
+
+    $default  redutseerin kasutades reeglit 76 (ident)
+
+
+olek 213
+
+   10 assign: '(' idList ')' . '=' simpleExpr
+
+    '='  nihuta ja liigu olekule 238
+
+
+olek 214
+
+    8 assignList: assignList ',' assign .
+
+    $default  redutseerin kasutades reeglit 8 (assignList)
+
+
+olek 215
+
+    9 assign: ident '=' simpleExpr .  [$end, WHERE, ',']
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
+
+    $default  redutseerin kasutades reeglit 9 (assign)
+
+
+olek 216
+
+   42 directionList: directionList ',' . direction
+   43 direction: . simpleExpr orderDirection
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
+
+    direction   liigu olekule 239
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 181
+
+
+olek 217
+
+   45 orderDirection: DESC .
+
+    $default  redutseerin kasutades reeglit 45 (orderDirection)
+
+
+olek 218
+
+   44 orderDirection: ASC .
+
+    $default  redutseerin kasutades reeglit 44 (orderDirection)
+
+
+olek 219
+
+   43 direction: simpleExpr orderDirection .
+
+    $default  redutseerin kasutades reeglit 43 (direction)
+
+
+olek 220
+
+   33 having: HAVING . condition
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   78 condition: . condition AND condition
+   79          | . condition OR condition
+   80          | . condition XOR condition
+   81          | . NOT condition
+   82          | . '(' condition ')'
+   83          | . comparison
+   84          | . simpleExpr inExpr '(' simExList ')'
+   85          | . simpleExpr inExpr '(' select ')'
+   86          | . '(' idList2 ')' inExpr '(' simExList ')'
+   87          | . '(' idList2 ')' inExpr '(' select ')'
+   88          | . simpleExpr IS optNot NULL
+   89          | . simpleExpr optNot LIKE simpleExpr escape
+   90          | . EXISTS '(' select ')'
+   91          | . simpleExpr optNot BETWEEN simpleExpr AND simpleExpr
+   94 comparison: . simpleExpr '=' simpleExpr
+   95           | . simpleExpr '>' simpleExpr
+   96           | . simpleExpr '<' simpleExpr
+   97           | . simpleExpr LE simpleExpr
+   98           | . simpleExpr NE simpleExpr
+   99           | . simpleExpr GE simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    EXISTS     nihuta ja liigu olekule 30
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    NOT        nihuta ja liigu olekule 34
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 40
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    condition   liigu olekule 240
+    comparison  liigu olekule 48
+    simpleExpr  liigu olekule 61
+
+
+olek 221
+
+   30 groupBy: GROUP BY simExList having .
+
+    $default  redutseerin kasutades reeglit 30 (groupBy)
+
+
+olek 222
+
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+  130 when: WHEN condition THEN simpleExpr .  [WHEN, ELSE, END]
+
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
+
+    $default  redutseerin kasutades reeglit 130 (when)
+
+
+olek 223
+
+  118 simpleExpr: CAST '(' simpleExpr AS ID . optSize ')'
+  124 optSize: .  [')']
+  125        | . '(' NUMBER ')'
+
+    '('  nihuta ja liigu olekule 241
+
+    $default  redutseerin kasutades reeglit 124 (optSize)
+
+    optSize  liigu olekule 242
+
+
+olek 224
+
+   23 select: . basicSelect where byClauses forUpdate
+   24       | . select UNION select
+   25 basicSelect: . SELECT optDist whatToSelect FROM tableList
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   86 condition: '(' idList2 ')' inExpr '(' . simExList ')'
+   87          | '(' idList2 ')' inExpr '(' . select ')'
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+  133 simExList: .  [',', ')']
+  134          | . simpleExpr
+  135          | . simExList ',' simpleExpr
+
+    SELECT     nihuta ja liigu olekule 1
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
+
+    $default  redutseerin kasutades reeglit 133 (simExList)
+
+    select       liigu olekule 243
+    basicSelect  liigu olekule 13
+    ident        liigu olekule 46
+    simpleExpr   liigu olekule 145
+    simExList    liigu olekule 244
+
+
+olek 225
+
+   59 tableList: tableList ',' table .  [$end, WHERE, ORDER, GROUP, UNION, FOR, ',', ')']
+   61 table: table . join alias ON condition
+   62 join: . JOIN
+   63     | . LEFT JOIN
+   64     | . outerType OUTER JOIN
+   65     | . INNER JOIN
+   66 outerType: . LEFT
+   67          | . RIGHT
+   68          | . FULL
+
+    RIGHT  nihuta ja liigu olekule 194
+    INNER  nihuta ja liigu olekule 195
+    JOIN   nihuta ja liigu olekule 196
+    LEFT   nihuta ja liigu olekule 197
+    FULL   nihuta ja liigu olekule 198
+
+    $default  redutseerin kasutades reeglit 59 (tableList)
+
+    join       liigu olekule 199
+    outerType  liigu olekule 200
+
+
+olek 226
+
+   65 join: INNER JOIN .
+
+    $default  redutseerin kasutades reeglit 65 (join)
+
+
+olek 227
+
+   63 join: LEFT JOIN .
+
+    $default  redutseerin kasutades reeglit 63 (join)
+
+
+olek 228
+
+   61 table: table join alias . ON condition
+
+    ON  nihuta ja liigu olekule 245
+
+
+olek 229
+
+   64 join: outerType OUTER . JOIN
+
+    JOIN  nihuta ja liigu olekule 246
+
+
+olek 230
+
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+  135 simExList: simExList ',' simpleExpr .  [$end, HAVING, ORDER, UNION, FOR, ',', ')']
+
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
+
+    $default  redutseerin kasutades reeglit 135 (simExList)
+
+
+olek 231
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  136 partition: '(' PARTITION BY . ident orderBy ')'
+
+    ID  nihuta ja liigu olekule 20
+
+    ident  liigu olekule 247
+
+
+olek 232
+
+   85 condition: simpleExpr inExpr '(' select ')' .
+
+    $default  redutseerin kasutades reeglit 85 (condition)
+
+
+olek 233
+
+   84 condition: simpleExpr inExpr '(' simExList ')' .
+
+    $default  redutseerin kasutades reeglit 84 (condition)
+
+
+olek 234
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   91 condition: simpleExpr optNot BETWEEN simpleExpr AND . simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 248
+
+
+olek 235
+
+  100 escape: ESCAPE . STRING_SQ
+
+    STRING_SQ  nihuta ja liigu olekule 249
+
+
+olek 236
+
+   89 condition: simpleExpr optNot LIKE simpleExpr escape .
+
+    $default  redutseerin kasutades reeglit 89 (condition)
+
+
+olek 237
+
+   20 idList: idList ',' ID .
+
+    $default  redutseerin kasutades reeglit 20 (idList)
+
+
+olek 238
+
+   10 assign: '(' idList ')' '=' . simpleExpr
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 250
+
+
+olek 239
+
+   42 directionList: directionList ',' direction .
+
+    $default  redutseerin kasutades reeglit 42 (directionList)
+
+
+olek 240
+
+   33 having: HAVING condition .  [$end, ORDER, UNION, FOR, ')']
+   78 condition: condition . AND condition
+   79          | condition . OR condition
+   80          | condition . XOR condition
+
+    OR   nihuta ja liigu olekule 88
+    AND  nihuta ja liigu olekule 89
+    XOR  nihuta ja liigu olekule 90
+
+    $default  redutseerin kasutades reeglit 33 (having)
+
+
+olek 241
+
+  125 optSize: '(' . NUMBER ')'
+
+    NUMBER  nihuta ja liigu olekule 251
+
+
+olek 242
+
+  118 simpleExpr: CAST '(' simpleExpr AS ID optSize . ')'
+
+    ')'  nihuta ja liigu olekule 252
+
+
+olek 243
+
+   24 select: select . UNION select
+   87 condition: '(' idList2 ')' inExpr '(' select . ')'
+
+    UNION  nihuta ja liigu olekule 27
+    ')'    nihuta ja liigu olekule 253
+
+
+olek 244
+
+   86 condition: '(' idList2 ')' inExpr '(' simExList . ')'
+  135 simExList: simExList . ',' simpleExpr
+
+    ','  nihuta ja liigu olekule 201
+    ')'  nihuta ja liigu olekule 254
+
+
+olek 245
+
+   61 table: table join alias ON . condition
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   78 condition: . condition AND condition
+   79          | . condition OR condition
+   80          | . condition XOR condition
+   81          | . NOT condition
+   82          | . '(' condition ')'
+   83          | . comparison
+   84          | . simpleExpr inExpr '(' simExList ')'
+   85          | . simpleExpr inExpr '(' select ')'
+   86          | . '(' idList2 ')' inExpr '(' simExList ')'
+   87          | . '(' idList2 ')' inExpr '(' select ')'
+   88          | . simpleExpr IS optNot NULL
+   89          | . simpleExpr optNot LIKE simpleExpr escape
+   90          | . EXISTS '(' select ')'
+   91          | . simpleExpr optNot BETWEEN simpleExpr AND simpleExpr
+   94 comparison: . simpleExpr '=' simpleExpr
+   95           | . simpleExpr '>' simpleExpr
+   96           | . simpleExpr '<' simpleExpr
+   97           | . simpleExpr LE simpleExpr
+   98           | . simpleExpr NE simpleExpr
+   99           | . simpleExpr GE simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    EXISTS     nihuta ja liigu olekule 30
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    NOT        nihuta ja liigu olekule 34
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 40
+    '?'        nihuta ja liigu olekule 41
+
+    ident       liigu olekule 46
+    condition   liigu olekule 255
+    comparison  liigu olekule 48
+    simpleExpr  liigu olekule 61
+
+
+olek 246
+
+   64 join: outerType OUTER JOIN .
+
+    $default  redutseerin kasutades reeglit 64 (join)
+
+
+olek 247
+
+   35 orderBy: . ORDER BY directionList
+  136 partition: '(' PARTITION BY ident . orderBy ')'
+
+    ORDER  nihuta ja liigu olekule 62
+
+    orderBy  liigu olekule 256
+
+
+olek 248
+
+   91 condition: simpleExpr optNot BETWEEN simpleExpr AND simpleExpr .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, AND, XOR, FOR, AS, ID, ',', ')']
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
+
+    $default  redutseerin kasutades reeglit 91 (condition)
+
+
+olek 249
+
+  100 escape: ESCAPE STRING_SQ .
+
+    $default  redutseerin kasutades reeglit 100 (escape)
+
+
+olek 250
+
+   10 assign: '(' idList ')' '=' simpleExpr .  [$end, WHERE, ',']
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
+
+    $default  redutseerin kasutades reeglit 10 (assign)
+
+
+olek 251
+
+  125 optSize: '(' NUMBER . ')'
+
+    ')'  nihuta ja liigu olekule 257
+
+
+olek 252
+
+  118 simpleExpr: CAST '(' simpleExpr AS ID optSize ')' .
+
+    $default  redutseerin kasutades reeglit 118 (simpleExpr)
+
+
+olek 253
+
+   87 condition: '(' idList2 ')' inExpr '(' select ')' .
+
+    $default  redutseerin kasutades reeglit 87 (condition)
+
+
+olek 254
+
+   86 condition: '(' idList2 ')' inExpr '(' simExList ')' .
+
+    $default  redutseerin kasutades reeglit 86 (condition)
+
+
+olek 255
+
+   61 table: table join alias ON condition .  [$end, WHERE, ORDER, GROUP, RIGHT, INNER, UNION, JOIN, LEFT, FULL, FOR, ',', ')']
+   78 condition: condition . AND condition
+   79          | condition . OR condition
+   80          | condition . XOR condition
+
+    OR   nihuta ja liigu olekule 88
+    AND  nihuta ja liigu olekule 89
+    XOR  nihuta ja liigu olekule 90
+
+    $default  redutseerin kasutades reeglit 61 (table)
+
+
+olek 256
+
+  136 partition: '(' PARTITION BY ident orderBy . ')'
+
+    ')'  nihuta ja liigu olekule 258
+
+
+olek 257
+
+  125 optSize: '(' NUMBER ')' .
+
+    $default  redutseerin kasutades reeglit 125 (optSize)
+
+
+olek 258
+
+  136 partition: '(' PARTITION BY ident orderBy ')' .
+
+    $default  redutseerin kasutades reeglit 136 (partition)
