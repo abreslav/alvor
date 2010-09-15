@@ -4,18 +4,15 @@ import java.io.FileNotFoundException;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
 import org.junit.Test;
 
 public class GuiTestEArved extends GUITest {
-	IJavaElement element = null;
-	
-	public GuiTestEArved() {
-		setProject("earved");
-		element = GUITest.getSourceFolder(this.javaProject, "src");
-	}
 	
 	@Test
-	public void testStringsAndMarkers() throws FileNotFoundException {
+	public void testStringsAndMarkers() throws FileNotFoundException, CoreException {
+		IJavaProject javaProject = GUITest.getJavaProject("earved"); 
+		IJavaElement element = GUITest.getSourceFolder(javaProject, "src");
 		testAbstractStringsClean(element);
 		writeAndTestMarkers(element, GuiChecker.ERROR_MARKER_ID, "errors", true);
 		writeAndTestMarkers(element, GuiChecker.WARNING_MARKER_ID, "warnings", true);

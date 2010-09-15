@@ -40,30 +40,39 @@ import org.eclipse.jdt.core.JavaModelException;
 
 import com.zeroturnaround.alvor.checkers.INodeDescriptor;
 import com.zeroturnaround.alvor.checkers.IStringNodeDescriptor;
-import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
 import com.zeroturnaround.alvor.crawler.PositionUtil;
 import com.zeroturnaround.alvor.crawler.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.samplegen.SampleGenerator;
 
 public abstract class GUITest {
-	IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-	IProject project = null; // to be set in constructor
-	IJavaProject javaProject = null; // to be set in constructor
 	GuiChecker checker = new GuiChecker();
 	
-	protected void setProject(String projectName) {
-		this.project = root.getProject(projectName);
-		
-		try {
-			if (!project.isOpen()) {
-				project.open(null);
-			}
-			
-			this.javaProject = (IJavaProject)project.getNature(JavaCore.NATURE_ID);
-		} catch (CoreException e) {
-			throw new IllegalStateException(e);
+//	protected void setProject(String projectName) {
+//		this.project = root.getProject(projectName);
+//		
+//		try {
+//			if (!project.isOpen()) {
+//				project.open(null);
+//			}
+//			
+//			this.javaProject = (IJavaProject)project.getNature(JavaCore.NATURE_ID);
+//		} catch (CoreException e) {
+//			throw new IllegalStateException(e);
+//		}
+//	}
+	
+	protected static IProject getProject(String projectName) throws CoreException {
+		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+		IProject project = root.getProject(projectName);
+		if (!project.isOpen()) {
+			project.open(null);
 		}
+		return project;
+	}
+	
+	protected static IJavaProject getJavaProject(String projectName) throws CoreException {
+		return (IJavaProject)GUITest.getProject(projectName).getNature(JavaCore.NATURE_ID);
 	}
 	
 	protected void testAbstractStringsClean(IJavaElement element) throws FileNotFoundException {
@@ -74,7 +83,7 @@ public abstract class GUITest {
 	/*
 	 * Make dummy change in a file and check that resulting markers are same
 	 */
-	protected void makeDummyChange(String filename) throws CoreException, FileNotFoundException {
+	protected void makeDummyChange(IProject project, String filename) throws CoreException {
 		IResource res = project.findMember(filename); 
 		res.touch(null);
 	}
@@ -143,7 +152,7 @@ public abstract class GUITest {
 	
 	private void writeAndCompare(List<String> items, String testId) throws FileNotFoundException {
 		
-		String filePrefix = "results/" + testId;
+		String filePrefix = "results/" + getWorkspaceName() + "_" + testId;
 		File outFile = new File(filePrefix + "_found.txt");
 		if (outFile.exists()) {
 			outFile.delete();
@@ -172,5 +181,9 @@ public abstract class GUITest {
 		}
 		
 		return true;
+	}
+	
+	public String getWorkspaceName() {
+		return ResourcesPlugin.getWorkspace().getRoot().getLocation().toFile().getName();
 	}
 }
