@@ -158,7 +158,8 @@ public class AlvorPropertiesEditor extends FormEditor {
 		private void setProperty(String key, String value) {
 			Properties props = loadProps();
 			
-			if (! props.getProperty(key).equals(value)) {
+			// If the property doesn't exist, this will return null
+			if (! value.equals(props.getProperty(key))) {
 				props.setProperty(key, value);
 				saveProps(props);
 			}
