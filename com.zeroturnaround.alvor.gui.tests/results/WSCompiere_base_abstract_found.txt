@@ -5,7 +5,7 @@
 /base/src/org/compiere/impexp/ImpFormat.java:100, "SELECT t.TableName,c.ColumnName " "FROM AD_Table t INNER JOIN AD_Column c ON (t.AD_Table_ID=c.AD_Table_ID AND c.IsKey='Y') " "WHERE t.AD_Table_ID=?" 
 /base/src/org/compiere/impexp/ImpFormat.java:255, "SELECT * FROM AD_ImpFormat WHERE Name=?"
 /base/src/org/compiere/impexp/ImpFormat.java:289, "SELECT f.SeqNo,c.ColumnName,f.StartNo,f.EndNo,f.DataType,c.FieldLength," "f.DataFormat,f.DecimalPoint,f.DivideBy100,f.ConstantValue,f.Callout " "FROM AD_ImpFormat_Row f,AD_Column c " "WHERE f.AD_ImpFormat_ID=? AND f.AD_Column_ID=c.AD_Column_ID AND f.IsActive='Y'" "ORDER BY f.SeqNo" 
-/base/src/org/compiere/impexp/ImpFormat.java:541, unsupported: Non-final fields are not supported
+/base/src/org/compiere/impexp/ImpFormat.java:541, unsupported: Non-final fields are not supported: ImpFormat.m_tablePK
 /base/src/org/compiere/impexp/MImpFormat.java:76, "SELECT * FROM AD_ImpFormat_Row " "WHERE AD_ImpFormat_ID=? " "ORDER BY SeqNo" 
 /base/src/org/compiere/model/CalloutAssignment.java:72, "SELECT p.M_Product_ID, ra.Name, ra.Description, ra.Qty " "FROM S_ResourceAssignment ra" " INNER JOIN M_Product p ON (p.S_Resource_ID=ra.S_Resource_ID) " "WHERE ra.S_ResourceAssignment_ID=?" 
 /base/src/org/compiere/model/CalloutBankStatement.java:133, "SELECT PayAmt FROM C_Payment_v WHERE C_Payment_ID=?"
@@ -40,7 +40,7 @@
 /base/src/org/compiere/model/CalloutRequest.java:101, "SELECT Name, ResponseText FROM R_StandardResponse " "WHERE R_StandardResponse_ID=?" 
 /base/src/org/compiere/model/CalloutTimeExpense.java:78, "SELECT bomPriceStd(p.M_Product_ID,pv.M_PriceList_Version_ID) AS PriceStd," "bomPriceList(p.M_Product_ID,pv.M_PriceList_Version_ID) AS PriceList," "bomPriceLimit(p.M_Product_ID,pv.M_PriceList_Version_ID) AS PriceLimit," "p.C_UOM_ID,pv.ValidFrom,pl.C_Currency_ID " "FROM M_Product p, M_ProductPrice pp, M_PriceList pl, M_PriceList_Version pv " "WHERE p.M_Product_ID=pp.M_Product_ID" " AND pp.M_PriceList_Version_ID=pv.M_PriceList_Version_ID" " AND pv.M_PriceList_ID=pl.M_PriceList_ID" " AND pv.IsActive='Y'" " AND p.M_Product_ID=?" " AND pl.M_PriceList_ID=?" " ORDER BY pv.ValidFrom DESC" 
 /base/src/org/compiere/model/CalloutTimeExpense.java:123, "SELECT bomPriceStd(p.M_Product_ID,pv.M_PriceList_Version_ID) AS PriceStd," "bomPriceList(p.M_Product_ID,pv.M_PriceList_Version_ID) AS PriceList," "bomPriceLimit(p.M_Product_ID,pv.M_PriceList_Version_ID) AS PriceLimit," "p.C_UOM_ID,pv.ValidFrom,pl.C_Currency_ID " "FROM M_Product p, M_ProductPrice pp, M_PriceList pl, M_PriceList bpl, M_PriceList_Version pv " "WHERE p.M_Product_ID=pp.M_Product_ID" " AND pp.M_PriceList_Version_ID=pv.M_PriceList_Version_ID" " AND pv.M_PriceList_ID=bpl.M_PriceList_ID" " AND pv.IsActive='Y'" " AND bpl.M_PriceList_ID=pl.BasePriceList_ID" " AND p.M_Product_ID=?" " AND pl.M_PriceList_ID=?" " ORDER BY pv.ValidFrom DESC" 
-/base/src/org/compiere/model/GridField.java:547, unsupported: unsupported modification scheme in loop
+/base/src/org/compiere/model/GridField.java:547, unsupported: Unsupported modification scheme in loop
 /base/src/org/compiere/model/GridField.java:1585, unsupported: Analysis level (5) too deep
 /base/src/org/compiere/model/GridTab.java:645, "SELECT cc.ColumnName " "FROM AD_Column c" " INNER JOIN AD_Ref_Table r ON (c.AD_Reference_Value_ID=r.AD_Reference_ID)" " INNER JOIN AD_Column cc ON (r.Column_Key_ID=cc.AD_Column_ID) " "WHERE c.AD_Reference_ID IN (18,30)" " AND c.ColumnName=?" 
 /base/src/org/compiere/model/GridTab.java:683, "SELECT t.TableName " "FROM AD_Column c" " INNER JOIN AD_Table t ON (c.AD_Table_ID=t.AD_Table_ID) " "WHERE c.ColumnName=? AND IsKey='Y'" " AND EXISTS (SELECT * FROM AD_Column cc" " WHERE cc.AD_Table_ID=t.AD_Table_ID AND cc.ColumnName=?)" 
@@ -51,13 +51,13 @@
 /base/src/org/compiere/model/GridTab.java:1621, "SELECT AD_Attachment_ID, Record_ID FROM AD_Attachment " "WHERE AD_Table_ID=?" 
 /base/src/org/compiere/model/GridTab.java:1705, "SELECT CM_Chat_ID, Record_ID FROM CM_Chat " "WHERE AD_Table_ID=?" 
 /base/src/org/compiere/model/GridTab.java:1779, "SELECT Record_ID " "FROM AD_Private_Access " "WHERE AD_User_ID=? AND AD_Table_ID=? AND IsActive='Y' " "ORDER BY Record_ID" 
-/base/src/org/compiere/model/GridTable.java:1222, unsupported: unsupported modification scheme in loop
-/base/src/org/compiere/model/GridTable.java:1695, unsupported: Non-final fields are not supported
-/base/src/org/compiere/model/GridTable.java:1859, unsupported: Non-final fields are not supported
-/base/src/org/compiere/model/GridTable.java:2338, unsupported: Non-final fields are not supported
-/base/src/org/compiere/model/GridTable.java:2466, unsupported: Non-final fields are not supported
-/base/src/org/compiere/model/GridTable.java:2975, unsupported: Non-final fields are not supported
-/base/src/org/compiere/model/GridTable.java:3000, unsupported: Non-final fields are not supported
+/base/src/org/compiere/model/GridTable.java:1222, unsupported: Unsupported modification scheme in loop
+/base/src/org/compiere/model/GridTable.java:1695, unsupported: Non-final fields are not supported: GridTable.m_SQL_Select
+/base/src/org/compiere/model/GridTable.java:1859, unsupported: Non-final fields are not supported: GridTable.m_SQL_Select
+/base/src/org/compiere/model/GridTable.java:2338, unsupported: Non-final fields are not supported: GridTable.m_tableName
+/base/src/org/compiere/model/GridTable.java:2466, unsupported: Non-final fields are not supported: GridTable.m_SQL_Select
+/base/src/org/compiere/model/GridTable.java:2975, unsupported: Non-final fields are not supported: GridTable.m_SQL_Count
+/base/src/org/compiere/model/GridTable.java:3000, unsupported: Non-final fields are not supported: GridTable.m_SQL
 /base/src/org/compiere/model/GridWindow.java:489, "SELECT MAX(w.Updated), MAX(t.Updated), MAX(tt.Updated), MAX(f.Updated), MAX(c.Updated) " "FROM AD_Window w" " INNER JOIN AD_Tab t ON (w.AD_Window_ID=t.AD_Window_ID)" " INNER JOIN AD_Table tt ON (t.AD_Table_ID=tt.AD_Table_ID)" " INNER JOIN AD_Field f ON (t.AD_Tab_ID=f.AD_Tab_ID)" " INNER JOIN AD_Column c ON (f.AD_Column_ID=c.AD_Column_ID) " "WHERE w.AD_Window_ID=?" 
 /base/src/org/compiere/model/GridWorkbench.java:112, unsupported: Analysis level (5) too deep
 /base/src/org/compiere/model/GridWorkbench.java:269, "SELECT AD_Window_ID, AD_Form_ID, AD_Process_ID, AD_Task_ID " "FROM AD_WorkbenchWindow " "WHERE AD_Workbench_ID=? AND IsActive='Y'" "ORDER BY SeqNo" 
@@ -248,10 +248,10 @@
 /base/src/org/compiere/model/MMatchPO.java:695, "SELECT i.DateAcct " "FROM C_InvoiceLine il" " INNER JOIN C_Invoice i ON (i.C_Invoice_ID=il.C_Invoice_ID) " "WHERE C_InvoiceLine_ID=?" 
 /base/src/org/compiere/model/MMatchPO.java:718, "SELECT io.DateAcct " "FROM M_InOutLine iol" " INNER JOIN M_InOut io ON (io.M_InOut_ID=iol.M_InOut_ID) " "WHERE iol.M_InOutLine_ID=?" 
 /base/src/org/compiere/model/MMatchPO.java:847, "SELECT * FROM M_MatchPO po " "WHERE EXISTS (SELECT 1 FROM M_MatchPO x " "WHERE po.C_OrderLine_ID=x.C_OrderLine_ID AND po.Qty=x.Qty " "GROUP BY C_OrderLine_ID, Qty " "HAVING COUNT(*) = 2) " " AND AD_Client_ID=?" "ORDER BY C_OrderLine_ID, M_InOutLine_ID" 
-/base/src/org/compiere/model/MMeasure.java:274, unsupported: unsupported modification scheme in loop
-/base/src/org/compiere/model/MMeasure.java:351, unsupported: unsupported modification scheme in loop
-/base/src/org/compiere/model/MMeasure.java:417, unsupported: unsupported modification scheme in loop
-/base/src/org/compiere/model/MMeasureCalc.java:261, unsupported: unsupported modification scheme in loop
+/base/src/org/compiere/model/MMeasure.java:274, unsupported: Unsupported modification scheme in loop
+/base/src/org/compiere/model/MMeasure.java:351, unsupported: Unsupported modification scheme in loop
+/base/src/org/compiere/model/MMeasure.java:417, unsupported: Unsupported modification scheme in loop
+/base/src/org/compiere/model/MMeasureCalc.java:261, unsupported: Unsupported modification scheme in loop
 /base/src/org/compiere/model/MMedia.java:51, "SELECT * FROM CM_Media WHERE CM_WebProject_ID=? ORDER BY CM_Media_ID"
 /base/src/org/compiere/model/MMedia.java:127, "SELECT CMM.* FROM CM_Media CMM, CM_MediaDeploy CMMD WHERE " "CMM.CM_Media_ID = CMMD.CM_Media_ID AND " "CMMD.CM_Media_Server_ID = ? AND " "CMMD.IsDeployed='N' " "ORDER BY CMM.CM_Media_ID" 
 /base/src/org/compiere/model/MMedia.java:173, "SELECT * FROM CM_Media WHERE (LOWER(Name) LIKE ?) AND CM_WebProject_ID=?"
@@ -497,7 +497,7 @@
 /base/src/org/compiere/process/ImportReportLine.java:377, "SELECT I_ReportLine_ID, PA_ReportSource_ID " "FROM I_ReportLine " "WHERE PA_ReportLine_ID IS NOT NULL" " AND I_IsImported='N'"  " AND AD_Client_ID=" [0123456789]  
 /base/src/org/compiere/process/ImportReportLine.java:419, "UPDATE PA_ReportSource " "SET (ElementType,C_ElementValue_ID,Updated,UpdatedBy)=" " (SELECT CAST('AC' AS CHAR(2)),C_ElementValue_ID,SysDate,UpdatedBy" " FROM I_ReportLine" " WHERE I_ReportLine_ID="  ([0123456789])+ ") " "WHERE PA_ReportSource_ID=" ([0123456789])+ " " " AND AD_Client_ID=" [0123456789]  
 /base/src/org/compiere/process/ImportRequest.java:829, "SELECT * FROM I_Request " "WHERE I_IsImported='N'"  " AND AD_Client_ID=" ([0123456789])+   " ORDER BY DocumentNo, I_Request_ID" 
-/base/src/org/compiere/process/InOutGenerate.java:161, unsupported: Non-final fields are not supported
+/base/src/org/compiere/process/InOutGenerate.java:161, unsupported: Non-final fields are not supported: InOutGenerate.m_sql
 /base/src/org/compiere/process/InventoryCountCreate.java:186, "SELECT s.M_Product_ID, s.M_Locator_ID, s.M_AttributeSetInstance_ID," " s.QtyOnHand, p.M_AttributeSet_ID " "FROM M_Product p" " INNER JOIN M_Storage s ON (s.M_Product_ID=p.M_Product_ID)" " INNER JOIN M_Locator l ON (s.M_Locator_ID=l.M_Locator_ID) " "WHERE l.M_Warehouse_ID=?" " AND p.IsActive='Y' AND p.IsStocked='Y' and p.ProductType='I'"  {" AND s.M_Locator_ID=?", ""}  {" AND UPPER(l.Value) LIKE ?", ""}  {" AND UPPER(p.Value) LIKE ?", ""}  {" AND p.M_Product_Category_ID=?", ""}  {" AND NOT EXISTS (SELECT * FROM M_InventoryLine il " "WHERE il.M_Inventory_ID=?" " AND il.M_Product_ID=s.M_Product_ID" " AND il.M_Locator_ID=s.M_Locator_ID" " AND COALESCE(il.M_AttributeSetInstance_ID,0)=COALESCE(s.M_AttributeSetInstance_ID,0))" , ""}  " ORDER BY l.Value, p.Value, s.QtyOnHand DESC" 
 /base/src/org/compiere/process/InventoryCountUpdate.java:151, "SELECT * FROM M_InventoryLine WHERE M_Inventory_ID=? AND COALESCE(M_AttributeSetInstance_ID,0)=0 "
 /base/src/org/compiere/process/InvoiceGenerate.java:166, {"SELECT * FROM C_Order " "WHERE IsSelected='Y' AND DocStatus IN('CO','CL') AND IsSOTrx='Y' " "ORDER BY M_Warehouse_ID, PriorityRule, C_BPartner_ID, Bill_Location_ID, C_PaymentTerm_ID, C_Order_ID" , "SELECT * FROM C_Order o " "WHERE DocStatus IN('CO','CL') AND IsSOTrx='Y'"  {" AND AD_Org_ID=?", ""}  {" AND C_BPartner_ID=?", ""}  {" AND C_Order_ID=?", ""}  {" AND TRUNC(DateOrdered,'DD') >= ?", ""}  {" AND TRUNC(DateOrdered,'DD') <= ?", ""}  {" AND AD_User_ID=?", ""}  " AND EXISTS (SELECT * FROM C_OrderLine ol " "WHERE o.C_Order_ID=ol.C_Order_ID AND ol.QtyOrdered<>ol.QtyInvoiced) " "ORDER BY M_Warehouse_ID, PriorityRule, C_BPartner_ID, Bill_Location_ID, C_PaymentTerm_ID, C_Order_ID"  }
@@ -506,10 +506,10 @@
 /base/src/org/compiere/process/MergeProcess.java:141, unsupported: String/Builder/Buffer, method=substring
 /base/src/org/compiere/process/MergeProcess.java:165, unsupported: String/Builder/Buffer, method=substring
 /base/src/org/compiere/process/MergeProcess.java:227, "SELECT t.TableName, c.ColumnName " "FROM AD_Table t" " INNER JOIN AD_Column c ON (t.AD_Table_ID=c.AD_Table_ID) " "WHERE t.IsView='N'" " AND c.ColumnSQL IS NULL " " AND t.TableName NOT IN ('C_TaxDeclarationAcct')" " AND (" "(c.ColumnName=? AND c.IsKey='N')" " OR " "c.AD_Reference_Value_ID IN " "(SELECT rt.AD_Reference_ID FROM AD_Ref_Table rt" " INNER JOIN AD_Column cc ON (rt.AD_Table_ID=cc.AD_Table_ID AND rt.Column_Key_ID=cc.AD_Column_ID) " "WHERE cc.IsKey='Y' AND cc.ColumnName=?)" ") " "ORDER BY t.LoadSeq DESC" 
-/base/src/org/compiere/process/OrderBatchProcess.java:110, unsupported: Non-final fields are not supported
+/base/src/org/compiere/process/OrderBatchProcess.java:110, unsupported: Non-final fields are not supported: OrderBatchProcess.p_IsSelfService
 /base/src/org/compiere/process/OrderPOCreate.java:122, {"SELECT * FROM C_Order o " "WHERE o.IsSOTrx='Y'" " AND NOT EXISTS (SELECT * FROM C_OrderLine ol WHERE o.C_Order_ID=ol.C_Order_ID AND ol.Ref_OrderLine_ID IS NOT NULL)"  " AND o.C_Order_ID=?" , {"SELECT * FROM C_Order o " "WHERE o.IsSOTrx='Y'" " AND NOT EXISTS (SELECT * FROM C_OrderLine ol WHERE o.C_Order_ID=ol.C_Order_ID AND ol.Ref_OrderLine_ID IS NOT NULL)"  {" AND o.C_BPartner_ID=?", ""}  {" AND o.IsDropShip=?", ""}  {" AND EXISTS (SELECT * FROM C_OrderLine ol" " INNER JOIN M_Product_PO po ON (ol.M_Product_ID=po.M_Product_ID) " "WHERE o.C_Order_ID=ol.C_Order_ID AND po.C_BPartner_ID=?)" , ""}  "AND TRUNC(o.DateOrdered,'DD') BETWEEN ? AND ?" , {"SELECT * FROM C_Order o " "WHERE o.IsSOTrx='Y'" " AND NOT EXISTS (SELECT * FROM C_OrderLine ol WHERE o.C_Order_ID=ol.C_Order_ID AND ol.Ref_OrderLine_ID IS NOT NULL)"  {" AND o.C_BPartner_ID=?", ""}  {" AND o.IsDropShip=?", ""}  {" AND EXISTS (SELECT * FROM C_OrderLine ol" " INNER JOIN M_Product_PO po ON (ol.M_Product_ID=po.M_Product_ID) " "WHERE o.C_Order_ID=ol.C_Order_ID AND po.C_BPartner_ID=?)" , ""}  "AND TRUNC(o.DateOrdered,'DD') >= ?" , "SELECT * FROM C_Order o " "WHERE o.IsSOTrx='Y'" " AND NOT EXISTS (SELECT * FROM C_OrderLine ol WHERE o.C_Order_ID=ol.C_Order_ID AND ol.Ref_OrderLine_ID IS NOT NULL)"  {" AND o.C_BPartner_ID=?", ""}  {" AND o.IsDropShip=?", ""}  {" AND EXISTS (SELECT * FROM C_OrderLine ol" " INNER JOIN M_Product_PO po ON (ol.M_Product_ID=po.M_Product_ID) " "WHERE o.C_Order_ID=ol.C_Order_ID AND po.C_BPartner_ID=?)" , ""}  {"AND TRUNC(o.DateOrdered,'DD') <= ?", ""} }}}
 /base/src/org/compiere/process/OrderPOCreate.java:198, "SELECT DISTINCT po.C_BPartner_ID, po.M_Product_ID " "FROM M_Product_PO po" " INNER JOIN C_OrderLine ol ON (po.M_Product_ID=ol.M_Product_ID) " "WHERE ol.C_Order_ID=? AND po.IsCurrentVendor='Y' " "ORDER BY 1" 
-/base/src/org/compiere/process/PaySelectionCreateFrom.java:211, unsupported: unsupported modification scheme in loop
+/base/src/org/compiere/process/PaySelectionCreateFrom.java:211, unsupported: Unsupported modification scheme in loop
 /base/src/org/compiere/process/PriceListCreate.java:127, "SELECT * FROM M_Product_PO po " "WHERE IsCurrentVendor='Y' AND IsActive='Y'"  " AND AD_Client_ID=" ([0123456789])+  " AND EXISTS (SELECT M_Product_ID FROM M_Product_PO x " "WHERE x.M_Product_ID=po.M_Product_ID" " AND IsCurrentVendor='Y' AND IsActive='Y' " "GROUP BY M_Product_ID HAVING COUNT(*) > 1) " "ORDER BY M_Product_ID, Created" 
 /base/src/org/compiere/process/PriceListCreate.java:245, {"INSERT INTO T_Selection (T_Selection_ID) " "SELECT DISTINCT po.M_Product_ID " "FROM M_Product_PO po " " INNER JOIN M_Product p ON (p.M_Product_ID=po.M_Product_ID)" " INNER JOIN M_DiscountSchemaLine dl ON (dl.M_DiscountSchemaLine_ID=?) " "WHERE p.AD_Client_ID IN (?, 0)" " AND p.IsActive='Y' AND po.IsActive='Y' AND po.IsCurrentVendor='Y'" " AND (dl.M_Product_Category_ID IS NULL OR p.M_Product_Category_ID=dl.M_Product_Category_ID)" " AND (dl.C_BPartner_ID IS NULL OR po.C_BPartner_ID=dl.C_BPartner_ID)" " AND (dl.M_Product_ID IS NULL OR p.M_Product_ID=dl.M_Product_ID)" , "INSERT INTO T_Selection (T_Selection_ID) " "SELECT DISTINCT p.M_Product_ID " "FROM M_ProductPrice pp" " INNER JOIN M_Product p ON (p.M_Product_ID=pp.M_Product_ID)" " INNER JOIN M_DiscountSchemaLine dl ON (dl.M_DiscountSchemaLine_ID=?) " "WHERE pp.M_PriceList_Version_ID=?" " AND p.IsActive='Y' AND pp.IsActive='Y'" " AND (dl.M_Product_Category_ID IS NULL OR p.M_Product_Category_ID=dl.M_Product_Category_ID)" " AND (dl.C_BPartner_ID IS NULL OR EXISTS " "(SELECT * FROM M_Product_PO po " "WHERE po.M_Product_ID=p.M_Product_ID AND po.C_BPartner_ID=dl.C_BPartner_ID))" " AND (dl.M_Product_ID IS NULL OR p.M_Product_ID=dl.M_Product_ID)" }
 /base/src/org/compiere/process/PriceListCreate.java:323, {"null", {"INSERT INTO M_ProductPrice " "(M_PriceList_Version_ID, M_Product_ID," " AD_Client_ID, AD_Org_ID, IsActive, Created, CreatedBy, Updated, UpdatedBy," " PriceList, PriceStd, PriceLimit) "  "SELECT plv.M_PriceList_Version_ID, po.M_Product_ID," " plv.AD_Client_ID, plv.AD_Org_ID, 'Y', SysDate, plv.UpdatedBy, SysDate, plv.UpdatedBy," " COALESCE(currencyConvert(po.PriceList," " po.C_Currency_ID, pl.C_Currency_ID, dl.ConversionDate, dl.C_ConversionType_ID, plv.AD_Client_ID, plv.AD_Org_ID), -po.PriceList)," " COALESCE(currencyConvert(po.PriceList," "	po.C_Currency_ID, pl.C_Currency_ID, dl.ConversionDate, dl.C_ConversionType_ID, plv.AD_Client_ID, plv.AD_Org_ID), -po.PriceList)," " COALESCE(currencyConvert(po.PricePO," " po.C_Currency_ID, pl.C_Currency_ID, dl.ConversionDate, dl.C_ConversionType_ID, plv.AD_Client_ID, plv.AD_Org_ID), -po.PricePO) " "FROM M_Product_PO po" " INNER JOIN M_PriceList_Version plv ON (plv.M_PriceList_Version_ID=?)" " INNER JOIN M_PriceList pl ON (pl.M_PriceList_ID=plv.M_PriceList_ID)" " INNER JOIN M_DiscountSchemaLine dl ON (dl.M_DiscountSchemaLine_ID=?) " "WHERE EXISTS (SELECT * FROM T_Selection s WHERE po.M_Product_ID=s.T_Selection_ID)" " AND po.IsCurrentVendor='Y' AND po.IsActive='Y'"  , "INSERT INTO M_ProductPrice " "(M_PriceList_Version_ID, M_Product_ID," " AD_Client_ID, AD_Org_ID, IsActive, Created, CreatedBy, Updated, UpdatedBy," " PriceList, PriceStd, PriceLimit) "  "SELECT plv.M_PriceList_Version_ID, pp.M_Product_ID," " plv.AD_Client_ID, plv.AD_Org_ID, 'Y', SysDate, plv.UpdatedBy, SysDate, plv.UpdatedBy," " COALESCE(currencyConvert(pp.PriceList," " bpl.C_Currency_ID, pl.C_Currency_ID, dl.ConversionDate, dl.C_ConversionType_ID, plv.AD_Client_ID, plv.AD_Org_ID), -pp.PriceList)," " COALESCE(currencyConvert(pp.PriceStd," " bpl.C_Currency_ID, pl.C_Currency_ID, dl.ConversionDate, dl.C_ConversionType_ID, plv.AD_Client_ID, plv.AD_Org_ID), -pp.PriceStd)," " COALESCE(currencyConvert(pp.PriceLimit," " bpl.C_Currency_ID, pl.C_Currency_ID, dl.ConversionDate, dl.C_ConversionType_ID, plv.AD_Client_ID, plv.AD_Org_ID), -pp.PriceLimit) " "FROM M_ProductPrice pp" " INNER JOIN M_PriceList_Version plv ON (plv.M_PriceList_Version_ID=?)" " INNER JOIN M_PriceList pl ON (pl.M_PriceList_ID=plv.M_PriceList_ID)" " INNER JOIN M_PriceList_Version bplv ON (pp.M_PriceList_Version_ID=bplv.M_PriceList_Version_ID)" " INNER JOIN M_PriceList bpl ON (bplv.M_PriceList_ID=bpl.M_PriceList_ID)" " INNER JOIN M_DiscountSchemaLine dl ON (dl.M_DiscountSchemaLine_ID=?) " "WHERE pp.M_PriceList_Version_ID=?" " AND EXISTS (SELECT * FROM T_Selection s WHERE pp.M_Product_ID=s.T_Selection_ID)" " AND pp.IsActive='Y'"  }}
@@ -533,13 +533,13 @@
 /base/src/org/compiere/process/TaxDeclarationCreate.java:101, "SELECT * FROM C_Invoice i " "WHERE TRUNC(i.DateInvoiced,'DD') >= ? AND TRUNC(i.DateInvoiced,'DD') <= ? " " AND Processed='Y'" " AND NOT EXISTS (SELECT * FROM C_TaxDeclarationLine tdl " "WHERE i.C_Invoice_ID=tdl.C_Invoice_ID)" 
 /base/src/org/compiere/process/TaxDeclarationCreate.java:170, "SELECT * FROM Fact_Acct WHERE AD_Table_ID=? AND Record_ID=?"
 /base/src/org/compiere/process/TranslationDocSync.java:71, "SELECT * FROM AD_Table " "WHERE TableName LIKE '%_Trl' AND TableName NOT LIKE 'AD%' " "ORDER BY TableName" 
-/base/src/org/compiere/process/TranslationMgr.java:248, unsupported: unsupported modification scheme in loop
+/base/src/org/compiere/process/TranslationMgr.java:248, unsupported: Unsupported modification scheme in loop
 /base/src/org/compiere/process/TranslationMgr.java:328, "SELECT TableName FROM AD_Table t" " INNER JOIN AD_Column c ON (c.AD_Table_ID=t.AD_Table_ID AND c.ColumnName='IsCentrallyMaintained') " "WHERE t.TableName=? AND c.IsActive='Y'" 
 /base/src/org/compiere/process/TranslationMgr.java:350, "SELECT ColumnName " "FROM AD_Column c" " INNER JOIN AD_Table t ON (c.AD_Table_ID=t.AD_Table_ID) " "WHERE t.TableName=?" " AND c.AD_Reference_ID IN (10,14) " "ORDER BY IsMandatory DESC, ColumnName" 
 /base/src/org/compiere/process/TranslationMgr.java:426, "SELECT * " "FROM AD_Language " "WHERE AD_Language=?" 
 /base/src/org/compiere/process/TranslationMgr.java:498, "SELECT Name, TableName " "FROM AD_Table " "WHERE TableName LIKE '%_Trl' " "ORDER BY 1" 
 /base/src/org/compiere/process/TreeMaintenance.java:131, unsupported: Analysis level (5) too deep
-/base/src/org/compiere/process/ViewCreate.java:114, unsupported: Non-final fields are not supported
+/base/src/org/compiere/process/ViewCreate.java:114, unsupported: Non-final fields are not supported: ViewCreate.p_EntityType
 /base/src/org/compiere/process/ViewImportFromDB.java:215, {"SELECT TEXT FROM USER_VIEWS WHERE VIEW_NAME LIKE ?", {"SELECT DEFINITION FROM PG_VIEWS WHERE VIEWNAME LIKE ?", "null"}}
 /base/src/org/compiere/report/FinReport.java:180, "SELECT p.C_Period_ID, p.Name, p.StartDate, p.EndDate, MIN(p1.StartDate) " "FROM C_Period p " " INNER JOIN C_Year y ON (p.C_Year_ID=y.C_Year_ID)," " C_Period p1 " "WHERE y.C_Calendar_ID=?" " AND p.PeriodType='S' " " AND p1.C_Year_ID=y.C_Year_ID AND p1.PeriodType='S' " "GROUP BY p.C_Period_ID, p.Name, p.StartDate, p.EndDate " "ORDER BY p.StartDate" 
 /base/src/org/compiere/report/MReportColumnSet.java:69, "SELECT * FROM PA_ReportColumn WHERE PA_ReportColumnSet_ID=? AND IsActive='Y' ORDER BY SeqNo"
@@ -590,8 +590,8 @@
 /base/src/org/compiere/wf/MWorkflowProcessor.java:54, "SELECT * FROM AD_WorkflowProcessor WHERE IsActive='Y'"
 /base/src/org/compiere/wf/MWorkflowProcessor.java:143, "SELECT * " "FROM AD_WorkflowProcessorLog " "WHERE AD_WorkflowProcessor_ID=? " "ORDER BY Created DESC" 
 /base/src/org/compiere/MigrateData.java:94, "UPDATE M_Product SET DownloadURL = NULL WHERE M_Product_ID=" ([0123456789])+ 
-/base/src/org/compiere/impexp/ImpFormat.java:572, unsupported: Non-final fields are not supported
-/base/src/org/compiere/impexp/ImpFormat.java:595, unsupported: unsupported modification scheme in loop
+/base/src/org/compiere/impexp/ImpFormat.java:572, unsupported: Non-final fields are not supported: ImpFormat.m_tableName
+/base/src/org/compiere/impexp/ImpFormat.java:595, unsupported: Unsupported modification scheme in loop
 /base/src/org/compiere/model/MAcctProcessor.java:205, "DELETE FROM C_AcctProcessorLog " "WHERE C_AcctProcessor_ID="  ([0123456789])+ " AND addDays(Created," ([0123456789])+ ") < SysDate" 
 /base/src/org/compiere/model/MAlertProcessor.java:184, "DELETE FROM AD_AlertProcessorLog " "WHERE AD_AlertProcessor_ID="  ([0123456789])+ " AND addDays(Created," ([0123456789])+ ") < SysDate" 
 /base/src/org/compiere/model/MAllocationHdr.java:376, "UPDATE C_AllocationHdr SET Processed='" {"Y", "N"} "' WHERE C_AllocationHdr_ID=" ([0123456789])+ 
@@ -674,34 +674,34 @@
 /base/src/org/compiere/model/MRequisitionLine.java:356, "UPDATE M_Requisition r" " SET TotalLines=" "(SELECT COALESCE(SUM(LineNetAmt),0) FROM M_RequisitionLine rl " "WHERE r.M_Requisition_ID=rl.M_Requisition_ID) " "WHERE M_Requisition_ID=" ([0123456789])+ 
 /base/src/org/compiere/model/MScheduler.java:205, "DELETE FROM AD_SchedulerLog " "WHERE AD_Scheduler_ID="  ([0123456789])+ " AND (Created+" ([0123456789])+ ") < SysDate" 
 /base/src/org/compiere/model/MSetup.java:205, "UPDATE AD_Client SET CreatedBy=0 WHERE Name=?"
-/base/src/org/compiere/model/MSetup.java:357, unsupported: Non-final fields are not supported
-/base/src/org/compiere/model/MSetup.java:381, unsupported: Non-final fields are not supported
-/base/src/org/compiere/model/MSetup.java:400, unsupported: Non-final fields are not supported
-/base/src/org/compiere/model/MSetup.java:405, unsupported: Non-final fields are not supported
-/base/src/org/compiere/model/MSetup.java:411, unsupported: Non-final fields are not supported
-/base/src/org/compiere/model/MSetup.java:642, unsupported: Non-final fields are not supported
+/base/src/org/compiere/model/MSetup.java:357, unsupported: Non-final fields are not supported: MSetup.m_stdColumns
+/base/src/org/compiere/model/MSetup.java:381, unsupported: Non-final fields are not supported: MSetup.m_stdColumns
+/base/src/org/compiere/model/MSetup.java:400, unsupported: Non-final fields are not supported: MSetup.m_stdColumns
+/base/src/org/compiere/model/MSetup.java:405, unsupported: Non-final fields are not supported: MSetup.m_stdColumns
+/base/src/org/compiere/model/MSetup.java:411, unsupported: Non-final fields are not supported: MSetup.m_stdColumns
+/base/src/org/compiere/model/MSetup.java:642, unsupported: Non-final fields are not supported: MSetup.m_stdColumns
 /base/src/org/compiere/model/MSetup.java:651, "UPDATE C_AcctSchema_Element SET Org_ID=" ([0123456789])+  " WHERE C_AcctSchema_Element_ID="  ([0123456789])+ 
 /base/src/org/compiere/model/MSetup.java:660, "UPDATE C_AcctSchema_Element SET C_ElementValue_ID=" ([0123456789])+  ", C_Element_ID="  ([0123456789])+  " WHERE C_AcctSchema_Element_ID="  ([0123456789])+ 
-/base/src/org/compiere/model/MSetup.java:723, unsupported: Non-final fields are not supported
-/base/src/org/compiere/model/MSetup.java:837, unsupported: Non-final fields are not supported
+/base/src/org/compiere/model/MSetup.java:723, unsupported: Non-final fields are not supported: MSetup.m_stdColumns
+/base/src/org/compiere/model/MSetup.java:837, unsupported: Non-final fields are not supported: MSetup.m_stdColumns
 /base/src/org/compiere/model/MSetup.java:1004, "UPDATE AD_ClientInfo SET " "C_AcctSchema1_ID="  ([0123456789])+  ", C_Calendar_ID="  ([0123456789])+  " WHERE AD_Client_ID="  ([0123456789])+ 
-/base/src/org/compiere/model/MSetup.java:1197, unsupported: Non-final fields are not supported
-/base/src/org/compiere/model/MSetup.java:1206, unsupported: Non-final fields are not supported
+/base/src/org/compiere/model/MSetup.java:1197, unsupported: Non-final fields are not supported: MSetup.m_stdColumns
+/base/src/org/compiere/model/MSetup.java:1206, unsupported: Non-final fields are not supported: MSetup.m_stdColumns
 /base/src/org/compiere/model/MSetup.java:1218, "UPDATE C_AcctSchema_Element SET " "C_Campaign_ID="  ([0123456789])+  " WHERE C_AcctSchema_ID="  ([0123456789])+  " AND ElementType='MC'" 
-/base/src/org/compiere/model/MSetup.java:1230, unsupported: Non-final fields are not supported
+/base/src/org/compiere/model/MSetup.java:1230, unsupported: Non-final fields are not supported: MSetup.m_stdColumns
 /base/src/org/compiere/model/MSetup.java:1242, "UPDATE C_AcctSchema_Element SET " "C_SalesRegion_ID="  ([0123456789])+  " WHERE C_AcctSchema_ID="  ([0123456789])+  " AND ElementType='SR'" 
 /base/src/org/compiere/model/MSetup.java:1281, "UPDATE C_AcctSchema_Element SET " "C_BPartner_ID="  ([0123456789])+  " WHERE C_AcctSchema_ID="  ([0123456789])+  " AND ElementType='BP'" 
-/base/src/org/compiere/model/MSetup.java:1312, unsupported: Non-final fields are not supported
+/base/src/org/compiere/model/MSetup.java:1312, unsupported: Non-final fields are not supported: MSetup.m_stdColumns
 /base/src/org/compiere/model/MSetup.java:1341, "UPDATE C_AcctSchema_Element SET " "M_Product_ID="  ([0123456789])+  " WHERE C_AcctSchema_ID="  ([0123456789])+  " AND ElementType='PR'" 
 /base/src/org/compiere/model/MSetup.java:1353, "UPDATE AD_OrgInfo SET C_Location_ID=" ([0123456789])+  " WHERE AD_Org_ID="  ([0123456789])+ 
 /base/src/org/compiere/model/MSetup.java:1381, "UPDATE AD_ClientInfo SET " "C_BPartnerCashTrx_ID="  ([0123456789])+  ",M_ProductFreight_ID="  ([0123456789])+  " WHERE AD_Client_ID="  ([0123456789])+ 
 /base/src/org/compiere/model/MSetup.java:1440, "UPDATE AD_User SET C_BPartner_ID=" ([0123456789])+  " WHERE AD_User_ID="  ([0123456789])+ 
 /base/src/org/compiere/model/MSetup.java:1466, "UPDATE AD_User SET C_BPartner_ID=" ([0123456789])+  " WHERE AD_User_ID="  ([0123456789])+ 
-/base/src/org/compiere/model/MSetup.java:1478, unsupported: Non-final fields are not supported
-/base/src/org/compiere/model/MSetup.java:1489, unsupported: Non-final fields are not supported
-/base/src/org/compiere/model/MSetup.java:1504, unsupported: Non-final fields are not supported
+/base/src/org/compiere/model/MSetup.java:1478, unsupported: Non-final fields are not supported: MSetup.m_stdColumns
+/base/src/org/compiere/model/MSetup.java:1489, unsupported: Non-final fields are not supported: MSetup.m_stdColumns
+/base/src/org/compiere/model/MSetup.java:1504, unsupported: Non-final fields are not supported: MSetup.m_stdColumns
 /base/src/org/compiere/model/MSetup.java:1516, "UPDATE C_AcctSchema_Element SET " "C_Project_ID="  ([0123456789])+  " WHERE C_AcctSchema_ID="  ([0123456789])+  " AND ElementType='PJ'" 
-/base/src/org/compiere/model/MSetup.java:1554, unsupported: Non-final fields are not supported
+/base/src/org/compiere/model/MSetup.java:1554, unsupported: Non-final fields are not supported: MSetup.m_stdColumns
 /base/src/org/compiere/model/MStatusCategory.java:96, "UPDATE R_Status SET R_StatusCategory_ID=" ([0123456789])+ " WHERE R_StatusCategory_ID IS NULL AND AD_Client_ID=" ([0123456789])+ 
 /base/src/org/compiere/model/MTemplate.java:393, "INSERT INTO AD_TreeNodeCMT " "(AD_Client_ID,AD_Org_ID, IsActive,Created,CreatedBy,Updated,UpdatedBy, " "AD_Tree_ID, Node_ID, Parent_ID, SeqNo) " "VALUES ("  ([0123456789])+  ",0, 'Y', SysDate, 0, SysDate, 0,"  ([0123456789])+  ","  ([0123456789])+  ", 0, 999)" 
 /base/src/org/compiere/model/MTemplate.java:439, "DELETE FROM AD_TreeNodeCMT " " WHERE Node_ID="  ([0123456789])+  " AND AD_Tree_ID="  ([0123456789])+ 
@@ -736,11 +736,11 @@
 /base/src/org/compiere/process/BPGroupAcctCopy.java:112, "INSERT INTO C_BP_Customer_Acct " "(C_BPartner_ID, C_AcctSchema_ID," " AD_Client_ID, AD_Org_ID, IsActive, Created, CreatedBy, Updated, UpdatedBy," " C_Receivable_Acct, C_Receivable_Services_Acct, C_PrePayment_Acct) " "SELECT p.C_BPartner_ID, acct.C_AcctSchema_ID," " p.AD_Client_ID, p.AD_Org_ID, 'Y', SysDate, 0, SysDate, 0," " acct.C_Receivable_Acct, acct.C_Receivable_Services_Acct, acct.C_PrePayment_Acct " "FROM C_BPartner p" " INNER JOIN C_BP_Group_Acct acct ON (acct.C_BP_Group_ID=p.C_BP_Group_ID)" "WHERE acct.C_AcctSchema_ID="  ([0123456789])+ " AND p.C_BP_Group_ID=" ([0123456789])+ " AND NOT EXISTS (SELECT * FROM C_BP_Customer_Acct ca " "WHERE ca.C_BPartner_ID=p.C_BPartner_ID" " AND ca.C_AcctSchema_ID=acct.C_AcctSchema_ID)" 
 /base/src/org/compiere/process/BPGroupAcctCopy.java:129, "UPDATE C_BP_Vendor_Acct va " "SET (V_Liability_Acct,V_Liability_Services_Acct,V_PrePayment_Acct)=" " (SELECT V_Liability_Acct,V_Liability_Services_Acct,V_PrePayment_Acct " " FROM C_BP_Group_Acct" " WHERE C_BP_Group_ID="  ([0123456789])+ " AND C_AcctSchema_ID=" ([0123456789])+ "), Updated=SysDate, UpdatedBy=0 " "WHERE va.C_AcctSchema_ID=" ([0123456789])+ " AND EXISTS (SELECT * FROM C_BPartner p " "WHERE p.C_BPartner_ID=va.C_BPartner_ID" " AND p.C_BP_Group_ID=" ([0123456789])+ ")" 
 /base/src/org/compiere/process/BPGroupAcctCopy.java:147, "INSERT INTO C_BP_Vendor_Acct " "(C_BPartner_ID, C_AcctSchema_ID," " AD_Client_ID, AD_Org_ID, IsActive, Created, CreatedBy, Updated, UpdatedBy," " V_Liability_Acct, V_Liability_Services_Acct, V_PrePayment_Acct) " "SELECT p.C_BPartner_ID, acct.C_AcctSchema_ID," " p.AD_Client_ID, p.AD_Org_ID, 'Y', SysDate, 0, SysDate, 0," " acct.V_Liability_Acct, acct.V_Liability_Services_Acct, acct.V_PrePayment_Acct " "FROM C_BPartner p" " INNER JOIN C_BP_Group_Acct acct ON (acct.C_BP_Group_ID=p.C_BP_Group_ID)" "WHERE acct.C_AcctSchema_ID="  ([0123456789])+ " AND p.C_BP_Group_ID=" ([0123456789])+ " AND NOT EXISTS (SELECT * FROM C_BP_Vendor_Acct va " "WHERE va.C_BPartner_ID=p.C_BPartner_ID AND va.C_AcctSchema_ID=acct.C_AcctSchema_ID)" 
-/base/src/org/compiere/process/ChangeLogProcess.java:326, unsupported: Non-final fields are not supported
-/base/src/org/compiere/process/ChangeLogProcess.java:345, unsupported: Non-final fields are not supported
+/base/src/org/compiere/process/ChangeLogProcess.java:326, unsupported: Non-final fields are not supported: ChangeLogProcess.m_sqlInsert
+/base/src/org/compiere/process/ChangeLogProcess.java:345, unsupported: Non-final fields are not supported: ChangeLogProcess.m_sqlUpdate
 /base/src/org/compiere/process/ChangeLogProcess.java:376, "UPDATE AD_ChangeLog SET IsCustomization='N' WHERE IsCustomization='Y'"
 /base/src/org/compiere/process/ChangeLogProcess.java:407, unsupported: getValOf(org.eclipse.jdt.core.dom.ArrayAccess)
-/base/src/org/compiere/process/ColumnSync.java:120, unsupported: unsupported modification scheme in loop
+/base/src/org/compiere/process/ColumnSync.java:120, unsupported: Unsupported modification scheme in loop
 /base/src/org/compiere/process/ColumnSync.java:127, unsupported: Non-parameter var (java.lang.String element[pos: 12][id:13][pc: 467-503]) asked from MethodDeclaration (doIt)
 /base/src/org/compiere/process/ColumnSync.java:315, unsupported: Unsupported modification scheme in loop
 /base/src/org/compiere/process/ColumnSync.java:343, unsupported: No declarations found for: rs.getString(1)
@@ -771,8 +771,8 @@
 /base/src/org/compiere/process/ImportAccount.java:229, "UPDATE I_ElementValue " "SET I_IsImported='E', I_ErrorMsg="  {"COALESCE(I_ErrorMsg,'')", "I_ErrorMsg"} "||'ERR=Invalid AccountSign, ' " "WHERE AccountSign NOT IN ('N','C','D')" " AND I_IsImported<>'Y'"  " AND AD_Client_ID=" [0123456789]  
 /base/src/org/compiere/process/ImportAccount.java:237, "UPDATE I_ElementValue " "SET I_IsImported='E', I_ErrorMsg="  {"COALESCE(I_ErrorMsg,'')", "I_ErrorMsg"} "||'ERR=No Key, ' " "WHERE (Value IS NULL OR Value='')" " AND I_IsImported<>'Y'"  " AND AD_Client_ID=" [0123456789]  
 /base/src/org/compiere/process/ImportAccount.java:248, "UPDATE I_ElementValue i " "SET C_ElementValue_ID=(SELECT C_ElementValue_ID FROM C_ElementValue ev" " INNER JOIN C_Element e ON (ev.C_Element_ID=e.C_Element_ID)" " WHERE i.C_Element_ID=e.C_Element_ID AND i.AD_Client_ID=e.AD_Client_ID" " AND i.Value=ev.Value) " "WHERE C_ElementValue_ID IS NULL" " AND I_IsImported='N'"  " AND AD_Client_ID=" [0123456789]  
-/base/src/org/compiere/process/ImportAccount.java:288, unsupported: unsupported modification scheme in loop
-/base/src/org/compiere/process/ImportAccount.java:309, unsupported: unsupported modification scheme in loop
+/base/src/org/compiere/process/ImportAccount.java:288, unsupported: Unsupported modification scheme in loop
+/base/src/org/compiere/process/ImportAccount.java:309, unsupported: Unsupported modification scheme in loop
 /base/src/org/compiere/process/ImportAccount.java:325, "UPDATE I_ElementValue " "SET I_IsImported='N', Updated=SysDate " "WHERE I_IsImported<>'Y'"  " AND AD_Client_ID=" [0123456789]  
 /base/src/org/compiere/process/ImportAccount.java:339, "UPDATE I_ElementValue i " "SET ParentElementValue_ID=(SELECT C_ElementValue_ID" " FROM C_ElementValue ev WHERE i.C_Element_ID=ev.C_Element_ID" " AND i.ParentValue=ev.Value AND i.AD_Client_ID=ev.AD_Client_ID) " "WHERE ParentElementValue_ID IS NULL" " AND I_IsImported='Y' AND Processed='N'"  " AND AD_Client_ID=" [0123456789]  
 /base/src/org/compiere/process/ImportAccount.java:346, "UPDATE I_ElementValue " "SET I_ErrorMsg="  {"COALESCE(I_ErrorMsg,'')", "I_ErrorMsg"} "||'Info=ParentNotFound, ' " "WHERE ParentElementValue_ID IS NULL AND ParentValue IS NOT NULL" " AND I_IsImported='Y' AND Processed='N'"  " AND AD_Client_ID=" [0123456789]  
@@ -1096,10 +1096,10 @@
 /base/src/org/compiere/process/ImportProduct.java:330, "UPDATE I_Product i " "SET I_IsImported='E', I_ErrorMsg="  {"COALESCE(I_ErrorMsg,'')", "I_ErrorMsg"} "||'ERR=No Mandatory Value,' " "WHERE Value IS NULL" " AND I_IsImported<>'Y'"  " AND AD_Client_ID=" [0123456789]  
 /base/src/org/compiere/process/ImportProduct.java:345, "UPDATE I_Product " "SET VendorProductNo=Value " "WHERE C_BPartner_ID IS NOT NULL AND VendorProductNo IS NULL" " AND I_IsImported='N'"  " AND AD_Client_ID=" [0123456789]  
 /base/src/org/compiere/process/ImportProduct.java:355, "UPDATE I_Product i " "SET I_IsImported='E', I_ErrorMsg="  {"COALESCE(I_ErrorMsg,'')", "I_ErrorMsg"} "||'ERR=VendorProductNo not unique,' " "WHERE I_IsImported<>'Y'" " AND C_BPartner_ID IS NOT NULL" " AND (C_BPartner_ID, VendorProductNo) IN " " (SELECT C_BPartner_ID, VendorProductNo FROM I_Product ii WHERE i.AD_Client_ID=ii.AD_Client_ID GROUP BY C_BPartner_ID, VendorProductNo HAVING COUNT(*) > 1)"  " AND AD_Client_ID=" [0123456789]  
-/base/src/org/compiere/process/ImportProduct.java:502, unsupported: unsupported modification scheme in loop
-/base/src/org/compiere/process/ImportProduct.java:536, unsupported: unsupported modification scheme in loop
-/base/src/org/compiere/process/ImportProduct.java:582, unsupported: unsupported modification scheme in loop
-/base/src/org/compiere/process/ImportProduct.java:606, unsupported: unsupported modification scheme in loop
+/base/src/org/compiere/process/ImportProduct.java:502, unsupported: Unsupported modification scheme in loop
+/base/src/org/compiere/process/ImportProduct.java:536, unsupported: Unsupported modification scheme in loop
+/base/src/org/compiere/process/ImportProduct.java:582, unsupported: Unsupported modification scheme in loop
+/base/src/org/compiere/process/ImportProduct.java:606, unsupported: Unsupported modification scheme in loop
 /base/src/org/compiere/process/ImportProduct.java:656, "UPDATE I_Product " "SET I_IsImported='N', Updated=SysDate " "WHERE I_IsImported<>'Y'"  " AND AD_Client_ID=" [0123456789]  
 /base/src/org/compiere/process/ImportReportLine.java:88, "DELETE FROM I_ReportLine " "WHERE I_IsImported='Y'"  " AND AD_Client_ID=" [0123456789]  
 /base/src/org/compiere/process/ImportReportLine.java:104, "UPDATE I_ReportLine " "SET AD_Client_ID = COALESCE (AD_Client_ID, "  ([0123456789])+  ")," " AD_Org_ID = COALESCE (AD_Org_ID, 0)," " IsActive = COALESCE (IsActive, 'Y')," " Created = COALESCE (Created, SysDate)," " CreatedBy = COALESCE (CreatedBy, 0)," " Updated = COALESCE (Updated, SysDate)," " UpdatedBy = COALESCE (UpdatedBy, 0)," " I_ErrorMsg = NULL," " I_IsImported = 'N' " "WHERE I_IsImported<>'Y' OR I_IsImported IS NULL"  
@@ -1120,8 +1120,8 @@
 /base/src/org/compiere/process/ImportReportLine.java:237, "UPDATE I_ReportLine i " "SET PA_ReportLine_ID=(SELECT MAX(PA_ReportLine_ID) FROM PA_ReportLine r" " WHERE i.Name=r.Name AND i.PA_ReportLineSet_ID=r.PA_ReportLineSet_ID) " "WHERE PA_ReportLine_ID IS NULL AND PA_ReportLineSet_ID IS NOT NULL" " AND I_IsImported='N'"  " AND AD_Client_ID=" [0123456789]  
 /base/src/org/compiere/process/ImportReportLine.java:313, "UPDATE I_ReportLine i " "SET PA_ReportLine_ID=(SELECT MAX(PA_ReportLine_ID) FROM PA_ReportLine r" " WHERE i.Name=r.Name AND i.PA_ReportLineSet_ID=r.PA_ReportLineSet_ID) " "WHERE PA_ReportLine_ID IS NULL AND PA_ReportLineSet_ID IS NOT NULL" " AND I_IsImported='N'"  " AND AD_Client_ID=" [0123456789]  
 /base/src/org/compiere/process/ImportReportLine.java:328, "UPDATE PA_ReportLine r " "SET (Description,SeqNo,IsSummary,IsPrinted,LineType,CalculationType,AmountType,PostingType,Updated,UpdatedBy)=" " (SELECT Description,SeqNo,IsSummary,IsPrinted,LineType,CalculationType,AmountType,PostingType,SysDate,UpdatedBy" " FROM I_ReportLine i WHERE r.Name=i.Name AND r.PA_ReportLineSet_ID=i.PA_ReportLineSet_ID" " AND i.I_ReportLine_ID=(SELECT MIN(I_ReportLine_ID) FROM I_ReportLine iii" " WHERE i.Name=iii.Name AND i.PA_ReportLineSet_ID=iii.PA_ReportLineSet_ID)) " "WHERE EXISTS (SELECT *" " FROM I_ReportLine i WHERE r.Name=i.Name AND r.PA_ReportLineSet_ID=i.PA_ReportLineSet_ID" " AND i.I_ReportLine_ID=(SELECT MIN(I_ReportLine_ID) FROM I_ReportLine iii" " WHERE i.Name=iii.Name AND i.PA_ReportLineSet_ID=iii.PA_ReportLineSet_ID AND i.I_IsImported='N'))"  " AND AD_Client_ID=" [0123456789]  
-/base/src/org/compiere/process/ImportReportLine.java:404, unsupported: unsupported modification scheme in loop
-/base/src/org/compiere/process/ImportReportLine.java:435, unsupported: unsupported modification scheme in loop
+/base/src/org/compiere/process/ImportReportLine.java:404, unsupported: Unsupported modification scheme in loop
+/base/src/org/compiere/process/ImportReportLine.java:435, unsupported: Unsupported modification scheme in loop
 /base/src/org/compiere/process/ImportReportLine.java:466, "UPDATE I_ReportLine " "SET I_IsImported='N', Updated=SysDate " "WHERE I_IsImported<>'Y'"  " AND AD_Client_ID=" [0123456789]  
 /base/src/org/compiere/process/ImportRequest.java:54, "DELETE FROM I_Request " "WHERE I_IsImported='Y'"  " AND AD_Client_ID=" [0123456789]  
 /base/src/org/compiere/process/ImportRequest.java:67, "UPDATE I_Request r" " SET AD_Client_ID = (SELECT AD_Client_ID FROM AD_Client c WHERE c.Value = r.ClientValue), " " ClientName = (SELECT Name FROM AD_Client c WHERE c.Value = r.ClientValue), " " Updated = COALESCE (Updated, SysDate)," " UpdatedBy = COALESCE (UpdatedBy, 0)" " WHERE (I_IsImported<>'Y' OR I_IsImported IS NULL)" " AND AD_Client_ID is NULL" " AND ClientValue is NOT NULL" 
@@ -1196,9 +1196,9 @@
 /base/src/org/compiere/process/ImportRequest.java:803, "UPDATE I_Request r" " SET M_ChangeRequest_ID =(SELECT M_ChangeRequest_ID FROM M_ChangeRequest c" " WHERE r.ChangeRequestName = c.Name AND r.AD_Client_ID=c.AD_Client_ID )" " WHERE M_ChangeRequest_ID IS NULL AND ChangeRequestName IS NOT NULL" " AND I_IsImported<>'Y'"  " AND AD_Client_ID=" [0123456789]  
 /base/src/org/compiere/process/ImportRequest.java:812, "UPDATE I_Request r" " SET I_IsImported='E', I_ErrorMsg="  {"COALESCE(I_ErrorMsg,'')", "I_ErrorMsg"} "||'ERR=Invalid ChangeRequestName, ' " " WHERE (I_IsImported<>'Y' OR I_IsImported IS NULL)" " AND r.M_ChangeRequest_ID IS NULL" " AND r.ChangeRequestName IS NOT NULL "  " AND AD_Client_ID=" [0123456789]  
 /base/src/org/compiere/process/ImportRequest.java:869, "UPDATE I_Request " "SET I_IsImported='N', Updated=SysDate " "WHERE I_IsImported<>'Y'"  " AND AD_Client_ID=" [0123456789]  
-/base/src/org/compiere/process/IndexValidate.java:100, unsupported: Non-final fields are not supported
+/base/src/org/compiere/process/IndexValidate.java:100, unsupported: Non-final fields are not supported: MTableIndex.m_ddl
 /base/src/org/compiere/process/IndexValidate.java:158, unsupported: getValOf(org.eclipse.jdt.core.dom.ArrayAccess)
-/base/src/org/compiere/process/IndexValidate.java:159, unsupported: Non-final fields are not supported
+/base/src/org/compiere/process/IndexValidate.java:159, unsupported: Non-final fields are not supported: MTableIndex.m_ddl
 /base/src/org/compiere/process/InventoryCountCreate.java:115, "DELETE FROM M_InventoryLine WHERE Processed='N' " "AND M_Inventory_ID=" ([0123456789])+ 
 /base/src/org/compiere/process/InventoryCountCreate.java:140, "INSERT INTO M_Storage " "(AD_Client_ID, AD_Org_ID, IsActive, Created, CreatedBy, Updated, UpdatedBy," " M_Locator_ID, M_Product_ID, M_AttributeSetInstance_ID," " QtyOnHand, QtyReserved, QtyOrdered, DateLastInventory) " "SELECT l.AD_CLIENT_ID, l.AD_ORG_ID, 'Y', SysDate, 0,SysDate, 0," " l.M_Locator_ID, p.M_Product_ID, 0," " 0,0,0,null " "FROM M_Locator l" " INNER JOIN M_Product p ON (l.AD_Client_ID=p.AD_Client_ID) " "WHERE l.M_Warehouse_ID=" [0123456789]  {" AND l.M_Locator_ID=" ([0123456789])+ , ""}  " AND l.IsDefault='Y'" " AND p.IsActive='Y' AND p.IsStocked='Y' and p.ProductType='I'" " AND NOT EXISTS (SELECT * FROM M_Storage s" " INNER JOIN M_Locator sl ON (s.M_Locator_ID=sl.M_Locator_ID) " "WHERE sl.M_Warehouse_ID=l.M_Warehouse_ID" " AND s.M_Product_ID=p.M_Product_ID)"  
 /base/src/org/compiere/process/InventoryCountCreate.java:246, "UPDATE M_InventoryLine l " "SET QtyCount=0 " "WHERE M_Inventory_ID=" ([0123456789])+ 
@@ -1276,8 +1276,8 @@
 /base/src/org/compiere/process/ReplenishReport.java:149, "UPDATE M_Product_PO p" " SET IsCurrentVendor='Y' " "WHERE IsCurrentVendor<>'Y'" " AND EXISTS (SELECT 1 FROM M_Product_PO pp " "WHERE p.M_Product_ID=pp.M_Product_ID " "GROUP BY pp.M_Product_ID " "HAVING COUNT(*) = 1) " "AND  Discontinued = 'N'" 
 /base/src/org/compiere/process/ReplenishReport.java:163, "UPDATE M_Product_PO p" " SET IsCurrentVendor='N' " "WHERE IsCurrentVendor = 'Y'" " AND EXISTS (SELECT 1 FROM M_Product_PO pp " "WHERE p.M_Product_ID=pp.M_Product_ID AND pp.IsCurrentVendor='Y' " "GROUP BY pp.M_Product_ID " "HAVING COUNT(*) > 1) " "AND  Discontinued = 'N'" 
 /base/src/org/compiere/process/ReplenishReport.java:169, "DELETE FROM T_Replenish WHERE AD_PInstance_ID=" ([0123456789])+ 
-/base/src/org/compiere/process/ReplenishReport.java:203, unsupported: Non-final fields are not supported
-/base/src/org/compiere/process/ReplenishReport.java:233, unsupported: Non-final fields are not supported
+/base/src/org/compiere/process/ReplenishReport.java:203, unsupported: Non-final fields are not supported: ReplenishReport.p_ReplenishmentCreate
+/base/src/org/compiere/process/ReplenishReport.java:233, unsupported: Non-final fields are not supported: ReplenishReport.p_ReplenishmentCreate
 /base/src/org/compiere/process/ReplenishReport.java:247, "UPDATE T_Replenish t SET " "QtyOnHand = (SELECT COALESCE(SUM(QtyOnHand),0) FROM M_Storage s, M_Locator l WHERE t.M_Product_ID=s.M_Product_ID" " AND l.M_Locator_ID=s.M_Locator_ID AND l.M_Warehouse_ID=t.M_Warehouse_ID)," "QtyReserved = (SELECT COALESCE(SUM(QtyReserved),0) FROM M_Storage s, M_Locator l WHERE t.M_Product_ID=s.M_Product_ID" " AND l.M_Locator_ID=s.M_Locator_ID AND l.M_Warehouse_ID=t.M_Warehouse_ID)," "QtyOrdered = (SELECT COALESCE(SUM(QtyOrdered),0) FROM M_Storage s, M_Locator l WHERE t.M_Product_ID=s.M_Product_ID" " AND l.M_Locator_ID=s.M_Locator_ID AND l.M_Warehouse_ID=t.M_Warehouse_ID)"  {", C_DocType_ID=" ([0123456789])+ , ""}  " WHERE AD_PInstance_ID=" ([0123456789])+  
 /base/src/org/compiere/process/ReplenishReport.java:258, "DELETE FROM T_Replenish r " "WHERE (EXISTS (SELECT * FROM M_Product p " "WHERE p.M_Product_ID=r.M_Product_ID AND p.IsActive='N')" " OR EXISTS (SELECT * FROM M_Replenish rr " " WHERE rr.M_Product_ID=r.M_Product_ID AND rr.M_Warehouse_ID=r.M_Warehouse_ID AND rr.IsActive='N'))" " AND AD_PInstance_ID=" ([0123456789])+ 
 /base/src/org/compiere/process/ReplenishReport.java:264, "UPDATE T_Replenish SET QtyOnHand = 0 WHERE QtyOnHand IS NULL"
@@ -1294,17 +1294,17 @@
 /base/src/org/compiere/process/ReplicationRemote.java:158, "UPDATE AD_Sequence SET StartNo = " ([0123456789])+ " WHERE IsTableID='Y' AND StartNo < " ([0123456789])+ 
 /base/src/org/compiere/process/ReplicationRemote.java:164, "UPDATE AD_Sequence SET CurrentNext = " ([0123456789])+ " WHERE IsTableID='Y' AND CurrentNext < " ([0123456789])+ 
 /base/src/org/compiere/process/ReplicationRemote.java:170, "UPDATE AD_Sequence SET CurrentNextSys = -1" " WHERE IsTableID='Y' AND CurrentNextSys <> -1" 
-/base/src/org/compiere/process/ReplicationRemote.java:192, unsupported: unsupported modification scheme in loop
-/base/src/org/compiere/process/ReplicationRemote.java:199, unsupported: unsupported modification scheme in loop
+/base/src/org/compiere/process/ReplicationRemote.java:192, unsupported: Unsupported modification scheme in loop
+/base/src/org/compiere/process/ReplicationRemote.java:199, unsupported: Unsupported modification scheme in loop
 /base/src/org/compiere/process/ReplicationRemote.java:214, unsupported: No declarations found for: rs.getString(2)
 /base/src/org/compiere/process/StorageCleanup.java:72, "DELETE FROM M_Storage " "WHERE QtyOnHand = 0 AND QtyReserved = 0 AND QtyOrdered = 0" " AND QtyDedicated = 0 AND QtyAllocated = 0" " AND Created < addDays(SysDate,-3)" 
 /base/src/org/compiere/process/TaxDeclarationCreate.java:82, "DELETE FROM C_TaxDeclarationLine WHERE C_TaxDeclaration_ID=?"
 /base/src/org/compiere/process/TaxDeclarationCreate.java:86, "DELETE FROM C_TaxDeclarationAcct WHERE C_TaxDeclaration_ID=?"
 /base/src/org/compiere/process/TransactionXRef.java:152, "INSERT INTO T_Transaction " "(AD_PInstance_ID, M_Transaction_ID," " AD_Client_ID, AD_Org_ID, IsActive, Created,CreatedBy, Updated,UpdatedBy," " MovementType, M_Locator_ID, M_Product_ID, M_AttributeSetInstance_ID," " MovementDate, MovementQty," " M_InOutLine_ID, M_InOut_ID," " M_MovementLine_ID, M_Movement_ID," " M_InventoryLine_ID, M_Inventory_ID, " " C_ProjectIssue_ID, C_Project_ID, " " M_ProductionLine_ID, M_Production_ID "  {", Search_Order_ID ", ""}  {", Search_Invoice_ID ", ""}  {", Search_InOut_ID ", ""}  ") SELECT " [0123456789] ", M_Transaction_ID," " AD_Client_ID, AD_Org_ID, IsActive, Created,CreatedBy, Updated,UpdatedBy," " MovementType, M_Locator_ID, M_Product_ID, M_AttributeSetInstance_ID," " MovementDate, MovementQty," " M_InOutLine_ID, M_InOut_ID, " " M_MovementLine_ID, M_Movement_ID," " M_InventoryLine_ID, M_Inventory_ID, " " C_ProjectIssue_ID, C_Project_ID, " " M_ProductionLine_ID, M_Production_ID "   {", " [0123456789] , ""}  {", " [0123456789] , ""}  {", " ([0123456789])+ , ""}  " FROM M_Transaction_v " "WHERE M_AttributeSetInstance_ID > 0 AND M_AttributeSetInstance_ID IN ("  {"SELECT NVL(ma.M_AttributeSetInstance_ID,iol.M_AttributeSetInstance_ID) " "FROM M_InOutLine iol" " LEFT OUTER JOIN M_InOutLineMA ma ON (iol.M_InOutLine_ID=ma.M_InOutLine_ID) " "WHERE M_InOut_ID=" ([0123456789])+ , "SELECT NVL(ma.M_AttributeSetInstance_ID,iol.M_AttributeSetInstance_ID) " "FROM M_InOutLine iol" " LEFT OUTER JOIN M_InOutLineMA ma ON (iol.M_InOutLine_ID=ma.M_InOutLine_ID) " " INNER JOIN M_InOut io ON (iol.M_InOut_ID=io.M_InOut_ID)" "WHERE io.C_Order_ID=" ([0123456789])+ , "SELECT NVL(ma.M_AttributeSetInstance_ID,iol.M_AttributeSetInstance_ID) " "FROM M_InOutLine iol" " LEFT OUTER JOIN M_InOutLineMA ma ON (iol.M_InOutLine_ID=ma.M_InOutLine_ID) " " INNER JOIN C_InvoiceLine il ON (iol.M_InOutLine_ID=il.M_InOutLine_ID) " "WHERE il.C_Invoice_ID=" ([0123456789])+ } ") ORDER BY M_Transaction_ID"  
 /base/src/org/compiere/process/TranslationDocSync.java:129, unsupported: getValOf(org.eclipse.jdt.core.dom.ArrayAccess)
-/base/src/org/compiere/process/TranslationHandler.java:168, unsupported: Non-final fields are not supported
+/base/src/org/compiere/process/TranslationHandler.java:168, unsupported: Non-final fields are not supported: TranslationHandler.m_sql
 /base/src/org/compiere/process/TreeMaintenance.java:109, unsupported: Analysis level (5) too deep
-/base/src/org/compiere/process/UserPassword.java:124, unsupported: unsupported modification scheme in loop
+/base/src/org/compiere/process/UserPassword.java:124, unsupported: Unsupported modification scheme in loop
 /base/src/org/compiere/process/ViewCreate.java:154, unsupported: getValOf(org.eclipse.jdt.core.dom.ArrayAccess)
 /base/src/org/compiere/process/ViewCreate.java:158, unsupported: String/Builder/Buffer, method=replace
 /base/src/org/compiere/process/ViewImport.java:303, unsupported: String/Builder/Buffer, method=substring
@@ -1317,23 +1317,23 @@
 /base/src/org/compiere/report/FinBalance.java:394, unsupported: String/Builder/Buffer, method=substring
 /base/src/org/compiere/report/FinReport.java:244, "INSERT INTO T_Report " "(AD_PInstance_ID, PA_ReportLine_ID, Record_ID,Fact_Acct_ID, SeqNo,LevelNo, Name,Description) "  "SELECT "  ([0123456789])+  ", PA_ReportLine_ID, 0,0, SeqNo,"  ([0123456789])+  ", Name,Description "  "FROM PA_ReportLine "  "WHERE IsActive='Y' AND PA_ReportLineSet_ID="  ([0123456789])+ 
 /base/src/org/compiere/report/FinReport.java:430, unsupported: Unknown method called on StringBuilder: insert
-/base/src/org/compiere/report/FinReport.java:491, unsupported: unsupported modification scheme in loop
-/base/src/org/compiere/report/FinReport.java:524, unsupported: unsupported modification scheme in loop
-/base/src/org/compiere/report/FinReport.java:560, unsupported: unsupported modification scheme in loop
+/base/src/org/compiere/report/FinReport.java:491, unsupported: Unsupported modification scheme in loop
+/base/src/org/compiere/report/FinReport.java:524, unsupported: Unsupported modification scheme in loop
+/base/src/org/compiere/report/FinReport.java:560, unsupported: Unsupported modification scheme in loop
 /base/src/org/compiere/report/FinReport.java:635, unsupported: Checking whether var is mentioned. Unsupported expression: class org.eclipse.jdt.core.dom.ArrayAccess
 /base/src/org/compiere/report/FinReport.java:767, "DELETE FROM T_Report WHERE ABS(LevelNo)<>1" " AND Col_0 IS NULL AND Col_1 IS NULL AND Col_2 IS NULL AND Col_3 IS NULL AND Col_4 IS NULL AND Col_5 IS NULL AND Col_6 IS NULL AND Col_7 IS NULL AND Col_8 IS NULL AND Col_9 IS NULL"  " AND Col_10 IS NULL AND Col_11 IS NULL AND Col_12 IS NULL AND Col_13 IS NULL AND Col_14 IS NULL AND Col_15 IS NULL AND Col_16 IS NULL AND Col_17 IS NULL AND Col_18 IS NULL AND Col_19 IS NULL AND Col_20 IS NULL" 
 /base/src/org/compiere/report/FinReport.java:777, "UPDATE T_Report r1 " "SET SeqNo = (SELECT SeqNo " "FROM T_Report r2 " "WHERE r1.AD_PInstance_ID=r2.AD_PInstance_ID AND r1.PA_ReportLine_ID=r2.PA_ReportLine_ID" " AND r2.Record_ID=0 AND r2.Fact_Acct_ID=0)" "WHERE SeqNo IS NULL" 
 /base/src/org/compiere/report/FinReport.java:794, "UPDATE T_Report r SET (Name,Description)=(" "SELECT '__'||e.Name, fa.Description " "FROM Fact_Acct fa" " INNER JOIN AD_Table t ON (fa.AD_Table_ID=t.AD_Table_ID)" " INNER JOIN AD_Element e ON (t.TableName||'_ID'=e.ColumnName) " "WHERE r.Fact_Acct_ID=fa.Fact_Acct_ID"   ") " "WHERE Fact_Acct_ID <> 0 AND AD_PInstance_ID="   ([0123456789])+ 
-/base/src/org/compiere/report/FinReport.java:918, unsupported: unsupported modification scheme in loop
+/base/src/org/compiere/report/FinReport.java:918, unsupported: Unsupported modification scheme in loop
 /base/src/org/compiere/report/FinReport.java:932, unsupported: Analysis level (5) too deep
 /base/src/org/compiere/report/FinReport.java:938, "UPDATE T_Report SET Name='_'||Name " "WHERE Record_ID <> 0 AND AD_PInstance_ID=" ([0123456789])+  " AND PA_ReportLine_ID="  ([0123456789])+  " AND Fact_Acct_ID=0"  
-/base/src/org/compiere/report/FinReport.java:1027, unsupported: unsupported modification scheme in loop
+/base/src/org/compiere/report/FinReport.java:1027, unsupported: Unsupported modification scheme in loop
 /base/src/org/compiere/report/FinReport.java:1046, "DELETE FROM T_Report WHERE AD_PInstance_ID=" ([0123456789])+ " AND PA_ReportLine_ID=" ([0123456789])+ 
 /base/src/org/compiere/report/FinStatement.java:266, unsupported: String/Builder/Buffer, method=substring
-/base/src/org/compiere/report/FinStatement.java:288, unsupported: Non-final fields are not supported
+/base/src/org/compiere/report/FinStatement.java:288, unsupported: Non-final fields are not supported: FinStatement.m_parameterWhere
 /base/src/org/compiere/report/FinStatement.java:303, "UPDATE T_ReportStatement r SET (Name,Description)=(" "SELECT e.Name, fa.Description " "FROM Fact_Acct fa" " INNER JOIN AD_Table t ON (fa.AD_Table_ID=t.AD_Table_ID)" " INNER JOIN AD_Element e ON (t.TableName||'_ID'=e.ColumnName) " "WHERE r.Fact_Acct_ID=fa.Fact_Acct_ID"   ") " "WHERE Fact_Acct_ID <> 0 AND AD_PInstance_ID="   ([0123456789])+ 
-/base/src/org/compiere/report/TrialBalance.java:390, unsupported: Non-final fields are not supported
-/base/src/org/compiere/report/TrialBalance.java:429, unsupported: Non-final fields are not supported
+/base/src/org/compiere/report/TrialBalance.java:390, unsupported: Non-final fields are not supported: TrialBalance.s_insert
+/base/src/org/compiere/report/TrialBalance.java:429, unsupported: Non-final fields are not supported: TrialBalance.s_insert
 /base/src/org/compiere/report/TrialBalance.java:438, "UPDATE T_TrialBalance tb SET AccountValue = " "(SELECT Value FROM C_ElementValue ev WHERE ev.C_ElementValue_ID=tb.Account_ID) " "WHERE tb.Account_ID IS NOT NULL" 
 /base/src/org/compiere/wf/MWorkflowProcessor.java:183, "DELETE FROM AD_WorkflowProcessorLog " "WHERE AD_WorkflowProcessor_ID="  ([0123456789])+ " AND addDays(Created," ([0123456789])+ ") < SysDate" 
 /base/src/org/compiere/wf/WorkflowMoveToClient.java:72, "UPDATE AD_Workflow SET AD_Client_ID=" ([0123456789])+ " WHERE AD_Client_ID=0 AND EntityType NOT IN ('D','C')" " AND AD_Workflow_ID=" ([0123456789])+ 

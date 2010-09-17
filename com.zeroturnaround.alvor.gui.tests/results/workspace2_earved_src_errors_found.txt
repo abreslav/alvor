@@ -233,7 +233,6 @@ select id, ref_inbox, file_name, mime_type from inbox_attachment where ref_inbox
 SQL engine: ORA-02289: sequence does not exist
 SQL: 
 select SEQ_DIM_CONN_IMPORT_ERROR.nextval from dual, at: /earved/src/ee/post/earved/dao/dimension/DimensionDataConnectionDAO.java:216
-SQL syntax checker: Syntax error. Most likely, unfinished query, at: /earved/src/ee/post/earved/dao/accountingPattern/PatternItemDAO.java:122
 SQL syntax checker: Syntax error. Most likely, unfinished query, at: /earved/src/ee/post/earved/dao/invoice/InvoiceItemDAO.java:181
 SQL syntax checker: Unexpected token: (, at: /earved/src/ee/post/earved/dao/invoice/AttachmentDAO.java:258
 SQL syntax checker: Unexpected token: ,, at: /earved/src/ee/post/earved/dao/journal/JournalEntryDAO.java:145
@@ -242,6 +241,7 @@ SQL syntax checker: Unexpected token: :, at: /earved/src/ee/post/earved/dao/invo
 SQL syntax checker: Unexpected token: :, at: /earved/src/ee/post/earved/dao/invoice/BankExportDAO.java:84
 SQL syntax checker: Unexpected token: INTERVAL, at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:1086
 SQL syntax checker: Unexpected token: ORDER, at: /earved/src/ee/post/earved/dao/dimension/DimensionDataConnectionDAO.java:263
+SQL syntax checker: Unexpected token: extra_id, at: /earved/src/ee/post/earved/dao/accountingPattern/PatternItemDAO.java:117
 SQL syntax checker: Unexpected token: null, at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:974
 SQL syntax checker: Unexpected token: value, at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:298
 SQL syntax checker: Unexpected token: value, at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:298
