@@ -22,9 +22,9 @@ import org.eclipse.jdt.core.JavaCore;
 import org.junit.Test;
 
 import com.zeroturnaround.alvor.cache.CacheService;
+import com.zeroturnaround.alvor.cache.PositionUtil;
 import com.zeroturnaround.alvor.checkers.INodeDescriptor;
 import com.zeroturnaround.alvor.checkers.IStringNodeDescriptor;
-import com.zeroturnaround.alvor.crawler.PositionUtil;
 import com.zeroturnaround.alvor.crawler.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.samplegen.SampleGenerator;

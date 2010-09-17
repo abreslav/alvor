@@ -21,11 +21,11 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaCore;
 
 import com.zeroturnaround.alvor.cache.CacheService;
+import com.zeroturnaround.alvor.cache.PositionUtil;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.common.logging.Timer;
 import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
-import com.zeroturnaround.alvor.crawler.PositionUtil;
 import com.zeroturnaround.alvor.gui.GuiChecker;
 import com.zeroturnaround.alvor.gui.GuiUtil;
 import com.zeroturnaround.alvor.main.OptionLoader;

@@ -87,12 +87,16 @@ public class JavaElementChecker {
 //				connMap.put(exp, prevCount == null ? 1 : prevCount + 1);
 			}
 			else if (hotspot instanceof UnsupportedNodeDescriptor) {
+				UnsupportedNodeDescriptor und = (UnsupportedNodeDescriptor) hotspot; 
 				assert LOG.message("UNSUPPORTED node desc, file=" + PositionUtil.getLineString(hotspot.getPosition())
-						+ ", msg=" + ((UnsupportedNodeDescriptor) hotspot).getProblemMessage());
+						+ ", msg=" + (und).getProblemMessage());
 				unsupportedCount++;
-				errorHandler.handleSQLWarning(
-						"Unsupported SQL construction: " + ((UnsupportedNodeDescriptor)hotspot).getProblemMessage(),
-						hotspot.getPosition());
+				
+				String msg = "Unsupported SQL construction: " + und.getProblemMessage(); 
+				if (und.getErrorPosition() != null && !und.getPosition().equals(und.getErrorPosition())) {
+					msg += " at: " + PositionUtil.getLineString(und.getErrorPosition());
+				}
+				errorHandler.handleSQLWarning(msg, hotspot.getPosition());
 			}
 			else {
 				throw new IllegalArgumentException("Unknown type of INodeTypeDescriptor: " + hotspot.getClass().getName());
