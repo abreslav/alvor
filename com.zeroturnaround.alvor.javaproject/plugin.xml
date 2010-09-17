@@ -4,7 +4,7 @@
 
    <extension
          id="esqlBuilder"
-         name="Embedded SQL Checker"
+         name="Alvor SQL Checker"
          point="org.eclipse.core.resources.builders">
       <builder
             callOnEmptyDelta="false"
@@ -17,7 +17,7 @@
    </extension>
    <extension
          id="esqlNature"
-         name="Embedded SQL Nature"
+         name="Alvor SQL Checker Nature"
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
@@ -36,7 +36,7 @@
             nameFilter="*"
             id="com.zeroturnaround.alvor.javaproject.contribution1">
          <action
-               label="Add/Remove ESQL Nature"
+               label="Enable/Disable Alvor SQL Checker Nature"
                class="com.zeroturnaround.alvor.javaproject.builder.ToggleNatureAction"
                menubarPath="additions"
                enablesFor="+"
