@@ -38,9 +38,9 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 
+import com.zeroturnaround.alvor.cache.PositionUtil;
 import com.zeroturnaround.alvor.checkers.INodeDescriptor;
 import com.zeroturnaround.alvor.checkers.IStringNodeDescriptor;
-import com.zeroturnaround.alvor.crawler.PositionUtil;
 import com.zeroturnaround.alvor.crawler.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.samplegen.SampleGenerator;
@@ -147,7 +147,12 @@ public abstract class GUITest {
 	}
 	
 	private String getElementDescriptor(IJavaElement e) {
-		return (e.getJavaProject().getElementName() + "_" + e.getElementName()).replace('/', '_');
+		if (e instanceof IJavaProject) {
+			return e.getJavaProject().getElementName().replace('/', '_');
+		}
+		else {
+			return (e.getJavaProject().getElementName() + "_" + e.getElementName()).replace('/', '_');
+		}
 	}
 	
 	private void writeAndCompare(List<String> items, String testId) throws FileNotFoundException {

@@ -604,7 +604,7 @@ public final class CacheServiceImpl implements ICacheService {
 		}
 		
 		String message = notNull(res, res.getString("message"));
-		throw new UnsupportedStringOpEx(message);
+		throw new UnsupportedStringOpEx(message, position);
 	}
 
 	private List<IAbstractString> getCollectionContents(int collectionId) throws SQLException {

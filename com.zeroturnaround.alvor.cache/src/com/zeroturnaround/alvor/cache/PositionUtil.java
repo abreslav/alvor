@@ -1,4 +1,4 @@
-package com.zeroturnaround.alvor.crawler;
+package com.zeroturnaround.alvor.cache;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
@@ -20,11 +21,11 @@ import com.zeroturnaround.alvor.string.IPosition;
 import com.zeroturnaround.alvor.string.Position;
 
 public class PositionUtil {
-	private static final ILog LOG = Logs.getLog(AbstractStringEvaluator.class);
+	private static final ILog LOG = Logs.getLog(PositionUtil.class);
 
 	public static IFile getFile(ASTNode node) {
 		try {
-			ICompilationUnit unit = ASTUtil.getICompilationUnit(node);
+			ICompilationUnit unit = (ICompilationUnit)((CompilationUnit)node.getRoot()).getJavaElement();
 			IFile correspondingResource = (IFile) unit.getCorrespondingResource();
 			return correspondingResource;
 		} catch (JavaModelException e) {

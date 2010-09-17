@@ -108,7 +108,7 @@ public class AbstractStringEvaluator {
 				result.add(new StringNodeDescriptor(pos, evaluator.eval(pos)));
 			} 
 			catch (UnsupportedStringOpEx e) {
-				result.add(new UnsupportedNodeDescriptor(pos, e.getMessage()));
+				result.add(new UnsupportedNodeDescriptor(pos, e.getMessage(), e.getPosition()));
 			} 
 		}
 		return result;
@@ -458,7 +458,7 @@ public class AbstractStringEvaluator {
 	}
 	
 	private IAbstractString evalClassInstanceCreation(ClassInstanceCreation node) {
-		if (!ASTUtil.isStringBuilderOrBuffer(node.resolveTypeBinding())) {
+		if (!ASTUtil.isStringOrStringBuilderOrBuffer(node.resolveTypeBinding())) {
 			throw new UnsupportedStringOpEx("Unsupported type in class instance creation: "
 					+ node.resolveTypeBinding().getQualifiedName(), node);
 		}
@@ -472,7 +472,7 @@ public class AbstractStringEvaluator {
 				return new StringConstant(PositionUtil.getPosition(node), "", "\"\"");
 			}
 			else { // CharSequence
-				throw new UnsupportedStringOpEx("Unknown StringBuilder/Buffer constructor: " 
+				throw new UnsupportedStringOpEx("Unknown String/StringBuilder/Buffer constructor: " 
 						+ arg.resolveTypeBinding().getName(), node);
 			}
 		}
