@@ -108,7 +108,7 @@ public class ASTUtil {
 		else {
 			throw new UnsupportedStringOpEx("Checking whether var is mentioned. "
 					+ "Unsupported expression: "
-					+ expr.getClass());
+					+ expr.getClass(), expr);
 		}
 	}
 	
@@ -145,7 +145,7 @@ public class ASTUtil {
 		}
 		else { 
 			throw new UnsupportedStringOpEx("getPrevStatement(" + node.getClass().getName() 
-				+ ", parent is " + node.getParent().getClass().getName() + ")");
+				+ ", parent is " + node.getParent().getClass().getName() + ")", node);
 		}
 	}
 	

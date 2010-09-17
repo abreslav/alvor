@@ -7,6 +7,7 @@ import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
+import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.EmptyStatement;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
@@ -28,6 +29,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import com.zeroturnaround.alvor.cache.UnsupportedStringOpEx;
 import com.zeroturnaround.alvor.crawler.ASTUtil;
+import com.zeroturnaround.alvor.string.IPosition;
 
 /*
  * getLastReachingModIn* methods stay in given scope
@@ -72,7 +74,7 @@ public class VariableTracker {
 	
 	private static NameUsage getFieldDefinition(IVariableBinding var) {
 		// for now, (final)fields should be handled by client 
-		throw new UnsupportedStringOpEx("Fields are not supported in tracker");
+		throw new UnsupportedStringOpEx("Fields are not supported in tracker", (IPosition)null);
 	}
 	
 	/*
@@ -95,6 +97,9 @@ public class VariableTracker {
 	    }
 		else if (scope instanceof IfStatement) {
 			return getLastReachingModInIf(var, target, (IfStatement)scope);
+		}
+		else if (scope instanceof ConditionalExpression) {
+			return getLastReachingModInCondExpr(var, target, (ConditionalExpression)scope);
 		}
 		else if (scope instanceof MethodInvocation) {
 			return getLastReachingModInInv(var, target, (MethodInvocation)scope);
@@ -159,7 +164,32 @@ public class VariableTracker {
 			return null;
 		}
 		else {
-			throw new UnsupportedStringOpEx("getLastReachingModIn " + scope.getClass());
+			throw new UnsupportedStringOpEx("getLastReachingModIn " + scope.getClass(), scope);
+		}
+	}
+
+	private static NameUsage getLastReachingModInCondExpr(IVariableBinding var,
+			ASTNode target, ConditionalExpression condExpr) {
+		
+		if (target == null) {
+			NameUsage thenUsage = getLastModIn(var, condExpr.getThenExpression());
+			NameUsage elseUsage = null;
+			if (condExpr.getElseExpression() != null) {
+				elseUsage = getLastModIn(var, condExpr.getElseExpression());
+			}
+			
+			if (thenUsage == null && elseUsage == null) {
+				return null;
+			}
+			
+			
+			return new NameUsageChoice(condExpr, thenUsage, elseUsage);
+		}
+		else {
+			return null;
+			// FIXME check also inside header
+			//assert target == ifStmt.getThenStatement() || target == ifStmt.getElseStatement();
+			//return getPrevReachingModIn(var, null, ifStmt.getExpression());
 		}
 	}
 
@@ -188,7 +218,7 @@ public class VariableTracker {
 		// ++ or --
 		if (target == null) {
 			if (ASTUtil.sameBinding(postfix.getOperand(), var)) {
-				throw new UnsupportedStringOpEx("Postfix operand");
+				throw new UnsupportedStringOpEx("Postfix operand", postfix);
 			}
 		}
 		return getLastReachingModIn(var, target, postfix.getOperand());
@@ -229,7 +259,7 @@ public class VariableTracker {
 			if (!var.isParameter()) {
 				throw new UnsupportedStringOpEx("Non-parameter var ("
 						+ var+ ") asked from MethodDeclaration ("
-						+ decl.getName().getFullyQualifiedName() + ")"); 
+						+ decl.getName().getFullyQualifiedName() + ")", decl); 
 			}
 			
 			int idx = ASTUtil.getParamIndex0(decl, var);
