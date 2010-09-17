@@ -10,8 +10,8 @@ public class GuiTestCompiere extends GUITest {
 	@Test
 	public void testStringsAndMarkers() throws FileNotFoundException, CoreException {
 		IJavaProject javaProject = GUITest.getJavaProject("base"); 
-//		testAbstractStringsClean(javaProject);
-//		writeAndTestMarkers(javaProject, GuiChecker.ERROR_MARKER_ID, "errors", true);
+		testAbstractStringsClean(javaProject);
+		writeAndTestMarkers(javaProject, GuiChecker.ERROR_MARKER_ID, "errors", true);
 		writeAndTestMarkers(javaProject, GuiChecker.WARNING_MARKER_ID, "warnings", true);
 	}
 

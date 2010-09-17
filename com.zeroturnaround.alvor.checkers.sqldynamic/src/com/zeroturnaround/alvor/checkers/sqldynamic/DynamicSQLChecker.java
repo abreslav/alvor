@@ -58,7 +58,7 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 			assert LOG.message("ABS: " + nodeDesc.getAbstractValue());
 			
 			if (AbstractStringSizeCounter.size(nodeDesc.getAbstractValue()) > SIZE_LIMIT) {
-				errorHandler.handleSQLWarning("Dynamic SQL checker: abstract string is too big", 
+				errorHandler.handleSQLWarning("Dynamic SQL checker: SQL string has too many possible variations", 
 						nodeDesc.getPosition());
 				continue;
 			}
@@ -105,7 +105,7 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 				String message = entry.getKey().trim() + "\nSQL: \n" 
 						+ entry.getValue();
 				//message = message.substring(0, Math.min(200, message.length()));
-				errorHandler.handleSQLError("SQL engine: " + message, nodeDesc.getPosition());
+				errorHandler.handleSQLError("Dynamic SQL checker: String may cause database error - " + message, nodeDesc.getPosition());
 			}
 
 			

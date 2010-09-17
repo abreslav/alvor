@@ -85,13 +85,25 @@ public class AlvorPropertiesEditor extends FormEditor {
 
 		public void refresh() {
 			Properties props = loadProps();
-				
-			// (getProperty defaults to null)
-			dbdrivername = props.getProperty(sdbdrivername);
-			dburl = props.getProperty(sdburl);
-			dbusername = props.getProperty(sdbusername);
-			dbpassword = props.getProperty(sdbpassword);
-			hotspots = props.getProperty(shotspots);
+			
+			if (props != null) {
+				// (getProperty defaults to null)
+				dbdrivername = props.getProperty(sdbdrivername);
+				if (dbdrivername == null)
+					dbdrivername = "";
+				dburl = props.getProperty(sdburl);
+				if (dburl == null)
+					dburl = "";
+				dbusername = props.getProperty(sdbusername);
+				if (dbusername == null)
+					dbusername = "";
+				dbpassword = props.getProperty(sdbpassword);
+				if (dbpassword == null)
+					dbpassword = "";
+				hotspots = props.getProperty(shotspots);
+				if (hotspots == null)
+					hotspots = "";
+			}
 		}
 
 		private Properties loadProps() {
@@ -146,7 +158,8 @@ public class AlvorPropertiesEditor extends FormEditor {
 		private void setProperty(String key, String value) {
 			Properties props = loadProps();
 			
-			if (! props.getProperty(key).equals(value)) {
+			// If the property doesn't exist, this will return null
+			if (! value.equals(props.getProperty(key))) {
 				props.setProperty(key, value);
 				saveProps(props);
 			}
@@ -320,33 +333,42 @@ public class AlvorPropertiesEditor extends FormEditor {
 			label = toolkit.createLabel(container, "Database driver");
 			label.setLayoutData(new TableWrapData());
 			fdbdrivername = toolkit.createText(container, "");
-			fdbdrivername.setLayoutData(new TableWrapData());
+			td = new TableWrapData(TableWrapData.FILL_GRAB); td.maxWidth = 500;
+			fdbdrivername.setLayoutData(td);
 			
 			label = toolkit.createLabel(container, "This is the information required to access the" +
 					"(optional) database for dynamic testing. Currently Alvor " +
 					"supports accessing only one database per project being checked", SWT.WRAP);
-			td = new TableWrapData(TableWrapData.FILL_GRAB); td.rowspan = 4;
+			td = new TableWrapData(TableWrapData.FILL_GRAB); td.rowspan = 4; td.maxWidth = 300;
 			label.setLayoutData(td);
 
 			label = toolkit.createLabel(container, "Database URL:");
 			label.setLayoutData(new TableWrapData());
 			fdburl = toolkit.createText(container, "");
-			fdburl.setLayoutData(new TableWrapData());
+			td = new TableWrapData(TableWrapData.FILL_GRAB); td.maxWidth = 500;
+			fdburl.setLayoutData(td);
+			
 			label = toolkit.createLabel(container, "Database username:");
 			label.setLayoutData(new TableWrapData());
 			fdbusername = toolkit.createText(container, "");
-			fdbusername.setLayoutData(new TableWrapData());
+			td = new TableWrapData(TableWrapData.FILL_GRAB); td.maxWidth = 500;
+			fdbusername.setLayoutData(td);
+			
 			label = toolkit.createLabel(container, "Database password:");
 			label.setLayoutData(new TableWrapData());
 			fdbpassword = toolkit.createText(container, "");
-			fdbpassword.setLayoutData(new TableWrapData());
+			td = new TableWrapData(TableWrapData.FILL_GRAB); td.maxWidth = 500;
+			fdbpassword.setLayoutData(td);
+			
 			label = toolkit.createLabel(container, "Hotspots:");
 			label.setLayoutData(new TableWrapData());
 			fhotspots = toolkit.createText(container, "");			
-			fhotspots.setLayoutData(new TableWrapData());
+			td = new TableWrapData(TableWrapData.FILL_GRAB); td.maxWidth = 500;
+			fhotspots.setLayoutData(td);
 			
 			label = toolkit.createLabel(container, "Hotspots define the entry points in code for SQL strings to be checked. For now, hotspots should be given as a semicolon-separated list of entries as such: \"<package>,<method>,<argument number>\" ", SWT.WRAP);
-			label.setLayoutData(new TableWrapData(TableWrapData.FILL_GRAB));
+			td = new TableWrapData(TableWrapData.FILL_GRAB); td.maxWidth = 300;
+			label.setLayoutData(td); 
 
 			modelChanged();
 			

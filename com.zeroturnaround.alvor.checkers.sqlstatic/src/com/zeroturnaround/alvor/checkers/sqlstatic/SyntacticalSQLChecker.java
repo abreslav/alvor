@@ -59,10 +59,10 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 						}
 					}
 					if (hasBigSubstrings) {
-						errorHandler.handleSQLWarning("SQL syntax checker: Abstract string is too big" + (hasSmallSubstrings ? ". Only some parts checked" : ""), descriptor.getPosition());
+						errorHandler.handleSQLWarning("SQL syntax checker: SQL string has too many possible variations" + (hasSmallSubstrings ? ". Only some are checked" : ""), descriptor.getPosition());
 					}
 				} else {
-					errorHandler.handleSQLWarning("SQL syntax checker: Abstract string is too big", descriptor.getPosition());
+					errorHandler.handleSQLWarning("SQL syntax checker: SQL string has too many possible variations", descriptor.getPosition());
 				}
 			} else {
 				try {
@@ -70,7 +70,7 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 				} catch (StackOverflowError e) {
 					// The analyzer has caused a stack overflow in the dfs-based evaluation procedure.
 					// See FixpointParser class
-					errorHandler.handleSQLWarning("SQL syntax checker: Abstract string is too big", descriptor.getPosition());
+					errorHandler.handleSQLWarning("SQL syntax checker: SQL string has too many possible variations", descriptor.getPosition());
 				}
 			}
 		}

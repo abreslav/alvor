@@ -1,11 +1,30 @@
-SQL engine: ORA-00908: missing NULL keyword
+Dynamic SQL checker: String may cause database error - ORA-00904: "R_REQUEST_ID": invalid identifier
+SQL: 
+SELECT * FROM R_RequestType WHERE AD_Client_ID IN (0,11) AND IsActive='Y'ORDER BY IsDefault DESC, AD_Client_ID DESC, R_Request_ID DESC, at: /base/src/org/compiere/model/MRequestType.java:77
+Dynamic SQL checker: String may cause database error - ORA-00904: "T"."M_ATTRIBUTESETINSTANCE_ID": invalid identifier
+SQL: 
+SELECT currencyConvert(ol.PriceCost, o.C_Currency_ID, ?, o.DateAcct, o.C_ConversionType_ID, ol.AD_Client_ID, ol.AD_Org_ID), currencyConvert(ol.PriceActual, o.C_Currency_ID, ?, o.DateAcct, o.C_ConversionType_ID, ol.AD_Client_ID, ol.AD_Org_ID) FROM C_OrderLine ol INNER JOIN C_Order o ON (ol.C_Order_ID=o.C_Order_ID) WHERE ol.M_Product_ID=? AND o.IsSOTrx='N' AND t.M_AttributeSetInstance_ID=? ORDER BY o.DateOrdered DESC, ol.Line DESC, at: /base/src/org/compiere/model/MCost.java:546
+Dynamic SQL checker: String may cause database error - ORA-00908: missing NULL keyword
 SQL: 
 SELECT c.MultiplyRate, uomTo.StdPrecision, uomTo.CostingPrecision FROM	C_UOM_Conversion c INNER JOIN C_UOM uomTo ON (c.C_UOM_To_ID=uomTo.C_UOM_ID) WHERE c.IsActive='Y' AND c.C_UOM_ID=? AND c.C_UOM_To_ID=?  AND c.M_Product_ID IS NULLORDER BY c.AD_Client_ID DESC, c.AD_Org_ID DESC, at: /base/src/org/compiere/model/MUOMConversion.java:397
-SQL engine: ORA-00936: missing expression
+Dynamic SQL checker: String may cause database error - ORA-00920: invalid relational operator
+SQL: 
+SELECT * FROM M_Product WHERE AD_Client_ID=?  AND null, at: /base/src/org/compiere/model/MProduct.java:77
+Dynamic SQL checker: String may cause database error - ORA-00933: SQL command not properly ended
+SQL: 
+SELECT * FROM M_ProductPrice WHERE M_PriceList_Version_ID=? null;;;
+SELECT * FROM M_ProductPrice WHERE M_PriceList_Version_ID=? true, at: /base/src/org/compiere/model/MPriceListVersion.java:123
+Dynamic SQL checker: String may cause database error - ORA-00936: missing expression
+SQL: 
+SELECT * FROM CM_NewsItem WHERE CM_NewsChannel_ID=? AND IsActive='Y' AND  ORDER BY pubDate DESC, at: /base/src/org/compiere/model/MNewsChannel.java:78
+Dynamic SQL checker: String may cause database error - ORA-00936: missing expression
 SQL: 
 SELECT * FROM M_RequisitionLine rl WHERE rl.C_OrderLine_ID IS NULL AND AD_Org_ID=? AND M_Product_ID=? AND EXISTS (SELECT * FROM M_Requisition r WHERE rl.M_Requisition_ID=r.M_Requisition_ID AND r.DocStatus='CO' AND r.M_Warehouse_ID=? AND r.DateDoc BETWEEN ? AND ? AND r.DateRequired BETWEEN ? AND ? AND r.PriorityRule => ? AND r.AD_User_ID=?) ORDER BY M_Requisition_ID, M_Product_ID, C_Charge_ID, M_AttributeSetInstance_ID;;;
-SELECT * FROM M_RequisitionLine rl WHERE rl.C_OrderLine_ID IS NULL AND AD_Org_ID=? AND M_Product_ID=? AND EXISTS (SELECT * FROM M_Requisition r WHERE rl.M_Requisition_ID=r.M_Requisition_ID AND r.DocStatus='CO' AND r.M_Warehouse_ID=? AND r.DateDoc BETWEEN ? AND ? AND r.DateRequired BETWEEN ? AND ? AND r.PriorityRule => ? AND r..., at: /base/src/org/compiere/process/RequisitionPOCreate.java:176
-SQL engine: ORA-00979: not a GROUP BY expression
+SELECT * FROM M_RequisitionLine rl WHERE rl.C_OrderLine_ID IS NULL AND AD_Org_ID=? AND M_Product_ID=? AND EXISTS (SELECT * FROM M_Requisition r WHERE rl.M_Requisition_ID=r.M_Requisition_ID AND r.DocStatus='CO' AND r.M_Warehouse_ID=? AND r.DateDoc BETWEEN ? AND ? AND r.DateRequired BE..., at: /base/src/org/compiere/process/RequisitionPOCreate.java:176
+Dynamic SQL checker: String may cause database error - ORA-00942: table or view does not exist
+SQL: 
+SELECT DEFINITION FROM PG_VIEWS WHERE VIEWNAME LIKE ?, at: /base/src/org/compiere/process/ViewImportFromDB.java:215
+Dynamic SQL checker: String may cause database error - ORA-00979: not a GROUP BY expression
 SQL: 
 SELECT TRUNC(Created, 'Q'), Count(*) FROM W_Click WHERE W_ClickCount_ID=? GROUP BY TRUNC(Created, 'MM');;;
 SELECT TRUNC(Created, 'Q'), Count(*) FROM W_Click WHERE W_ClickCount_ID=? GROUP BY TRUNC(Created, 'DY');;;
@@ -13,25 +32,43 @@ SELECT TRUNC(Created, 'Q'), Count(*) FROM W_Click WHERE W_ClickCount_ID=? GROUP 
 SELECT TRUNC(Created, 'MM'), Count(*) FROM W_Click WHERE W_ClickCount_ID=? GROUP BY TRUNC(Created, 'Q');;;
 SELECT TRUNC(Created, 'MM'), Count(*) FROM W_Click WHERE W_ClickCount_ID=? GROUP BY TRUNC(Created, 'DY');;;
 SELECT TRUNC(Created, 'MM'), Count(*) FROM W_Click WHERE W_ClickCount_ID=? GROUP BY TRUNC(Created, 'J');;;
-SELECT TRUNC(Created, 'DY'), Count(*) FROM W_Click WHERE W_ClickCount_ID=? GROUP BY TRUNC(Created, 'Q')..., at: /base/src/org/compiere/model/MClickCount.java:114
+SELECT TRUNC(Created, 'DY'), Count(*) FROM W_Click WHERE W_C..., at: /base/src/org/compiere/model/MClickCount.java:114
+SQL syntax checker: Syntax error. Most likely, unfinished query, at: /base/src/org/compiere/model/MProduct.java:77
 SQL syntax checker: Unexpected token: 1WHERE, at: /base/src/org/compiere/process/ImportGLJournal.java:272
 SQL syntax checker: Unexpected token: 1WHERE, at: /base/src/org/compiere/process/ImportGLJournal.java:273
-SQL syntax checker: Unexpected token: =>, at: /base/src/org/compiere/process/RequisitionPOCreate.java:164
+SQL syntax checker: Unexpected token: =>, at: /base/src/org/compiere/process/RequisitionPOCreate.java:159
 SQL syntax checker: Unexpected token: CHAR, at: /base/src/org/compiere/process/ImportProduct.java:555
 SQL syntax checker: Unexpected token: CHAR, at: /base/src/org/compiere/process/ImportReportLine.java:413
+SQL syntax checker: Unexpected token: CURRENT_TIMESTAMP, at: /base/src/org/compiere/process/SynchronizeTerminology.java:157
+SQL syntax checker: Unexpected token: CURRENT_TIMESTAMP, at: /base/src/org/compiere/process/SynchronizeTerminology.java:330
+SQL syntax checker: Unexpected token: CURRENT_TIMESTAMP, at: /base/src/org/compiere/process/SynchronizeTerminology.java:357
+SQL syntax checker: Unexpected token: CURRENT_TIMESTAMP, at: /base/src/org/compiere/process/SynchronizeTerminology.java:413
+SQL syntax checker: Unexpected token: CURRENT_TIMESTAMP, at: /base/src/org/compiere/process/SynchronizeTerminology.java:560
+SQL syntax checker: Unexpected token: CURRENT_TIMESTAMP, at: /base/src/org/compiere/process/SynchronizeTerminology.java:646
+SQL syntax checker: Unexpected token: CURRENT_TIMESTAMP, at: /base/src/org/compiere/process/SynchronizeTerminology.java:690
+SQL syntax checker: Unexpected token: CURRENT_TIMESTAMP, at: /base/src/org/compiere/process/SynchronizeTerminology.java:75
+SQL syntax checker: Unexpected token: CURRENT_TIMESTAMP, at: /base/src/org/compiere/process/SynchronizeTerminology.java:757
+SQL syntax checker: Unexpected token: CURRENT_TIMESTAMP, at: /base/src/org/compiere/process/SynchronizeTerminology.java:786
+SQL syntax checker: Unexpected token: CURRENT_TIMESTAMP, at: /base/src/org/compiere/process/SynchronizeTerminology.java:835
+SQL syntax checker: Unexpected token: CURRENT_TIMESTAMP, at: /base/src/org/compiere/process/SynchronizeTerminology.java:869
 SQL syntax checker: Unexpected token: Insert, at: /base/src/org/compiere/process/ImportBPartner.java:302
 SQL syntax checker: Unexpected token: Insert, at: /base/src/org/compiere/process/ImportBPartner.java:400
 SQL syntax checker: Unexpected token: Insert, at: /base/src/org/compiere/process/ImportBPartner.java:422
 SQL syntax checker: Unexpected token: Insert, at: /base/src/org/compiere/process/ImportBPartner.java:518
 SQL syntax checker: Unexpected token: NULLORDER, at: /base/src/org/compiere/model/MUOMConversion.java:392
 SQL syntax checker: Unexpected token: NULLORDER, at: /base/src/org/compiere/model/MUOMConversion.java:393
+SQL syntax checker: Unexpected token: ORDER, at: /base/src/org/compiere/model/MNewsChannel.java:74
 SQL syntax checker: Unexpected token: Update, at: /base/src/org/compiere/process/ImportBPartner.java:481
 SQL syntax checker: Unexpected token: Value, at: /base/src/org/compiere/MigrateData.java:129
+SQL syntax checker: Unexpected token: Value, at: /base/src/org/compiere/model/MAttribute.java:141
 SQL syntax checker: Unexpected token: Value, at: /base/src/org/compiere/model/MBPartner.java:276
 SQL syntax checker: Unexpected token: Value, at: /base/src/org/compiere/model/MLdapProcessor.java:332
 SQL syntax checker: Unexpected token: Value, at: /base/src/org/compiere/model/MPaySelectionCheck.java:347
+SQL syntax checker: Unexpected token: Value, at: /base/src/org/compiere/model/MSetup.java:572
 SQL syntax checker: Unexpected token: Value, at: /base/src/org/compiere/model/MStatus.java:117
 SQL syntax checker: Unexpected token: Value, at: /base/src/org/compiere/model/MTemplate.java:102
+SQL syntax checker: Unexpected token: Value, at: /base/src/org/compiere/process/AllocationAuto.java:101
+SQL syntax checker: Unexpected token: Value, at: /base/src/org/compiere/process/AllocationAuto.java:140
 SQL syntax checker: Unexpected token: Value, at: /base/src/org/compiere/process/DocumentTypeVerify.java:73
 SQL syntax checker: Unexpected token: Value, at: /base/src/org/compiere/process/ImportAccount.java:149
 SQL syntax checker: Unexpected token: Value, at: /base/src/org/compiere/process/ImportAccount.java:235
@@ -104,9 +141,13 @@ SQL syntax checker: Unexpected token: Value, at: /base/src/org/compiere/process/
 SQL syntax checker: Unexpected token: Value, at: /base/src/org/compiere/process/ImportRequest.java:73
 SQL syntax checker: Unexpected token: Value, at: /base/src/org/compiere/process/ImportRequest.java:84
 SQL syntax checker: Unexpected token: Value, at: /base/src/org/compiere/process/ImportRequest.java:97
+SQL syntax checker: Unexpected token: Value, at: /base/src/org/compiere/process/InventoryCountCreate.java:166
 SQL syntax checker: Unexpected token: Value, at: /base/src/org/compiere/report/TrialBalance.java:436
 SQL syntax checker: Unexpected token: Value, at: /base/src/org/compiere/util/WebUser.java:456
+SQL syntax checker: Unexpected token: null, at: /base/src/org/compiere/process/PriceListCreate.java:271
+SQL syntax checker: Unexpected token: null, at: /base/src/org/compiere/process/ViewImportFromDB.java:207
 SQL syntax checker: Unexpected token: of, at: /base/src/org/compiere/process/ImportBPartner.java:442
+SQL syntax checker: Unexpected token: true, at: /base/src/org/compiere/process/PriceListCreate.java:363
 SQL syntax checker: Unexpected token: value, at: /base/src/org/compiere/process/ImportOrder.java:234
 SQL syntax checker: Unexpected token: value, at: /base/src/org/compiere/process/ImportRequest.java:328
 SQL syntax checker: Unexpected token: value, at: /base/src/org/compiere/process/ImportRequest.java:402
