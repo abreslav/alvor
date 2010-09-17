@@ -31,6 +31,7 @@ import org.eclipse.jdt.core.dom.TagElement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 import com.zeroturnaround.alvor.cache.CacheService;
+import com.zeroturnaround.alvor.cache.PositionUtil;
 import com.zeroturnaround.alvor.cache.UnsupportedStringOpEx;
 import com.zeroturnaround.alvor.checkers.INodeDescriptor;
 import com.zeroturnaround.alvor.checkers.IStringNodeDescriptor;
@@ -77,7 +78,7 @@ public class AbstractStringEvaluator {
 	
 	private AbstractStringEvaluator(int level, IJavaElement[] scope, boolean templateConstructionMode) {
 		if (level > maxLevel) {
-			throw new UnsupportedStringOpEx("Analysis level (" + level + ") too deep");
+			throw new UnsupportedStringOpEx("Analysis level (" + level + ") too deep", (IPosition)null);
 		}
 		this.level = level;
 		this.scope = scope;
@@ -207,7 +208,7 @@ public class AbstractStringEvaluator {
 		}
 		else if (node instanceof Name) {
 			if (!ASTUtil.isStringOrStringBuilderOrBuffer(type)) {
-				throw new UnsupportedStringOpEx("Unsupported type: " + type.getQualifiedName());
+				throw new UnsupportedStringOpEx("Unsupported type of Name: " + type.getQualifiedName(), node);
 			}
 			return evalName((Name)node);
 		}
@@ -243,7 +244,7 @@ public class AbstractStringEvaluator {
 		}
 		else {
 			throw new UnsupportedStringOpEx
-				("getValOf(" + node.getClass().getName() + ")");
+				("getValOf(" + node.getClass().getName() + ")", node);
 		}
 	}
 	
@@ -262,7 +263,8 @@ public class AbstractStringEvaluator {
 		assert var.isField();
 		
 		if ((var.getModifiers() & Modifier.FINAL) == 0) {
-			throw new UnsupportedStringOpEx("Non-final fields are not supported");
+			throw new UnsupportedStringOpEx("Non-final fields are not supported: "
+					+ var.getDeclaringClass().getName() + '.' + var.getName(), (IPosition)null);
 		}
 		VariableDeclarationFragment frag = NodeSearchEngine.findFieldDeclarationFragment(
 					scope, 
@@ -271,7 +273,8 @@ public class AbstractStringEvaluator {
 		
 		if (frag.getInitializer() == null) {
 			// TODO should check for initializer in constructor
-			throw new UnsupportedStringOpEx("Final fields without initializer are not supported");
+			throw new UnsupportedStringOpEx("Final fields without initializer are not supported"
+					+ var.getDeclaringClass().getName() + '.' + var.getName(), (IPosition)null);
 		}
 		return eval(frag.getInitializer());
 	}
@@ -305,8 +308,7 @@ public class AbstractStringEvaluator {
 			}
 			else {
 				throw new UnsupportedStringOpEx("String/Builder/Buffer, method=" 
-						+ inv.getName().getIdentifier(),
-						PositionUtil.getPosition(inv)); 
+						+ inv.getName().getIdentifier(), inv); 
 			}
 		}
 		if (inv.getExpression() != null
@@ -327,7 +329,7 @@ public class AbstractStringEvaluator {
 	private IAbstractString evalInvocationResultOrArgOut(MethodInvocation inv,
 			int argumentIndex) {
 		if (! supportInvocations) {
-			throw new UnsupportedStringOpEx("Method call");
+			throw new UnsupportedStringOpEx("Method call", inv);
 		}
 		
 		assert LOG.message("evalInvocationResultOrArgOut: " + inv.resolveMethodBinding()
@@ -340,7 +342,7 @@ public class AbstractStringEvaluator {
 					inv, argumentIndex);
 		
 		if (templates.size() == 0) {
-			throw new UnsupportedStringOpEx("No declarations found for: " + inv.toString());
+			throw new UnsupportedStringOpEx("No declarations found for: " + inv.toString(), inv);
 		}
 		
 		AbstractStringEvaluator argEvaluator = new AbstractStringEvaluator(this.level+1, this.scope, this.templateConstructionMode);
@@ -443,7 +445,7 @@ public class AbstractStringEvaluator {
 		if (tag != null) {
 			String tagText = ASTUtil.getTagElementText(tag);
 			if (tagText == null) {
-				throw new UnsupportedStringOpEx("Problem reading " + RESULT_FOR_SQL_CHECKER);
+				throw new UnsupportedStringOpEx("Problem reading " + RESULT_FOR_SQL_CHECKER, decl);
 			} else {
 				//return new StringConstant(tagText);
 				return new StringConstant(PositionUtil.getPosition(tag), 
@@ -458,7 +460,7 @@ public class AbstractStringEvaluator {
 	private IAbstractString evalClassInstanceCreation(ClassInstanceCreation node) {
 		if (!ASTUtil.isStringBuilderOrBuffer(node.resolveTypeBinding())) {
 			throw new UnsupportedStringOpEx("Unsupported type in class instance creation: "
-					+ node.resolveTypeBinding().getQualifiedName());
+					+ node.resolveTypeBinding().getQualifiedName(), node);
 		}
 		if (node.arguments().size() == 1) {
 			Expression arg = (Expression)node.arguments().get(0);
@@ -471,7 +473,7 @@ public class AbstractStringEvaluator {
 			}
 			else { // CharSequence
 				throw new UnsupportedStringOpEx("Unknown StringBuilder/Buffer constructor: " 
-						+ arg.resolveTypeBinding().getName());
+						+ arg.resolveTypeBinding().getName(), node);
 			}
 		}
 		else {
@@ -492,7 +494,7 @@ public class AbstractStringEvaluator {
 		}
 		else {
 			throw new UnsupportedStringOpEx
-				("getValOf( infix op = " + expr.getOperator() + ")");
+				("getValOf( infix op = " + expr.getOperator() + ")", expr);
 		}
 	}
 	
@@ -517,7 +519,7 @@ public class AbstractStringEvaluator {
 				return widened;
 			} 
 			else {
-				throw new UnsupportedStringOpEx("unsupported modification scheme in loop");
+				throw new UnsupportedStringOpEx("Unsupported modification scheme in loop", usage.getNode());
 			}
 		}
 		else {
@@ -560,7 +562,7 @@ public class AbstractStringEvaluator {
 			return evalNameInCallExpression(name, (NameInMethodCallExpression)usage);
 		}
 		else {
-			throw new UnsupportedStringOpEx("Unsupported NameUsage: " + usage.getClass());
+			throw new UnsupportedStringOpEx("Unsupported NameUsage: " + usage.getClass(), usage.getNode());
 		}
 	}
 
@@ -612,7 +614,7 @@ public class AbstractStringEvaluator {
 			}
 			else {
 				throw new UnsupportedStringOpEx("Unknown method called on StringBuilder: " 
-						+ inv.getName());
+						+ inv.getName(), inv);
 			}
 		}
 	}
@@ -628,7 +630,7 @@ public class AbstractStringEvaluator {
 					eval(usage.getRightHandSide()));
 		}
 		else {
-			throw new UnsupportedStringOpEx("Unknown assignment operator: " + usage.getOperator());
+			throw new UnsupportedStringOpEx("Unknown assignment operator: " + usage.getOperator(), usage.getNode());
 		}
 	}
 
@@ -665,7 +667,7 @@ public class AbstractStringEvaluator {
 				|| isInsideBadLoop(usage.getBaseUsage().getNode())
 				|| isInsideBadLoop(usage.getLoopUsage().getNode())
 				) {
-			throw new UnsupportedStringOpEx("Unsupported modification scheme in loop");
+			throw new UnsupportedStringOpEx("Unsupported modification scheme in loop", usage.getNode());
 		}
 		
 		assert usage.getBaseUsage() != null;
@@ -714,7 +716,8 @@ public class AbstractStringEvaluator {
 					choices.add(((IStringNodeDescriptor)choiceDesc).getAbstractValue());
 				}
 				else if (choiceDesc instanceof UnsupportedNodeDescriptor) {
-					throw new UnsupportedStringOpEx(((UnsupportedNodeDescriptor)choiceDesc).getProblemMessage());
+					throw new UnsupportedStringOpEx(((UnsupportedNodeDescriptor)choiceDesc).getProblemMessage(),
+							usage.getNode());
 				}
 				else {
 					throw new IllegalStateException();
@@ -723,7 +726,8 @@ public class AbstractStringEvaluator {
 			if (descList.size() == 0) {
 				throw new UnsupportedStringOpEx("Possible problem, no callsites found in current project for: "
 						+ method.resolveBinding().getDeclaringClass().getQualifiedName() + "."
-						+ method.getName() + ASTUtil.getArgumentTypesString(method.resolveBinding()));
+						+ method.getName() + ASTUtil.getArgumentTypesString(method.resolveBinding()),
+						usage.getNode());
 			}
 			return new StringChoice(
 					PositionUtil.getPosition(

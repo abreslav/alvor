@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.eclipse.jdt.core.IJavaElement;
 
+import com.zeroturnaround.alvor.cache.PositionUtil;
 import com.zeroturnaround.alvor.checkers.IAbstractStringChecker;
 import com.zeroturnaround.alvor.checkers.INodeDescriptor;
 import com.zeroturnaround.alvor.checkers.ISQLErrorHandler;
@@ -17,7 +18,6 @@ import com.zeroturnaround.alvor.common.logging.Measurements;
 import com.zeroturnaround.alvor.common.logging.Timer;
 import com.zeroturnaround.alvor.crawler.AbstractStringEvaluator;
 import com.zeroturnaround.alvor.crawler.NodeRequest;
-import com.zeroturnaround.alvor.crawler.PositionUtil;
 import com.zeroturnaround.alvor.crawler.UnsupportedNodeDescriptor;
 
 /**

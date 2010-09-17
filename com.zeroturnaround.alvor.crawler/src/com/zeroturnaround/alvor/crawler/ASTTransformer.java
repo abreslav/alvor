@@ -9,6 +9,8 @@ import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.NodeFinder;
 
+import com.zeroturnaround.alvor.cache.PositionUtil;
+
 public class ASTTransformer {
 	
 	public static ASTNode patchAndReParse(ASTNode node, String replacement) 

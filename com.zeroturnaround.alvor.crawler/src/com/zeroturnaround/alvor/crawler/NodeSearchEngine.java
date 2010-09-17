@@ -39,6 +39,7 @@ import org.eclipse.jdt.core.search.SearchRequestor;
 
 import com.zeroturnaround.alvor.cache.CacheService;
 import com.zeroturnaround.alvor.cache.ICacheService;
+import com.zeroturnaround.alvor.cache.PositionUtil;
 import com.zeroturnaround.alvor.cache.UnsupportedStringOpEx;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
@@ -335,7 +336,7 @@ public class NodeSearchEngine {
 		
 		if (result.size() != 1) {
 			throw new UnsupportedStringOpEx("findFieldDeclarationFragment: " +
-					" name=" + qualifiedName + ", result.size=" + result.size());
+					" name=" + qualifiedName + ", result.size=" + result.size(), (IPosition)null);
 		}
 		return result.get(0);
 	}

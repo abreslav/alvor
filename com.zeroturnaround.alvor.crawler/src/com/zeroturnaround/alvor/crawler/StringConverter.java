@@ -3,6 +3,7 @@ package com.zeroturnaround.alvor.crawler;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.zeroturnaround.alvor.cache.PositionUtil;
 import com.zeroturnaround.alvor.cache.UnsupportedStringOpEx;
 import com.zeroturnaround.alvor.string.AbstractStringCollection;
 import com.zeroturnaround.alvor.string.IAbstractString;
@@ -51,15 +52,15 @@ public class StringConverter {
 						// TODO problem if several RecChoices with same key
 					}
 					else {
-						throw new UnsupportedStringOpEx("Unsupported form of NamedString-A");
+						throw new UnsupportedStringOpEx("Unsupported form of NamedString-A", str.getPosition());
 					}
 				}
 				else {
-					throw new UnsupportedStringOpEx("Unsupported form of NamedString-B");
+					throw new UnsupportedStringOpEx("Unsupported form of NamedString-B", str.getPosition());
 				}
 			}
 			else {
-				throw new UnsupportedStringOpEx("Unsupported form of NamedString-C");
+				throw new UnsupportedStringOpEx("Unsupported form of NamedString-C", str.getPosition());
 			}
 		}
 		else if (str instanceof StringParameter) {
@@ -72,7 +73,7 @@ public class StringConverter {
 			return str;
 		} 
 		else if (str instanceof StringRepetition) {
-			throw new UnsupportedStringOpEx("Widening inside StringRepetion");
+			throw new UnsupportedStringOpEx("Widening inside StringRepetion", str.getPosition());
 		}
 		else if (str instanceof StringChoice) {
 			List<IAbstractString> resultItems = new ArrayList<IAbstractString>();
