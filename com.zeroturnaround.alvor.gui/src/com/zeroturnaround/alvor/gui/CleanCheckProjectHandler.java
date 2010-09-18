@@ -5,11 +5,9 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jdt.core.IJavaElement;
 
-import com.zeroturnaround.alvor.cache.CacheService;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.common.logging.Timer;
-import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
 
 public class CleanCheckProjectHandler extends AbstractHandler {
 	GuiChecker checker = new GuiChecker();

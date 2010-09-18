@@ -1,7 +1,7 @@
 package com.zeroturnaround.alvor.common.logging;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintStream;
 
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -9,26 +9,26 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 
-public class AlternativeLog implements ILog {
+public class LogImpl implements ILog {
 	
-	private PrintStream messageStream;
+	private PrintStream fileStream;
 	
-	public AlternativeLog(Class<?> clazz) {
+	public LogImpl(Class<?> clazz) {
 		IPath wsPath = Platform.isRunning()? ResourcesPlugin.getWorkspace().getRoot().getLocation() : new Path(".");
 		IPath logFolder = wsPath.append(".metadata/.plugins/com.zeroturnaround.alvor.common/");
 		File f = logFolder.append(clazz.getCanonicalName() + ".log").toFile();
-		
 		try {
-			messageStream = new PrintStream(f);
-		} catch (FileNotFoundException e) {
-			messageStream = System.err;
+			f.createNewFile(); // creates if it doesn't exist yet 
+			fileStream = new PrintStream(f);
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
 		}
 	}
 
 	@Override
 	public void exception(Throwable e) {
-		e.printStackTrace(messageStream);
-		messageStream.flush();
+		e.printStackTrace(fileStream);
+		fileStream.flush();
 		
 		e.printStackTrace(System.err);
 		System.err.flush();
@@ -36,8 +36,8 @@ public class AlternativeLog implements ILog {
 
 	@Override
 	public boolean format(String format, Object... args) {
-		messageStream.format(format, args);
-		messageStream.flush();
+		fileStream.format(format, args);
+		fileStream.flush();
 		
 		System.out.format(format, args);
 		System.out.flush();
@@ -46,8 +46,8 @@ public class AlternativeLog implements ILog {
 
 	@Override
 	public boolean message(Object message) {
-		messageStream.println(message);
-		messageStream.flush();
+		fileStream.println(message);
+		fileStream.flush();
 		
 		System.out.println(message);
 		System.out.flush();
@@ -57,20 +57,20 @@ public class AlternativeLog implements ILog {
 	
 	@Override
 	public void error(Object message) {
-		messageStream.println(message);
+		fileStream.println(message);
+		System.err.println(message);
+		
 		if (message instanceof Throwable) {
-			((Throwable) message).printStackTrace(messageStream);
+			((Throwable) message).printStackTrace(fileStream);
+			((Throwable) message).printStackTrace(System.err);
 		}
 		
-		messageStream.flush();
-		
-		System.err.println(message);
+		fileStream.flush();
 		System.err.flush();
-		
 	}
 	
 	@Override
 	protected void finalize() throws Throwable {
-		messageStream.close();
+		fileStream.close();
 	}
 }

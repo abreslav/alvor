@@ -7,11 +7,11 @@ public class Timer {
 	private String message;
 	
 	public Timer() {
-		this(PrintStreamLog.SYSTEM_OUT);
+		this(Logs.getLog(Timer.class));
 	}
 
 	public Timer(String message) {
-		this(PrintStreamLog.SYSTEM_OUT, message);
+		this(Logs.getLog(Timer.class), message);
 	}
 	
 	public Timer(ILog log) {
