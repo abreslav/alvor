@@ -2,13 +2,13 @@ package com.zeroturnaround.alvor.gui;
 
 import org.eclipse.ui.IStartup;
 
-import com.zeroturnaround.alvor.common.logging.Logs;
-
 public class AlvorGuiStartup implements IStartup {
 
 	@Override
 	public void earlyStartup() {
-		Logs.configureFromStream(CleanCheckProjectHandler.class.getClassLoader().getResourceAsStream("logging.properties"));
+		// This was created for reading logging folder location
+		// When logging was simplified then it's not necessary anymore but
+		// now it just waits for some useful task to execute at startup
 	}
 
 }
