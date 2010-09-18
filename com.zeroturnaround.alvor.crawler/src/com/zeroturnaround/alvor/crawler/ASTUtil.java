@@ -169,7 +169,6 @@ public class ASTUtil {
 		// exclude abstract methods
 		if (inv.getName().getIdentifier().contains("getSequenceNextValueFunction")
 				|| inv.getName().getIdentifier().contains("getNextValueSQL")) {
-			System.out.println();
 		}
 		
 		if (decl.getBody() == null) {

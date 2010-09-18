@@ -15,10 +15,10 @@ public class CleanCheckProjectHandler extends AbstractHandler {
 	
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		System.out.println("MEM: totalMemory() == " + Runtime.getRuntime().totalMemory());
-		System.out.println("MEM: maxMemory() == " + Runtime.getRuntime().maxMemory());
-		System.out.println("MEM: freeMemory() == " + Runtime.getRuntime().freeMemory());
-		System.out.println("MEM: used memory == " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
+		assert LOG.message("MEM: totalMemory() == " + Runtime.getRuntime().totalMemory());
+		assert LOG.message("MEM: maxMemory() == " + Runtime.getRuntime().maxMemory());
+		assert LOG.message("MEM: freeMemory() == " + Runtime.getRuntime().freeMemory());
+		assert LOG.message("MEM: used memory == " + (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()));
 		
 		Timer timer = new Timer();
 		timer.start("TIMER: whole process");

@@ -1128,16 +1128,12 @@ public final class CacheServiceImpl implements ICacheService {
 	private IAbstractString findOutermostAbstractString(int id) throws SQLException {
 		while (true) {
 			Integer parent = getParent(id);
-//			System.out.println(parent);
 			if (parent == null) {
 				return getAbstractStringById(id);
 			}
 			if (parent == MANY_PARENTS) {
 				return null;
 			}
-//			System.out.println(getAbstractStringById(parent));
-//			System.out.println("is a parent for");
-//			System.out.println(getAbstractStringById(id));
 			if (id == parent) {
 				throw new IllegalStateException();
 			}
@@ -1159,8 +1155,6 @@ public final class CacheServiceImpl implements ICacheService {
 		if (res.next()) {
 			result = notNull(res, res.getInt("collection"));
 			if (res.next()) {
-//				System.out.println("dup: " + getAbstractStringById(result));
-//				System.out.println(getAbstractStringById(notNull(res, res.getInt("collection"))));
 				return MANY_PARENTS;
 			}
 		}
@@ -1177,8 +1171,6 @@ public final class CacheServiceImpl implements ICacheService {
 		while (res.next()) {
 			boolean parentlessSame = isParentlessSame(res);
 			if (result != null && !parentlessSame) {
-//				System.out.println("dup: " + getAbstractStringById(result));
-//				System.out.println(getAbstractStringById(notNull(res, res.getInt("id"))));
 				return MANY_PARENTS;
 			}
 			if (parentlessSame) {
