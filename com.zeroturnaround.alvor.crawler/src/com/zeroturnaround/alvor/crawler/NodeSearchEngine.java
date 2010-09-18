@@ -145,15 +145,6 @@ public class NodeSearchEngine {
 		IJavaElement[] elems = scopeToSearchIn.toArray(new IJavaElement[scopeToSearchIn.size()]);
 		IJavaSearchScope scope = SearchEngine.createJavaSearchScope(elems, IJavaSearchScope.SOURCES);
 		
-//		if (nodeRequest.getPatternString().startsWith("getProductInfoValue")) {
-//			System.out.println("stop");
-//			IJavaElement[] elems2 = {elems[0].getJavaProject()};
-//			scope = SearchEngine.createJavaSearchScope(elems2, IJavaSearchScope.SOURCES);
-//			for (IJavaElement el : scopeToSearchIn) {
-//				System.out.println(el.getElementName());
-//			}
-//		}
-		
 		SearchRequestor requestor = new SearchRequestor() {
 			@SuppressWarnings("rawtypes")
 			public void acceptSearchMatch(SearchMatch match) {
@@ -224,7 +215,7 @@ public class NodeSearchEngine {
 
 	private static void executeSearch(SearchPattern pattern, SearchRequestor requestor,
 			IJavaSearchScope scope) {
-		System.out.println("SEARCH");
+		assert LOG.message("SEARCH: " + pattern);
 		SearchEngine searchEngine = new SearchEngine();
 		try {
 			searchEngine.search(pattern,
@@ -245,7 +236,6 @@ public class NodeSearchEngine {
 		
 		if (inv.getName().getIdentifier().contains("getSequenceNextValueFunction")
 				|| inv.getName().getIdentifier().contains("getNextValueSQL")) {
-			System.out.println("stop");
 		}
 		
 		SearchPattern pattern = SearchPattern.createPattern(
@@ -348,7 +338,7 @@ public class NodeSearchEngine {
 		int length = position.getLength();
 		
 		if (cUnit == null) {
-			System.err.println("Compilation unit is null for the position: " + position);
+			LOG.error("Compilation unit is null for the position: " + position);
 		}
 		return getASTNode(cUnit, start, length);
 	}
@@ -370,7 +360,7 @@ public class NodeSearchEngine {
 		int length = match.getLength();
 		
 		if (cUnit == null) {
-			System.err.println("Compilation unit is null for the match: " + match);
+			LOG.error("Compilation unit is null for the match: " + match);
 		}
 		return getASTNode(cUnit, start, length);
 	}
@@ -399,7 +389,7 @@ public class NodeSearchEngine {
 	private static void checkClearCache(int freeMBsRequired) {
 		if (astCache.size() > 30 && getAvailableMemory() < freeMBsRequired * 1024 * 1024) {
 			astCache.clear();
-			System.err.println("Cleaning ast cache");
+			assert LOG.message("Cleaning ast cache");
 		}
 	}
 	

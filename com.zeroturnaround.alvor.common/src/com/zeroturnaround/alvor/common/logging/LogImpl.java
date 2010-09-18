@@ -13,10 +13,10 @@ public class LogImpl implements ILog {
 	
 	private PrintStream fileStream;
 	
-	public LogImpl(Class<?> clazz) {
+	public LogImpl(String name) {
 		IPath wsPath = Platform.isRunning()? ResourcesPlugin.getWorkspace().getRoot().getLocation() : new Path(".");
 		IPath logFolder = wsPath.append(".metadata/.plugins/com.zeroturnaround.alvor.common/");
-		File f = logFolder.append(clazz.getCanonicalName() + ".log").toFile();
+		File f = logFolder.append(name + ".log").toFile();
 		try {
 			f.createNewFile(); // creates if it doesn't exist yet 
 			fileStream = new PrintStream(f);

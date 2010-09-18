@@ -158,7 +158,7 @@ public class ESQLBuilder extends IncrementalProjectBuilder {
 //			return;
 //		}
 		
-		System.out.println("!!! Files to invalidate (directly): " + filesToRecheck);
+		assert LOG.message("!!! Files to invalidate (directly): " + filesToRecheck);
 		CacheService.getCacheService().removeFiles(filesToRecheck);
 		
 		t.printTime();
@@ -173,9 +173,9 @@ public class ESQLBuilder extends IncrementalProjectBuilder {
 		Collection<IPosition> hotspots = CacheService.getCacheService().getInvalidatedHotspotPositions();
 		t.printTimeAndStart("Elements");
 		
-		System.out.println("Invalidated hotspot positions:");
+		assert LOG.message("Invalidated hotspot positions:");
 		for (IPosition position : hotspots) {
-			System.out.println(position);
+			assert LOG.message(position);
 			elements.add(JavaCore.create(PositionUtil.getFile(position)));
 		}
 		
@@ -185,7 +185,7 @@ public class ESQLBuilder extends IncrementalProjectBuilder {
 		t.printTime();
 
 		for (IJavaElement e : elements) {
-			System.out.println(e);
+			assert LOG.message(e);
 		}
 		t.start("Search and check");
 		checkResources(elements.toArray(new IJavaElement[elements.size()]));

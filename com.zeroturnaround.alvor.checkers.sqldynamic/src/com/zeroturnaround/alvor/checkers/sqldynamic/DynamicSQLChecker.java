@@ -99,8 +99,6 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 				}
 			}
 			
-//			System.out.println(errorMap.keySet());
-			
 			for (Entry<String, String> entry : errorMap.entrySet()) {
 				String message = entry.getKey().trim() + "\nSQL: \n" 
 						+ entry.getValue();

@@ -363,7 +363,7 @@ public class AbstractStringEvaluator {
 		// apply arguments to each template
 		List<IAbstractString> choices = new ArrayList<IAbstractString>();
 		for (IAbstractString template: templates) {
-			System.out.println("METHOD STRING for " + inv.getName().getFullyQualifiedName() + ": " + template);
+			assert LOG.message("METHOD STRING for " + inv.getName().getFullyQualifiedName() + ": " + template);
 			choices.add(ArgumentApplier.applyArguments(template, arguments));
 		}
 		
@@ -513,9 +513,9 @@ public class AbstractStringEvaluator {
 						PositionUtil.getPosition(usage.getNode()),
 						usage.getNode(),
 						evalNameAfterUsageWithoutLoopCheck(name, usage));
-				System.out.println("BEFORE WIDENING: " + named);
+				assert LOG.message("BEFORE WIDENING: " + named);
 				IAbstractString widened = StringConverter.widenToRegular(named);
-				System.out.println("AFTER WIDENING: " + widened);
+				assert LOG.message("AFTER WIDENING: " + widened);
 				return widened;
 			} 
 			else {
@@ -641,7 +641,7 @@ public class AbstractStringEvaluator {
 		}
 		else {
 			if (!ASTUtil.isStringBuilderOrBuffer(name.resolveTypeBinding())) {
-				System.out.println(name.resolveTypeBinding());
+				assert LOG.message(name.resolveTypeBinding());
 			}
 			assert ASTUtil.isStringBuilderOrBuffer(name.resolveTypeBinding());
 			return evalInvocationArgOut(usage.getInv(), usage.getIndex()); 

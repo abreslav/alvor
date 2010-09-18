@@ -25,7 +25,7 @@ public class CreateDBHSQL {
 	    try {
 	        Class.forName("org.hsqldb.jdbc.JDBCDriver" );
 	    } catch (Exception e) {
-	        System.err.println("ERROR: failed to load HSQLDB JDBC driver.");
+	    	LOG.error("ERROR: failed to load HSQLDB JDBC driver.");
 	        e.printStackTrace();
 	        return;
 	    }
