@@ -224,8 +224,5 @@
             name="Alvor Properties Editor">
       </editor>
    </extension>
-   <extension
-         point="org.eclipse.ui.editors">
-   </extension>
 </plugin>
 
