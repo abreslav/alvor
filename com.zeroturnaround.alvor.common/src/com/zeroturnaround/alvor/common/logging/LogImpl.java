@@ -4,18 +4,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
+
+import com.zeroturnaround.alvor.common.AlvorCommonPlugin;
 
 public class LogImpl implements ILog {
 	
 	private PrintStream fileStream;
 	
 	public LogImpl(String name) {
-		IPath wsPath = Platform.isRunning()? ResourcesPlugin.getWorkspace().getRoot().getLocation() : new Path(".");
-		IPath logFolder = wsPath.append(".metadata/.plugins/com.zeroturnaround.alvor.common/");
+		IPath logFolder = AlvorCommonPlugin.getDefault().getStateLocation();
 		File f = logFolder.append(name + ".log").toFile();
 		try {
 			f.createNewFile(); // creates if it doesn't exist yet 
