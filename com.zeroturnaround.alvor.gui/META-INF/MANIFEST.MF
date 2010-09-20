@@ -18,13 +18,13 @@ Require-Bundle: org.eclipse.ui;bundle-version="3.5.0",
  org.eclipse.jdt.core;bundle-version="3.5.0",
  org.eclipse.core.resources;bundle-version="3.5.0",
  org.eclipse.ui.editors;bundle-version="3.5.0",
+ org.eclipse.ui.forms;bundle-version="3.4.0",
+ org.eclipse.jface.text;bundle-version="3.5.0",
  com.zeroturnaround.alvor.model;bundle-version="1.0.0",
  com.zeroturnaround.alvor.checkers;bundle-version="1.0.0",
  com.zeroturnaround.alvor.crawler;bundle-version="1.0.0",
  com.zeroturnaround.alvor.common;bundle-version="1.0.0",
- com.zeroturnaround.alvor.cache;bundle-version="1.0.0",
- org.eclipse.ui.forms;bundle-version="3.4.0",
- org.eclipse.jface.text;bundle-version="3.5.0"
+ com.zeroturnaround.alvor.cache;bundle-version="1.0.0"
 Export-Package: com.zeroturnaround.alvor.gui;
   uses:="org.eclipse.jface.text,
    org.eclipse.core.runtime,
@@ -41,4 +41,3 @@ Export-Package: com.zeroturnaround.alvor.gui;
    com.zeroturnaround.alvor.checkers,
    org.eclipse.swt.widgets,
    org.eclipse.ui.editors.text"
-Bundle-ActivationPolicy: lazy
