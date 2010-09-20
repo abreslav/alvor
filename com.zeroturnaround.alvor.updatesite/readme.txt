@@ -17,7 +17,7 @@
 
 -------
 
-* Keep in mind that Eclipse can cache information about update-sites and available versions. 
+* When installing, keep in mind that Eclipse can cache information about update-sites and available versions. 
   When in trouble, restarting Eclipse could help.
 
 * Seems that "Check for updates" detects updated update-site only when feature version is
