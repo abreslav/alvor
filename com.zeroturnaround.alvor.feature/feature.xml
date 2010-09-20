@@ -17,29 +17,25 @@
    </license>
 
    <requires>
-      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.core.runtime" version="3.5.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.jdt.core" version="3.5.0" match="greaterOrEqual"/>
       <import plugin="com.zeroturnaround.alvor.model" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.zeroturnaround.alvor.common" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.runtime" version="3.5.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.resources" version="3.5.0" match="greaterOrEqual"/>
       <import plugin="com.zeroturnaround.alvor.checkers" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.zeroturnaround.alvor.sqllexer" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="com.zeroturnaround.alvor.sqlparser" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.jdt.core" version="3.5.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.resources" version="3.5.0" match="greaterOrEqual"/>
       <import plugin="com.zeroturnaround.alvor.cache" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.ui.editors" version="3.5.0" match="greaterOrEqual"/>
       <import plugin="com.zeroturnaround.alvor.crawler" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.forms" version="3.5.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.jface.text"/>
       <import plugin="org.eclipse.core.commands"/>
       <import plugin="org.eclipse.jdt.ui"/>
       <import plugin="org.eclipse.jface"/>
       <import plugin="org.eclipse.ui.ide"/>
       <import plugin="com.zeroturnaround.alvor.gui" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.jdt.core" version="3.5.2" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.resources" version="3.5.1" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.jdt.core" version="3.5.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui" version="3.5.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.jface.text" version="3.5.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
