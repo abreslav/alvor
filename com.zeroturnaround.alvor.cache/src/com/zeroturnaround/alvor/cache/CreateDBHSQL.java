@@ -25,8 +25,7 @@ public class CreateDBHSQL {
 	    try {
 	        Class.forName("org.hsqldb.jdbc.JDBCDriver" );
 	    } catch (Exception e) {
-	    	LOG.error("ERROR: failed to load HSQLDB JDBC driver.");
-	        e.printStackTrace();
+	    	LOG.error("ERROR: failed to load HSQLDB JDBC driver.", e);
 	        return;
 	    }
 
@@ -40,7 +39,7 @@ public class CreateDBHSQL {
 	    		try {
 					conn.close();
 				} catch (SQLException e) {
-					e.printStackTrace();
+					LOG.error("running cache creation script", e);
 				}
 	    	}
 	    }
@@ -65,7 +64,7 @@ public class CreateDBHSQL {
 					conn.prepareStatement(string).execute();
 					commit.execute();
 				} catch (SQLException e) {
-					LOG.error("Failed to run \"" + string + "\", " + e.getMessage());
+					LOG.error("Failed to run \"" + string, e);
 				}
 			}
 

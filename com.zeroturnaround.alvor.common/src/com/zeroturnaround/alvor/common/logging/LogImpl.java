@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 
 import com.zeroturnaround.alvor.common.AlvorCommonPlugin;
 
@@ -25,11 +27,7 @@ public class LogImpl implements ILog {
 
 	@Override
 	public void exception(Throwable e) {
-		e.printStackTrace(fileStream);
-		fileStream.flush();
-		
-		e.printStackTrace(System.err);
-		System.err.flush();
+		this.error("EXCEPTION", e);
 	}
 
 	@Override
@@ -54,21 +52,25 @@ public class LogImpl implements ILog {
 	}
 	
 	@Override
-	public void error(Object message) {
+	protected void finalize() throws Throwable {
+		fileStream.close();
+	}
+
+	@Override
+	public void error(String message, Throwable e) {
 		fileStream.println(message);
 		System.err.println(message);
 		
-		if (message instanceof Throwable) {
-			((Throwable) message).printStackTrace(fileStream);
-			((Throwable) message).printStackTrace(System.err);
+		if (e != null) {
+			e.printStackTrace(fileStream);
+			e.printStackTrace(System.err);
 		}
+		
+		// add also to eclipse log
+		AlvorCommonPlugin.getDefault().getLog().log(
+				new Status(IStatus.ERROR, AlvorCommonPlugin.ID, message, e));
 		
 		fileStream.flush();
 		System.err.flush();
-	}
-	
-	@Override
-	protected void finalize() throws Throwable {
-		fileStream.close();
 	}
 }

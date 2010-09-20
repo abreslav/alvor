@@ -6,11 +6,15 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jdt.core.IJavaElement;
 
+import com.zeroturnaround.alvor.common.logging.ILog;
+import com.zeroturnaround.alvor.common.logging.Logs;
+import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
 import com.zeroturnaround.alvor.main.ResultSetChecker;
 
 
 
 public class CheckResultSetsHandler extends AbstractHandler {
+	private static final ILog LOG = Logs.getLog(CheckResultSetsHandler.class);
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -20,7 +24,7 @@ public class CheckResultSetsHandler extends AbstractHandler {
 				ResultSetChecker.checkUsages(new IJavaElement[] {element});
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.exception(e);
 		}
 		return null;
 	}

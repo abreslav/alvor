@@ -46,7 +46,7 @@ public class ConnectionSourceFinder implements IEditorActionDelegate {
 		
 		ASTNode node = NodeFinder.perform(ast, textSel.getOffset(), textSel.getLength());
 		if (node == null) {
-			LOG.error("ERROR: Did not find node");
+			LOG.error("ERROR: Did not find node", null);
 		}
 		else if (node instanceof Expression) {
 			assert LOG.message("###############################");

@@ -34,9 +34,11 @@ public class OptionLoader {
     }
 
     public static IFile getElementSqlCheckerPropertiesRes(IProject project) {
-            return (IFile)project.findMember("/" + OptionLoader.CONF_FILE_NAME);
-            //return project.getResource().getLocation().append(OptionLoader.CONF_FILE_NAME);
+        return (IFile)project.findMember("/" + OptionLoader.CONF_FILE_NAME);
     }
 
+    public static boolean propertiesFileExists(IProject project) {
+    	return project.findMember("/" + OptionLoader.CONF_FILE_NAME) != null;
+    }
 
 }

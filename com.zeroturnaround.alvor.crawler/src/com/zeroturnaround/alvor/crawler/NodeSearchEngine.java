@@ -121,7 +121,6 @@ public class NodeSearchEngine {
 				resource.accept(visitor);
 			} catch (CoreException e) {
 				LOG.exception(e);
-				e.printStackTrace();
 			}
 		}
 		
@@ -170,7 +169,7 @@ public class NodeSearchEngine {
 				}
 				
 				if (methodBinding == null || methodBinding.getDeclaringClass() == null) {
-					LOG.error("TODO: crawler methodBinding.getDeclaringClass() == null");
+					LOG.error("TODO: crawler methodBinding.getDeclaringClass() == null", null);
 					return;
 				}
 				signature = methodBinding.getDeclaringClass().getQualifiedName()
@@ -187,7 +186,7 @@ public class NodeSearchEngine {
 				if (arguments.size() < requestedArgumentIndex) {
 					LOG.error("can't find required argument (" + requestedArgumentIndex + "), method="
 							+ methodBinding.getDeclaringClass().getQualifiedName()
-							+ "." + methodBinding.getName());
+							+ "." + methodBinding.getName(), null);
 					return;
 				}
 				
@@ -222,7 +221,7 @@ public class NodeSearchEngine {
 				new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant()}, 
 				scope, requestor, null);
 		} catch (CoreException e) {
-			e.printStackTrace();
+			LOG.exception(e);
 		}
 	}
 	
@@ -260,7 +259,7 @@ public class NodeSearchEngine {
 		try {
 			executeSearch(pattern, requestor, scope);
 		} catch (Exception e) {
-			LOG.error("SEARCH ERROR: " + e.getMessage() + ", pattern=" + patternStr);
+			LOG.error("SEARCH ERROR for pattern=" + patternStr, e);
 			throw new IllegalStateException(e);
 		}
 		return result;
@@ -338,7 +337,7 @@ public class NodeSearchEngine {
 		int length = position.getLength();
 		
 		if (cUnit == null) {
-			LOG.error("Compilation unit is null for the position: " + position);
+			LOG.error("Compilation unit is null for the position: " + position, null);
 		}
 		return getASTNode(cUnit, start, length);
 	}
@@ -360,7 +359,7 @@ public class NodeSearchEngine {
 		int length = match.getLength();
 		
 		if (cUnit == null) {
-			LOG.error("Compilation unit is null for the match: " + match);
+			LOG.error("Compilation unit is null for the match: " + match, null);
 		}
 		return getASTNode(cUnit, start, length);
 	}

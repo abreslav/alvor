@@ -58,6 +58,8 @@ public class GuiChecker implements ISQLErrorHandler {
 	/**
 	 * NB! Before calling this you should take care that NodeSearchEngine's ASTCache doesn't
 	 * contain old stuff (either clear it completely or remove expired AST-s)
+	 * 
+	 * Also, it's assumed that sqlchecker.properties for the project exists
 	 */
 	public List<INodeDescriptor> performIncrementalCheck(IJavaElement optionsFrom, IJavaElement[] scope) {
 		
@@ -94,7 +96,7 @@ public class GuiChecker implements ISQLErrorHandler {
 			OptionLoader.getElementSqlCheckerPropertiesRes(project.getProject()).deleteMarkers(WARNING_MARKER_ID, 
 					true, IResource.DEPTH_ZERO);
 		} catch (CoreException e) {
-			LOG.error(e);
+			LOG.error("Cleaning markers", e);
 		}
 	}
 
