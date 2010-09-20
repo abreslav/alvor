@@ -288,7 +288,7 @@ public class AbstractStringEvaluator {
 	private IAbstractString evalInvocationResult(MethodInvocation inv) {
 //		if (inv.toString().contains("Integer.toString")) {
 //			ITypeBinding typ = inv.getExpression().resolveTypeBinding();
-//			System.err.println(typ.getQualifiedName());
+//			LOG.error(typ.getQualifiedName());
 //		}
 
 		if (inv.getExpression() != null
