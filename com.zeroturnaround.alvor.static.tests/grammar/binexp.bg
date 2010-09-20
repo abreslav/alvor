@@ -1,0 +1,98 @@
+%{
+import java.io.IOException;
+@SuppressWarnings("unused")
+%}
+
+%code {
+
+
+	public static void main(String[] args) throws IOException {
+		BinExpParser parser = new BinExpParser(new BinExpParser.Lexer() {
+
+			int tokens[] = {49,43,48,43,49,0,0,};
+			int current;
+			
+			@Override
+			public Object getLVal() {
+				return "";
+			}
+
+			@Override
+			public void yyerror(String s) {
+				
+			}
+
+			@Override
+			public int yylex() throws IOException {
+				return tokens[current++];
+			}
+			
+		});
+		parser.yyDebugStream = System.out;
+		parser.yydebug = 1;
+		
+		System.out.println(parser.parse());
+	}
+}
+%define parser_class_name "BinExpParser"
+%token VALUES
+%token ESCAPE
+%token SELECT
+%token INSERT
+%token WHERE
+%token ORDER
+%token OUTER
+%token GROUP
+%token RIGHT
+%token INNER
+%token FROM
+%token JOIN
+%token LEFT
+%token WHEN
+%token THEN
+%token ELSE
+%token CASE
+%token INTO
+%token FULL
+%token DESC
+%token ASC
+%token AND
+%token END
+%token XOR
+%token NOT
+%token OR
+%token ON
+%token BY
+%token AS
+%token IN
+%token IS
+%token NULL
+%token DIGAL_ERR
+%token STRING_DQ
+%token STRING_DQ_ERR 
+%token STRING_SQ
+%token STRING_SQ_ERR 
+%token NUMBER  
+%token ID
+%token DISTINCT
+%token UNKNOWN_CHARACTER_ERR
+%token NE
+%token LE
+%token GE
+%token CONCAT
+%token TABLE
+%token LIKE
+
+//%left AS
+%left OR XOR
+%left AND
+%nonassoc IN
+%right NOT
+%left '=' NE LE GE '>' '<'
+%left '-' '+'    
+%left '/' '*' CONCAT
+
+%%
+select 
+	: SELECT NUMBER '-' NUMBER FROM ID
+	;

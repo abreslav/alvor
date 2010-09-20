@@ -1,0 +1,9 @@
+syntax: glob
+
+*.class
+bin
+.metadata
+
+
+syntax: regexp
+^ee\.stacc\.productivity\.edsl\.cache/src/ee/stacc/productivity/edsl/cache/CacheServiceImpl\.java$
