@@ -1,7 +1,7 @@
 * "site.xml" defines whole update-site -- this is the only file required for building the site
 
 * before updating the site, delete all files in this folder except "site.xml" and this readme.txt
-	- seems that otherwise Eclipse keeps old version of feature*.jar
+	- seems that otherwise Eclipse keeps old version of feature*.jar despite of rebuilding
 	
 * for building new version of site, open "site.xml" editor and press "Synchronize" and "Build all"
 	- not sure if "Synchronize" is required, but it can't do harm 
@@ -17,6 +17,8 @@
 
 -------
 
-* When updating plugin from client Eclipse ("Check for updates"),
-  keep in mind that Eclipse can cache information about update-sites and available versions. 
-  Restarting Eclipse should clean that cache.   
+* Keep in mind that Eclipse can cache information about update-sites and available versions. 
+  When in trouble, restarting Eclipse could help.
+
+* Seems that "Check for updates" detects updated update-site only when feature version is
+  increased (but then you also need to replace the feature in update-site project)  
