@@ -6,4 +6,10 @@ bin
 
 
 syntax: regexp
-^ee\.stacc\.productivity\.edsl\.cache/src/ee/stacc/productivity/edsl/cache/CacheServiceImpl\.java$
+^com\.zeroturnaround\.alvor\.updatesite/features$
+syntax: regexp
+^com\.zeroturnaround\.alvor\.updatesite/plugins$
+syntax: regexp
+^com\.zeroturnaround\.alvor\.updatesite/artifacts\.jar$
+syntax: regexp
+^com\.zeroturnaround\.alvor\.updatesite/content\.jar$
