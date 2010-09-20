@@ -920,7 +920,7 @@ public final class CacheServiceImpl implements ICacheService {
 				ResultSet res = query.executeQuery();
 
 				if (!res.next()) {
-					LOG.error("Method not found " + pattern, null);
+					LOG.message("Method not found " + pattern);
 					return;
 				}
 				
