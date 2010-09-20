@@ -13,3 +13,5 @@ syntax: regexp
 ^com\.zeroturnaround\.alvor\.updatesite/artifacts\.jar$
 syntax: regexp
 ^com\.zeroturnaround\.alvor\.updatesite/content\.jar$
+syntax: regexp
+^External Plug-in Libraries$
