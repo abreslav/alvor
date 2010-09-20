@@ -223,14 +223,6 @@
             id="com.zeroturnaround.alvor.gui.AlvorPropertiesEditor"
             name="Alvor Properties Editor">
       </editor>
-      <editor
-            class="com.zeroturnaround.alvor.gui.editors.MultiPageEditor"
-            contributorClass="com.zeroturnaround.alvor.gui.editors.MultiPageEditorContributor"
-            extensions="mpe"
-            icon="icons/sample.gif"
-            id="com.zeroturnaround.alvor.gui.editors.MultiPageEditor"
-            name="Sample Multi-page Editor">
-      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.editors">
