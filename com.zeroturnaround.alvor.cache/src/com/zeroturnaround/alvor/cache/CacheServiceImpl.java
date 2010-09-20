@@ -788,7 +788,7 @@ public final class CacheServiceImpl implements ICacheService {
 				PreparedStatement query = queries.getSignatureQuery(desc.getSignature());
 				ResultSet res = query.executeQuery();
 				if (!res.next()) {
-					LOG.error("Signature not found " + desc.getSignature());
+					LOG.error("Signature not found " + desc.getSignature(), null);
 					return;
 				}
 				
@@ -920,7 +920,7 @@ public final class CacheServiceImpl implements ICacheService {
 				ResultSet res = query.executeQuery();
 
 				if (!res.next()) {
-					LOG.error("Method not found " + pattern);
+					LOG.error("Method not found " + pattern, null);
 					return;
 				}
 				
@@ -1037,7 +1037,7 @@ public final class CacheServiceImpl implements ICacheService {
 		);
 		int[] res = batch.executeBatch();
 		if (res.length != 3) {
-			LOG.error("CLEANUP FAILED!");
+			LOG.error("CLEANUP FAILED!", null);
 		}
 		
 		// CollectionContents is cleaned using triggers
@@ -1196,30 +1196,6 @@ public final class CacheServiceImpl implements ICacheService {
 		return parentlessSame;
 	}
 	
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	public void dumpLog() {
-		try {
-			PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM Log");
-			ResultSet res = preparedStatement.executeQuery();
-			while (res.next()) {
-				for (int i = 1; i <= res.getMetaData().getColumnCount(); i++) {
-					System.out.print(res.getObject(i) + " ");
-				}
-				System.out.println();
-			}
-			connection.prepareStatement("DELETE FROM Log").execute();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		
 	@SuppressWarnings("serial")
 	private class RethrowException extends RuntimeException {
 

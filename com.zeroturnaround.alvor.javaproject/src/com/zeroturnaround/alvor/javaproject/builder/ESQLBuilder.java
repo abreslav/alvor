@@ -201,7 +201,7 @@ public class ESQLBuilder extends IncrementalProjectBuilder {
 			}
 			checker.performIncrementalCheck(JavaCore.create(getProject()), elements);
 		} catch (Throwable e) {
-			LOG.error(e);
+			LOG.error("ESQLBuilder.checkResources", e);
 		} 
 	}
 

@@ -37,7 +37,7 @@ public class CleanCheckProjectHandler extends AbstractHandler {
 			GuiUtil.ShowErrorDialog(msg, e);
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			LOG.exception(e);
 		}
 		
 		timer.printTime();

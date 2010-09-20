@@ -30,6 +30,10 @@ import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
+import com.zeroturnaround.alvor.common.logging.ILog;
+import com.zeroturnaround.alvor.common.logging.Logs;
+import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
+
 /*
  * These are the component of current sqlchecker.properties to deal with:
  * 
@@ -58,6 +62,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 */
 
 public class AlvorPropertiesEditor extends FormEditor {
+	private static final ILog LOG = Logs.getLog(AlvorPropertiesEditor.class);
 	//	private boolean isDirty = false;
 	private AlvorPropertiesModel model;
 	private AlvorPropertiesPage propertiespage;
@@ -119,11 +124,9 @@ public class AlvorPropertiesEditor extends FormEditor {
 				try {
 					props.load(new ByteArrayInputStream(document.get().getBytes("UTF-8")));
 				} catch (UnsupportedEncodingException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LOG.exception(e);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LOG.exception(e);
 				}
 			}
 			
@@ -139,8 +142,7 @@ public class AlvorPropertiesEditor extends FormEditor {
 				try {
 					props.store(baos, null);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LOG.exception(e);
 				}
 				document.set(baos.toString());
 			}
