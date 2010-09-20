@@ -32,7 +32,7 @@ import com.zeroturnaround.alvor.main.OptionLoader;
 import com.zeroturnaround.alvor.string.IPosition;
 
 public class ESQLBuilder extends IncrementalProjectBuilder {
-	GuiChecker checker = new GuiChecker();
+	GuiChecker checker = null; // seems I can't initialize it here (?)
 	
 	private static ILog LOG = Logs.getLog(ESQLBuilder.class);
 	private Set<IFile> invalidatedFiles = new HashSet<IFile>();
@@ -196,6 +196,9 @@ public class ESQLBuilder extends IncrementalProjectBuilder {
 
 	private void checkResources(IJavaElement[] elements) {
 		try {
+			if (checker == null) {
+				checker = new GuiChecker();
+			}
 			checker.performIncrementalCheck(JavaCore.create(getProject()), elements);
 		} catch (Throwable e) {
 			LOG.error(e);
