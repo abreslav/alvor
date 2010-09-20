@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="com.zeroturnaround.alvor.feature"
-      label="Alvor SQL Checker4"
+      label="Alvor SQL Checker"
       version="0.3.1">
 
    <description url="http://barclay.stacc.ee/edsl/alvor">
