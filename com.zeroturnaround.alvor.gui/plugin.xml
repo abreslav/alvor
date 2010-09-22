@@ -55,7 +55,7 @@
             defaultHandler="com.zeroturnaround.alvor.gui.ClearCacheHandler"
             description="Clears SQL checker cache for the workspace"
             id="com.zeroturnaround.alvor.gui.clearCache"
-            name="Clear SQL checher cache">
+            name="Clear SQL checker cache">
       </command>
       <command
             categoryId="org.eclipse.jdt.ui.category.source"
@@ -69,10 +69,18 @@
          point="org.eclipse.ui.menus">
       <menuContribution
             locationURI="popup:org.eclipse.jdt.ui.PackageExplorer?after=additions">
-         <command
+
+		 <command
                commandId="com.zeroturnaround.alvor.plugin.CheckProject"
                label="Check SQL in selected elements"
                style="push">
+                          <!--
+			<visibleWhen>
+						<test property="org.eclipse.core.resources.projectNature" 
+							value="com.zeroturnaround.alvor.javaproject.esqlNature"> 
+						</test> 
+			</visibleWhen>
+               //-->
          </command>
          <command
                commandId="com.zeroturnaround.alvor.gui.clearCache"
