@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         id="esqlBuilder"
+         name="Alvor SQL Checker"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            callOnEmptyDelta="false"
+            hasNature="true"
+            isConfigurable="true">
+         <run
+               class="com.zeroturnaround.alvor.javaproject.builder.ESQLBuilder">
+         </run>
+      </builder>
+   </extension>
+   <extension
+         id="esqlNature"
+         name="Alvor SQL Checker Nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="com.zeroturnaround.alvor.javaproject.builder.ESQLNature">
+         </run>
+      </runtime>
+      <builder
+            id="com.zeroturnaround.alvor.javaproject.esqlBuilder">
+      </builder>
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="true"
+            objectClass="org.eclipse.core.resources.IProject"
+            nameFilter="*"
+            id="com.zeroturnaround.alvor.javaproject.contribution1">
+         <action
+               label="Enable/Disable Alvor SQL Checker Nature"
+               class="com.zeroturnaround.alvor.javaproject.builder.ToggleNatureAction"
+               menubarPath="additions"
+               enablesFor="+"
+               id="com.zeroturnaround.alvor.javaproject.addRemoveNatureAction">
+         </action>
+      </objectContribution>
+   </extension>
+
+</plugin>
