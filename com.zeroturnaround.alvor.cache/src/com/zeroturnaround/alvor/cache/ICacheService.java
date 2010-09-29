@@ -17,7 +17,7 @@ public interface ICacheService {
 	
 	/**
 	 * 
-	 * @return collections of positions of hotspots which are invalidated in the cache:
+	 * @return collection of positions of hotspots which are invalidated in the cache:
 	 * 		some strings on which they depend were removed from cache
 	 */
 	Collection<IPosition> getInvalidatedHotspotPositions();

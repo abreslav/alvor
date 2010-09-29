@@ -27,20 +27,6 @@ while there are hotspot-patterns left:
 
 
 
-STRING_METHODS
-----------------
--- watch this table when a file is changed, 
--- check if new implementations for something appear or disappear
-ID
-SIGNATURE -- (originating_type_name, method_name, overloading_info)
-
-
-STRING_METHOD_IMPLEMENTATIONS
------------------------------
-id
-signature_id
-ABSTRACT_STRING_ID // with this link you can find abstract strings dependent on this impl (and signature)
-
 
 ABSTRACT_STRINGS
 ----------------
@@ -48,16 +34,19 @@ ID
 TYPE
 CONTENT -- string constant, charset or unsupported msg
 ?? LINK -- to ABSTRACT_STRINGS (for repetition or "same as"). Do I need "same as" ?
+			contains param number for strings representing parameter
 REPETITION_FLAG ??
-STRING_METHOD_ID 
-    given if this record is a choice between different implementations
-    if a string-method gains or loses an implementation, then you can track all dependent choices
+POSITION
 HOTSPOT_ID 
     given if this record is choice between argument values from different callsites
     if hotspot method gains or loses a callsite, then this enables connecting
+    
+CALLED_STRING_METHOD_ID 
+    given if this record is a choice between different implementations
+    if a string-method gains or loses an implementation, then you can track all dependent choices
 
-STRING_METHOD_IMPL_ID
-    given if this is represents string method body/summary
+IMPLEMENTED_STRING_METHOD_ID
+    given if this is represents a string method's implementation (as summary)
 
 
 COLLECTION_ITEMS
@@ -67,12 +56,29 @@ ITEM_ID
 INDEX
 
 
+STRING_METHODS
+----------------
+-- watch this table when a file is changed, 
+-- check if new implementations for something appear or disappear
+ID
+TYPE_NAME -- most general type name
+SIGNATURE -- method descriptor
 
 
+HOTSPOT_PATTERNS (old HOTSPOTS)
+----------------
+ID
+SIGNATURE
+ARG_INDEX
+IS_PROPER_HOTSPOT (requiring full SQL statement vs. requiring a fragment)
+
+FILES
+------
+ID
+NAME
 
 
-
-
-
-
-
+SUBTYPES
+--------
+TYPE_NAME
+SUBTYPE_NAME
