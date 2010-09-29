@@ -102,8 +102,7 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 			for (Entry<String, String> entry : errorMap.entrySet()) {
 				String message = entry.getKey().trim() + "\nSQL: \n" 
 						+ entry.getValue();
-				//message = message.substring(0, Math.min(200, message.length()));
-				errorHandler.handleSQLError("Dynamic SQL checker: String may cause database error - " + message, nodeDesc.getPosition());
+				errorHandler.handleSQLError("SQL test failed  - " + message, nodeDesc.getPosition());
 			}
 
 			
