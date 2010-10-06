@@ -22,6 +22,7 @@ import com.zeroturnaround.alvor.common.logging.Timer;
 import com.zeroturnaround.alvor.crawler.AbstractStringEvaluator;
 import com.zeroturnaround.alvor.crawler.NodeRequest;
 import com.zeroturnaround.alvor.crawler.UnsupportedNodeDescriptor;
+import com.zeroturnaround.alvor.string.Position;
 
 /**
  * This is main class
@@ -133,6 +134,12 @@ public class JavaElementChecker {
 		Timer timer = new Timer();
 		timer.start("TIMER checking");
 		
+		if (!dynamicCheckerIsConfigured(options)) {
+			errorHandler.handleSQLWarning(
+					"SQL checker: Test-database is not configured, SQL testing is not performed",
+					new Position(options.get("SourceFileName"), 0, 0));
+		}
+		
 		try {
 			if (this.smartChecking) {
 				// TODO maybe it's better to get specific checkers more directly
@@ -177,6 +184,10 @@ public class JavaElementChecker {
 		}
 	}
 	
+	private boolean dynamicCheckerIsConfigured(Map<String, String> options) {
+		return options.get("DBUrl") != null && !options.get("DBUrl").isEmpty();
+	}
+	
 	private void checkValidHotspotsSmartly(
 			List<IStringNodeDescriptor> descriptors, 
 			ISQLErrorHandler errorHandler, 
@@ -184,10 +195,8 @@ public class JavaElementChecker {
 			IAbstractStringChecker staticChecker, 
 			Map<String, String> options) throws CheckerException {
 		
-		boolean dynamicIsConfigured = options.get("DBUrl") != null; 
-		
 		for (IStringNodeDescriptor descriptor : descriptors) {
-			if (dynamicIsConfigured) { 
+			if (dynamicCheckerIsConfigured(options)) { 
 				// use staticChecker only when dynamic gives error
 				if (!dynamicChecker.checkAbstractString(descriptor, errorHandler, options)) {
 					staticChecker.checkAbstractString(descriptor, errorHandler, options);
