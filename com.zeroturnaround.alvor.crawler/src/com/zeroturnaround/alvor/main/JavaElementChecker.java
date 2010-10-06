@@ -13,6 +13,8 @@ import com.zeroturnaround.alvor.checkers.IAbstractStringChecker;
 import com.zeroturnaround.alvor.checkers.INodeDescriptor;
 import com.zeroturnaround.alvor.checkers.ISQLErrorHandler;
 import com.zeroturnaround.alvor.checkers.IStringNodeDescriptor;
+import com.zeroturnaround.alvor.checkers.sqldynamic.DynamicSQLChecker;
+import com.zeroturnaround.alvor.checkers.sqlstatic.SyntacticalSQLChecker;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.common.logging.Measurements;
@@ -32,7 +34,10 @@ public class JavaElementChecker {
 
 	private static final String HOTSPOTS = "hotspots";
 	private static final ILog LOG = Logs.getLog(JavaElementChecker.class);
-	private Timer timer = new Timer();
+	
+	// NB! smartChecking==true can hide problems with static checker
+	// so for testing it should be set false
+	private boolean smartChecking = true;
 
 	/*
 	 * The map must contain an entry 
@@ -47,6 +52,8 @@ public class JavaElementChecker {
 	 */
 	public List<INodeDescriptor> findAndEvaluateHotspots(IJavaElement[] scope, Map<String, String> options) {
 		Measurements.resetAll();
+		
+		Timer timer = new Timer();
 		timer.start("TIMER: string construction");
 		List<NodeRequest> requests = parseNodeRequests(options);
 		if (requests.isEmpty()) {
@@ -122,31 +129,74 @@ public class JavaElementChecker {
 			ISQLErrorHandler errorHandler, 
 			List<IAbstractStringChecker> checkers, 
 			Map<String, String> options) {
+		
+		Timer timer = new Timer();
+		timer.start("TIMER checking");
+		
+		try {
+			if (this.smartChecking) {
+				// TODO maybe it's better to get specific checkers more directly
+				// (current scheme was made for checking everything with all checkers
+				// and for dynamic addition of new checkers) 
+				IAbstractStringChecker dynamicChecker = null;
+				IAbstractStringChecker staticChecker = null;
+				for (IAbstractStringChecker checker : checkers) {
+					if (checker instanceof DynamicSQLChecker) {
+						dynamicChecker = checker;
+					}
+					if (checker instanceof SyntacticalSQLChecker) {
+						staticChecker = checker;
+					}
+				}
+				
+				assert (dynamicChecker != null && staticChecker != null);
+				checkValidHotspotsSmartly(hotspots, errorHandler, dynamicChecker, staticChecker, options);
+			}
+			else {
+				checkValidHotspotsFully(hotspots, errorHandler, checkers, options);
+			}
+		}
+		catch (CheckerException e) {
+			errorHandler.handleSQLError("SQL checker exception: " + e.getMessage(), e.getPosition());
+		}
+		
+		timer.printTime();
+	}
 	
-//		assert LOG.message("Abstract strings:");
-//
-//		for (INodeDescriptor descriptor : hotspots) {
-//			if (descriptor instanceof IStringNodeDescriptor) {
-//				assert LOG.message(((IStringNodeDescriptor)descriptor).getAbstractValue());
-//			}
-//		}
+	private void checkValidHotspotsFully(
+			List<IStringNodeDescriptor> hotspots, 
+			ISQLErrorHandler errorHandler, 
+			List<IAbstractStringChecker> checkers, 
+			Map<String, String> options) throws CheckerException {
 		
 		for (IAbstractStringChecker checker : checkers) {
+			Timer timer = new Timer();
 			timer.start("TIMER checker=" + checker.getClass().getName());
-			try {
-				checker.checkAbstractStrings(hotspots, errorHandler, options);
-			} catch (CheckerException e) {
-				errorHandler.handleSQLWarning(e.getMessage(), e.getPosition());
-			}
+			checker.checkAbstractStrings(hotspots, errorHandler, options);
 			timer.printTime();
 		}
 	}
 	
-//	public void recheckHotspot(IPosition position, ISQLErrorHandler errorHandler, 
-//			List<IAbstractStringChecker> checkers, 
-//			Map<String, Object> options) {
-////		AbstractStringEvaluator.evaluateExpression(null)
-//	}
+	private void checkValidHotspotsSmartly(
+			List<IStringNodeDescriptor> descriptors, 
+			ISQLErrorHandler errorHandler, 
+			IAbstractStringChecker dynamicChecker, 
+			IAbstractStringChecker staticChecker, 
+			Map<String, String> options) throws CheckerException {
+		
+		boolean dynamicIsConfigured = options.get("DBUrl") != null; 
+		
+		for (IStringNodeDescriptor descriptor : descriptors) {
+			if (dynamicIsConfigured) { 
+				// use staticChecker only when dynamic gives error
+				if (!dynamicChecker.checkAbstractString(descriptor, errorHandler, options)) {
+					staticChecker.checkAbstractString(descriptor, errorHandler, options);
+				}
+			} else {
+				staticChecker.checkAbstractString(descriptor, errorHandler, options);
+			}
+		}
+	}
 	
 	private List<NodeRequest> parseNodeRequests(Map<String, String> options) {
 		if (options == null) {
@@ -182,6 +232,10 @@ public class JavaElementChecker {
 			}
 		}
 		return requests;
+	}
+	
+	public void setSmartChecking(boolean smartChecking) {
+		this.smartChecking = smartChecking;
 	}
 	
 }

@@ -8,7 +8,6 @@ import org.eclipse.jdt.core.IJavaElement;
 
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
-import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
 import com.zeroturnaround.alvor.main.ResultSetChecker;
 
 
