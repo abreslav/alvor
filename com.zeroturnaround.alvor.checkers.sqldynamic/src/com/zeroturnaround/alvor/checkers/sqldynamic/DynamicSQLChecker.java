@@ -120,7 +120,7 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 					|| options.get("DBUsername") == null || options.get("DBPassword") == null
 					|| options.get("DBDriverName").toString().isEmpty()
 					|| options.get("DBDriverName").toString().isEmpty()) {
-				throw new CheckerException("SQL checker: Test database configuration is not complete, dynamic checking will be disabled", 
+				throw new CheckerException("SQL checker: Test database configuration is not complete", 
 						new Position(options.get("SourceFileName"), 0, 0));
 			}
 			
