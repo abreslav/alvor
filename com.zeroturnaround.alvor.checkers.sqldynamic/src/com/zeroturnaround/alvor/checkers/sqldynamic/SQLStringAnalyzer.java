@@ -17,6 +17,7 @@ public class SQLStringAnalyzer {
 	private String username;
 	private String password;
 	private int usageCount=0;
+	private String driverName;
 	
 	public SQLStringAnalyzer(String driverName, String url, String username,
 			String password) throws SQLException, ClassNotFoundException {
@@ -24,6 +25,7 @@ public class SQLStringAnalyzer {
 		this.url = url;
 		this.username = username;
 		this.password = password;
+		this.driverName = driverName;
 		
 		Class.forName (driverName);
 		checkConnect();
@@ -55,5 +57,17 @@ public class SQLStringAnalyzer {
 				stmt.close();
 			}
 		}
+	}
+	
+	public String getUrl() {
+		return url;
+	}
+	
+	public String getUsername() {
+		return username;
+	}
+	
+	public String getDriverName() {
+		return driverName;
 	}
 }
