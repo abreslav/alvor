@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import com.zeroturnaround.alvor.checkers.CheckerException;
 import com.zeroturnaround.alvor.checkers.IAbstractStringChecker;
 import com.zeroturnaround.alvor.checkers.ISQLErrorHandler;
 import com.zeroturnaround.alvor.checkers.IStringNodeDescriptor;
@@ -37,7 +38,7 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 	
 	@Override
 	public void checkAbstractStrings(List<IStringNodeDescriptor> descriptors,
-			final ISQLErrorHandler errorHandler, Map<String, String> options) {
+			final ISQLErrorHandler errorHandler, Map<String, String> options) throws CheckerException {
 		for (final IStringNodeDescriptor descriptor : descriptors) {
 			IAbstractString abstractString = descriptor.getAbstractValue();
 			if (!hasAcceptableSize(abstractString)) {
@@ -123,5 +124,11 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 	 */
 	public static boolean hasAcceptableSize(IAbstractString abstractString) {
 		return AbstractStringSizeCounter.size(abstractString) <= SIZE_THRESHOLD;
+	}
+
+	@Override
+	public void checkAbstractString(IStringNodeDescriptor descriptor,
+			ISQLErrorHandler errorHandler, Map<String, String> options)
+			throws CheckerException {
 	}
 }

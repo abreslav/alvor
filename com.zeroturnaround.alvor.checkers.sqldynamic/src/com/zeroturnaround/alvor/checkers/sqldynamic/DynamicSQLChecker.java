@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.zeroturnaround.alvor.checkers.CheckerException;
 import com.zeroturnaround.alvor.checkers.IAbstractStringChecker;
 import com.zeroturnaround.alvor.checkers.ISQLErrorHandler;
 import com.zeroturnaround.alvor.checkers.IStringNodeDescriptor;
@@ -18,36 +19,18 @@ import com.zeroturnaround.alvor.string.util.AbstractStringSizeCounter;
 public class DynamicSQLChecker implements IAbstractStringChecker {
 	private static final ILog LOG = Logs.getLog(DynamicSQLChecker.class);
 	private static final int SIZE_LIMIT = 10000;
+	
+	// analyzers indexed by hash-code of options map
+	Map<Integer, SQLStringAnalyzer> analyzers = new HashMap<Integer, SQLStringAnalyzer>();
 
 	@Override
 	public void checkAbstractStrings(List<IStringNodeDescriptor> descriptors,
-			ISQLErrorHandler errorHandler, Map<String, String> options) {
+			ISQLErrorHandler errorHandler, Map<String, String> options) throws CheckerException {
 		if (descriptors.size() == 0) {
 			return;
 		}
 		
-		
-		if (options.get("DBDriverName") == null || options.get("DBUrl") == null
-				|| options.get("DBUsername") == null || options.get("DBPassword") == null
-				|| options.get("DBDriverName").toString().isEmpty()
-				|| options.get("DBDriverName").toString().isEmpty()) {
-			errorHandler.handleSQLWarning("SQL checker: Test database configuration is not complete, dynamic checking will be disabled", 
-					new Position(options.get("SourceFileName"), 0, 0));
-			return;
-		}
-		
-		SQLStringAnalyzer analyzer = null;
-		try {
-			analyzer = new SQLStringAnalyzer(				
-				options.get("DBDriverName").toString(),
-				options.get("DBUrl").toString(),
-				options.get("DBUsername").toString(),
-				options.get("DBPassword").toString());
-		} catch (Exception e) {
-			errorHandler.handleSQLError("SQL checker: can't connect with test database: "
-					+ e.getMessage(), new Position(options.get("SourceFileName"), 0, 0));
-			return;
-		}
+		SQLStringAnalyzer analyzer = this.getAnalyzer(options);
 		
 		int totalConcrete = 0;
 		Map<String, Integer> concretes = new HashMap<String, Integer>();
@@ -113,5 +96,43 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 		LOG.message("TOTAL ABSTRACT COUNT: " + descriptors.size());
 		LOG.message("TOTAL CONCRETE COUNT: " + totalConcrete);
 		LOG.message("DIFFERENT CONCRETE COUNT: " + concretes.size());
+	}
+
+	@Override
+	public void checkAbstractString(IStringNodeDescriptor descriptor,
+		ISQLErrorHandler errorHandler, Map<String, String> options) {
+		
+	}
+	
+	private SQLStringAnalyzer getAnalyzer(Map<String, String> options) throws CheckerException {
+		// give different analyzer for different options
+		// first search for cached version
+		SQLStringAnalyzer analyzer = this.analyzers.get(options.hashCode());
+		
+		if (analyzer == null) {
+			if (options.get("DBDriverName") == null || options.get("DBUrl") == null
+					|| options.get("DBUsername") == null || options.get("DBPassword") == null
+					|| options.get("DBDriverName").toString().isEmpty()
+					|| options.get("DBDriverName").toString().isEmpty()) {
+				throw new CheckerException("SQL checker: Test database configuration is not complete, dynamic checking will be disabled", 
+						new Position(options.get("SourceFileName"), 0, 0));
+			}
+			
+			try {
+				analyzer = new SQLStringAnalyzer(				
+					options.get("DBDriverName").toString(),
+					options.get("DBUrl").toString(),
+					options.get("DBUsername").toString(),
+					options.get("DBPassword").toString());
+			} catch (Exception e) {
+				throw new CheckerException("SQL checker: can't connect with test database: "
+						+ e.getMessage(), new Position(options.get("SourceFileName"), 0, 0));
+			}
+			
+			this.analyzers.put(options.hashCode(), analyzer);
+		}
+		
+		return analyzer;
+		
 	}
 }

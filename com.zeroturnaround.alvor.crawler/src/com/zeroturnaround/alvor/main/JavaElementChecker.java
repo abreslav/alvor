@@ -8,6 +8,7 @@ import java.util.Map;
 import org.eclipse.jdt.core.IJavaElement;
 
 import com.zeroturnaround.alvor.cache.PositionUtil;
+import com.zeroturnaround.alvor.checkers.CheckerException;
 import com.zeroturnaround.alvor.checkers.IAbstractStringChecker;
 import com.zeroturnaround.alvor.checkers.INodeDescriptor;
 import com.zeroturnaround.alvor.checkers.ISQLErrorHandler;
@@ -132,7 +133,11 @@ public class JavaElementChecker {
 		
 		for (IAbstractStringChecker checker : checkers) {
 			timer.start("TIMER checker=" + checker.getClass().getName());
-			checker.checkAbstractStrings(hotspots, errorHandler, options);
+			try {
+				checker.checkAbstractStrings(hotspots, errorHandler, options);
+			} catch (CheckerException e) {
+				errorHandler.handleSQLWarning(e.getMessage(), e.getPosition());
+			}
 			timer.printTime();
 		}
 	}
