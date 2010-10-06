@@ -36,6 +36,8 @@ public class JavaElementCheckerTest {
 	private boolean clearCache = true;
 	
 	public JavaElementCheckerTest()  {
+		checker.setSmartChecking(false); // ie. test all hotspots with both (all) checkers
+		
 		File dir1 = new File (".");
 		try {
 			System.out.println ("Current dir : " + dir1.getCanonicalPath());

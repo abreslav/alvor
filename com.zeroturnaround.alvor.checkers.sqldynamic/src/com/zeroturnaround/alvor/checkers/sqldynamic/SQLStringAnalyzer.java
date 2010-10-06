@@ -42,6 +42,17 @@ public class SQLStringAnalyzer {
 		}
 	}
 	
+	
+	public boolean canValidate(String sql) {
+		if (url.contains("oracle") || url.contains("odbc")) {
+			// oracle wont parse these before executing
+			return sql.substring(0, 6).toLowerCase().equals("select");
+		}
+		else {
+			return true; // TODO don't be so sure about it
+		}
+	}
+	
 	public void validate(String sql) throws SQLException {
 		checkConnect();
 		

@@ -1,5 +1,6 @@
 package com.zeroturnaround.alvor.checkers.sqlstatic;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -40,47 +41,15 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 	public void checkAbstractStrings(List<IStringNodeDescriptor> descriptors,
 			final ISQLErrorHandler errorHandler, Map<String, String> options) throws CheckerException {
 		for (final IStringNodeDescriptor descriptor : descriptors) {
-			IAbstractString abstractString = descriptor.getAbstractValue();
-			if (!hasAcceptableSize(abstractString)) {
-				if (abstractString instanceof StringChoice) { // This may make things slower, but more precise 
-					StringChoice choice = (StringChoice) abstractString;
-					boolean hasBigSubstrings = false;
-					boolean hasSmallSubstrings = false;
-					for (IAbstractString option : choice.getItems()) {
-						if (!hasAcceptableSize(option)) {
-							hasBigSubstrings = true;
-						} else {
-							try {
-								checkStringOfAppropriateSize(errorHandler, descriptor, option);
-								hasSmallSubstrings = true;
-							} catch (StackOverflowError e) { 
-								// TODO: This hack is no good. May be it can be fixed in the FixpointParser   
-								hasBigSubstrings = true;
-							}
-						}
-					}
-					if (hasBigSubstrings) {
-						errorHandler.handleSQLWarning("SQL syntax checker: SQL string has too many possible variations" + (hasSmallSubstrings ? ". Only some are checked" : ""), descriptor.getPosition());
-					}
-				} else {
-					errorHandler.handleSQLWarning("SQL syntax checker: SQL string has too many possible variations", descriptor.getPosition());
-				}
-			} else {
-				try {
-					checkStringOfAppropriateSize(errorHandler, descriptor, abstractString);
-				} catch (StackOverflowError e) {
-					// The analyzer has caused a stack overflow in the dfs-based evaluation procedure.
-					// See FixpointParser class
-					errorHandler.handleSQLWarning("SQL syntax checker: SQL string has too many possible variations", descriptor.getPosition());
-				}
-			}
+			checkAbstractString(descriptor, errorHandler, options);
 		}
 	}
 
 	private void checkStringOfAppropriateSize(
 			final ISQLErrorHandler errorHandler,
 			final IStringNodeDescriptor descriptor,
-			IAbstractString abstractString) {
+			IAbstractString abstractString) throws CheckerException {
+		
 		try {
 			State automaton = PositionedCharacterUtil.createPositionedAutomaton(abstractString);
 			
@@ -115,7 +84,7 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 			throw e;
 		} catch (Throwable e) {
 			LOG.exception(e);
-			errorHandler.handleSQLError("SQL syntax checker: internal error: " + e.toString(), descriptor.getPosition());
+			throw new CheckerException("SQL syntax checker: internal error: " + e.toString(), descriptor.getPosition());
 		}
 	}
 
@@ -127,8 +96,44 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 	}
 
 	@Override
-	public void checkAbstractString(IStringNodeDescriptor descriptor,
+	public boolean checkAbstractString(IStringNodeDescriptor descriptor,
 			ISQLErrorHandler errorHandler, Map<String, String> options)
 			throws CheckerException {
+		
+		IAbstractString abstractString = descriptor.getAbstractValue();
+		if (!hasAcceptableSize(abstractString)) {
+			if (abstractString instanceof StringChoice) { // This may make things slower, but more precise 
+				StringChoice choice = (StringChoice) abstractString;
+				boolean hasBigSubstrings = false;
+				boolean hasSmallSubstrings = false;
+				for (IAbstractString option : choice.getItems()) {
+					if (!hasAcceptableSize(option)) {
+						hasBigSubstrings = true;
+					} else {
+						try {
+							checkStringOfAppropriateSize(errorHandler, descriptor, option);
+							hasSmallSubstrings = true;
+						} catch (StackOverflowError e) { 
+							// TODO: This hack is no good. May be it can be fixed in the FixpointParser   
+							hasBigSubstrings = true;
+						}
+					}
+				}
+				if (hasBigSubstrings) {
+					errorHandler.handleSQLWarning("SQL syntax checker: SQL string has too many possible variations" + (hasSmallSubstrings ? ". Only some are checked" : ""), descriptor.getPosition());
+				}
+			} else {
+				errorHandler.handleSQLWarning("SQL syntax checker: SQL string has too many possible variations", descriptor.getPosition());
+			}
+		} else {
+			try {
+				checkStringOfAppropriateSize(errorHandler, descriptor, abstractString);
+			} catch (StackOverflowError e) {
+				// The analyzer has caused a stack overflow in the dfs-based evaluation procedure.
+				// See FixpointParser class
+				errorHandler.handleSQLWarning("SQL syntax checker: SQL string has too many possible variations", descriptor.getPosition());
+			}
+		}
+		return false; // syntax-checker can't be sure about semantic correctness
 	}
 }
