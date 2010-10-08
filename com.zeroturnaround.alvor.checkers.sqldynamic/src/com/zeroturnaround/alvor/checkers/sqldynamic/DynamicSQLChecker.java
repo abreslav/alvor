@@ -51,6 +51,8 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 		Map<String, Integer> concretes = new HashMap<String, Integer>();
 
 		assert LOG.message("DYN CHECK ABS: " + descriptor.getAbstractValue());
+		
+		// FIXME if AS contains repetition then check but return false
 
 		Map<String, String> errorMap = new HashMap<String, String>();
 		if (AbstractStringSizeCounter.size(descriptor.getAbstractValue()) > SIZE_LIMIT) {
@@ -70,25 +72,19 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 				duplicates = 0;
 				if (countSoFar == null) {
 					assert LOG.message("CON: " + s);
-					if (analyzer.canValidate(s)) {
-						try {
-							analyzer.validate(s);
-						} catch (SQLException e) {
-							allOK = false;
-							assert LOG.message("    ERR: " + e.getMessage());
-	
-							String errStrings = errorMap.get(e.getMessage());
-							if (errStrings == null) {
-								errStrings = s; 
-							} else {
-								errStrings += ";;;\n" + s;
-							}
-							errorMap.put(e.getMessage(), errStrings);
-						}
-					} 
-					else {
-						// ignore this, but not sure about result anymore
+					try {
+						analyzer.validate(s);
+					} catch (SQLException e) {
 						allOK = false;
+						assert LOG.message("    ERR: " + e.getMessage());
+
+						String errStrings = errorMap.get(e.getMessage());
+						if (errStrings == null) {
+							errStrings = s; 
+						} else {
+							errStrings += ";;;\n" + s;
+						}
+						errorMap.put(e.getMessage(), errStrings);
 					}
 					concretes.put(s, 1);
 				}

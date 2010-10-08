@@ -16,7 +16,7 @@ public class SQLStringAnalyzer {
 	private String url;
 	private String username;
 	private String password;
-	private int usageCount=0;
+	private int testCount=0;
 	private String driverName;
 	
 	public SQLStringAnalyzer(String driverName, String url, String username,
@@ -33,35 +33,67 @@ public class SQLStringAnalyzer {
 	
 	private void checkConnect() throws SQLException {
 		// disconnecting is necessary because of "too many open cursors" error
-		if (usageCount % 300 == 0) {
+		if (testCount % 100 == 0) {
 			if (conn != null) {
 				conn.close();
 			}
 			conn = DriverManager.getConnection(url, username, password);
-			usageCount = 0;
-		}
-	}
-	
-	
-	public boolean canValidate(String sql) {
-		if (url.contains("oracle") || url.contains("odbc")) {
-			// oracle wont parse these before executing
-			return sql.substring(0, 6).toLowerCase().equals("select");
-		}
-		else {
-			return true; // TODO don't be so sure about it
+			testCount = 0;
 		}
 	}
 	
 	public void validate(String sql) throws SQLException {
 		checkConnect();
 		
+		if (url.contains("oracle")) {
+			testOracleSQL(sql);
+		}
+		else {
+			testNormalEngineSQL(sql);
+		}
+		testCount++;
+	}
+	public void testNormalEngineSQL(String sql) throws SQLException {
 		PreparedStatement stmt = null;
 		try {
-			usageCount++;
 			stmt = conn.prepareStatement(sql);
-			if (url.contains("oracle") || url.contains("odbc")) {
+			// TODO there may be other engines besides oracle that require stmt.getMetaData()
+		} finally {
+			if (stmt != null) {
+				stmt.close();
+			}
+		}
+	}
+	
+	public void testOracleSQL(String sql) throws SQLException {
+		boolean isSelect = sql.substring(0, 6).toLowerCase().equals("select");
+		PreparedStatement stmt = null;
+		try {
+			if (isSelect) {
+				System.out.println("##### SELECT");
+				stmt = conn.prepareStatement(sql); 
 				stmt.getMetaData();
+			}
+			else {
+				// oracle wont parse DML statement without executing
+				// so i'll parse them explicitly
+				String quotedSql = sql.replace("'", "''").replace("?", "null");
+				stmt = conn.prepareCall(
+					"declare " +
+					"    c integer;" +
+					"    stmt varchar2(4000) := '" + quotedSql +  "';" +
+					"begin " +
+					"    c := dbms_sql.open_cursor;" +
+					"    dbms_sql.parse(c,stmt,dbms_sql.native);" +
+					"    dbms_sql.close_cursor(c);" +
+					"exception" +
+					"    when others then" +
+					"    begin" +
+					"        dbms_sql.close_cursor(c);" +
+					"        raise;" +
+					"    end;" +
+					"end;"); 
+				stmt.execute();
 			}
 		} finally {
 			if (stmt != null) {
@@ -69,6 +101,7 @@ public class SQLStringAnalyzer {
 			}
 		}
 	}
+	
 	
 	public String getUrl() {
 		return url;

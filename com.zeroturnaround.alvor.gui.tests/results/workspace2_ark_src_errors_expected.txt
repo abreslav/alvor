@@ -26,10 +26,35 @@ SQL syntax checker: Unexpected token: value, at: /ark/src/ee/ark/aris2/juhiload/
 SQL syntax checker: Unexpected token: value, at: /ark/src/ee/ark/aris2/juhiload/data/TaotlusDAO.java:941
 SQL syntax checker: Unexpected token: value, at: /ark/src/ee/ark/aris2/teooriaeksam/eksamineerija/data/EksamineerijaDAO.java:178
 SQL syntax checker: Unexpected token: value, at: /ark/src/ee/ark/aris2/teooriaeksam/eksamineerija/data/EksamineerijaDAO.java:190
+SQL test failed  - ORA-00904: "BYROO_ID": invalid identifier
+ORA-06512: at line 1
+SQL: 
+UPDATE OOTEL_TOOD SET BYROO_ID = (select t1.id from byroo t1 where t1.kood=?) WHERE sisendparameeterid = ?  , at: /ark/src/ee/ark/aris2/soiduk/data/OotelToodDAO.java:106
 SQL test failed  - ORA-00904: "CHECK_CATEGORIES": invalid identifier
 SQL: 
 select OPETAJA_ID, TUNNISTUSE_NR from OPETAJA_BY_KATEGOORIA where  koolitusasutus_id=? and check_categories(?, kategooria)>0 and LIIK LIKE  'TEOORIA%'  ORDER BY TUNNISTUSE_NR ASC;;;
 select OPETAJA_ID, TUNNISTUSE_NR from OPETAJA_BY_KATEGOORIA where  koolitusasutus_id=? and check_categories(?, kategooria)>0 and LIIK LIKE  '%SOIT'  ORDER BY TUNNISTUSE_NR ASC, at: /ark/src/ee/ark/aris2/juhiload/data/KoolitusnimekiriDAO.java:115
+SQL test failed  - ORA-00904: "KUUPAEV": invalid identifier
+ORA-06512: at line 1
+SQL: 
+ select * from (select * from YMBEREHITUS_SOIDUKI_ANDMED where SOIDUK_ID=?  ORDER by kuupaev desc) where rownum=1;;;
+ select * from (select * from YMBEREHITUS_SOIDUKI_ANDMED where SOIDUK_ID_ID=?  ORDER by kuupaev desc) where rownum=1, at: /ark/src/ee/ark/aris2/soiduk/data/YmberehituslubaDAO.java:49
+SQL test failed  - ORA-00904: "LOPP": invalid identifier
+ORA-06512: at line 1
+SQL: 
+INSERT INTO TEOORIAEKSAM_ERISOORITUS (ID, TEOORIAEKSAMIL_OSALEJA_ID, EKSAMINEERIJA_KASUTAJA_ID, TEOORIAEKSAM_TEST_ID, VIGADE_ARV, TEOORIAEKSAM_SEISUNDID,LOPP) VALUES (S_TEOORIAEKSAM_ERISOORITUS.NEXTVAL, ?, ?, ?, ?,?,sysdate), at: /ark/src/ee/ark/aris2/teooriaeksam/eksamineerija/data/EksamineerijaDAO.java:165
+SQL test failed  - ORA-00904: "MS"."SISENDPARAMEETRID": invalid identifier
+ORA-06512: at line 1
+SQL: 
+update maksed_seotud ms set ms.lisainfo =? where ms.komponent =? and ms.sisendparameetrid=?, at: /ark/src/ee/ark/aris2/tasu/data/TasuDAO.java:456
+SQL test failed  - ORA-00904: "MS"."SISENDPARAMEETRID": invalid identifier
+ORA-06512: at line 1
+SQL: 
+update maksed_seotud ms set ms.sisendparameetrid =? where ms.id =?, at: /ark/src/ee/ark/aris2/tasu/data/TasuDAO.java:449
+SQL test failed  - ORA-00904: "P"."PIIRANG_ID": invalid identifier
+ORA-06512: at line 1
+SQL: 
+DELETE FROM piirang_riigiloiv WHERE  p.piirang_id=?, at: /ark/src/ee/ark/aris2/soiduk/data/PiirangDAO.java:801
 SQL test failed  - ORA-00904: "PKG_TRYB"."GET_TAKSO_XML": invalid identifier
 SQL: 
 select pkg_tryb.get_takso_xml(?) from dual, at: /ark/src/ee/ark/aris2/tryb/data/TrybDAO.java:101
@@ -109,6 +134,56 @@ SELECT ID FROM HAIREINFO WHERE () AND (LOPP IS NULL OR LOPP>sysdate) , at: /ark/
 SQL test failed  - ORA-00936: missing expression
 SQL: 
 select * from xtee_soiduki_andmed where , at: /ark/src/ee/ark/aris2/xtee/endpoint/SoidukiAndmedEndpoint.java:51
+SQL test failed  - ORA-00942: table or view does not exist
+ORA-06512: at line 1
+SQL: 
+DELETE FROM fotobox_foto sd WHERE sd.isikukood = (select isikukood from fotobox_foto where id=? ), at: /ark/src/ee/ark/aris2/juhiload/data/PiltDAO.java:124
+SQL test failed  - ORA-00942: table or view does not exist
+ORA-06512: at line 1
+SQL: 
+DELETE FROM veesoiduk_kustutamine WHERE veesoiduk_id = ?, at: /ark/src/ee/ark/aris2/soiduk/data/VeesoidukKustutamineDAO.java:39
+SQL test failed  - ORA-00942: table or view does not exist
+ORA-06512: at line 1
+SQL: 
+INSERT INTO DELIKAAT_LOGI (KASUTAJA_ID, BYROO_ID, KUUPAEV, INFORMATION, REQUEST) values (?,?,sysdate ,?,?), at: /ark/src/ee/ark/aris2/common/data/SensitiveInformationDAO.java:16
+SQL test failed  - ORA-00942: table or view does not exist
+ORA-06512: at line 1
+SQL: 
+UPDATE PVA_DOCUMENT  SET status = 'Z'  WHERE DOCUMENT_ID = ? , at: /ark/src/ee/ark/aris2/park/data/ParkDokumentDAO.java:63
+SQL test failed  - ORA-00942: table or view does not exist
+ORA-06512: at line 1
+SQL: 
+UPDATE PVA_DOCUMENT  SET status = ? , VASTU_KPV=sysdate, VASTU_KASUTAJA= ? WHERE DOCUMENT_ID = ? ;;;
+UPDATE PVA_DOCUMENT  SET status = ? , TYHIST_KPV=sysdate, TYHIST_KASUTAJA= ? WHERE DOCUMENT_ID = ? ;;;
+UPDATE PVA_DOCUMENT  SET status = ?  WHERE DOCUMENT_ID = ? , at: /ark/src/ee/ark/aris2/park/data/ParkDokumentDAO.java:53
+SQL test failed  - ORA-00942: table or view does not exist
+ORA-06512: at line 1
+SQL: 
+delete from fail WHERE fail.ID= ? , at: /ark/src/ee/ark/aris2/admin/data/FailDAO.java:60
+SQL test failed  - ORA-00942: table or view does not exist
+ORA-06512: at line 1
+SQL: 
+insert into dokument (id,dokument_nr , dokument_tyyp , dokument_sisu ) values ( ?, ?, ?,?), at: /ark/src/ee/ark/aris2/soiduk/data/DokumentDAO.java:125
+SQL test failed  - ORA-00942: table or view does not exist
+ORA-06512: at line 1
+SQL: 
+insert into isik_pildid (id, pilt, isik_id, pilt_tyyp, kuupaev) values( ?, (select foto_data from fotobox_foto where id=?), ?, ?, ?), at: /ark/src/ee/ark/aris2/juhiload/data/PiltDAO.java:113
+SQL test failed  - ORA-00942: table or view does not exist
+ORA-06512: at line 1
+SQL: 
+insert into sis_vastus (id,vin_kood, dokument_id, paringu_kp, vastuse_kood, soiduk_id) values ( ?, ?, ?,sysdate,?,?), at: /ark/src/ee/ark/aris2/soiduk/data/DokumentDAO.java:114
+SQL test failed  - ORA-00942: table or view does not exist
+ORA-06512: at line 1
+SQL: 
+insert into taotlus_pva_document (TAOTLUS_ID,PVA_DOCUMENT) values (?,?), at: /ark/src/ee/ark/aris2/park/data/ParkDokumentDAO.java:72
+SQL test failed  - ORA-00942: table or view does not exist
+ORA-06512: at line 1
+SQL: 
+insert into typ_arve_numeratsioon (typ_unikaalne_id , viimane_vaartus ) values(?,extract(month from sysdate) || '0000' ), at: /ark/src/ee/ark/aris2/typ/data/TypDAO.java:158
+SQL test failed  - ORA-00942: table or view does not exist
+ORA-06512: at line 1
+SQL: 
+update  typ_arve_numeratsioon set  viimane_vaartus =? where typ_unikaalne_id=(select t.unikaalne_id from tehnoylevaatuspunkt t where t.id=?), at: /ark/src/ee/ark/aris2/typ/data/TypDAO.java:333
 SQL test failed  - ORA-00942: table or view does not exist
 SQL: 
 SELECT * FROM OPETAJA_TUNNISTUSED pd  where pd.isik_id=?, at: /ark/src/ee/ark/aris2/admin/data/OpetajaDAO.java:102
@@ -249,6 +324,10 @@ select viimane_vaartus from typ_arve_numeratsioon t join tehnoylevaatuspunkt tt 
 SQL test failed  - ORA-00942: table or view does not exist
 SQL: 
 select y.dokument_id from ylevaatus_dokument y join dokument d on d.id=y.dokument_id where y.ylevaatus_id=? and d.dokument_tyyp=?, at: /ark/src/ee/ark/aris2/soiduk/data/DokumentDAO.java:96
+SQL test failed  - ORA-01732: data manipulation operation not legal on this view
+ORA-06512: at line 1
+SQL: 
+update taotlus_dokumentid set taotlus_id =? where id = ? , at: /ark/src/ee/ark/aris2/juhiload/data/TaotlusDAO.java:1026
 SQL test failed  - ORA-02289: sequence does not exist
 SQL: 
 select S_SIS_VASTUS.nextval from dual, at: /ark/src/ee/ark/aris2/soiduk/data/DokumentDAO.java:113
@@ -268,6 +347,13 @@ select * from xtee_soiduki_andmed where  (UPPER(REGMRK) = ? and soiduk_id_id is 
 SQL test failed  - ORA-04063: view "ARIS2.XTEE_SOIDUKI_ANDMED" has errors
 SQL: 
 select * from xtee_soiduki_andmed where soiduk_id_id = ?, at: /ark/src/ee/ark/aris2/xtee/endpoint/SoidukiAndmedEndpoint.java:63
+SQL test failed  - ORA-06550: line 1, column 18:
+PLS-00302: component 'AKTIVERII_OLEK' must be declared
+ORA-06550: line 1, column 9:
+PL/SQL: Statement ignored
+ORA-06512: at line 1
+SQL: 
+begin   pkg_jobs.aktiverii_olek(?); end;, at: /ark/src/ee/ark/aris2/juhiload/data/JuhtimisoigusDAO.java:429
 SQL test failed  - ORA-06553: PLS-306: wrong number or types of arguments in call to 'OGC_Y'
 SQL: 
 select id  from ylevaatus  where y.staatus='POOLELI' and  soiduk_id = ? and soiduk_id_id = ?   and sisestusaeg=(select max(sisestusaeg) from ylevaatus where soiduk_id = ? and soiduk_id_id=? ) , at: /ark/src/ee/ark/aris2/typ/data/YlevaatusDAO.java:522

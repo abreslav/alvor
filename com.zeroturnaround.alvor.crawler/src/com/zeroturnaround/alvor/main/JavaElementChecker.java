@@ -177,10 +177,17 @@ public class JavaElementChecker {
 			Map<String, String> options) throws CheckerException {
 		
 		for (IAbstractStringChecker checker : checkers) {
-			Timer timer = new Timer();
-			timer.start("TIMER checker=" + checker.getClass().getName());
-			checker.checkAbstractStrings(hotspots, errorHandler, options);
-			timer.printTime();
+			if (checker instanceof DynamicSQLChecker 
+					&& !dynamicCheckerIsConfigured(options)) {
+				errorHandler.handleSQLWarning("SQL checker: testing database is not configured", 
+						new Position(options.get("SourceFileName"), 0, 0));
+				
+			} else {
+				Timer timer = new Timer();
+				timer.start("TIMER checker=" + checker.getClass().getName());
+				checker.checkAbstractStrings(hotspots, errorHandler, options);
+				timer.printTime();
+			}
 		}
 	}
 	

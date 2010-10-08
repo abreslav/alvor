@@ -1,8 +1,6 @@
 SQL syntax checker: Syntax error. Most likely, unfinished query, at: /sql_bus/src/ee/emt/xgate/component/address/impl/ClientAddressImpl.java:3099
 SQL syntax checker: Syntax error. Most likely, unfinished query, at: /sql_bus/src/ee/emt/xgate/component/www/question/impl/FaqImpl.java:96
 SQL syntax checker: Unexpected token: , at: /sql_bus/src/ee/emt/xgate/component/client/impl/ClientImpl.java:529
-SQL syntax checker: Unexpected token: (, at: /sql_bus/src/ee/emt/xgate/component/www/search/documentsearch/impl/SearcherImpl.java:161
-SQL syntax checker: Unexpected token: (, at: /sql_bus/src/ee/emt/xgate/component/www/search/documentsearch/impl/SearcherImpl.java:375
 SQL syntax checker: Unexpected token: ., at: /sql_bus/src/ee/emt/xgate/component/services/impl/ServicesImpl.java:2975
 SQL syntax checker: Unexpected token: ., at: /sql_bus/src/ee/emt/xgate/component/services/impl/ServicesImpl.java:3108
 SQL syntax checker: Unexpected token: ., at: /sql_bus/src/ee/emt/xgate/component/services/impl/ServicesImpl.java:5488
@@ -10,6 +8,7 @@ SQL syntax checker: Unexpected token: ., at: /sql_bus/src/ee/emt/xgate/component
 SQL syntax checker: Unexpected token: 1ORDER, at: /sql_bus/src/ee/emt/xgate/component/sms/impl/SmsImpl.java:1423
 SQL syntax checker: Unexpected token: 1ORDER, at: /sql_bus/src/ee/emt/xgate/component/sms/impl/SmsImpl.java:1424
 SQL syntax checker: Unexpected token: :=, at: /sql_bus/src/ee/emt/xgate/component/eshop/impl/OrderProcessImpl.java:95
+SQL syntax checker: Unexpected token: >, at: /sql_bus/src/ee/emt/xgate/component/www/search/documentsearch/impl/SearcherImpl.java:55
 SQL syntax checker: Unexpected token: ?, at: /sql_bus/src/ee/emt/xgate/component/numberportability/impl/NumberPortabilityFacadeImpl.java:75
 SQL syntax checker: Unexpected token: ?, at: /sql_bus/src/ee/emt/xgate/component/numberportability/impl/NumberPortabilityFacadeImpl.java:77
 SQL syntax checker: Unexpected token: ?, at: /sql_bus/src/ee/emt/xgate/component/numberportability/impl/NumberPortabilityFacadeImpl.java:78
@@ -24,8 +23,9 @@ SQL syntax checker: Unexpected token: NOT, at: /sql_bus/src/ee/emt/xgate/compone
 SQL syntax checker: Unexpected token: NUMBER, at: /sql_bus/src/ee/emt/xgate/brms/creditrating/dao/impl/CreditRatingDAOImpl.java:574
 SQL syntax checker: Unexpected token: NUMBER, at: /sql_bus/src/ee/emt/xgate/brms/creditrating/dao/impl/CreditRatingDAOImpl.java:862
 SQL syntax checker: Unexpected token: ORDER, at: /sql_bus/src/ee/emt/xgate/component/pdfcalldistinction/impl/PdfCallDistinctionImpl.java:357
-SQL syntax checker: Unexpected token: ORDER, at: /sql_bus/src/ee/emt/xgate/component/www/search/documentsearch/impl/SearcherImpl.java:56
-SQL syntax checker: Unexpected token: UPPER, at: /sql_bus/src/ee/emt/xgate/component/www/search/documentsearch/impl/SearcherImpl.java:314
+SQL syntax checker: Unexpected token: ORDER, at: /sql_bus/src/ee/emt/xgate/component/www/search/documentsearch/impl/SearcherImpl.java:162
+SQL syntax checker: Unexpected token: ORDER, at: /sql_bus/src/ee/emt/xgate/component/www/search/documentsearch/impl/SearcherImpl.java:316
+SQL syntax checker: Unexpected token: ORDER, at: /sql_bus/src/ee/emt/xgate/component/www/search/documentsearch/impl/SearcherImpl.java:376
 SQL syntax checker: Unexpected token: USER, at: /sql_bus/src/ee/emt/xgate/component/ppchange/impl/SmsTemplateImpl.java:360
 SQL syntax checker: Unexpected token: VALUE, at: /sql_bus/src/ee/emt/xgate/component/prov/impl/ProvisioningServiceModuleImpl.java:1282
 SQL syntax checker: Unexpected token: WHERE, at: /sql_bus/src/ee/emt/xgate/brms/creditrating/dao/impl/CreditRatingDAOImpl.java:616
