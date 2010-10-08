@@ -1,3 +1,4 @@
+SQL syntax checker: Syntax error. Most likely, unfinished query, at: /earved/src/ee/post/earved/dao/accountingPattern/PatternItemDAO.java:122
 SQL syntax checker: Syntax error. Most likely, unfinished query, at: /earved/src/ee/post/earved/dao/invoice/InvoiceItemDAO.java:181
 SQL syntax checker: Unexpected token: (, at: /earved/src/ee/post/earved/dao/invoice/AttachmentDAO.java:258
 SQL syntax checker: Unexpected token: ,, at: /earved/src/ee/post/earved/dao/journal/JournalEntryDAO.java:145
@@ -6,7 +7,6 @@ SQL syntax checker: Unexpected token: :, at: /earved/src/ee/post/earved/dao/invo
 SQL syntax checker: Unexpected token: :, at: /earved/src/ee/post/earved/dao/invoice/BankExportDAO.java:84
 SQL syntax checker: Unexpected token: INTERVAL, at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:1086
 SQL syntax checker: Unexpected token: ORDER, at: /earved/src/ee/post/earved/dao/dimension/DimensionDataConnectionDAO.java:263
-SQL syntax checker: Unexpected token: extra_id, at: /earved/src/ee/post/earved/dao/accountingPattern/PatternItemDAO.java:117
 SQL syntax checker: Unexpected token: null, at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:974
 SQL syntax checker: Unexpected token: value, at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:298
 SQL syntax checker: Unexpected token: value, at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:298
@@ -16,6 +16,10 @@ SQL syntax checker: Unexpected token: where, at: /earved/src/ee/post/earved/dao/
 SQL test failed  - ORA-00904: "ACCOUNTING_OPPOSITE_ACCOUNT": invalid identifier
 SQL: 
 select ACCOUNTING_OPPOSITE_ACCOUNT from person where id = ?, at: /earved/src/ee/post/earved/dao/person/PersonDAO.java:65
+SQL test failed  - ORA-00904: "BUY_ORDER_NUMBER": invalid identifier
+ORA-06512: at line 1
+SQL: 
+update invoice set ref_invoice_additional=?, region=?, HAS_BUY_ORDER=?, BUY_ORDER_NUMBER=? where id=?, at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:1169
 SQL test failed  - ORA-00904: "CB"."REF_DOM_BANK": invalid identifier
 SQL: 
 select cb.id, cb.ref_dom_bank, dv.name, cb.bank_account_code, cb.is_supported from channel_bank cb  join domain_v dv on cb.ref_dom_bank=dv.code  where is_supported=1 and bank_account_code like ? ESCAPE '\' and rownum=1, at: /earved/src/ee/post/earved/dao/channelBank/ChannelBankDAO.java:57
@@ -41,11 +45,23 @@ SQL test failed  - ORA-00904: "CONFIRM"."REF_CONFIRM_PATTERN_CONFIRMER": invalid
 SQL: 
 select confirm.ID, confirm.REF_INVOICE, confirm.ORDER_NR, confirm.REF_PERSON_CONFIRMER, confirm.COMMENT_TO_CONFIRMER, confirm.SENT_TO_CONFIRM_TIME, confirm.REF_DOM_CONFIRM_DECISION, confirm.DECISION_COMMENT, confirm.DECISION_TIME, confirm.CANCELED, confirm.CREATED_BY, confirm.CREATED, confirm.REF_CONFIRM_PATTERN_CONFIRMER, (case when creator.is_juridical_person = 0 then creator.given_name || ' ' || creator.name else creator.name end) as created_by_full_name from confirm join person creator on confirm.created_by=creator.id where confirm.ID=?, at: /earved/src/ee/post/earved/dao/invoice/ConfirmDAO.java:67
 SQL test failed  - ORA-00904: "CONFIRM_DEADLINE_NOTICE": invalid identifier
+ORA-06512: at line 1
+SQL: 
+update person set accounting_opposite_account=?, CONFIRM_DEADLINE_DAYS=?, CONFIRM_DEADLINE_NOTICE=? where id=?, at: /earved/src/ee/post/earved/dao/person/PersonDAO.java:551
+SQL test failed  - ORA-00904: "CONFIRM_DEADLINE_NOTICE": invalid identifier
 SQL: 
 SELECT  id, name, given_name, is_juridical_person, code, vat_number, reminder_email, reminder_phone, invoice_notice_email, invoice_notice_phone, ref_invoice_layout, contact_email, information_content, default_email_text, default_due_date, invoice_number_prefix, next_invoice_number, fine_rate_per_day, number_retries, invoice_reference, password, erp_access, phone_number, url, ACCOUNTING_OPPOSITE_ACCOUNT, invoice_additional_field_name, CONFIRM_DEADLINE_DAYS, CONFIRM_DEADLINE_NOTICE FROM person WHERE code = ?, at: /earved/src/ee/post/earved/dao/person/PersonDAO.java:131
 SQL test failed  - ORA-00904: "CONFIRM_DEADLINE_NOTICE": invalid identifier
 SQL: 
 SELECT  id, name, given_name, is_juridical_person, code, vat_number, reminder_email, reminder_phone, invoice_notice_email, invoice_notice_phone, ref_invoice_layout, contact_email, information_content, default_email_text, default_due_date, invoice_number_prefix, next_invoice_number, fine_rate_per_day, number_retries, invoice_reference, password, erp_access, phone_number, url, ACCOUNTING_OPPOSITE_ACCOUNT, invoice_additional_field_name, CONFIRM_DEADLINE_DAYS, CONFIRM_DEADLINE_NOTICE FROM person WHERE id = ?, at: /earved/src/ee/post/earved/dao/person/PersonDAO.java:116
+SQL test failed  - ORA-00904: "CRA"."LAST_USED": invalid identifier
+ORA-06512: at line 1
+SQL: 
+update client_register_account cra set cra.last_used=(case when cra.id=? then 1 else 0 end) where ref_client_register in (select id from client_register where ref_person=? and reg_number=?), at: /earved/src/ee/post/earved/dao/client/ClientRegisterAccountDAO.java:50
+SQL test failed  - ORA-00904: "DEFAULT_EMAIL_TEXT": invalid identifier
+ORA-06512: at line 1
+SQL: 
+UPDATE person SET invoice_reference=?, fine_rate_per_day=?, invoice_number_prefix=?, next_invoice_number=?, default_due_date=?, ref_invoice_layout=?, information_content=?, default_email_text=? where id =?, at: /earved/src/ee/post/earved/dao/person/PersonDAO.java:204
 SQL test failed  - ORA-00904: "EXPORT_STATE": invalid identifier
 SQL: 
 select  id, ref_invoice as invoice_id , invoice_xml_part , queued, sent , file_id, bank_code from BANK_EXPORT where sent is null and export_state=? and FAILED_ATTEMPTS<? and bank_code=?, at: /earved/src/ee/post/earved/dao/invoice/BankExportDAO.java:92
@@ -54,6 +70,10 @@ SQL:
 SELECT * FROM (   SELECT i.id,i.ref_dom_invoice_state,i.last_status_change_sale     FROM invoice i WHERE  sale_invoice = 1 AND ref_person_code_sale = ?      AND i.last_status_change_sale > ? AND i.ref_dom_invoice_state_sale in (?, ?, ?)    ORDER BY i.last_status_change_sale, id) WHERE rownum <= ?;;;
 SELECT * FROM (   SELECT i.id,i.ref_dom_invoice_state,i.last_status_change_sale     FROM invoice i WHERE  sale_invoice = 1 AND ref_person_code_sale = ?      AND i.last_status_change_sale > ? AND i.ref_dom_invoice_state_sale in (?, ?, ?)    ORDER BY i.sent_to_erp, id) WHERE rownum <= ?;;;
 SELECT * FROM (   SELECT i.id,i.ref_dom_invoice_state,i.last_status_change_sale     FROM invoice i WHERE  sale_invoice = 1 A..., at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:1011
+SQL test failed  - ORA-00904: "IC"."REF_INVOICE_CHANNEL_ADDITIONAL": invalid identifier
+ORA-06512: at line 1
+SQL: 
+delete from invoice_channel_additional ica where (select 1 from invoice_channel ic where ic.ref_invoice_channel_additional=ica.id  and rownum=1) is null, at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:573
 SQL test failed  - ORA-00904: "IC"."REF_INVOICE_CHANNEL_ADDITIONAL": invalid identifier
 SQL: 
 select  ic.id as channel_id,ic.BANK_PERSON_CODE, ic.ACCOUNT_NUMBER, ic.REF_DOM_CHANNEL, ic.REF_DOM_CHANNEL_COUNTRY, nvl(dv.NAME,ic.country) as COUNTRY_NAME, ic.CITY, ic.EMAIL_ADDRESS, ic.ref_invoice, ic.POSTAL_ADDRESS_1, ic.POSTAL_ADDRESS_2, ic.POSTAL_CODE, ic.REG_NUMBER, ic.REF_DOM_BANK, ic.is_sent, ic.ref_invoice_channel_additional, ica.additional_text  from invoice_channel ic  left outer join domain_value dv on (dv.value_code = ic.ref_dom_channel_country) left outer join invoice_channel_additional ica on ic.ref_invoice_channel_additional=ica.id where ic.ref_invoice = ? and ic.ref_invoice_automatic is not null, at: /earved/src/ee/post/earved/dao/invoice/InvoiceChannelDAO.java:125
@@ -67,6 +87,10 @@ SQL test failed  - ORA-00904: "INFO": invalid identifier
 SQL: 
 select invoice_event_value, invoice_state_code, invoice_state_value, info, created_by_full_name, created from INVOICE_HISTORY_V where ref_invoice=? and invoice_state_code in  (?, ?, ?)order by created, id;;;
 select invoice_event_value, invoice_state_code, invoice_state_value, info, created_by_full_name, created from INVOICE_HISTORY_V where ref_invoice=? order by created, id, at: /earved/src/ee/post/earved/dao/invoice/HistoryDAO.java:66
+SQL test failed  - ORA-00904: "INVOICE_ADDITIONAL_FIELD_NAME": invalid identifier
+ORA-06512: at line 1
+SQL: 
+update person set invoice_additional_field_name=? where id=?, at: /earved/src/ee/post/earved/dao/person/PersonDAO.java:532
 SQL test failed  - ORA-00904: "INVOICE_ADDITIONAL_FIELD_NAME": invalid identifier
 SQL: 
 select invoice_additional_field_name from person where id=?, at: /earved/src/ee/post/earved/dao/person/PersonDAO.java:537
@@ -82,6 +106,30 @@ select PERSON_CODE, PERSON_NAME, BILLING_PLAN_NAME, SERVICE_NAME,SERVICE_PRICE,S
 SQL test failed  - ORA-00904: "INVOICE_UTIL_PKG"."IS_INVOICE_LAST_EVENT": invalid identifier
 SQL: 
 select invoice_util_pkg.is_invoice_last_event(?,?) from dual, at: /earved/src/ee/post/earved/dao/invoice/HistoryDAO.java:149
+SQL test failed  - ORA-00904: "INVOICE_XML_PART": invalid identifier
+ORA-06512: at line 1
+SQL: 
+insert into BANK_EXPORT (ID, REF_INVOICE, QUEUED, FILE_ID, BANK_CODE, EXPORT_STATE, INVOICE_XML_PART) values (:id, :invoiceId, :queued, :fileId, :bankCode, :exportStateName, :invoiceXmlPart), at: /earved/src/ee/post/earved/dao/invoice/BankExportDAO.java:85
+SQL test failed  - ORA-00904: "IS_AUTOMATIC": invalid identifier
+ORA-06512: at line 1
+SQL: 
+update invoice set IS_AUTOMATIC=? where id=?, at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:1222
+SQL test failed  - ORA-00904: "IS_CHANGED_AFTER_SENDING": invalid identifier
+ORA-06512: at line 1
+SQL: 
+update invoice set is_changed_after_sending=1 where id in  (?, ?, ?), at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:1233
+SQL test failed  - ORA-00904: "IS_MAIN": invalid identifier
+ORA-06512: at line 1
+SQL: 
+UPDATE dimensions SET dimension_name=?, is_main=? WHERE id = ?, at: /earved/src/ee/post/earved/dao/dimension/DimensionDAO.java:61
+SQL test failed  - ORA-00904: "IS_MAIN": invalid identifier
+ORA-06512: at line 1
+SQL: 
+UPDATE dimensions SET is_main=? WHERE id = ?, at: /earved/src/ee/post/earved/dao/dimension/DimensionDAO.java:57
+SQL test failed  - ORA-00904: "IS_MAIN": invalid identifier
+ORA-06512: at line 1
+SQL: 
+update dimensions set is_main=0 where ref_person=? and is_main=1, at: /earved/src/ee/post/earved/dao/dimension/DimensionDAO.java:118
 SQL test failed  - ORA-00904: "IS_MAIN": invalid identifier
 SQL: 
 select 1 from dimensions where ref_person=? and is_main=1 and rownum=1, at: /earved/src/ee/post/earved/dao/dimension/DimensionDAO.java:123
@@ -91,6 +139,27 @@ select id from dimensions where ref_person=? and is_main=1 and rownum=1, at: /ea
 SQL test failed  - ORA-00904: "IS_MAIN": invalid identifier
 SQL: 
 select id, DIMENSION_NAME, ref_person, IS_MAIN from dimensions where ref_person=? and is_main=1 and rownum=1, at: /earved/src/ee/post/earved/dao/dimension/DimensionDAO.java:133
+SQL test failed  - ORA-00904: "IS_SENT": invalid identifier
+ORA-06512: at line 1
+SQL: 
+INSERT INTO INTEGRATION_ITEM(id, type, ref_upload, status, invoice_number, is_sent) VALUES (?,?,?,?,?,?), at: /earved/src/ee/post/earved/dao/integration/IntegrationItemDAO.java:18
+SQL test failed  - ORA-00904: "LAST_EXPORT_BUY": invalid identifier
+ORA-06512: at line 1
+SQL: 
+UPDATE invoice set LAST_EXPORT_BUY= sysdate WHERE id IN  (?, ?, ?);;;
+UPDATE invoice set LAST_EXPORT_BUY= null WHERE id IN  (?, ?, ?), at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:1118
+SQL test failed  - ORA-00904: "LAST_EXPORT_SALE": invalid identifier
+ORA-06512: at line 1
+SQL: 
+UPDATE invoice set LAST_EXPORT_SALE= sysdate WHERE id IN  (?, ?, ?);;;
+UPDATE invoice set LAST_EXPORT_SALE= null WHERE id IN  (?, ?, ?), at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:1118
+SQL test failed  - ORA-00904: "LAST_STATUS_CHANGE_SALE": invalid identifier
+ORA-06512: at line 1
+SQL: 
+UPDATE invoice SET last_status_change_sale=last_status_change_sale + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND last_status_change_sale = ?   AND id >= ?;;;
+UPDATE invoice SET last_status_change_sale=last_status_change_sale + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND sent_to_erp = ?   AND id >= ?;;;
+UPDATE invoice SET last_status_change_sale=last_status_change_sale + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND last_status_change = ?   AND id >= ?;;;
+UPDATE invoice SET last_status_change_sale=sent_to_erp + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND..., at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:1101
 SQL test failed  - ORA-00904: "LAST_USED": invalid identifier
 SQL: 
 select account_number from client_register_account where last_used=1 and ref_client_register in (select id from client_register where ref_person=? and reg_number=?) and rownum=1, at: /earved/src/ee/post/earved/dao/client/ClientRegisterAccountDAO.java:57
@@ -100,6 +169,10 @@ select id, name, account_number,last_used from client_register_account where ref
 SQL test failed  - ORA-00904: "ORDER_ID": invalid identifier
 SQL: 
 select id, cost_objective, cost_objective_dimension_code, cost_objective_dimension_name, order_id from journal_entry where ref_invoice_item = ? order by order_id asc, at: /earved/src/ee/post/earved/dao/journal/JournalEntryDAO.java:48
+SQL test failed  - ORA-00904: "POSITION": invalid identifier
+ORA-06512: at line 1
+SQL: 
+UPDATE REPRESENTATION_RIGHT SET ref_person_representative=?, from_date=?, until_date=?, email=?, position=? WHERE id=?, at: /earved/src/ee/post/earved/dao/person/RepresentationRightDAO.java:138
 SQL test failed  - ORA-00904: "POSITION": invalid identifier
 SQL: 
 select distinct deputy_person_id, deputy_full_name, has_deputies, code, position from deputies_deputies_v where representative_id=? and represented_id=? order by deputy_full_name asc, at: /earved/src/ee/post/earved/dao/person/RepresentationRightDAO.java:286
@@ -116,8 +189,16 @@ SQL test failed  - ORA-00904: "POSITION": invalid identifier
 SQL: 
 select id, ref_person_representative, ref_person_represented, ref_dom_base, email, position from representation_right where ref_person_represented=? and from_date < sysdate AND COALESCE(until_date, sysdate) >= sysdate and ref_person_representative in  (?, ?, ?), at: /earved/src/ee/post/earved/dao/person/RepresentationRightDAO.java:62
 SQL test failed  - ORA-00904: "PREVIOUS": invalid identifier
+ORA-06512: at line 1
+SQL: 
+update confirm set previous=(case when id in  (?, ?, ?) then 1 else 0 end) where ref_invoice=?, at: /earved/src/ee/post/earved/dao/invoice/ConfirmDAO.java:823
+SQL test failed  - ORA-00904: "PREVIOUS": invalid identifier
 SQL: 
 select  ID, REF_INVOICE, ORDER_NR, REF_PERSON_CONFIRMER, PERSON_CONFIRMER_FULL_NAME, COMMENT_TO_CONFIRMER  from confirm_v where id in (select id from confirm where ref_invoice = ? and previous = 1) order by order_nr, id, at: /earved/src/ee/post/earved/dao/invoice/ConfirmDAO.java:262
+SQL test failed  - ORA-00904: "REF_ADDRESS": invalid identifier
+ORA-06512: at line 1
+SQL: 
+update invoice_channel_preferences set ref_dom_channel = 'INVOICE_CHANNEL_POST', ref_address = ? where id = ? , at: /earved/src/ee/post/earved/dao/person/InvoiceChannelPreferencesDAO.java:117
 SQL test failed  - ORA-00904: "REF_ADDRESS": invalid identifier
 SQL: 
 SELECT id FROM invoice_channel_preferences WHERE ref_address=? AND rownum = 1, at: /earved/src/ee/post/earved/dao/person/InvoiceChannelPreferencesDAO.java:207
@@ -155,14 +236,41 @@ SQL test failed  - ORA-00904: "REF_DOM_BANK": invalid identifier
 SQL: 
 select name from domain_v where code in (select ref_dom_bank from channel_bank where is_supported=1) order by name, at: /earved/src/ee/post/earved/dao/channelBank/ChannelBankDAO.java:36
 SQL test failed  - ORA-00904: "REF_DOM_TYPE": invalid identifier
+ORA-06512: at line 1
+SQL: 
+update url set end_time=SYSDATE where ref_invoice=? and REF_REPRESENTATION_RIGHT=? and ref_dom_type=?, at: /earved/src/ee/post/earved/dao/invoice/UrlDAO.java:42
+SQL test failed  - ORA-00904: "REF_DOM_TYPE": invalid identifier
+ORA-06512: at line 1
+SQL: 
+update url set end_time=SYSDATE where ref_invoice=? and ref_dom_type=?, at: /earved/src/ee/post/earved/dao/invoice/UrlDAO.java:36
+SQL test failed  - ORA-00904: "REF_DOM_TYPE": invalid identifier
 SQL: 
 select id, ref_invoice, REF_REPRESENTATION_RIGHT, code, end_time, ref_dom_type from url where id=? and code=? and end_time >= SYSDATE, at: /earved/src/ee/post/earved/dao/invoice/UrlDAO.java:28
+SQL test failed  - ORA-00904: "REF_INBOX": invalid identifier
+ORA-06512: at line 1
+SQL: 
+insert into attachment (ID, REF_INVOICE, FILE_NAME, DESCRIPTION, REF_ID, FILE_TYPE, REF_UPLOAD, CONTENT, ERP_INVOICEID_ATTR, INVOICE, EXTERNAL, PAGE_COUNT, REF_INBOX, buy_attachment)  (select SEQ_ATTACHMENT.NEXTVAL, ?, FILE_NAME, DESCRIPTION, REF_ID, FILE_TYPE, REF_UPLOAD, CONTENT, ERP_INVOICEID_ATTR, INVOICE, EXTERNAL, PAGE_COUNT, REF_INBOX, buy_attachment from attachment t where t.invoice=0 and t.ref_invoice=?), at: /earved/src/ee/post/earved/dao/invoice/AttachmentDAO.java:260
 SQL test failed  - ORA-00904: "REF_INVOICE_ADDITIONAL": invalid identifier
 SQL: 
 select  id, FROM_NAME, MESSAGE_NAME, REF_PERSON, REF_INVOICE_ADDITIONAL  from (select  id, FROM_NAME, MESSAGE_NAME, REF_PERSON, REF_INVOICE_ADDITIONAL  from inbox where ref_person=? and REF_INVOICE_ADDITIONAL is null order by created asc) where rownum=1, at: /earved/src/ee/post/earved/dao/inbox/InboxDAO.java:40
 SQL test failed  - ORA-00904: "REF_INVOICE_ADDITIONAL": invalid identifier
 SQL: 
 select  id, FROM_NAME, MESSAGE_NAME, REF_PERSON, REF_INVOICE_ADDITIONAL  from (select  id, FROM_NAME, MESSAGE_NAME, REF_PERSON, REF_INVOICE_ADDITIONAL  from inbox where ref_person=? and REF_INVOICE_ADDITIONAL=? order by created asc) where rownum=1, at: /earved/src/ee/post/earved/dao/inbox/InboxDAO.java:45
+SQL test failed  - ORA-00904: "REF_INVOICE_AUTOMATIC": invalid identifier
+ORA-06512: at line 1
+SQL: 
+delete from invoice_channel where ref_invoice = ? and ref_invoice_automatic is  not  null and id not in  (?, ?, ?);;;
+delete from invoice_channel where ref_invoice = ? and ref_invoice_automatic is  null and id not in  (?, ?, ?);;;
+delete from invoice_channel where ref_invoice = ? and ref_invoice_automatic is  not  null ;;;
+delete from invoice_channel where ref_invoice = ? and ref_invoice_automatic is  null , at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:568
+SQL test failed  - ORA-00904: "REF_INVOICE_AUTOMATIC": invalid identifier
+ORA-06512: at line 1
+SQL: 
+delete from invoice_channel where ref_invoice=? and ref_invoice_automatic is not null, at: /earved/src/ee/post/earved/dao/invoice/InvoiceChannelDAO.java:49
+SQL test failed  - ORA-00904: "REF_INVOICE_AUTOMATIC": invalid identifier
+ORA-06512: at line 1
+SQL: 
+delete from invoice_channel_additional where id in (select ref_invoice_channel_additional from invoice_channel where ref_invoice=? and ref_invoice_automatic is not null), at: /earved/src/ee/post/earved/dao/invoice/InvoiceChannelDAO.java:44
 SQL test failed  - ORA-00904: "REF_PERSON": invalid identifier
 SQL: 
 select (select count(*) from invoice where buy_invoice = 1 and ref_dom_invoice_state = 'INVOICE_STATE_RECEIVED' and ref_person_code_buy = ?) + (select count(*) from inbox where ref_person = (select id from person where code=?)) as count from dual, at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:877
@@ -178,11 +286,19 @@ select 1 from client_register where ref_person = ? and rownum=1  and supplier_co
 SQL test failed  - ORA-00904: "SUPPLIER_CODE": invalid identifier
 SQL: 
 select 1 from client_register where ref_person = ? and supplier_code = ? and rownum=1, at: /earved/src/ee/post/earved/dao/client/ClientRegisterDAO.java:76
+SQL test failed  - ORA-00904: "URL": invalid identifier
+ORA-06512: at line 1
+SQL: 
+UPDATE person set name = ?, vat_number = ?, contact_email = ?, phone_number = ?, url = ? where id = ?, at: /earved/src/ee/post/earved/dao/person/PersonDAO.java:273
 SQL test failed  - ORA-00907: missing right parenthesis
 SQL: 
 SELECT * FROM (   SELECT i.id,i.ref_dom_invoice_state,i.last_status_change_sale     FROM invoice i WHERE  sale_invoice = 1 AND ref_person_code_sale = ?      AND i.last_status_change_sale > ?null    ORDER BY i.last_status_change_sale, id) WHERE rownum <= ?;;;
 SELECT * FROM (   SELECT i.id,i.ref_dom_invoice_state,i.last_status_change_sale     FROM invoice i WHERE  sale_invoice = 1 AND ref_person_code_sale = ?      AND i.last_status_change_sale > ?null    ORDER BY i.sent_to_erp, id) WHERE rownum <= ?;;;
 SELECT * FROM (   SELECT i.id,i.ref_dom_invoice_state,i.last_status_change_sale     FROM invoice i WHERE  sale_invoice = 1 AND ref_person_code_sale = ?      AND i.last_status_change_sale > ?null    ORDER BY i.last_status_change, id)..., at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:1011
+SQL test failed  - ORA-00920: invalid relational operator
+ORA-06512: at line 1
+SQL: 
+delete from invoice_confirm_late where (ref_invoice, ref_confirm) not in  (?, ?, ?), at: /earved/src/ee/post/earved/dao/invoice/ConfirmDAO.java:786
 SQL test failed  - ORA-00920: invalid relational operator
 SQL: 
 select dimension.dimension_name, dim_data.code from dimensions dimension join dimension_data dim_data on dimension.ref_person = ? and dim_data.ref_dimensions = dimension.id where dimension.id = ? and (dimension.dimension_name, dim_data.code) in  (?, ?, ?);;;
@@ -190,6 +306,10 @@ select dimension.dimension_name, dim_data.code from dimensions dimension join di
 SQL test failed  - ORA-00920: invalid relational operator
 SQL: 
 select id, REF_DIMENSIONS_FROM, REF_DIMENSIONS_TO, REF_DIMENSION_DATA_FROM, REF_DIMENSION_DATA_TO from DIMENSION_DATA_CONNECTIONS where (REF_DIMENSIONS_FROM, REF_DIMENSION_DATA_FROM, REF_DIMENSIONS_TO) in  (?, ?, ?), at: /earved/src/ee/post/earved/dao/dimension/DimensionDataConnectionDAO.java:182
+SQL test failed  - ORA-00923: FROM keyword not found where expected
+ORA-06512: at line 1
+SQL: 
+delete from invoice_channel_additional where id in (select ref_invoice_channel_additional where id in  (?, ?, ?)), at: /earved/src/ee/post/earved/dao/invoice/InvoiceChannelDAO.java:60
 SQL test failed  - ORA-00933: SQL command not properly ended
 SQL: 
 select  id, ref_invoice, description, item_unit, item_amount, item_price, item_sum, sum_before_vat, vat_rate, ref_vat_codes, vat_sum, item_total, customer_ref, accounting_account_code, accounting_account_name, accounting_opposite_account, is_unified, seller_product_id , invoice_item_group, serial_number, buyer_product_id, taric_code, ean, initial_reading, final_reading from invoice_item WHERE  (is_unified=0 and ref_invoice in  (?, ?, ?))  (is_unified=1 and ref_invoice in  (?, ?, ?)) , at: /earved/src/ee/post/earved/dao/invoice/InvoiceItemDAO.java:181
@@ -204,6 +324,38 @@ SQL test failed  - ORA-00936: missing expression
 SQL: 
 select distinct item_id from pattern_item_ids where  or extra_id in  (?, ?, ?);;;
 select distinct item_id from pattern_item_ids where , at: /earved/src/ee/post/earved/dao/accountingPattern/PatternItemDAO.java:122
+SQL test failed  - ORA-00942: table or view does not exist
+ORA-06512: at line 1
+SQL: 
+INSERT INTO UPLOAD(id, ref_person, ref_represented, upload_type, ref_dom_upload_status, file_name, ref_id, invoice_status_after_upload, system_id, content) VALUES (seq_upload.nextval,?,?,?,?,?,?,?,?,?), at: /earved/src/ee/post/earved/dao/integration/UploadDAO.java:37
+SQL test failed  - ORA-00942: table or view does not exist
+ORA-06512: at line 1
+SQL: 
+UPDATE UPLOAD set ref_dom_upload_status = ? WHERE id = ?, at: /earved/src/ee/post/earved/dao/integration/UploadDAO.java:100
+SQL test failed  - ORA-00942: table or view does not exist
+ORA-06512: at line 1
+SQL: 
+UPDATE upload SET error_count = (SELECT count(*) FROM integration_error ie INNER JOIN integration_item ii ON (ie.ref_integration_item = ii.id) WHERE ii.ref_upload = ?) WHERE id = ?, at: /earved/src/ee/post/earved/dao/integration/UploadDAO.java:158
+SQL test failed  - ORA-00942: table or view does not exist
+ORA-06512: at line 1
+SQL: 
+UPDATE upload SET ref_dom_upload_status = ? WHERE id = ?, at: /earved/src/ee/post/earved/dao/integration/UploadDAO.java:122
+SQL test failed  - ORA-00942: table or view does not exist
+ORA-06512: at line 1
+SQL: 
+UPDATE upload SET sent_count = (SELECT count(*) FROM integration_item WHERE ref_upload = ? AND is_sent = 1) WHERE id = ?, at: /earved/src/ee/post/earved/dao/integration/UploadDAO.java:172
+SQL test failed  - ORA-00942: table or view does not exist
+ORA-06512: at line 1
+SQL: 
+UPDATE upload SET total_count = (SELECT count(*) FROM integration_item WHERE ref_upload = ?) WHERE id = ?, at: /earved/src/ee/post/earved/dao/integration/UploadDAO.java:165
+SQL test failed  - ORA-00942: table or view does not exist
+ORA-06512: at line 1
+SQL: 
+delete from inbox_attachment where ref_inbox = ? , at: /earved/src/ee/post/earved/dao/inbox/InboxAttachmentDAO.java:46
+SQL test failed  - ORA-00942: table or view does not exist
+ORA-06512: at line 1
+SQL: 
+delete from inbox_attachment where ref_inbox in  (?, ?, ?), at: /earved/src/ee/post/earved/dao/inbox/InboxDAO.java:25
 SQL test failed  - ORA-00942: table or view does not exist
 SQL: 
 SELECT * FROM ( SELECT u.created,   (select dv.name from domain_value dv where dv.value_code=u.ref_dom_upload_status) AS status,   u.total_count as invoice_count, u.error_count, attachment_count    FROM upload u  WHERE u.upload_type = 'INVOICE_FILE_TYPE_ERP'    AND ref_represented = ?    AND created is not null   ORDER BY created DESC) WHERE rownum <= ?, at: /earved/src/ee/post/earved/dao/integration/UploadDAO.java:257
@@ -248,3 +400,68 @@ select id, ref_inbox, file_name, mime_type from inbox_attachment where ref_inbox
 SQL test failed  - ORA-02289: sequence does not exist
 SQL: 
 select SEQ_DIM_CONN_IMPORT_ERROR.nextval from dual, at: /earved/src/ee/post/earved/dao/dimension/DimensionDataConnectionDAO.java:216
+SQL test failed  - ORA-04098: trigger 'E_ARVED.INVOICE_LAST_STATUS_CHANGE' is invalid and failed re-validation
+ORA-06512: at line 1
+SQL: 
+UPDATE invoice SET sent_to_erp=sent_to_erp + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND sent_to_erp = ?   AND id >= ?;;;
+UPDATE invoice SET sent_to_erp=sent_to_erp + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND last_status_change = ?   AND id >= ?;;;
+UPDATE invoice SET sent_to_erp=last_status_change + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND sent_to_erp = ?   AND id >= ?;;;
+UPDATE invoice SET sent_to_erp=last_status_change + INTERVAL '1' SECOND WHERE  sale_invoice = 1 AND ref_person_code_sale = ?   AND last_status_change = ?   AND id >= ?;;;
+UPDATE..., at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:1101
+SQL test failed  - ORA-04098: trigger 'E_ARVED.INVOICE_LAST_STATUS_CHANGE' is invalid and failed re-validation
+ORA-06512: at line 1
+SQL: 
+UPDATE invoice set SENT_TO_ERP= sysdate  WHERE id IN  (?, ?, ?);;;
+UPDATE invoice set SENT_TO_ERP= null  WHERE id IN  (?, ?, ?), at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:1152
+SQL test failed  - ORA-04098: trigger 'E_ARVED.INVOICE_LAST_STATUS_CHANGE' is invalid and failed re-validation
+ORA-06512: at line 1
+SQL: 
+update invoice set ACCOUNTING_TRANSACTION_DATE=? where id=? and accounting_transaction_date is null, at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:637
+SQL test failed  - ORA-04098: trigger 'E_ARVED.INVOICE_LAST_STATUS_CHANGE' is invalid and failed re-validation
+ORA-06512: at line 1
+SQL: 
+update invoice set buy_invoice = 0 where id = ?, at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:267
+SQL test failed  - ORA-04098: trigger 'E_ARVED.INVOICE_LAST_STATUS_CHANGE' is invalid and failed re-validation
+ORA-06512: at line 1
+SQL: 
+update invoice set buy_invoice = 0 where id in (?, ?, ?), at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:285
+SQL test failed  - ORA-04098: trigger 'E_ARVED.INVOICE_LAST_STATUS_CHANGE' is invalid and failed re-validation
+ORA-06512: at line 1
+SQL: 
+update invoice set last_credit_invoice = sysdate where id=?, at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:535
+SQL test failed  - ORA-04098: trigger 'E_ARVED.INVOICE_LAST_STATUS_CHANGE' is invalid and failed re-validation
+ORA-06512: at line 1
+SQL: 
+update invoice set ref_dom_invoice_state = ? where id = ? , at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:598
+SQL test failed  - ORA-04098: trigger 'E_ARVED.INVOICE_LAST_STATUS_CHANGE' is invalid and failed re-validation
+ORA-06512: at line 1
+SQL: 
+update invoice set ref_dom_invoice_state = ? where id in  (?, ?, ?), at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:586
+SQL test failed  - ORA-04098: trigger 'E_ARVED.INVOICE_LAST_STATUS_CHANGE' is invalid and failed re-validation
+ORA-06512: at line 1
+SQL: 
+update invoice set ref_dom_invoice_state = ?, ref_dom_invoice_state_sale = ? where id = ? , at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:608
+SQL test failed  - ORA-04098: trigger 'E_ARVED.INVOICE_LAST_STATUS_CHANGE' is invalid and failed re-validation
+ORA-06512: at line 1
+SQL: 
+update invoice set ref_dom_invoice_state_sale = ? where id = ? , at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:603
+SQL test failed  - ORA-04098: trigger 'E_ARVED.INVOICE_LAST_STATUS_CHANGE' is invalid and failed re-validation
+ORA-06512: at line 1
+SQL: 
+update invoice set ref_dom_invoice_state_sale = ? where id in  (?, ?, ?), at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:593
+SQL test failed  - ORA-04098: trigger 'E_ARVED.INVOICE_LAST_STATUS_CHANGE' is invalid and failed re-validation
+ORA-06512: at line 1
+SQL: 
+update invoice set sale_invoice = 0 where id = ?, at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:262
+SQL test failed  - ORA-04098: trigger 'E_ARVED.INVOICE_LAST_STATUS_CHANGE' is invalid and failed re-validation
+ORA-06512: at line 1
+SQL: 
+update invoice set sale_invoice = 0 where id in (?, ?, ?), at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:276
+SQL test failed  - ORA-04098: trigger 'E_ARVED.THI_DIMENSION_DATA_DELETE' is invalid and failed re-validation
+ORA-06512: at line 1
+SQL: 
+DELETE FROM dimension_data WHERE id = ?, at: /earved/src/ee/post/earved/dao/dimension/DimensionDataDAO.java:64
+SQL test failed  - ORA-04098: trigger 'E_ARVED.THI_DIMENSION_DATA_DELETE' is invalid and failed re-validation
+ORA-06512: at line 1
+SQL: 
+DELETE FROM dimension_data WHERE ref_dimensions = ?, at: /earved/src/ee/post/earved/dao/dimension/DimensionDataDAO.java:60
