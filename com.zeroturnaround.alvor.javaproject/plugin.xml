@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-
    <extension
          id="esqlBuilder"
          name="Alvor SQL Checker"
@@ -28,6 +27,7 @@
             id="com.zeroturnaround.alvor.javaproject.esqlBuilder">
       </builder>
    </extension>
+   
    <extension
          point="org.eclipse.ui.popupMenus">
       <objectContribution
@@ -41,6 +41,13 @@
                menubarPath="additions"
                enablesFor="+"
                id="com.zeroturnaround.alvor.javaproject.addRemoveNatureAction">
+         </action>
+         <action
+               label="Generate Alvor sqlchecker.properties file"
+               class="com.zeroturnaround.alvor.javaproject.builder.GeneratePropertiesFile"
+               menubarPath="additions"
+               enablesFor="+"
+               id="com.zeroturnaround.alvor.javaproject.generatePropertiesFileAction">
          </action>
       </objectContribution>
    </extension>
