@@ -205,8 +205,13 @@ public class JavaElementChecker {
 		for (IStringNodeDescriptor descriptor : descriptors) {
 			if (dynamicCheckerIsConfigured(options)) { 
 				// use staticChecker only when dynamic gives error
-				if (!dynamicChecker.checkAbstractString(descriptor, errorHandler, options)) {
-					staticChecker.checkAbstractString(descriptor, errorHandler, options);
+				boolean dynResult = false;
+				try {
+					dynResult = dynamicChecker.checkAbstractString(descriptor, errorHandler, options);
+				} finally {
+					if (!dynResult) {
+						staticChecker.checkAbstractString(descriptor, errorHandler, options);
+					}
 				}
 			} else {
 				staticChecker.checkAbstractString(descriptor, errorHandler, options);
