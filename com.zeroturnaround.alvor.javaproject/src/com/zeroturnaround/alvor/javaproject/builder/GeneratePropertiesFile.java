@@ -16,9 +16,23 @@ import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
 public class GeneratePropertiesFile implements IObjectActionDelegate {
-
 	private ISelection selection;
 
+	@Override
+	public void selectionChanged(IAction action, ISelection selection) {
+		this.selection = selection;
+		if (selection instanceof IStructuredSelection) {
+			for (Iterator<?> it = ((IStructuredSelection) selection).iterator(); it
+					.hasNext();) {
+				Object element = it.next();
+				IProject project = getProject(element);
+				
+				// We can enable this for any project?
+				action.setEnabled(project != null);
+			}
+		}
+	}
+	
 	@Override
 	public void run(IAction action) {
 		if (selection instanceof IStructuredSelection) {
@@ -61,11 +75,6 @@ public class GeneratePropertiesFile implements IObjectActionDelegate {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	@Override
-	public void selectionChanged(IAction action, ISelection selection) {
-		//
 	}
 
 	@Override
