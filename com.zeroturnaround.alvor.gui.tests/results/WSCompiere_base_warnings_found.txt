@@ -1,0 +1,131 @@
+Dynamic SQL checker: abstract string is too big, at: /base/src/org/compiere/process/CommissionCalc.java:332
+Dynamic SQL checker: abstract string is too big, at: /base/src/org/compiere/process/SynchronizeTerminology.java:1667
+SQL syntax checker: Abstract string is too big, at: /base/src/org/compiere/process/CommissionCalc.java:332
+SQL syntax checker: Abstract string is too big. Only some parts checked, at: /base/src/org/compiere/process/SynchronizeTerminology.java:1667
+Unsupported SQL construction: Analysis level (5) too deep, at: /base/src/org/compiere/model/GridField.java:1585
+Unsupported SQL construction: Analysis level (5) too deep, at: /base/src/org/compiere/model/GridWorkbench.java:112
+Unsupported SQL construction: Analysis level (5) too deep, at: /base/src/org/compiere/model/MDesktop.java:85
+Unsupported SQL construction: Analysis level (5) too deep, at: /base/src/org/compiere/process/TreeMaintenance.java:109
+Unsupported SQL construction: Analysis level (5) too deep, at: /base/src/org/compiere/process/TreeMaintenance.java:131
+Unsupported SQL construction: Analysis level (5) too deep, at: /base/src/org/compiere/report/FinReport.java:932
+Unsupported SQL construction: Checking whether var is mentioned. Unsupported expression: class org.eclipse.jdt.core.dom.ArrayAccess at: /ad/src/org/compiere/model/MRole.java:2161, at: /base/src/org/compiere/esb/GwtServerUtil.java:50
+Unsupported SQL construction: Checking whether var is mentioned. Unsupported expression: class org.eclipse.jdt.core.dom.ArrayAccess at: /ad/src/org/compiere/model/MRole.java:2161, at: /base/src/org/compiere/model/MBPartner.java:155
+Unsupported SQL construction: Checking whether var is mentioned. Unsupported expression: class org.eclipse.jdt.core.dom.ArrayAccess at: /ad/src/org/compiere/model/MRole.java:2161, at: /base/src/org/compiere/model/MBPartnerInfo.java:104
+Unsupported SQL construction: Checking whether var is mentioned. Unsupported expression: class org.eclipse.jdt.core.dom.ArrayAccess at: /ad/src/org/compiere/model/MRole.java:2161, at: /base/src/org/compiere/model/MBankStatementMatcher.java:55
+Unsupported SQL construction: Checking whether var is mentioned. Unsupported expression: class org.eclipse.jdt.core.dom.ArrayAccess at: /ad/src/org/compiere/model/MRole.java:2161, at: /base/src/org/compiere/model/MUOM.java:163
+Unsupported SQL construction: Checking whether var is mentioned. Unsupported expression: class org.eclipse.jdt.core.dom.ArrayAccess at: /ad/src/org/compiere/model/MRole.java:2161, at: /base/src/org/compiere/model/MUOMConversion.java:168
+Unsupported SQL construction: Checking whether var is mentioned. Unsupported expression: class org.eclipse.jdt.core.dom.ArrayAccess at: /ad/src/org/compiere/model/MRole.java:2161, at: /base/src/org/compiere/model/MWarehousePrice.java:96
+Unsupported SQL construction: Checking whether var is mentioned. Unsupported expression: class org.eclipse.jdt.core.dom.ArrayAccess at: /ad/src/org/compiere/model/MRole.java:2161, at: /base/src/org/compiere/model/ScheduleUtil.java:169
+Unsupported SQL construction: Checking whether var is mentioned. Unsupported expression: class org.eclipse.jdt.core.dom.ArrayAccess at: /ad/src/org/compiere/model/MRole.java:2161, at: /base/src/org/compiere/model/ScheduleUtil.java:565
+Unsupported SQL construction: Checking whether var is mentioned. Unsupported expression: class org.eclipse.jdt.core.dom.ArrayAccess at: /ad/src/org/compiere/model/MRole.java:2161, at: /base/src/org/compiere/process/Aging.java:132
+Unsupported SQL construction: Checking whether var is mentioned. Unsupported expression: class org.eclipse.jdt.core.dom.ArrayAccess at: /base/src/org/compiere/report/FinReport.java:597, at: /base/src/org/compiere/report/FinReport.java:635
+Unsupported SQL construction: Checking whether var is mentioned. Unsupported expression: class org.eclipse.jdt.core.dom.ArrayAccess, at: /base/src/org/compiere/model/MGoal.java:117
+Unsupported SQL construction: No declarations found for: rs.getString(1), at: /base/src/org/compiere/process/ColumnSync.java:343
+Unsupported SQL construction: No declarations found for: rs.getString(2) at: /base/src/org/compiere/process/ReplicationRemote.java:210, at: /base/src/org/compiere/process/ReplicationRemote.java:214
+Unsupported SQL construction: No declarations found for: rs.getString(2), at: /base/src/org/compiere/process/FactAcctReset.java:134
+Unsupported SQL construction: No declarations found for: rs.getString(2), at: /base/src/org/compiere/process/FactAcctReset.java:139
+Unsupported SQL construction: No declarations found for: rs.getString(2), at: /base/src/org/compiere/process/FactAcctReset.java:229
+Unsupported SQL construction: No declarations found for: rs.getString(2), at: /base/src/org/compiere/process/FactAcctReset.java:237
+Unsupported SQL construction: No declarations found for: rs.getString(3) at: /base/src/org/compiere/process/ImportAccount.java:543, at: /base/src/org/compiere/process/ImportAccount.java:554
+Unsupported SQL construction: Non-final fields are not supported: ChangeLogProcess.m_sqlInsert, at: /base/src/org/compiere/process/ChangeLogProcess.java:326
+Unsupported SQL construction: Non-final fields are not supported: ChangeLogProcess.m_sqlUpdate, at: /base/src/org/compiere/process/ChangeLogProcess.java:345
+Unsupported SQL construction: Non-final fields are not supported: FinStatement.m_parameterWhere, at: /base/src/org/compiere/report/FinStatement.java:288
+Unsupported SQL construction: Non-final fields are not supported: GridTable.m_SQL, at: /base/src/org/compiere/model/GridTable.java:3000
+Unsupported SQL construction: Non-final fields are not supported: GridTable.m_SQL_Count, at: /base/src/org/compiere/model/GridTable.java:2975
+Unsupported SQL construction: Non-final fields are not supported: GridTable.m_SQL_Select, at: /base/src/org/compiere/model/GridTable.java:1695
+Unsupported SQL construction: Non-final fields are not supported: GridTable.m_SQL_Select, at: /base/src/org/compiere/model/GridTable.java:1859
+Unsupported SQL construction: Non-final fields are not supported: GridTable.m_SQL_Select, at: /base/src/org/compiere/model/GridTable.java:2466
+Unsupported SQL construction: Non-final fields are not supported: GridTable.m_tableName, at: /base/src/org/compiere/model/GridTable.java:2338
+Unsupported SQL construction: Non-final fields are not supported: ImpFormat.m_tableName, at: /base/src/org/compiere/impexp/ImpFormat.java:572
+Unsupported SQL construction: Non-final fields are not supported: ImpFormat.m_tablePK, at: /base/src/org/compiere/impexp/ImpFormat.java:541
+Unsupported SQL construction: Non-final fields are not supported: InOutGenerate.m_sql, at: /base/src/org/compiere/process/InOutGenerate.java:161
+Unsupported SQL construction: Non-final fields are not supported: MSetup.m_stdColumns, at: /base/src/org/compiere/model/MSetup.java:1197
+Unsupported SQL construction: Non-final fields are not supported: MSetup.m_stdColumns, at: /base/src/org/compiere/model/MSetup.java:1206
+Unsupported SQL construction: Non-final fields are not supported: MSetup.m_stdColumns, at: /base/src/org/compiere/model/MSetup.java:1230
+Unsupported SQL construction: Non-final fields are not supported: MSetup.m_stdColumns, at: /base/src/org/compiere/model/MSetup.java:1312
+Unsupported SQL construction: Non-final fields are not supported: MSetup.m_stdColumns, at: /base/src/org/compiere/model/MSetup.java:1478
+Unsupported SQL construction: Non-final fields are not supported: MSetup.m_stdColumns, at: /base/src/org/compiere/model/MSetup.java:1489
+Unsupported SQL construction: Non-final fields are not supported: MSetup.m_stdColumns, at: /base/src/org/compiere/model/MSetup.java:1504
+Unsupported SQL construction: Non-final fields are not supported: MSetup.m_stdColumns, at: /base/src/org/compiere/model/MSetup.java:1554
+Unsupported SQL construction: Non-final fields are not supported: MSetup.m_stdColumns, at: /base/src/org/compiere/model/MSetup.java:357
+Unsupported SQL construction: Non-final fields are not supported: MSetup.m_stdColumns, at: /base/src/org/compiere/model/MSetup.java:381
+Unsupported SQL construction: Non-final fields are not supported: MSetup.m_stdColumns, at: /base/src/org/compiere/model/MSetup.java:400
+Unsupported SQL construction: Non-final fields are not supported: MSetup.m_stdColumns, at: /base/src/org/compiere/model/MSetup.java:405
+Unsupported SQL construction: Non-final fields are not supported: MSetup.m_stdColumns, at: /base/src/org/compiere/model/MSetup.java:411
+Unsupported SQL construction: Non-final fields are not supported: MSetup.m_stdColumns, at: /base/src/org/compiere/model/MSetup.java:642
+Unsupported SQL construction: Non-final fields are not supported: MSetup.m_stdColumns, at: /base/src/org/compiere/model/MSetup.java:723
+Unsupported SQL construction: Non-final fields are not supported: MSetup.m_stdColumns, at: /base/src/org/compiere/model/MSetup.java:837
+Unsupported SQL construction: Non-final fields are not supported: MTableIndex.m_ddl, at: /base/src/org/compiere/process/IndexValidate.java:100
+Unsupported SQL construction: Non-final fields are not supported: MTableIndex.m_ddl, at: /base/src/org/compiere/process/IndexValidate.java:159
+Unsupported SQL construction: Non-final fields are not supported: OrderBatchProcess.p_IsSelfService, at: /base/src/org/compiere/process/OrderBatchProcess.java:110
+Unsupported SQL construction: Non-final fields are not supported: ReplenishReport.p_ReplenishmentCreate, at: /base/src/org/compiere/process/ReplenishReport.java:203
+Unsupported SQL construction: Non-final fields are not supported: ReplenishReport.p_ReplenishmentCreate, at: /base/src/org/compiere/process/ReplenishReport.java:233
+Unsupported SQL construction: Non-final fields are not supported: TranslationHandler.m_sql, at: /base/src/org/compiere/process/TranslationHandler.java:168
+Unsupported SQL construction: Non-final fields are not supported: TrialBalance.s_insert, at: /base/src/org/compiere/report/TrialBalance.java:390
+Unsupported SQL construction: Non-final fields are not supported: TrialBalance.s_insert, at: /base/src/org/compiere/report/TrialBalance.java:429
+Unsupported SQL construction: Non-final fields are not supported: ViewCreate.p_EntityType, at: /base/src/org/compiere/process/ViewCreate.java:114
+Unsupported SQL construction: Non-parameter var (java.lang.String element[pos: 12][id:13][pc: 467-503]) asked from MethodDeclaration (doIt), at: /base/src/org/compiere/process/ColumnSync.java:127
+Unsupported SQL construction: Non-parameter var (java.lang.String element[pos: 6][id:5][pc: 547-636]) asked from MethodDeclaration (doIt) at: /base/src/org/compiere/process/ImportAccount.java:79, at: /base/src/org/compiere/process/ImportAccount.java:183
+Unsupported SQL construction: Non-parameter var (java.lang.String element[pos: 6][id:5][pc: 641-732]) asked from MethodDeclaration (doIt) at: /base/src/org/compiere/process/ImportProduct.java:70, at: /base/src/org/compiere/process/ImportProduct.java:187
+Unsupported SQL construction: Non-parameter var (java.lang.String element[pos: 7][id:10][pc: 814-919]) asked from MethodDeclaration (doIt) at: /base/src/org/compiere/process/ImportProduct.java:70, at: /base/src/org/compiere/process/ImportProduct.java:200
+Unsupported SQL construction: Non-parameter var (java.lang.String element[pos: 8][id:15][pc: 997-1090]) asked from MethodDeclaration (doIt) at: /base/src/org/compiere/process/ImportProduct.java:70, at: /base/src/org/compiere/process/ImportProduct.java:217
+Unsupported SQL construction: Non-parameter var (java.lang.String element[pos: 9][id:20][pc: 1184-1289]) asked from MethodDeclaration (doIt) at: /base/src/org/compiere/process/ImportProduct.java:70, at: /base/src/org/compiere/process/ImportProduct.java:232
+Unsupported SQL construction: Possible problem, no callsites found in current project for: org.compiere.model.MOrder.getLines(int,String,String) at: /base/src/org/compiere/model/MOrder.java:1483, at: /base/src/org/compiere/model/MOrder.java:1496
+Unsupported SQL construction: Possible problem, no callsites found in current project for: org.compiere.process.ImportAccount.updateDefaultAccount(String,String,int,int) at: /base/src/org/compiere/process/ImportAccount.java:543, at: /base/src/org/compiere/process/ImportAccount.java:588
+Unsupported SQL construction: String/Builder/Buffer, method=replace at: /base/src/org/compiere/process/ViewCreate.java:155, at: /base/src/org/compiere/process/ViewCreate.java:158
+Unsupported SQL construction: String/Builder/Buffer, method=substring at: /ad/src/org/compiere/db/DB_Oracle.java:426, at: /base/src/org/compiere/process/ImportConversionRate.java:126
+Unsupported SQL construction: String/Builder/Buffer, method=substring at: /ad/src/org/compiere/db/DB_Oracle.java:426, at: /base/src/org/compiere/process/ImportGLJournal.java:137
+Unsupported SQL construction: String/Builder/Buffer, method=substring at: /ad/src/org/compiere/db/DB_Oracle.java:426, at: /base/src/org/compiere/process/ImportInventory.java:113
+Unsupported SQL construction: String/Builder/Buffer, method=substring at: /ad/src/org/compiere/db/DB_Oracle.java:426, at: /base/src/org/compiere/process/InvoiceNGL.java:147
+Unsupported SQL construction: String/Builder/Buffer, method=substring at: /ad/src/org/compiere/db/DB_Oracle.java:426, at: /base/src/org/compiere/process/InvoiceWriteOff.java:170
+Unsupported SQL construction: String/Builder/Buffer, method=substring at: /ad/src/org/compiere/db/DB_Oracle.java:426, at: /base/src/org/compiere/report/FinStatement.java:266
+Unsupported SQL construction: String/Builder/Buffer, method=substring at: /base/src/org/compiere/model/MTemplate.java:454, at: /base/src/org/compiere/model/MTemplate.java:459
+Unsupported SQL construction: String/Builder/Buffer, method=substring at: /base/src/org/compiere/model/MTemplate.java:468, at: /base/src/org/compiere/model/MTemplate.java:469
+Unsupported SQL construction: String/Builder/Buffer, method=substring at: /base/src/org/compiere/process/InventoryValue.java:169, at: /base/src/org/compiere/process/InventoryValue.java:173
+Unsupported SQL construction: String/Builder/Buffer, method=substring at: /base/src/org/compiere/process/MergeProcess.java:135, at: /base/src/org/compiere/process/MergeProcess.java:141
+Unsupported SQL construction: String/Builder/Buffer, method=substring at: /base/src/org/compiere/process/MergeProcess.java:159, at: /base/src/org/compiere/process/MergeProcess.java:165
+Unsupported SQL construction: String/Builder/Buffer, method=substring at: /base/src/org/compiere/process/ViewImport.java:112, at: /base/src/org/compiere/process/ViewImport.java:303
+Unsupported SQL construction: String/Builder/Buffer, method=substring, at: /base/src/org/compiere/report/FinBalance.java:380
+Unsupported SQL construction: String/Builder/Buffer, method=substring, at: /base/src/org/compiere/report/FinBalance.java:394
+Unsupported SQL construction: Unknown method called on StringBuilder: insert at: /base/src/org/compiere/report/FinReport.java:426, at: /base/src/org/compiere/report/FinReport.java:430
+Unsupported SQL construction: Unsupported modification scheme in loop at: /ad/src/org/compiere/util/DB.java:1969, at: /base/src/org/compiere/process/ImportAccount.java:288
+Unsupported SQL construction: Unsupported modification scheme in loop at: /ad/src/org/compiere/util/DB.java:1969, at: /base/src/org/compiere/process/ImportAccount.java:309
+Unsupported SQL construction: Unsupported modification scheme in loop at: /ad/src/org/compiere/util/DB.java:1969, at: /base/src/org/compiere/process/ImportProduct.java:502
+Unsupported SQL construction: Unsupported modification scheme in loop at: /ad/src/org/compiere/util/DB.java:1969, at: /base/src/org/compiere/process/ImportProduct.java:536
+Unsupported SQL construction: Unsupported modification scheme in loop at: /ad/src/org/compiere/util/DB.java:1969, at: /base/src/org/compiere/process/ImportProduct.java:582
+Unsupported SQL construction: Unsupported modification scheme in loop at: /ad/src/org/compiere/util/DB.java:1969, at: /base/src/org/compiere/process/ImportProduct.java:606
+Unsupported SQL construction: Unsupported modification scheme in loop at: /ad/src/org/compiere/util/DB.java:1969, at: /base/src/org/compiere/process/ImportReportLine.java:404
+Unsupported SQL construction: Unsupported modification scheme in loop at: /ad/src/org/compiere/util/DB.java:1969, at: /base/src/org/compiere/process/ImportReportLine.java:435
+Unsupported SQL construction: Unsupported modification scheme in loop at: /ad/src/org/compiere/util/DB.java:1969, at: /base/src/org/compiere/process/PaySelectionCreateFrom.java:211
+Unsupported SQL construction: Unsupported modification scheme in loop at: /ad/src/org/compiere/util/DB.java:1969, at: /base/src/org/compiere/process/ReplicationRemote.java:192
+Unsupported SQL construction: Unsupported modification scheme in loop at: /ad/src/org/compiere/util/DB.java:1969, at: /base/src/org/compiere/process/ReplicationRemote.java:199
+Unsupported SQL construction: Unsupported modification scheme in loop at: /ad/src/org/compiere/util/DB.java:1969, at: /base/src/org/compiere/process/UserPassword.java:124
+Unsupported SQL construction: Unsupported modification scheme in loop at: /ad/src/org/compiere/util/Env.java:458, at: /base/src/org/compiere/model/GridField.java:547
+Unsupported SQL construction: Unsupported modification scheme in loop at: /base/src/org/compiere/impexp/ImpFormat.java:590, at: /base/src/org/compiere/impexp/ImpFormat.java:595
+Unsupported SQL construction: Unsupported modification scheme in loop at: /base/src/org/compiere/model/GridTable.java:1208, at: /base/src/org/compiere/model/GridTable.java:1222
+Unsupported SQL construction: Unsupported modification scheme in loop at: /base/src/org/compiere/model/MMeasureCalc.java:351, at: /base/src/org/compiere/model/MMeasure.java:274
+Unsupported SQL construction: Unsupported modification scheme in loop at: /base/src/org/compiere/model/MMeasureCalc.java:351, at: /base/src/org/compiere/model/MMeasure.java:351
+Unsupported SQL construction: Unsupported modification scheme in loop at: /base/src/org/compiere/model/MMeasureCalc.java:351, at: /base/src/org/compiere/model/MMeasure.java:417
+Unsupported SQL construction: Unsupported modification scheme in loop at: /base/src/org/compiere/model/MMeasureCalc.java:351, at: /base/src/org/compiere/model/MMeasureCalc.java:261
+Unsupported SQL construction: Unsupported modification scheme in loop at: /base/src/org/compiere/model/MOrder.java:1433, at: /base/src/org/compiere/model/MOrder.java:1444
+Unsupported SQL construction: Unsupported modification scheme in loop at: /base/src/org/compiere/process/TranslationMgr.java:221, at: /base/src/org/compiere/process/TranslationMgr.java:248
+Unsupported SQL construction: Unsupported modification scheme in loop at: /base/src/org/compiere/report/FinReport.java:479, at: /base/src/org/compiere/report/FinReport.java:491
+Unsupported SQL construction: Unsupported modification scheme in loop at: /base/src/org/compiere/report/FinReport.java:515, at: /base/src/org/compiere/report/FinReport.java:524
+Unsupported SQL construction: Unsupported modification scheme in loop at: /base/src/org/compiere/report/FinReport.java:550, at: /base/src/org/compiere/report/FinReport.java:560
+Unsupported SQL construction: Unsupported modification scheme in loop at: /base/src/org/compiere/report/FinReport.java:897, at: /base/src/org/compiere/report/FinReport.java:918
+Unsupported SQL construction: Unsupported modification scheme in loop at: /base/src/org/compiere/report/FinReport.java:997, at: /base/src/org/compiere/report/FinReport.java:1027
+Unsupported SQL construction: Unsupported modification scheme in loop, at: /base/src/org/compiere/model/MInvoice.java:604
+Unsupported SQL construction: Unsupported modification scheme in loop, at: /base/src/org/compiere/process/ColumnSync.java:120
+Unsupported SQL construction: Unsupported modification scheme in loop, at: /base/src/org/compiere/process/ColumnSync.java:315
+Unsupported SQL construction: findFieldDeclarationFragment:  name=org.compiere.model.X_C_Invoice.INVOICECOLLECTIONTYPE_CollectionAgency, result.size=0, at: /base/src/org/compiere/process/DunningRunCreate.java:227
+Unsupported SQL construction: findFieldDeclarationFragment:  name=org.compiere.model.X_C_PeriodControl.PERIODSTATUS_Open, result.size=0, at: /base/src/org/compiere/process/PeriodStatus.java:90
+Unsupported SQL construction: findFieldDeclarationFragment:  name=org.compiere.util.TimeUtil.TRUNC_WEEK, result.size=0, at: /base/src/org/compiere/report/FinBalance.java:351
+Unsupported SQL construction: getValOf(org.eclipse.jdt.core.dom.ArrayAccess) at: /ad/src/org/compiere/framework/PO.java:590, at: /base/src/org/compiere/model/MDataMigrationEntry.java:138
+Unsupported SQL construction: getValOf(org.eclipse.jdt.core.dom.ArrayAccess) at: /ad/src/org/compiere/framework/PO.java:590, at: /base/src/org/compiere/process/ImportDelete.java:75
+Unsupported SQL construction: getValOf(org.eclipse.jdt.core.dom.ArrayAccess) at: /ad/src/org/compiere/framework/PO.java:590, at: /base/src/org/compiere/process/IndexValidate.java:158
+Unsupported SQL construction: getValOf(org.eclipse.jdt.core.dom.ArrayAccess) at: /ad/src/org/compiere/framework/PO.java:590, at: /base/src/org/compiere/process/TranslationDocSync.java:129
+Unsupported SQL construction: getValOf(org.eclipse.jdt.core.dom.ArrayAccess) at: /ad/src/org/compiere/framework/PO.java:590, at: /base/src/org/compiere/process/ViewCreate.java:154
+Unsupported SQL construction: getValOf(org.eclipse.jdt.core.dom.ArrayAccess) at: /base/src/org/compiere/model/MBOM.java:65, at: /base/src/org/compiere/model/MBOM.java:74
+Unsupported SQL construction: getValOf(org.eclipse.jdt.core.dom.ArrayAccess) at: /base/src/org/compiere/wf/DocWorkflowManager.java:156, at: /base/src/org/compiere/wf/DocWorkflowManager.java:171
+Unsupported SQL construction: getValOf(org.eclipse.jdt.core.dom.ArrayAccess), at: /base/src/org/compiere/process/ChangeLogProcess.java:407
+Unsupported SQL construction: getValOf(org.eclipse.jdt.core.dom.ArrayAccess), at: /base/src/org/compiere/process/ViewImportFromDB.java:253

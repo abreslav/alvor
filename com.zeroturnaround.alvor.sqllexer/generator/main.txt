@@ -1,0 +1,147 @@
+	public static void main(String[] args) {
+		String pack = args[0];
+		String className = args[1];
+		
+		System.out.println("package " + pack + ";");
+		System.out.println();
+		System.out.println("public class " + className + "{");
+		
+		System.out.println("/** Char classes (char - class (char)) */");
+		System.out.println("private static final String CHAR_CLASSES_PACKED = ");
+		{
+			int stored = 0;
+			int cmpLen = ZZ_CMAP_PACKED.length();
+			while (stored < cmpLen) {
+				int rightBnd = Math.min(stored + 30, cmpLen);
+				System.out.print("\"");
+				for (int i = stored; i < rightBnd; i++) {
+					char c = ZZ_CMAP_PACKED.charAt(i);
+					if (c < 256) {
+						System.out.format("\\%o", (int) c);
+					} else {
+						System.out.format("\\u%4x", (int) c);
+					}
+				}
+				System.out.println("\" + ");
+				stored = rightBnd;
+			}
+			System.out.println("\"\";");
+		}
+			
+		System.out.println();
+		System.out.println("public static final char[] CHAR_CLASSES = unpackCharClasses(CHAR_CLASSES_PACKED);");
+		System.out.println();
+		System.out.println("  /** ");
+		System.out.println("   * Copied from JFlex code");
+		System.out.println("   * Unpacks the compressed character translation table.");
+		System.out.println("   *");
+		System.out.println("   * @param packed   the packed character translation table");
+		System.out.println("   * @return         the unpacked character translation table");
+		System.out.println("   */");
+		System.out.println("  private static char [] unpackCharClasses(String packed) {");
+		System.out.println("    char [] map = new char[0x10000];");
+		System.out.println("    int i = 0;  /* index in packed string  */");
+		System.out.println("    int j = 0;  /* index in unpacked array */");
+		System.out.println("    int length = packed.length();");
+		System.out.println("    while (i < length) {");
+		System.out.println("      int  count = packed.charAt(i++);");
+		System.out.println("      char value = packed.charAt(i++);");
+		System.out.println("      do map[j++] = value; while (--count > 0);");
+		System.out.println("    }");
+		System.out.println("    return map;");
+		System.out.println("  }");
+		System.out.println();
+		
+
+		
+		char[] zzCmap = ZZ_CMAP;
+//		System.out.println("public static final char[] CHAR_CLASSES = {");
+		int maxCharClass = 0;
+		int count = 0;
+		int lineCount = 100;
+		char[] alphabet = new char[Character.MAX_VALUE + 1];
+		int alphCount = 0;
+		for (int i = 0; i < zzCmap.length; i++) {
+			char c = zzCmap[i];
+			if (c > maxCharClass) {
+				maxCharClass = c;
+			} 
+			if (c != 0) {
+				alphabet[alphCount] = (char) i;
+				alphCount++;
+			}
+			switch (c) {
+				case '\n': 
+//					System.out.print("'\\n', ");
+					break;
+				case '\r': 
+//					System.out.print("'\\r', ");
+					break;
+				case '\"':
+//					System.out.print("'\\\"', ");
+					break;
+				case '\'':
+//					System.out.print("'\\\'', ");
+					break;
+				default:
+//					System.out.format("'\\u%04X', ", ((int) c ));
+			}
+			count++;
+			if (count >= lineCount) {
+//				System.out.println();
+				count = 0;
+			}
+		}
+//		System.out.println("};");
+
+		System.out.println("// Alphabet:");
+		System.out.print("// ");
+		for (int i = 0; i < alphCount; i++) {
+			if (alphabet[i] <= 32) {
+				System.out.print(((int) alphabet[i]) + " ");
+			} else {
+				System.out.print(alphabet[i]);
+			}
+		}
+		System.out.println("\n");
+		
+		int[] zzRowmap = ZZ_ROWMAP;
+		System.out.println("/** Number of states (table height) */");
+		System.out.println("public static final int STATE_COUNT = " + zzRowmap.length + ";");
+		System.out.println();
+
+		System.out.println("/** Number of character classes (table width) */");
+		System.out.println("public static final int CHAR_CLASS_COUNT = " + (maxCharClass + 1) + ";");
+		System.out.println();
+		
+		System.out.println("/** Transitions (state : state(char class)) */");
+		System.out.println("public static final int[][] TRANSITIONS = {");
+		for (int zzState = 0; zzState < zzRowmap.length; zzState++) {
+			System.out.format("/*%4d : */", zzState);
+			System.out.print("{ ");
+			for (int charClass = 0; charClass <= maxCharClass; charClass++) {
+				int zzNext = ZZ_TRANS[ZZ_ROWMAP[zzState] + charClass];
+				System.out.format("%4d, ", zzNext);
+			}
+			System.out.println("},");
+		}
+		System.out.println("};");
+		System.out.println();
+		
+		System.out.println("/** Attributes (state - attrs (oct)) */");
+		System.out.println("public static final int[] ATTRIBUTES = {");
+		for (int zzState = 0; zzState < zzRowmap.length; zzState++) {
+			int zzAttributes = ZZ_ATTRIBUTE[zzState];
+			System.out.format("/*%4d */ %04o,\n", zzState, zzAttributes);
+		}
+		System.out.println("};");
+		System.out.println();
+		
+		System.out.println("/** Actions (state - action) */");
+		System.out.println("public static final int[] ACTIONS = {");
+		int[] zzAction = ZZ_ACTION;
+		for (int i = 0; i < zzAction.length; i++) {
+			System.out.format("/*%4d*/ %4d,\n", i, zzAction[i]);
+		}
+		System.out.println("};");
+		System.out.println();

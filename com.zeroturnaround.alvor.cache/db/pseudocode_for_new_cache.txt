@@ -1,0 +1,84 @@
+* isImplementationOf(signature)
+* isCallsiteOf(signature)
+* isCallsiteOf(implementation)
+
+
+
+* What actual hotspot's depend on this file (before changes or after changes) ?
+* 
+
+
+
+PSEUDO
+
+start with set of hotspot-patterns
+
+while there are hotspot-patterns left:
+    search for this hotspot in the project (parse when necessary)
+    foreach hotspot:
+        * evaluate expression; when some piece comes from parameter, 
+          then this method becomes a new semi-hotspot -- add it to the set (if it's not there yet)
+          This avoids(?) duplicate work in case of nested hotspot methods
+        
+        * when a string function is used, then calculate it's summary and cache it
+          (or take it cache if available)
+          If it'
+    
+
+
+
+
+ABSTRACT_STRINGS
+----------------
+ID
+TYPE
+CONTENT -- string constant, charset or unsupported msg
+?? LINK -- to ABSTRACT_STRINGS (for repetition or "same as"). Do I need "same as" ?
+			contains param number for strings representing parameter
+REPETITION_FLAG ??
+POSITION
+HOTSPOT_ID 
+    given if this record is choice between argument values from different callsites
+    if hotspot method gains or loses a callsite, then this enables connecting
+    
+CALLED_STRING_METHOD_ID 
+    given if this record is a choice between different implementations
+    if a string-method gains or loses an implementation, then you can track all dependent choices
+
+IMPLEMENTED_STRING_METHOD_ID
+    given if this is represents a string method's implementation (as summary)
+
+
+COLLECTION_ITEMS
+-------------------
+COLLECTION_ID
+ITEM_ID
+INDEX
+
+
+STRING_METHODS
+----------------
+-- watch this table when a file is changed, 
+-- check if new implementations for something appear or disappear
+ID
+TYPE_NAME -- most general type name
+SIGNATURE -- method descriptor
+
+
+HOTSPOT_PATTERNS (old HOTSPOTS)
+----------------
+ID
+SIGNATURE
+ARG_INDEX
+IS_PROPER_HOTSPOT (requiring full SQL statement vs. requiring a fragment)
+
+FILES
+------
+ID
+NAME
+
+
+SUBTYPES
+--------
+TYPE_NAME
+SUBTYPE_NAME
