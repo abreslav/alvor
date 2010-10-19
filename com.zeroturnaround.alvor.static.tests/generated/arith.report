@@ -1,0 +1,123 @@
+Grammatika
+
+    0 $accept: E $end
+
+    1 E: E '*' B
+    2  | E '+' B
+    3  | B
+
+    4 B: '0'
+    5  | '1'
+
+
+Terminalid, koos reeglitega kus nad ilmuvad
+
+$end (0) 0
+'*' (42) 1
+'+' (43) 2
+'0' (48) 4
+'1' (49) 5
+error (256)
+
+
+Mitteterminalid, koos reeglitega kus nad ilmuvad
+
+$accept (7)
+    vasakul: 0
+E (8)
+    vasakul: 1 2 3, paremal: 0 1 2
+B (9)
+    vasakul: 4 5, paremal: 1 2 3
+
+
+olek 0
+
+    0 $accept: . E $end
+    1 E: . E '*' B
+    2  | . E '+' B
+    3  | . B
+    4 B: . '0'
+    5  | . '1'
+
+    '0'  nihuta ja liigu olekule 1
+    '1'  nihuta ja liigu olekule 2
+
+    E  liigu olekule 3
+    B  liigu olekule 4
+
+
+olek 1
+
+    4 B: '0' .
+
+    $default  redutseerin kasutades reeglit 4 (B)
+
+
+olek 2
+
+    5 B: '1' .
+
+    $default  redutseerin kasutades reeglit 5 (B)
+
+
+olek 3
+
+    0 $accept: E . $end
+    1 E: E . '*' B
+    2  | E . '+' B
+
+    $end  nihuta ja liigu olekule 5
+    '*'   nihuta ja liigu olekule 6
+    '+'   nihuta ja liigu olekule 7
+
+
+olek 4
+
+    3 E: B .
+
+    $default  redutseerin kasutades reeglit 3 (E)
+
+
+olek 5
+
+    0 $accept: E $end .
+
+    $default  nõustun
+
+
+olek 6
+
+    1 E: E '*' . B
+    4 B: . '0'
+    5  | . '1'
+
+    '0'  nihuta ja liigu olekule 1
+    '1'  nihuta ja liigu olekule 2
+
+    B  liigu olekule 8
+
+
+olek 7
+
+    2 E: E '+' . B
+    4 B: . '0'
+    5  | . '1'
+
+    '0'  nihuta ja liigu olekule 1
+    '1'  nihuta ja liigu olekule 2
+
+    B  liigu olekule 9
+
+
+olek 8
+
+    1 E: E '*' B .
+
+    $default  redutseerin kasutades reeglit 1 (E)
+
+
+olek 9
+
+    2 E: E '+' B .
+
+    $default  redutseerin kasutades reeglit 2 (E)
