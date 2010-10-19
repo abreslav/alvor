@@ -11,42 +11,73 @@
 
 PSEUDO
 
-start with set of hotspot-patterns
+start with given set of hotspot-patterns
 
 while there are hotspot-patterns left:
-    search for this hotspot in the project (parse when necessary)
-    foreach hotspot:
-        * evaluate expression; when some piece comes from parameter, 
+    * search for this hotspot in the project (parse when ast is not cached)
+    * foreach hotspot:
+        * evaluate expression. When some piece comes from parameter, 
           then this method becomes a new semi-hotspot -- add it to the set (if it's not there yet)
-          This avoids(?) duplicate work in case of nested hotspot methods
+          How to avoid duplicate work in case of "nested" hotspot method calls?
         
         * when a string function is used, then calculate it's summary and cache it
           (or take it cache if available)
           If it'
     
 
+bullshit, i guess:
+		if a hotspot has only one callsite and it passes whole sql then this callsite becomes
+		new hotspot and old hotspot is marked as hidden (this should speed up things a bit).
+		NB! Need to check for new callsites though 
+
+
+
+if a file is changed:
+	* delete all abstract strings with positions in this file (also respective choice-items,
+	  there shouldn't be interprocedural sequences or same-as'es (TODO).)
+	* check METHODS tables to see if new version of the file has callsites to some hotspots
+	  or implementations to some string-methods. Construct abstract strings for respective
+	  arguments/implementations and update respective choices.
+	
 
 
 
 ABSTRACT_STRINGS
 ----------------
 ID
-TYPE
-CONTENT -- string constant, charset or unsupported msg
-?? LINK -- to ABSTRACT_STRINGS (for repetition or "same as"). Do I need "same as" ?
-			contains param number for strings representing parameter
-REPETITION_FLAG ??
-POSITION
-HOTSPOT_ID 
-    given if this record is choice between argument values from different callsites
-    if hotspot method gains or loses a callsite, then this enables connecting
-    
-CALLED_STRING_METHOD_ID 
-    given if this record is a choice between different implementations
-    if a string-method gains or loses an implementation, then you can track all dependent choices
+KIND            -- shape of the abs-string: literal | seq | choice | ...
+SOURCE_KIND     -- one of:
+                   | 1=variable value at some (assignment) point 
+                   | 2=concatenation
+                   | 3=method impl (choice) 
+                   | 4=method call result (possibly choice)  
+                   | 5=param value, from callsite arg (possibly choice) 
+                   
+METHOD_ID       -- the method that's called or implemented or whose parameter this is
 
-IMPLEMENTED_STRING_METHOD_ID
-    given if this is represents a string method's implementation (as summary)
+	if a hotspot method gains/loses/changes a callsite then insert/delete/update
+	respective choice item in choice where source_kind = 5 and method_id = resp method id 
+
+STR_CONTENT     -- string constant | charset | unsupported msg
+INT_CONTENT     -- one of:
+                    link to ABSTRACT_STRINGS (for repetition or "same as"). Do I need "same as" ?
+                   | param number (for strings representing parameter)
+POS_FILE
+POS_START
+POS_LENGTH
+
+
+Not necessary anymore:
+			HOTSPOT_ID 
+			    given if this record is choice between argument values from different callsites
+			    if hotspot method gains or loses a callsite, then this enables connecting
+			    
+			CALLED_STRING_METHOD_ID 
+			    given if this record is a choice between different implementations
+			    if a string-method gains or loses an implementation, then you can track all dependent choices
+			
+			IMPLEMENTED_STRING_METHOD_ID
+			    given if this represents a string method's implementation (as summary)
 
 
 COLLECTION_ITEMS
@@ -56,21 +87,24 @@ ITEM_ID
 INDEX
 
 
-STRING_METHODS
+METHODS
 ----------------
 -- watch this table when a file is changed, 
--- check if new implementations for something appear or disappear
+-- check if new implementations or callsites for something appear or disappear
 ID
 TYPE_NAME -- most general type name
 SIGNATURE -- method descriptor
+ROLE      -- hotspot or string method
+ARG_INDEX -- for string method the output argument of interest (-1 for return value)
 
 
-HOTSPOT_PATTERNS (old HOTSPOTS)
-----------------
-ID
-SIGNATURE
-ARG_INDEX
-IS_PROPER_HOTSPOT (requiring full SQL statement vs. requiring a fragment)
+Is it necessary to keep hotspots and string methods in separate tables ?
+		HOTSPOT_PATTERNS (old HOTSPOTS)
+		----------------
+		ID
+		SIGNATURE
+		ARG_INDEX
+		IS_PROPER_HOTSPOT (requiring full SQL statement vs. requiring a fragment)
 
 FILES
 ------
@@ -78,7 +112,8 @@ ID
 NAME
 
 
-SUBTYPES
---------
-TYPE_NAME
-SUBTYPE_NAME
+Possible helper table, needed to speed up construction of other tables
+		SUBTYPES
+		--------
+		TYPE_NAME
+		SUBTYPE_NAME
