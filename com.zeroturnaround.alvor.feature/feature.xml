@@ -2,7 +2,7 @@
 <feature
       id="com.zeroturnaround.alvor.feature"
       label="Alvor SQL Checker"
-      version="0.3.1">
+      version="0.3.4.qualifier">
 
    <description url="http://barclay.stacc.ee/edsl/alvor">
       Alvor - Embedded SQL checker
