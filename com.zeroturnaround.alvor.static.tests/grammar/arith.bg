@@ -1,0 +1,41 @@
+%{
+import java.io.IOException;
+@SuppressWarnings("unused")
+%}
+
+%code {
+
+
+	public static void main(String[] args) throws IOException {
+		YYParser parser = new YYParser(new YYParser.Lexer() {
+
+			int tokens[] = {49,43,48,43,49,0,0,};
+			int current;
+			
+			@Override
+			public Object getLVal() {
+				return "";
+			}
+
+			@Override
+			public void yyerror(String s) {
+				
+			}
+
+			@Override
+			public int yylex() throws IOException {
+				return tokens[current++];
+			}
+			
+		});
+		parser.yyDebugStream = System.out;
+		parser.yydebug = 1;
+		
+		System.out.println(parser.parse());
+	}
+}
+%%
+
+E : E '*' B | E '+' B | B;
+B : '0';
+B : '1';

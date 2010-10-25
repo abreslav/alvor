@@ -1,0 +1,1 @@
+java -cp c:/alvor/ws/com.zeroturnaround.alvor.cache/lib/hsqldb.jar org.hsqldb.server.Server --database.0 file:cache --dbname.0 xdb

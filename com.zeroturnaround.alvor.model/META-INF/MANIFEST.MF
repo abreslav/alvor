@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Model
+Bundle-SymbolicName: com.zeroturnaround.alvor.model
+Bundle-Version: 1.0.0.qualifier
+Export-Package: com.zeroturnaround.alvor.message,
+ com.zeroturnaround.alvor.string,
+ com.zeroturnaround.alvor.string.samplegen,
+ com.zeroturnaround.alvor.string.util
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
