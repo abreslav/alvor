@@ -788,7 +788,7 @@ public final class CacheServiceImpl implements ICacheService {
 				PreparedStatement query = queries.getSignatureQuery(desc.getSignature());
 				ResultSet res = query.executeQuery();
 				if (!res.next()) {
-					LOG.error("Signature not found " + desc.getSignature(), null);
+					LOG.message("Signature not found " + desc.getSignature());
 					return;
 				}
 				
