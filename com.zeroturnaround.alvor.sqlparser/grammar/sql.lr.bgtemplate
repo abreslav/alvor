@@ -1,0 +1,373 @@
+%{
+import java.io.IOException;
+%}
+
+%code {
+	public static void main(String[] args) throws IOException {
+		SQLParser parser = new SQLParser(new Lexer() {
+
+			int tokens[] = {258,260,259,260,0,0,};
+			int current;
+			
+			@Override
+			public Object getLVal() {
+				return "";
+			}
+
+			@Override
+			public void yyerror(String s) {
+				
+			}
+
+			@Override
+			public int yylex() throws IOException {
+				return tokens[current++];
+			}
+			
+		});
+		parser.yyDebugStream = System.out;
+		parser.yydebug = 1;
+		
+		System.out.println(parser.parse());
+	}
+}
+//%define parser_class_name "SQLParser"
+
+%lex-keyword PARTITION
+%lex-keyword DISTINCT
+%lex-keyword BETWEEN
+%lex-keyword VALUES
+%lex-keyword SELECT
+%lex-keyword DELETE
+%lex-keyword INSERT
+%lex-keyword ESCAPE
+%lex-keyword OVER
+%lex-keyword UPDATE
+%lex-keyword EXISTS
+%lex-keyword HAVING
+%lex-keyword COMMIT
+%lex-keyword WHERE
+%lex-keyword TABLE
+%lex-keyword ORDER
+%lex-keyword OR
+%lex-keyword GROUP
+%lex-keyword RIGHT
+%lex-keyword INNER
+%lex-keyword OUTER
+%lex-keyword UNION
+%lex-keyword FROM
+%lex-keyword WHEN
+%lex-keyword THEN
+%lex-keyword CASE
+%lex-keyword CAST
+%lex-keyword ELSE
+%lex-keyword DESC
+%lex-keyword LIKE
+%lex-keyword JOIN
+%lex-keyword LEFT
+%lex-keyword NULL
+%lex-keyword FULL
+%lex-keyword INTO
+%lex-keyword AND
+%lex-keyword SET
+%lex-keyword END
+%lex-keyword ASC
+%lex-keyword XOR
+%lex-keyword FOR
+%lex-keyword NOT
+%lex-keyword ON
+%lex-keyword BY
+%lex-keyword AS
+%lex-keyword IN
+%lex-keyword IS
+
+
+%lex-token OUTERJ = "(+)"
+%lex-token NE = "<>" | "!="
+%lex-token LE = "<="
+%lex-token GE = ">="
+%lex-token CONCAT = "||"
+%lex-literal ","
+%lex-literal "("
+%lex-literal ")"
+%lex-literal "."
+%lex-literal "+"
+%lex-literal "-"
+%lex-literal "*"
+%lex-literal "/"
+%lex-literal "="
+%lex-literal "<"
+%lex-literal ">"
+%lex-literal "?"
+
+%lex-helper ALPHA=[A-Za-z]
+%lex-helper DIGIT=[0-9]
+%lex-helper NONNEWLINE_WHITE_SPACE_CHAR=[\ \t\b\012]
+%lex-helper NEWLINE=\r|\n|\r\n
+%lex-helper WHITE_SPACE_CHAR=[\n\r\ \t\b\012]
+%lex-helper SQ_STRING_TEXT=(\'\' | [^\n\r\'] | \")*
+%lex-helper COMMENT_TEXT=([^*/\n]|[^*\n]"/"[^*\n]|[^/\n]"*"[^/\n]|"*"[^/\n]|"/"[^*\n])*
+%lex-helper Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
+
+%lex-whitespace {NONNEWLINE_WHITE_SPACE_CHAR}+ 
+%lex-token DIGAL_ERR = {DIGIT}+{ALPHA}({DIGIT}|{ALPHA})*
+%lex-token STRING_SQ = N?\'{SQ_STRING_TEXT}\'
+%lex-token STRING_SQ_ERR = \'{SQ_STRING_TEXT} 
+%lex-token NUMBER = {DIGIT}+(\.{DIGIT}+)?  
+%lex-token ID = {Ident}
+%lex-token UNKNOWN_CHARACTER_ERR = .
+
+%left OVER
+%left OR XOR
+%left AND
+%right NOT
+%left UNION
+%left '=' NE LE GE '>' '<'
+%left LIKE
+%left '-' '+'  
+%left '/' '*' CONCAT OUTERJ
+
+%%
+query
+	: bracketedSelect
+	| delete
+	| insert
+	| update
+	| COMMIT
+	;
+update
+	: UPDATE alias SET assignList where
+	;
+assignList
+	: assign
+	| assignList ',' assign
+	;
+assign
+	: ident '=' simpleExpr
+	| '(' idList ')' '=' simpleExpr
+	;
+delete
+	: DELETE optFrom alias where
+	;	
+optFrom
+	: FROM
+	| /*empty*/
+	;
+insert
+	: INSERT INTO alias optIdList insertRest
+	;
+insertRest
+	: VALUES identRest
+	| select
+	;
+optIdList
+	: /*empty*/
+	| '(' idList ')'
+	;
+idList
+	: ID
+	| idList ',' ID 
+	;
+bracketedSelect
+	: select
+	| '(' select ')'
+	;
+select 
+	: basicSelect where byClauses forUpdate 
+	| select UNION select
+	;
+basicSelect
+	: SELECT optDist whatToSelect FROM tableList
+	;
+where
+	: WHERE whereCond
+	| /*empty*/
+	;
+forUpdate
+	: FOR UPDATE
+	| /*empty*/
+	;
+groupBy
+	: GROUP BY simExList having
+	// GROUP BY identList having
+	;
+optGroupBy
+	: groupBy 	
+	| /*empty*/
+	;
+/*
+identList
+	: ident
+	| identList ',' ident
+	;*/
+having 
+	: HAVING condition
+	| /*empty*/
+	;
+orderBy
+	: ORDER BY directionList 
+	;
+optOrderBy
+	: orderBy 
+	| /*empty*/
+	;
+byClauses
+	: orderBy optGroupBy
+	| groupBy optOrderBy
+	| /* empty */
+	;
+directionList
+	: direction
+	| directionList ',' direction
+	;
+direction
+	: simpleExpr orderDirection
+	;
+orderDirection
+	: ASC
+	| DESC
+	| /*empty*/
+	;
+optDist
+	: DISTINCT
+	| /*empty*/
+	;
+whatToSelect
+	: selectExpressionList
+	;
+selectExpression
+	: expression
+	| selectExpression AS id
+	| selectExpression id
+	;
+id : ID;
+expression
+	: condition
+	| simpleExpr
+	;
+selectExpressionList
+	: selectExpression
+	| selectExpressionList ',' selectExpression
+	;
+tableList 
+	: table
+	| tableList ',' table 
+	;
+table
+	: alias
+	| table join alias ON condition
+	;
+join
+	: JOIN
+	| LEFT JOIN
+	| outerType OUTER JOIN
+	| INNER JOIN
+	;
+outerType
+	: LEFT
+	| RIGHT
+	| FULL
+	;
+alias
+	: tableExpr
+	| tableExpr ID
+	; 
+tableExpr
+	: ident
+	| TABLE '(' simpleExpr ')'
+	| '(' select ')'
+	;
+ident 
+	: ID 
+	| ID '.' ID
+	| ID '.' ID '.' ID
+	;
+whereCond
+	: condition;
+condition
+	: condition AND condition
+	| condition OR condition
+	| condition XOR condition
+	| NOT condition
+	| '(' condition ')'
+	| comparison
+	| simpleExpr inExpr '(' simExList ')'
+	| simpleExpr inExpr '(' select ')'
+	| '(' idList2 ')' inExpr '(' simExList ')'
+	| '(' idList2 ')' inExpr '(' select ')'
+	| simpleExpr IS optNot NULL
+	| simpleExpr optNot LIKE simpleExpr escape
+	| EXISTS '(' select ')' 
+	| simpleExpr optNot BETWEEN simpleExpr AND simpleExpr
+	;
+idList2
+	: ID ',' ID
+	| idList2 ',' ID
+	;
+comparison 
+	: simpleExpr '=' simpleExpr 
+	| simpleExpr '>' simpleExpr 
+	| simpleExpr '<' simpleExpr 
+	| simpleExpr LE simpleExpr 
+	| simpleExpr NE simpleExpr 
+	| simpleExpr GE simpleExpr 
+    ;
+escape
+	: ESCAPE STRING_SQ
+	| /*empty*/
+	;
+inExpr
+	: optNot IN
+	;
+optNot
+	: NOT
+	| /*empty*/
+	;
+simpleExpr
+	: NUMBER
+	| simpleExpr OUTERJ
+	| '-' simpleExpr
+	| CASE whenList else END
+	| STRING_SQ
+	| ident identRest
+	| '(' simpleExpr ')'
+	| simpleExpr '-' simpleExpr
+	| simpleExpr '+' simpleExpr
+	| simpleExpr '*' simpleExpr
+	| simpleExpr '/' simpleExpr
+	| simpleExpr CONCAT simpleExpr
+	| simpleExpr OVER partition
+	| CAST '(' simpleExpr AS ID optSize ')'
+	| '(' select ')'
+	| ID '.' '*'
+	| '*'
+	| '?'
+	| NULL
+	;	
+optSize
+	: /*empty*/
+	| '(' NUMBER ')'
+	;
+identRest
+	: '(' simExList ')'
+	| /*empty*/
+	;
+whenList
+	: when
+	| when whenList
+	;
+when
+	: WHEN condition THEN simpleExpr
+	;
+else
+	: ELSE simpleExpr
+	| /*empty*/
+	;
+simExList
+	: /*empty*/
+	| simpleExpr
+	| simExList ',' simpleExpr
+	;
+partition
+	: '(' PARTITION BY ident orderBy ')'
+	;

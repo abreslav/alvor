@@ -1,0 +1,66 @@
+package com.zeroturnaround.alvor.parser;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.junit.Test;
+
+import com.zeroturnaround.alvor.sqlparser.ParserSimulator;
+import com.zeroturnaround.alvor.string.IAbstractString;
+import com.zeroturnaround.alvor.string.parser.AbstractStringParser;
+
+
+public class ParserPerformanceTest {
+
+	@Test
+	public void test() throws Exception {
+		
+		Set<String> strings = new HashSet<String>();
+		
+		BufferedReader reader = new BufferedReader(new FileReader("data/earved_all.txt"));
+		int count = 0;
+		do {
+			String readLine = reader.readLine();
+			if (readLine == null) {
+				 break;
+			}
+			count++;
+			if (!strings.add(readLine)) {
+				System.out.println(readLine);
+			}
+		} while (true);
+		reader.close();
+		
+//		System.out.println("Lines: " + count);
+//		System.out.println("Unique: " + strings.size());
+		
+		List<IAbstractString> all = AbstractStringParser.parseFile("data/earved_all.txt");
+//		System.out.println("Strings: " + all.size());
+
+//		doTest(all);
+//		
+//		doTest(all);
+//		doTest(all);
+//		doTest(all);
+		
+	}
+
+	private void doTest(List<IAbstractString> all) {
+		ParserSimulator.getLALRInstance().allTime = 0;
+		long time = System.nanoTime();
+		for (IAbstractString as : all) {
+			ParserSimulator.getLALRInstance().check(as);
+		}
+		printNano("All checks: ", (System.nanoTime() - time));
+		printNano("Syntax: ", ParserSimulator.getLALRInstance().allTime);
+	}
+
+	private void printNano(String string, long x) {
+		System.out.println(string + 
+				(x / 1000000000.0)
+		);
+	}
+}
