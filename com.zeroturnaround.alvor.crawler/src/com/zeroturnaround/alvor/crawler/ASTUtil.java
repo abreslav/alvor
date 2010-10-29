@@ -2,7 +2,9 @@ package com.zeroturnaround.alvor.crawler;
 
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.Annotation;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
@@ -505,4 +507,14 @@ public class ASTUtil {
 		return result;
 	}
 
+	
+	public static ASTNode parseCompilationUnit(ICompilationUnit cUnit) {
+		ASTParser parser = ASTParser.newParser(AST.JLS3);
+		parser.setKind(ASTParser.K_COMPILATION_UNIT);
+		parser.setResolveBindings(true);
+		parser.setSource(cUnit);
+		ASTNode ast = parser.createAST(null);
+		return ast;
+
+	}
 }

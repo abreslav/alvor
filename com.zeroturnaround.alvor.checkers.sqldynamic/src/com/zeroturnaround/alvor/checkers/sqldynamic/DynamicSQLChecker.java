@@ -127,6 +127,7 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 					options.get("DBUsername").toString(),
 					options.get("DBPassword").toString());
 			} catch (Exception e) {
+				LOG.exception(e);
 				throw new CheckerException("SQL checker: can't connect with test database: "
 						+ e.getMessage(), new Position(options.get("SourceFileName"), 0, 0));
 			}

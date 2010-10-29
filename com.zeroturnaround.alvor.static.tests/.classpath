@@ -10,5 +10,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/com.zeroturnaround.alvor.checkers.sqlstatic"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/com.zeroturnaround.alvor.checkers"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/com.zeroturnaround.alvor.common"/>
+	<classpathentry kind="lib" path="/com.zeroturnaround.alvor.sqlparser/lib/jdom.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

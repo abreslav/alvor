@@ -57,7 +57,7 @@ public class SQLStringAnalyzer {
 		PreparedStatement stmt = null;
 		try {
 			stmt = conn.prepareStatement(sql);
-			// TODO there may be other engines besides oracle that require stmt.getMetaData()
+			stmt.getMetaData();
 		} finally {
 			if (stmt != null) {
 				stmt.close();

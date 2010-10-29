@@ -1,12 +1,11 @@
 package com.zeroturnaround.alvor.gui;
 
-import org.eclipse.jdt.core.ITypeRoot;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.NodeFinder;
-import org.eclipse.jdt.ui.JavaUI;
-import org.eclipse.jdt.ui.SharedASTProvider;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
@@ -18,6 +17,7 @@ import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.conntracker.ConnectionDescriptor;
 import com.zeroturnaround.alvor.conntracker.ConnectionTracker;
+import com.zeroturnaround.alvor.crawler.ASTUtil;
 
 public class ConnectionSourceFinder implements IEditorActionDelegate {
 	private static final ILog LOG = Logs.getLog(ConnectionSourceFinder.class);
@@ -40,9 +40,9 @@ public class ConnectionSourceFinder implements IEditorActionDelegate {
 		assert selection instanceof ITextSelection;
 		ITextSelection textSel = (ITextSelection) selection;
 		
-		ITypeRoot root = JavaUI.getEditorInputTypeRoot(targetEditor.getEditorInput());
-		CompilationUnit ast = SharedASTProvider
-			.getAST(root, SharedASTProvider.WAIT_YES, null);
+		IResource resource = (IResource) targetEditor.getEditorInput().getAdapter(IResource.class);
+		ICompilationUnit icu = (ICompilationUnit) JavaCore.create(resource);
+		ASTNode ast = ASTUtil.parseCompilationUnit(icu);
 		
 		ASTNode node = NodeFinder.perform(ast, textSel.getOffset(), textSel.getLength());
 		if (node == null) {
