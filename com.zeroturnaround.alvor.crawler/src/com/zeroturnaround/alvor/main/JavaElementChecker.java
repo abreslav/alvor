@@ -35,10 +35,11 @@ public class JavaElementChecker {
 
 	private static final String HOTSPOTS = "hotspots";
 	private static final ILog LOG = Logs.getLog(JavaElementChecker.class);
+	private static final ILog HOTSPOTS_LOG = Logs.getLog("Hotspots");
 	
 	// NB! smartChecking==true can hide problems with static checker
 	// so for testing it should be set false
-	private boolean smartChecking = true;
+	private boolean smartChecking = false;
 
 	/*
 	 * The map must contain an entry 
@@ -83,7 +84,8 @@ public class JavaElementChecker {
 		for (INodeDescriptor hotspot : hotspots) {
 			if (hotspot instanceof IStringNodeDescriptor) {
 				validHotspots.add((IStringNodeDescriptor) hotspot);
-				assert LOG.message("STRING node desc, file=" + PositionUtil.getLineString(hotspot.getPosition())
+				// TODO this makes log quite big
+				HOTSPOTS_LOG.message("STRING node desc, file=" + PositionUtil.getLineString(hotspot.getPosition())
 						+ ", str=" + ((IStringNodeDescriptor) hotspot).getAbstractValue());
 				
 				
@@ -192,7 +194,8 @@ public class JavaElementChecker {
 	}
 	
 	private boolean dynamicCheckerIsConfigured(Map<String, String> options) {
-		return options.get("DBUrl") != null && !options.get("DBUrl").isEmpty();
+		return options.get("DBUrl") != null && !options.get("DBUrl").trim().isEmpty()
+			&& options.get("DBDriverName") != null && !options.get("DBDriverName").trim().isEmpty();
 	}
 	
 	private void checkValidHotspotsSmartly(

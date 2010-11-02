@@ -1,6 +1,5 @@
-SQL syntax checker: Syntax error. Most likely, unfinished query, at: /earved/src/ee/post/earved/dao/accountingPattern/PatternItemDAO.java:122
-SQL syntax checker: Syntax error. Most likely, unfinished query, at: /earved/src/ee/post/earved/dao/invoice/InvoiceItemDAO.java:181
 SQL syntax checker: Unexpected token: (, at: /earved/src/ee/post/earved/dao/invoice/AttachmentDAO.java:258
+SQL syntax checker: Unexpected token: (, at: /earved/src/ee/post/earved/dao/invoice/InvoiceItemDAO.java:177
 SQL syntax checker: Unexpected token: ,, at: /earved/src/ee/post/earved/dao/journal/JournalEntryDAO.java:145
 SQL syntax checker: Unexpected token: :, at: /earved/src/ee/post/earved/dao/integration/ElektronpostExportDAO.java:43
 SQL syntax checker: Unexpected token: :, at: /earved/src/ee/post/earved/dao/invoice/AttachmentDAO.java:108
@@ -8,6 +7,7 @@ SQL syntax checker: Unexpected token: :, at: /earved/src/ee/post/earved/dao/invo
 SQL syntax checker: Unexpected token: INTERVAL, at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:1086
 SQL syntax checker: Unexpected token: ORDER, at: /earved/src/ee/post/earved/dao/dimension/DimensionDataConnectionDAO.java:263
 SQL syntax checker: Unexpected token: null, at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:974
+SQL syntax checker: Unexpected token: or, at: /earved/src/ee/post/earved/dao/accountingPattern/PatternItemDAO.java:114
 SQL syntax checker: Unexpected token: value, at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:298
 SQL syntax checker: Unexpected token: value, at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:298
 SQL syntax checker: Unexpected token: value, at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:620
