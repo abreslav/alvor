@@ -44,7 +44,8 @@ public class AbstractStringEqualsVisitor implements
 	@Override
 	public Boolean visitStringParameter(
 			StringParameter me, IAbstractString data) {
-		throw new UnsupportedOperationException();
+		return (data instanceof StringParameter &&
+				((StringParameter)data).getIndex() == me.getIndex());
 	}
 
 	@Override
