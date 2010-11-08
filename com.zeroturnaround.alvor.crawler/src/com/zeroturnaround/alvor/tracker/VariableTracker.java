@@ -60,7 +60,27 @@ public class VariableTracker {
 			return usage;
 		}
 		else {
-			return getLastReachingMod(var, target.getParent());
+			
+			// nothing found inside parent, so search in things preceding the parent
+			NameUsage precedingUsage = getLastReachingMod(var, parent);
+			
+			// TODO move loop handling here
+			//
+			// if parent is a loop, then target is something inside a loop
+			//   - mod was not found between target and start of the loop
+			//   - normal action is to start moving upwards from the parent
+			//   - in loop case you also need to check, if preceding loop iterations could modify
+			//
+			/*
+			if (ASTUtil.isLoopStatement(parent)) {
+				// special case -- we're at the loop boundary, "preceding" gets another meaning:
+				// 		need also to take into account the preceding iteration of the loop 
+				// if find modification inside loop, then:
+				// precedingUsage = choice of (precedingUsage, loopUsage)
+			} 
+			*/
+
+			return precedingUsage;			
 		}
 	}
 	
