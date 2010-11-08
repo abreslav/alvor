@@ -674,6 +674,7 @@ public class AbstractStringEvaluator {
 		assert usage.getLoopUsage() != null;
 		
 		IAbstractString baseString = evalNameAfterUsage(name, usage.getBaseUsage());
+		// FIXME recursion is not necessary here, can be more indirect
 		return new RecursiveStringChoice(
 				PositionUtil.getPosition(usage.getNode()),
 				baseString, 
