@@ -30,8 +30,13 @@ public class NameAssignment extends NameUsage {
 		return node;
 	}
 	
+	@Deprecated
 	public Name getName() {
 		return (Name)leftHandSide; 
+	}
+	
+	public Expression getLeftHandSide() {
+		return leftHandSide;
 	}
 	
 	public Expression getRightHandSide() {

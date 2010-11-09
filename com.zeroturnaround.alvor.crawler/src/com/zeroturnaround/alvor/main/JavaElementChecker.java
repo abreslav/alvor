@@ -61,7 +61,7 @@ public class JavaElementChecker {
 		if (requests.isEmpty()) {
 			throw new IllegalArgumentException("No hotspot definitions found in options");
 		}
-		List<INodeDescriptor> result = AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(requests, scope, 0);
+		List<INodeDescriptor> result = AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(requests, scope, 0, null);
 		timer.printTime(); // String construction
 		
 		LOG.message(Measurements.parseTimer);
