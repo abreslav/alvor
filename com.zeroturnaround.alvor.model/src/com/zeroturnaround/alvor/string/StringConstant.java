@@ -48,4 +48,9 @@ public class StringConstant extends PositionedString {
 	public String getEscapedValue() {
 		return escaped;
 	}
+
+	@Override
+	public boolean containsRecursion() {
+		return false;
+	}
 }

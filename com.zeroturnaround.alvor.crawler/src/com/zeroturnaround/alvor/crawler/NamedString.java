@@ -5,6 +5,7 @@ import com.zeroturnaround.alvor.string.IAbstractStringVisitor;
 import com.zeroturnaround.alvor.string.IPosition;
 import com.zeroturnaround.alvor.string.PositionedString;
 
+@Deprecated
 public class NamedString extends PositionedString {
 
 	private Object key;
@@ -44,6 +45,11 @@ public class NamedString extends PositionedString {
 	@Override
 	public String toString() {
 		return "Named(" + key.hashCode() + ", " + body.toString() +  ")";
+	}
+
+	@Override
+	public boolean containsRecursion() {
+		return true;
 	}
 	
 }

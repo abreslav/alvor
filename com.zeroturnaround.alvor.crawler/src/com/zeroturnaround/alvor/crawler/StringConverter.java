@@ -354,49 +354,5 @@ public class StringConverter {
 		}
 	}
 	
-	/*
-	 * Assuming that str is recursively referred to in one of it's descendant nodes.
-	 *   
-	 * Lets call recursive reference to str as 'S'. We can think of S as starting nonterminal
-	 * in a grammar, where some right hand sides also contain S.
-	 * 
-	 * (Also assuming, that S is only  kind of recursive call in it, ie. other "local" 
-	 * recursions have been already resolved. TODO this reduces universality of the method) 
-	 * 
-	 * First flatten the structure -- convert str to a choice of flat sequences 
-	 * (ie. without any further choices and without nested sequences).
-	 * The sequences can contain literals, parameters, repetitions ...
-	 * 
-	 * (Actually, those sequences can contain nested choices and sequences if they don't contain S,
-	 * ie. all occurrences of S should be only in top level sequences.
-	 * TODO during creation of the abstract string try to keep recursive calls in top level,
-	 * transform if necessary)
-	 * 
-	 * Then partition resulting sequences into 4 sets: 
-	 * 		(1) S doesn't occur in the sequence
-	 * 		(2) S is first item (and doesn't occur in other positions)
-	 * 		(3) S is last item (and doesn't in other positions)
-	 * 		(4) S is in between other items or occurs multiple times (is this always a problem??) 
-	 * 
-	 * Now check resulting sets:
-	 * 		- if there's nothing in set (1) then there is no base case in the recursion,
-	 * 				language is smth like "S -> S" ie. nothing can be generated
-	 * 		- if there's something in (4) then it's not (necessarily?) a regular language
-	 * 		- if there's something in both (2) and (3) then it's not (necessarily?) a regular language
-	 * 
-	 * 		- if there is smth only in (1) and (2):
-	 * 			- start = choice of all things in (1)
-	 * 			- rep   = choice of all things following S in (2)
-	 * 			- result = seq(start, rep)
-	 * 
-	 * 		- if there is smth only in (1) and (3):
-	 * 			- end = choice of all things in (1)
-	 * 			- rep   = choice of all things preceding S in (3)
-	 * 			- result = seq(rep, end)
-	 * 
-	 * 
-	 */
-	public static IAbstractString recursionToRepetition(IAbstractString str) {
-		return null;
-	}
+	
 }
