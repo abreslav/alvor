@@ -44,4 +44,9 @@ public class RecursiveStringChoice extends PositionedString {
 		return "RecChoice(" + base.toString() + ", " + recKey.hashCode() + ")";
 	}
 
+	@Override
+	public boolean containsRecursion() {
+		return true;
+	}
+
 }

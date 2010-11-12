@@ -33,4 +33,9 @@ public class StringParameter extends PositionedString {
 	public String toString() {
 		return "Param(" + index + ")";
 	}
+
+	@Override
+	public boolean containsRecursion() {
+		return false;
+	}
 }
