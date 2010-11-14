@@ -3,6 +3,7 @@ package com.zeroturnaround.alvor.crawler;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.zeroturnaround.alvor.cache.DummyPosition;
 import com.zeroturnaround.alvor.cache.PositionUtil;
 import com.zeroturnaround.alvor.cache.UnsupportedStringOpEx;
 import com.zeroturnaround.alvor.string.AbstractStringCollection;
@@ -273,7 +274,7 @@ public class StringConverter {
 								containingStr.getPosition(), 
 								tail, 
 								// FIXME this position is not good
-								new StringConstant(PositionUtil.getDummyPosition(), "", "\"\"")));
+								new StringConstant(new DummyPosition(), "", "\"\"")));
 			}
 			else {
 				return str;

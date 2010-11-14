@@ -121,8 +121,4 @@ public class PositionUtil {
 	public static String getLineString(IPosition sr) {
 		return sr.getPath() + ":" + getLineNumber(sr);
 	}
-	
-	public static IPosition getDummyPosition() {
-		return new Position("__dummy__", 1, 2);
-	}
 }
