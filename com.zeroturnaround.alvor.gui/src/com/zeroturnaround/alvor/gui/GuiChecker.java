@@ -17,6 +17,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
 import com.zeroturnaround.alvor.cache.CacheService;
+import com.zeroturnaround.alvor.cache.DummyPosition;
 import com.zeroturnaround.alvor.checkers.AbstractStringCheckerManager;
 import com.zeroturnaround.alvor.checkers.INodeDescriptor;
 import com.zeroturnaround.alvor.checkers.ISQLErrorHandler;
@@ -128,8 +129,13 @@ public class GuiChecker implements ISQLErrorHandler {
 
 	public static void createMarker(String message, String markerType,
 			IPosition pos, Map<String, Comparable<?>> map) {
+		
 		// dummy positions are created in string conversion when no actual position fits
-		if (pos.getPath().equals("__dummy__")) {
+		// or when new nodes are created in string transformings
+		// FIXME This actually shouldnt occur or
+		// maybe this should create a marker for the whole workspace ??
+		if (pos instanceof DummyPosition) {
+			LOG.exception(new IllegalArgumentException("Warning: Dummy position in 'createMarker'"));
 			return;
 		}
 		

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.zeroturnaround.alvor.cache.DummyPosition;
 import com.zeroturnaround.alvor.cache.UnsupportedStringOpEx;
 import com.zeroturnaround.alvor.string.AbstractStringCollection;
 import com.zeroturnaround.alvor.string.IAbstractString;
@@ -11,6 +12,7 @@ import com.zeroturnaround.alvor.string.StringCharacterSet;
 import com.zeroturnaround.alvor.string.StringChoice;
 import com.zeroturnaround.alvor.string.StringConstant;
 import com.zeroturnaround.alvor.string.StringParameter;
+import com.zeroturnaround.alvor.string.StringRecursion;
 import com.zeroturnaround.alvor.string.StringRepetition;
 import com.zeroturnaround.alvor.string.StringSequence;
 
@@ -101,14 +103,16 @@ public class RecursionConverter {
 //	}
 	
 	/**
-	 * str can be a branch of a bigger abstract string, ie some recursive references may have their 
-	 * "target" outside 'str'
+	 * It's assumed, that abstract string is constructed so that all refursive references are descendants
+	 * of their target node. Note that this str can be a branch of a bigger abstract string, 
+	 * ie some recursive references may have their "target" upwards of 'str' 
 	 *  
-	 * The function transforms all "complete" recursions, ie. when both recursive refs and 
-	 * their target node are inside 'str'. All remaining recursive calls are brought up in the structure
+	 * The function transforms all "complete" recursions, ie. cases where both recursive refs and 
+	 * their target node are inside 'str'. All remaining recursive calls are brought up in the structure,
 	 * so that they are easier to find (caller of this function can locate all remaining recursive 
-	 * refs in 2 topmost levels of the result) 
-	 * 
+	 * refs in 2 topmost levels of the result). Result is a list of options (possibly
+	 * with one item) and each option is either something "simple" (constant, rec-ref) 
+	 * or a "linear sequence" (ie. there are no choices or nested sequences in it).
 	 * 
 	 * If str contains recursive calls then return a result StringChoice such that:
 	 * 		- it's equivalent to str
@@ -120,15 +124,15 @@ public class RecursionConverter {
 	 * 
 	 * 
 	 */
-	public static List<IAbstractString> removeRecursion(IAbstractString str) {
+	public static StringChoice recursionToRepetition(IAbstractString str) {
 		
 		// simple Abstract Strings
 		if (str instanceof StringConstant
 				|| str instanceof StringParameter
 				|| str instanceof StringCharacterSet
-				//|| str instanceof StringRecursiveReference
+				|| str instanceof StringRecursion // this will be handled somewhere else in call stack 
 				) {
-			return Arrays.asList(str);			
+			return new StringChoice(new DummyPosition(), str);			
 		}
 		else if (str instanceof StringRepetition) {
 			// TODO just now i'm assuming that there's no further recursion inside a repetition
@@ -137,34 +141,29 @@ public class RecursionConverter {
 				throw new UnsupportedStringOpEx("internal problem: Recursion in repetition", str.getPosition());
 			}
 			else {
-				return Arrays.asList(str);			
+				return new StringChoice(new DummyPosition(), str);			
 			}
 		}
 		
-		else {
-			assert str instanceof AbstractStringCollection;
-			
-			// reorganize children into a set of options, so that ... 
+		else if (str instanceof AbstractStringCollection) {
+			// reorganize children into a set of options, so that each option is either 
+			// "simple" node or "linear sequence"
 			List<IAbstractString> options = new ArrayList<IAbstractString>();
 			
 			// In case of Option, merge processed children together into new set of options
 			if (str instanceof StringChoice) {
 				for (IAbstractString item : ((StringChoice)str).getItems()) {
-					options.addAll(removeRecursion(item));
+					options.addAll(recursionToRepetition(item).getItems());
 				}
 			}
 			
 			// In case of Sequence, "multiply" the choices
 			else if (str instanceof StringSequence) {
-				/*  Most straightforward solution would be bringing all choices to the top level,
-				 *  eg, each resulting option would be a linear sequence or smth simpler.
-				 * 
-				 *  TODO: this can cause much duplication. I only need that options 
-				 *  containing rec-refs are linearized
-				 */
+				// TODO: currently this way of "normalizing" creates lots of duplication in the result string
+				// Should treat branches without rec-refs differently (those may contain inner choices)
 				
-				for (IAbstractString item : ((StringChoice)str).getItems()) {
-					List<IAbstractString> itemOptions = removeRecursion(item);
+				for (IAbstractString item : ((StringSequence)str).getItems()) {
+					List<IAbstractString> itemOptions = recursionToRepetition(item).getItems();
 					assert ! itemOptions.isEmpty();
 					
 					// options from first piece of the sequence go to the result as they are
@@ -187,17 +186,35 @@ public class RecursionConverter {
 					}
 				}
 			}
-			return options;
+			
+			return preparedRecursionToRepetition(options);
 		}
 		
-		// now the structure is normalized
+		else {
+			throw new IllegalArgumentException("Unknown abstract string: " + str.getClass());
+		}
 		
-		// TODO remove recursion
 		
 		// TODO after creating a resulting repetition, check that there's no recursion in it
 		// I just don't know how to deal with it
+	}
+	
+	private static StringChoice preparedRecursionToRepetition(List<IAbstractString> options) {
+		/*
+		 * Now the structure is normalized in 'options' -- if there is recursive references
+		 * somewhere then they are easy to find.
+		 * If this node (str) is target to some recursive references, then try to translate
+		 * thCan remove those recursion if pos of 'str' is mentioned in one of options
+		 * 
+		 * can handle only cases without mixed-recursion (ie all rec-refs are either leftmost
+		 * items in sequences or all rightmost.
+		 *  
+		 */
 		
 		
+		// partition options into 5 sets
+		
+		return new StringChoice(new DummyPosition(), options);		
 	}
 	
 //	/* Restructures str into options of a choice so that all recursive refs 
