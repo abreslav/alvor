@@ -3,9 +3,9 @@ package com.zeroturnaround.alvor.crawler;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.zeroturnaround.alvor.cache.DummyPosition;
 import com.zeroturnaround.alvor.cache.UnsupportedStringOpEx;
 import com.zeroturnaround.alvor.string.AbstractStringCollection;
+import com.zeroturnaround.alvor.string.DummyPosition;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.IPosition;
 import com.zeroturnaround.alvor.string.StringCharacterSet;
@@ -216,7 +216,7 @@ public class RecursionConverter {
 				nonrec.add(option);
 			}
 			else if (option instanceof StringRecursion) { 
-				if (((StringRecursion) option).getTarget().equals(pos)) {
+				if (((StringRecursion) option).getPosition().equals(pos)) {
 					hasOnlyRecOptions = true;
 				} 
 			}
@@ -228,7 +228,7 @@ public class RecursionConverter {
 				for (int i = 0; i < seq.getItems().size(); i++) {
 					if (seq.get(i) instanceof StringRecursion) {
 						StringRecursion rec = (StringRecursion)seq.get(i);
-						if (!rec.getTarget().equals(pos)) {
+						if (!rec.getPosition().equals(pos)) {
 							optionHasOtherRec = true;
 						} 
 						else {

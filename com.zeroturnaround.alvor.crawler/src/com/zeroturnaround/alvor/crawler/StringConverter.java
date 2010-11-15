@@ -3,7 +3,6 @@ package com.zeroturnaround.alvor.crawler;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.zeroturnaround.alvor.cache.DummyPosition;
 import com.zeroturnaround.alvor.cache.PositionUtil;
 import com.zeroturnaround.alvor.cache.UnsupportedStringOpEx;
 import com.zeroturnaround.alvor.string.AbstractStringCollection;
@@ -13,16 +12,19 @@ import com.zeroturnaround.alvor.string.StringCharacterSet;
 import com.zeroturnaround.alvor.string.StringChoice;
 import com.zeroturnaround.alvor.string.StringConstant;
 import com.zeroturnaround.alvor.string.StringParameter;
+import com.zeroturnaround.alvor.string.StringRecursion;
 import com.zeroturnaround.alvor.string.StringRepetition;
 import com.zeroturnaround.alvor.string.StringSequence;
 
 public class StringConverter {
 	private static IAbstractStringVisitor<Boolean, IAbstractString> EQUALS_VISITOR_EX = new AbstractStringEqualsVisitorExtended();
 	
+	@Deprecated
 	public static IAbstractString widenToRegular(IAbstractString str) {
 		return widenFlatToRegular(flattenStringCollections(str));
 	}
 	
+	@Deprecated
 	private static IAbstractString widenFlatToRegular(IAbstractString str) {
 		if (str instanceof NamedString) {
 			NamedString namedStr = (NamedString)str;
@@ -99,6 +101,7 @@ public class StringConverter {
 		}
 	}
 	
+	@Deprecated
 	private static StringChoice namedChoiceToChoiceOfNamed(NamedString str) {
 		// FIXME this actually alters semantics!
 		
@@ -110,6 +113,7 @@ public class StringConverter {
 		return new StringChoice(str.getPosition(), options);
 	}
 	
+	@Deprecated
 	private static boolean hasRecursiveChoice(IAbstractString str, Object key) {
 		if (str instanceof RecursiveStringChoice) {
 			RecursiveStringChoice recChoice = (RecursiveStringChoice)str;
@@ -163,6 +167,9 @@ public class StringConverter {
 			return false;
 		}
 		else if (str instanceof NamedString) {
+			return true;
+		}
+		else if (str instanceof StringRecursion) {
 			return true;
 		}
 		else if (str instanceof StringRepetition) {

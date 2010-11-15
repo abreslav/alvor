@@ -5,6 +5,7 @@ import com.zeroturnaround.alvor.string.IAbstractStringVisitor;
 import com.zeroturnaround.alvor.string.IPosition;
 import com.zeroturnaround.alvor.string.PositionedString;
 
+@Deprecated
 public class RecursiveStringChoice extends PositionedString {
 	private IAbstractString base;
 	private Object recKey; // pointer to a parent node of this node

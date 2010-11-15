@@ -1,6 +1,5 @@
-package com.zeroturnaround.alvor.cache;
+package com.zeroturnaround.alvor.string;
 
-import com.zeroturnaround.alvor.string.Position;
 
 public class DummyPosition extends Position {
 	public DummyPosition() {

@@ -1,6 +1,6 @@
 package com.zeroturnaround.alvor.crawler;
 
-import com.zeroturnaround.alvor.cache.DummyPosition;
+import com.zeroturnaround.alvor.string.DummyPosition;
 import com.zeroturnaround.alvor.string.IPosition;
 import com.zeroturnaround.alvor.string.StringConstant;
 
