@@ -64,7 +64,7 @@ import com.zeroturnaround.alvor.tracker.VariableTracker;
  */
 public class AbstractStringEvaluator {
 	private static int maxLevel = 4;
-	private static boolean supportLoops = false;
+	private static boolean supportLoops = true;
 	private static boolean supportInvocations = true;
 	private static boolean optimizeChoice = true;
 	
@@ -472,7 +472,7 @@ public class AbstractStringEvaluator {
 				return eval(arg, context);
 			}
 			else if (arg.resolveTypeBinding().getName().equals("int")) {
-				return new StringConstant(PositionUtil.getPosition(node), "", "\"\"");
+				return new EmptyStringConstant(PositionUtil.getPosition(node));
 			}
 			else { // CharSequence
 				throw new UnsupportedStringOpEx("Unknown String/StringBuilder/Buffer constructor: " 
@@ -481,7 +481,7 @@ public class AbstractStringEvaluator {
 		}
 		else {
 			assert node.arguments().size() == 0;
-			return new StringConstant(PositionUtil.getPosition(node), "", "\"\"");
+			return new EmptyStringConstant(PositionUtil.getPosition(node));
 		}
 	}
 
@@ -512,13 +512,22 @@ public class AbstractStringEvaluator {
 		
 		if (ASTUtil.inALoopSeparatingFrom(usage.getNode(), name)) {
 			if (supportLoops && !isInsideBadLoop(usage.getNode())) {
+				IAbstractString namedBody = evalNameAfterUsageWithoutLoopCheck(name, usage, context); 
+
 				NamedString named = new NamedString(
 						PositionUtil.getPosition(usage.getNode()),
 						usage.getNode(),
-						evalNameAfterUsageWithoutLoopCheck(name, usage, context));
+						namedBody);
+				
 				assert LOG.message("BEFORE WIDENING: " + named);
 				IAbstractString widened = StringConverter.widenToRegular(named);
 				assert LOG.message("AFTER WIDENING: " + widened);
+				
+//				assert LOG.message("BEFORE CONVERSION: " + namedBody);
+//				IAbstractString widened = RecursionConverter.recursionToRepetition(namedBody);
+//				assert LOG.message("AFTER CONVERSION: " + widened);
+//				assert !widened.containsRecursion();
+				
 				return widened;
 			} 
 			else {
@@ -652,6 +661,7 @@ public class AbstractStringEvaluator {
 	}
 
 	private boolean isInsideBadLoop(ASTNode node) {
+		// FIXME
 		ASTNode loop = ASTUtil.getContainingLoop(node);
 		if (loop == null) {
 			return false;

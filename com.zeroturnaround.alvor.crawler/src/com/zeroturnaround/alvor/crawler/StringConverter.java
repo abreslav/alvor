@@ -274,7 +274,7 @@ public class StringConverter {
 								containingStr.getPosition(), 
 								tail, 
 								// FIXME this position is not good
-								new StringConstant(new DummyPosition(), "", "\"\"")));
+								new EmptyStringConstant()));
 			}
 			else {
 				return str;
@@ -305,7 +305,7 @@ public class StringConverter {
 						// FIXME: following is not quite correct 
 						|| !assumeSharedStrings && headN.toString().equals(str.toString())) {
 						if (seqN.getItems().size() == 1) {
-							tails.add(new StringConstant(seqN.getPosition(), "", "\"\""));
+							tails.add(new EmptyStringConstant(seqN.getPosition()));
 						}
 						else if (seqN.getItems().size() == 2) {
 							tails.add(seqN.get(1));
@@ -337,7 +337,7 @@ public class StringConverter {
 				
 				if (seq.getItems().size() == 1) {
 					// that would be weird case, but anyway...
-					return new StringConstant(seq.getPosition(), "", "\"\"");
+					return new EmptyStringConstant(seq.getPosition());
 				}
 				else if (seq.getItems().size() == 2) {
 					return seq.get(1);

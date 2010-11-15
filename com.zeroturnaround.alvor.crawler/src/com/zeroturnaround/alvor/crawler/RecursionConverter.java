@@ -18,6 +18,7 @@ import com.zeroturnaround.alvor.string.StringSequence;
 
 /*
  * OVERALL IDEA OF THE ALGORITHM
+ * TODO review this
  * 
  * Assuming that str is recursively referred to in one of it's descendant nodes.
  *   
