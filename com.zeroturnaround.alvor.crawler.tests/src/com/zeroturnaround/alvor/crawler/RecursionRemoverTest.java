@@ -11,7 +11,7 @@ import com.zeroturnaround.alvor.string.StringRecursion;
 import com.zeroturnaround.alvor.string.StringSequence;
 
 public class RecursionRemoverTest {
-	//@Test
+	@Test
 	public void test1() {
 		System.out.println("test1");
 		IPosition pos = new Position("p1", 0, 0);
@@ -26,7 +26,8 @@ public class RecursionRemoverTest {
 				
 		);
 		
-		System.out.println(RecursionConverter.recursionToRepetition(str));
+		System.out.println("BEFORE: " + str);
+		System.out.println("AFTER: " + RecursionConverter.recursionToRepetition(str));
 	}
 	
 	@Test
@@ -47,7 +48,7 @@ public class RecursionRemoverTest {
 				
 		);
 		
-		System.out.println(str);
-		System.out.println(RecursionConverter.recursionToRepetition(str));
+		System.out.println("BEFORE: " + str);
+		System.out.println("AFTER: " + RecursionConverter.recursionToRepetition(str));
 	}
 }

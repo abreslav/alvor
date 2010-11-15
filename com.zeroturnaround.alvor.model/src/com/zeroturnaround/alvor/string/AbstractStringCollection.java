@@ -53,4 +53,5 @@ public abstract class AbstractStringCollection extends PositionedString {
 		}
 		return false;
 	};
+	
 }
