@@ -1,13 +1,13 @@
 package com.zeroturnaround.alvor.string;
 
+/*
+ * Represents a string that recursively refers to one of it's ancestor string having same pos
+ */
 public class StringRecursion extends PositionedString {
 
-	private final IPosition target;
-
-	public StringRecursion(IPosition position, IPosition target) {
+	public StringRecursion(IPosition position) {
 		super(position);
-		this.target = target;
-		
+		assert !(position instanceof DummyPosition); 
 	}
 
 	@Override
@@ -27,16 +27,7 @@ public class StringRecursion extends PositionedString {
 	}
 
 	@Override
-	public IPosition getPosition() {
-		return null;
-	}
-
-	public IPosition getTarget() {
-		return target;
-	}
-	
-	@Override
 	public String toString() {
-		return "<<<" + target + ">>>";
+		return "<<<" + getPosition() + ">>>";
 	}
 }

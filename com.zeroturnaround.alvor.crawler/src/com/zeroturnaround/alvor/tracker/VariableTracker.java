@@ -45,7 +45,7 @@ public class VariableTracker {
 	/**
 	 * Finds previous modification place of var, that is preceding target in CFG
 	 * @param var 
-	 * @param target The node that gonna be affected by the Mod
+	 * @param target - modifications are searched backwards from this node
 	 * @return
 	 */
 	public static NameUsage getLastReachingMod(IVariableBinding var, ASTNode target) {
@@ -64,21 +64,25 @@ public class VariableTracker {
 			// nothing found inside parent, so search in things preceding the parent
 			NameUsage precedingUsage = getLastReachingMod(var, parent);
 			
-			// TODO move loop handling here
-			//
-			// if parent is a loop, then target is something inside a loop
-			//   - mod was not found between target and start of the loop
-			//   - normal action is to start moving upwards from the parent
-			//   - in loop case you also need to check, if preceding loop iterations could modify
-			//
 			/*
+			 *  A special case:
+			 *  if parent is a loop, then target is something inside a loop
+			 *    - mod was not found between target and start of the loop
+			 *    - normal action is to start moving upwards from the parent
+			 *    - in loop case you also need to check, if preceding loop iterations could modify var
+			 *    
+			 *  So look again for modification in loop-s body, if find something then make a choice of 
+			 *  that and stuff found preceding the loop. (Client should take care of avoiding infinite recursion)
+			 *  
+			 */
 			if (ASTUtil.isLoopStatement(parent)) {
 				// special case -- we're at the loop boundary, "preceding" gets another meaning:
 				// 		need also to take into account the preceding iteration of the loop 
-				// if find modification inside loop, then:
-				// precedingUsage = choice of (precedingUsage, loopUsage)
+				NameUsage loopUsage = getLastModIn(var, ASTUtil.getLoopBody(parent));
+				if (loopUsage != null) {
+					precedingUsage = new NameUsageChoice(parent, precedingUsage, loopUsage);
+				}
 			} 
-			*/
 
 			return precedingUsage;			
 		}
@@ -339,36 +343,21 @@ public class VariableTracker {
 			ASTNode target, Block block) {
 		int stmtIdx; // last statement that can affect target
 		
-		if (target == null) {
+		if (target == null) { // search whole block
 			stmtIdx = block.statements().size()-1;
 		}
-		else {
+		else { 
+			// should be called only when block really is target's direct parent
 			stmtIdx = block.statements().indexOf(target)-1;
 		}
 		
+		// go backwards in statements
 		for (int i = stmtIdx; i >= 0; i--) {
 			Statement stmt = (Statement)block.statements().get(i);
 			
 			NameUsage usage = getLastModIn(var, stmt);
 			if (usage != null) {
-				// if target is loop then moving out of loop??
-				
-				// stmt is loop then found last usage in loop
-				
-				// FIXME won't work in all cases
-				// should create new Tracker at loop entry
-				// and another in loop exit ???
-				
-				
-				if (ASTUtil.isLoopStatement(target)) { // moving out of loop
-					assert(ASTUtil.getLoopBody(target) != block);
-//					throw new UnsupportedConstructionException("target is loop");
-					return new NameUsageLoopChoice(target, usage, 
-							getLastModIn(var, ASTUtil.getLoopBody(target)));
-				}
-				else {
-					return usage;
-				}
+				return usage;
 			}
 		}
 		

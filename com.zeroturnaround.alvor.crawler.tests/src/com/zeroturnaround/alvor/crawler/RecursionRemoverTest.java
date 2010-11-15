@@ -21,7 +21,7 @@ public class RecursionRemoverTest {
 			new StringConstant("b"),
 			new StringSequence(
 				new StringConstant("a"),
-				new StringRecursion(null, pos)
+				new StringRecursion(pos)
 			)
 				
 		);
@@ -42,10 +42,29 @@ public class RecursionRemoverTest {
 				new StringConstant("a"),
 				new StringChoice(
 					new StringConstant("c"),
-					new StringRecursion(null, pos)
+					new StringRecursion(pos)
 				)
 			)
 				
+		);
+		
+		System.out.println("BEFORE: " + str);
+		System.out.println("AFTER: " + RecursionConverter.recursionToRepetition(str));
+	}
+	
+	@Test
+	public void test3() {
+		System.out.println("test3");
+		IPosition pos = new Position("p1", 0, 0);
+		
+		IAbstractString str = new StringSequence (
+			pos,
+			new StringRecursion(pos),
+			new StringChoice(
+					new StringConstant("c"),
+					new EmptyStringConstant()
+			),
+			new StringConstant("?")
 		);
 		
 		System.out.println("BEFORE: " + str);

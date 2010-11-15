@@ -17,7 +17,6 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
 import com.zeroturnaround.alvor.cache.CacheService;
-import com.zeroturnaround.alvor.cache.DummyPosition;
 import com.zeroturnaround.alvor.checkers.AbstractStringCheckerManager;
 import com.zeroturnaround.alvor.checkers.INodeDescriptor;
 import com.zeroturnaround.alvor.checkers.ISQLErrorHandler;
@@ -28,6 +27,7 @@ import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
 import com.zeroturnaround.alvor.crawler.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.main.JavaElementChecker;
 import com.zeroturnaround.alvor.main.OptionLoader;
+import com.zeroturnaround.alvor.string.DummyPosition;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.IAbstractStringVisitor;
 import com.zeroturnaround.alvor.string.IPosition;

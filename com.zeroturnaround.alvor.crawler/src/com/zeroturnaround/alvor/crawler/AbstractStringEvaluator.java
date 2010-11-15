@@ -43,6 +43,7 @@ import com.zeroturnaround.alvor.string.StringChoice;
 import com.zeroturnaround.alvor.string.StringConstant;
 import com.zeroturnaround.alvor.string.StringParameter;
 import com.zeroturnaround.alvor.string.StringRandomInteger;
+import com.zeroturnaround.alvor.string.StringRecursion;
 import com.zeroturnaround.alvor.string.StringSequence;
 import com.zeroturnaround.alvor.string.util.ArgumentApplier;
 import com.zeroturnaround.alvor.tracker.NameAssignment;
@@ -51,7 +52,6 @@ import com.zeroturnaround.alvor.tracker.NameInMethodCallExpression;
 import com.zeroturnaround.alvor.tracker.NameInParameter;
 import com.zeroturnaround.alvor.tracker.NameUsage;
 import com.zeroturnaround.alvor.tracker.NameUsageChoice;
-import com.zeroturnaround.alvor.tracker.NameUsageLoopChoice;
 import com.zeroturnaround.alvor.tracker.VariableTracker;
 
 
@@ -66,7 +66,7 @@ public class AbstractStringEvaluator {
 	private static int maxLevel = 4;
 	private static boolean supportLoops = true;
 	private static boolean supportInvocations = true;
-	private static boolean optimizeChoice = true;
+	private static boolean optimizeChoice = false; // TODO 'true' doesn't work at the moment
 	
 	private int ipLevel; // level of interprocedural calls
 	private IJavaElement[] scope;
@@ -88,7 +88,6 @@ public class AbstractStringEvaluator {
 	/*
 	 * Used for debugging
 	 */
-	@Deprecated
 	public static IAbstractString evaluateExpression(Expression node) {
 		AbstractStringEvaluator evaluator = new AbstractStringEvaluator(0, new IJavaElement[] {ASTUtil.getNodeProject(node)}, false);
 		return evaluator.eval(node, null);
@@ -116,6 +115,7 @@ public class AbstractStringEvaluator {
 	}
 	
 	private IAbstractString eval(IPosition pos, ContextLink context) {
+		
 		IAbstractString abstractString = null;
 		if (shouldUseCache()) {
 			abstractString = CacheService.getCacheService().getAbstractString(pos);
@@ -138,6 +138,9 @@ public class AbstractStringEvaluator {
 			try {
 				logMessage("EVALUATING", ipLevel, node);
 				result = doEval(node, context);
+				if (result.getPosition() == null) {
+					LOG.exception(new IllegalArgumentException("Got null position"));
+				}
 				assert result.getPosition() != null;
 				if (shouldUseCache() && !StringConverter.includesStringExtensions(result)) {
 					CacheService.getCacheService().addAbstractString(PositionUtil.getPosition(node), result);
@@ -164,6 +167,14 @@ public class AbstractStringEvaluator {
 	
 	
 	private IAbstractString doEval(Expression node, ContextLink context) {
+		// recursion check
+		IPosition pos = PositionUtil.getPosition(node);
+		if (context != null && context.contains(pos)) { 
+			// ie. i'm already computing the value of this node lower in the call stack
+			// ie. it's recursion!
+			System.err.println("FOUND RECURSION");
+			return new StringRecursion(pos);			
+		}
 		
 		ITypeBinding type = node.resolveTypeBinding();
 		assert type != null;
@@ -285,7 +296,7 @@ public class AbstractStringEvaluator {
 	private IAbstractString evalNameBefore(Name name, ASTNode target, ContextLink context) {
 		NameUsage usage = VariableTracker.getLastReachingMod
 			((IVariableBinding)name.resolveBinding(), target);
-		return evalNameAfterUsage(name, usage, context); 
+		return evalNameAfter(name, usage, new ContextLink(name, context)); 
 	}
 
 	private IAbstractString evalInvocationResult(MethodInvocation inv, ContextLink context) {
@@ -434,7 +445,7 @@ public class AbstractStringEvaluator {
 
 		// need new evaluator because mode changes to template construction
 		AbstractStringEvaluator evaluator = new AbstractStringEvaluator(ipLevel+1, scope, true);
-		return evaluator.evalNameAfterUsage(paramName, lastMod, null);
+		return evaluator.evalNameAfter(paramName, lastMod, null);
 	}
 
 	private IAbstractString getMethodReturnValueFromJavadoc(MethodDeclaration decl) {
@@ -501,90 +512,39 @@ public class AbstractStringEvaluator {
 		}
 	}
 	
-	private IAbstractString evalNameAfterUsage(Name name, NameUsage usage, ContextLink context) {
+	private IAbstractString evalNameAfter(Name name, NameUsage usage, ContextLink context) {
 		assert usage != null;
 		assert usage.getNode() != null;
 		
 		
-		// if usage in loop and name outside the loop then
-		// wrap result into loop-wrapper
-		// alternatively, resolve recursion
-		
-		if (ASTUtil.inALoopSeparatingFrom(usage.getNode(), name)) {
-			if (supportLoops && !isInsideBadLoop(usage.getNode())) {
-				IAbstractString namedBody = evalNameAfterUsageWithoutLoopCheck(name, usage, context); 
-
-				NamedString named = new NamedString(
-						PositionUtil.getPosition(usage.getNode()),
-						usage.getNode(),
-						namedBody);
-				
-				assert LOG.message("BEFORE WIDENING: " + named);
-				IAbstractString widened = StringConverter.widenToRegular(named);
-				assert LOG.message("AFTER WIDENING: " + widened);
-				
-//				assert LOG.message("BEFORE CONVERSION: " + namedBody);
-//				IAbstractString widened = RecursionConverter.recursionToRepetition(namedBody);
-//				assert LOG.message("AFTER CONVERSION: " + widened);
-//				assert !widened.containsRecursion();
-				
-				return widened;
-			} 
-			else {
-				throw new UnsupportedStringOpEx("Unsupported modification scheme in loop", usage.getNode());
-			}
-		}
-		else {
-			return evalNameAfterUsageWithoutLoopCheck(name, usage, context);
-		}
-	}
-	
-	
-	private IAbstractString evalNameAfterUsageWithoutLoopCheck(Name name, NameUsage usage, ContextLink context) {
-		// check, if it's necessary to start new evaluator (entering the loop from below)
-		/* TODO
-		if (usage.getMainStatement() != this.mainBlock
-				// and if usage.mainStmt inside this.mainBlock and it's a loop then 
-				) {
-			NewASE newEval = new NewASE(level, invocationContext, scope);
-			newEval.mainBlock = usage.getMainStatement();
-			newEval.startingPlace = usage;
-			return widenToRegular(newEval.evalNameAfterUsage(usage));
-		}
-		*/
-		
-		
-		// can use this evaluator
 		if (usage instanceof NameUsageChoice) {
-			return evalNameInChoice(name, (NameUsageChoice)usage, context);
-		}
-		else if (usage instanceof NameUsageLoopChoice) {
-			return evalNameInLoopChoice(name, (NameUsageLoopChoice)usage, context);
+			return evalNameAfterUsageChoice(name, (NameUsageChoice)usage, context);
 		}
 		else if (usage instanceof NameAssignment) {
-			return evalNameAssignment(name, (NameAssignment)usage, context);
+			return evalNameAfterAssignment(name, (NameAssignment)usage, context);
 		}
 		else if (usage instanceof NameInParameter) {
-			return evalNameInParameter((NameInParameter)usage, context);
+			return evalNameAfterMethodEntryInParameter((NameInParameter)usage, context);
 		}
 		else if (usage instanceof NameInArgument) {
-			return evalNameInArgument(name, (NameInArgument)usage, context);
+			return evalNameAfterEvaluatingArgument(name, (NameInArgument)usage, context);
 		}
 		else if (usage instanceof NameInMethodCallExpression) {
-			return evalNameInCallExpression(name, (NameInMethodCallExpression)usage, context);
+			return evalNameAfterEvaluatingCallExpression(name, (NameInMethodCallExpression)usage, context);
 		}
 		else {
 			throw new UnsupportedStringOpEx("Unsupported NameUsage: " + usage.getClass(), usage.getNode());
 		}
 	}
-
-	private IAbstractString evalNameInChoice(Name name, NameUsageChoice uc, ContextLink context) {
+	
+	
+	private IAbstractString evalNameAfterUsageChoice(Name name, NameUsageChoice uc, ContextLink context) {
 		IAbstractString thenStr;
 		if (uc.getThenUsage() == null) {
 			thenStr = this.evalNameBefore(name, uc.getNode(), context); // eval before if statement
 		}
 		else {
-			 thenStr = this.evalNameAfterUsage(name, uc.getThenUsage(), context);
+			 thenStr = this.evalNameAfter(name, uc.getThenUsage(), context);
 		}
 		
 		IAbstractString elseStr;
@@ -592,7 +552,7 @@ public class AbstractStringEvaluator {
 			elseStr = this.evalNameBefore(name, uc.getNode(), context); // eval before if statement
 		}
 		else {
-			elseStr = this.evalNameAfterUsage(name, uc.getElseUsage(), context);
+			elseStr = this.evalNameAfter(name, uc.getElseUsage(), context);
 		}
 		
 		StringChoice result = new StringChoice(PositionUtil.getPosition(uc.getNode()),
@@ -605,7 +565,7 @@ public class AbstractStringEvaluator {
 		}
 	}
 	
-	private IAbstractString evalNameInCallExpression(Name name, 
+	private IAbstractString evalNameAfterEvaluatingCallExpression(Name name, 
 			NameInMethodCallExpression usage, ContextLink context) {
 		if (ASTUtil.isString(name.resolveTypeBinding())) {
 			// this usage doesn't affect it
@@ -631,7 +591,7 @@ public class AbstractStringEvaluator {
 		}
 	}
 
-	private IAbstractString evalNameAssignment(Name name, NameAssignment usage, ContextLink context) {
+	private IAbstractString evalNameAfterAssignment(Name name, NameAssignment usage, ContextLink context) {
 		if (usage.getOperator() == Assignment.Operator.ASSIGN) {
 			return eval(usage.getRightHandSide(), context);
 		}
@@ -646,7 +606,8 @@ public class AbstractStringEvaluator {
 		}
 	}
 
-	private IAbstractString evalNameInArgument(Name name, NameInArgument usage, ContextLink context) {
+ 
+	private IAbstractString evalNameAfterEvaluatingArgument(Name name, NameInArgument usage, ContextLink context) {
 		if (ASTUtil.isString(name.resolveTypeBinding())) {
 			// this usage doesn't affect it, keep looking
 			return evalNameBefore(name, usage.getNode(), context);
@@ -660,50 +621,54 @@ public class AbstractStringEvaluator {
 		}
 	}
 
-	private boolean isInsideBadLoop(ASTNode node) {
-		// FIXME
-		ASTNode loop = ASTUtil.getContainingLoop(node);
-		if (loop == null) {
-			return false;
-		}
-		else {
-			return ASTUtil.containsConditional(loop);
-		}
-	}
+//	private boolean isInsideBadLoop(ASTNode node) {
+//		// FIXME
+//		return false; 
+//		/*
+//		ASTNode loop = ASTUtil.getContainingLoop(node);
+//		if (loop == null) {
+//			return false;
+//		}
+//		else {
+//			return ASTUtil.containsConditional(loop);
+//		}
+//		*/
+//	}
 	
-	private IAbstractString evalNameInLoopChoice(Name name, NameUsageLoopChoice usage, ContextLink context) {
-		if (!supportLoops 
-				// TODO temporary guards
-				|| isInsideBadLoop(usage.getNode())
-				|| usage.getBaseUsage() == null
-				|| usage.getLoopUsage() == null
-				|| isInsideBadLoop(usage.getBaseUsage().getNode())
-				|| isInsideBadLoop(usage.getLoopUsage().getNode())
-				) {
-			throw new UnsupportedStringOpEx("Unsupported modification scheme in loop", usage.getNode());
-		}
-		
-		assert usage.getBaseUsage() != null;
-		assert usage.getLoopUsage() != null;
-		
-		IAbstractString baseString = evalNameAfterUsage(name, usage.getBaseUsage(), context);
-		// FIXME recursion is not necessary here, can be more indirect
-		return new RecursiveStringChoice(
-				PositionUtil.getPosition(usage.getNode()),
-				baseString, 
-				usage.getLoopUsage().getNode()); // null means outermost string. TODO too ugly
-		/*
-		if (loopChoice.getLoopUsage() == this.startingPlace) {
-			IAbstractString baseString = evalNameAfterUsage(loopChoice.getBaseUsage());
-			return new RecursiveStringChoice(baseString, null); // null means outermost string TODO too ugly
-		}
-		else {
-			throw new UnsupportedStringOpEx("NameUsageLoopChoice weird case");
-		}
-		*/
-	}
+//	@Deprecated
+//	private IAbstractString evalNameInLoopChoice(Name name, NameUsageLoopChoice usage, ContextLink context) {
+//		if (!supportLoops 
+//				// TODO temporary guards
+//				|| isInsideBadLoop(usage.getNode())
+//				|| usage.getBaseUsage() == null
+//				|| usage.getLoopUsage() == null
+//				|| isInsideBadLoop(usage.getBaseUsage().getNode())
+//				|| isInsideBadLoop(usage.getLoopUsage().getNode())
+//				) {
+//			throw new UnsupportedStringOpEx("Unsupported modification scheme in loop", usage.getNode());
+//		}
+//		
+//		assert usage.getBaseUsage() != null;
+//		assert usage.getLoopUsage() != null;
+//		
+//		IAbstractString baseString = evalNameAfterUsage(name, usage.getBaseUsage(), context);
+//		// FIXME recursion is not necessary here, can be more indirect
+//		return new RecursiveStringChoice(
+//				PositionUtil.getPosition(usage.getNode()),
+//				baseString, 
+//				usage.getLoopUsage().getNode()); // null means outermost string. TODO too ugly
+//		/*
+//		if (loopChoice.getLoopUsage() == this.startingPlace) {
+//			IAbstractString baseString = evalNameAfterUsage(loopChoice.getBaseUsage());
+//			return new RecursiveStringChoice(baseString, null); // null means outermost string TODO too ugly
+//		}
+//		else {
+//			throw new UnsupportedStringOpEx("NameUsageLoopChoice weird case");
+//		}
+//		*/
+//	}
 
-	private IAbstractString evalNameInParameter(NameInParameter usage, ContextLink context) {
+	private IAbstractString evalNameAfterMethodEntryInParameter(NameInParameter usage, ContextLink context) {
 		if (this.templateConstructionMode) {
 			return new StringParameter(
 					PositionUtil.getPosition(usage.getNode()),
