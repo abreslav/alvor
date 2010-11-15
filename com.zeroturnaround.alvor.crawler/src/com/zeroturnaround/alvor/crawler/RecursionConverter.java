@@ -1,13 +1,13 @@
 package com.zeroturnaround.alvor.crawler;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import com.zeroturnaround.alvor.cache.DummyPosition;
 import com.zeroturnaround.alvor.cache.UnsupportedStringOpEx;
 import com.zeroturnaround.alvor.string.AbstractStringCollection;
 import com.zeroturnaround.alvor.string.IAbstractString;
+import com.zeroturnaround.alvor.string.IPosition;
 import com.zeroturnaround.alvor.string.StringCharacterSet;
 import com.zeroturnaround.alvor.string.StringChoice;
 import com.zeroturnaround.alvor.string.StringConstant;
@@ -16,92 +16,51 @@ import com.zeroturnaround.alvor.string.StringRecursion;
 import com.zeroturnaround.alvor.string.StringRepetition;
 import com.zeroturnaround.alvor.string.StringSequence;
 
+/*
+ * OVERALL IDEA OF THE ALGORITHM
+ * 
+ * Assuming that str is recursively referred to in one of it's descendant nodes.
+ *   
+ * Lets call recursive reference to str as 'S'. We can think of S as starting nonterminal
+ * in a grammar, where some right hand sides also contain S.
+ * 
+ * (Also assuming, that S is only  kind of recursive call in it, ie. other "local" 
+ * recursions have been already resolved. TODO this reduces universality of the method) 
+ * 
+ * First flatten the structure -- convert str to a choice of flat sequences 
+ * (ie. without any further choices and without nested sequences).
+ * The sequences can contain literals, parameters, repetitions ...
+ * 
+ * (Actually, those sequences can contain nested choices and sequences if they don't contain S,
+ * ie. all occurrences of S should be only in top level sequences.
+ * TODO during creation of the abstract string try to keep recursive calls in top level,
+ * transform if necessary)
+ * 
+ * Then partition resulting sequences into 4 sets: 
+ * 		(1) S doesn't occur in the sequence
+ * 		(2) S is first item (and doesn't occur in other positions)
+ * 		(3) S is last item (and doesn't occur in other positions)
+ * 		(4) S is in between other items or occurs multiple times (is this always a problem??) 
+ * 
+ * Now check resulting sets:
+ * 		- if there's nothing in set (1) then there is no base case in the recursion,
+ * 				language is smth like "S -> S" ie. nothing can be generated
+ * 		- if there's something in (4) then it's not (necessarily?) a regular language
+ * 		- if there's something in both (2) and (3) then it's not (necessarily?) a regular language
+ * 
+ * 		- if there is smth only in (1) and (2):
+ * 			- start = choice of all things in (1)
+ * 			- rep   = choice of all things following S in (2)
+ * 			- result = seq(start, rep)
+ * 
+ * 		- if there is smth only in (1) and (3):
+ * 			- end = choice of all things in (1)
+ * 			- rep   = choice of all things preceding S in (3)
+ * 			- result = seq(rep, end)
+ * 
+ * 
+ */
 public class RecursionConverter {
-//	/*
-//	 * Assuming that str is recursively referred to in one of it's descendant nodes.
-//	 *   
-//	 * Lets call recursive reference to str as 'S'. We can think of S as starting nonterminal
-//	 * in a grammar, where some right hand sides also contain S.
-//	 * 
-//	 * (Also assuming, that S is only  kind of recursive call in it, ie. other "local" 
-//	 * recursions have been already resolved. TODO this reduces universality of the method) 
-//	 * 
-//	 * First flatten the structure -- convert str to a choice of flat sequences 
-//	 * (ie. without any further choices and without nested sequences).
-//	 * The sequences can contain literals, parameters, repetitions ...
-//	 * 
-//	 * (Actually, those sequences can contain nested choices and sequences if they don't contain S,
-//	 * ie. all occurrences of S should be only in top level sequences.
-//	 * TODO during creation of the abstract string try to keep recursive calls in top level,
-//	 * transform if necessary)
-//	 * 
-//	 * Then partition resulting sequences into 4 sets: 
-//	 * 		(1) S doesn't occur in the sequence
-//	 * 		(2) S is first item (and doesn't occur in other positions)
-//	 * 		(3) S is last item (and doesn't occur in other positions)
-//	 * 		(4) S is in between other items or occurs multiple times (is this always a problem??) 
-//	 * 
-//	 * Now check resulting sets:
-//	 * 		- if there's nothing in set (1) then there is no base case in the recursion,
-//	 * 				language is smth like "S -> S" ie. nothing can be generated
-//	 * 		- if there's something in (4) then it's not (necessarily?) a regular language
-//	 * 		- if there's something in both (2) and (3) then it's not (necessarily?) a regular language
-//	 * 
-//	 * 		- if there is smth only in (1) and (2):
-//	 * 			- start = choice of all things in (1)
-//	 * 			- rep   = choice of all things following S in (2)
-//	 * 			- result = seq(start, rep)
-//	 * 
-//	 * 		- if there is smth only in (1) and (3):
-//	 * 			- end = choice of all things in (1)
-//	 * 			- rep   = choice of all things preceding S in (3)
-//	 * 			- result = seq(rep, end)
-//	 * 
-//	 * 
-//	 */
-//	public static IAbstractString recursionToRepetition(IAbstractString str) {
-//		if (!str.containsRecursion()) {
-//			return str;
-//		}
-//		// TODO recursive string choice and stuff...
-//		else {
-//			// prepare string
-//			IAbstractString prepStr = str;
-//			
-//			// process children 
-//			if (str instanceof AbstractStringCollection) {
-//				AbstractStringCollection strColl = (AbstractStringCollection)str;
-//				List<IAbstractString> items = new ArrayList<IAbstractString>();
-//				for (IAbstractString item : strColl.getItems()) {
-//					items.add(recursionToRepetition(item));
-//				}
-//				if (str instanceof StringChoice) {
-//					prepStr = new StringChoice(str.getPosition(), items);
-//				}
-//				else if (str instanceof StringSequence) {
-//					prepStr = new StringSequence(str.getPosition(), items);
-//				}
-//			}
-//			else if (str instanceof StringRepetition) {
-//				prepStr = new StringRepetition(str.getPosition(), 
-//						recursionToRepetition(((StringRepetition) str).getBody()));
-//			}
-//			
-//			
-//			// flatten
-////			prepStr = flattenStringCollections(prepStr);
-//			
-//			if (! (prepStr instanceof StringChoice)) {
-//				throw new UnsupportedStringOpEx("Unterminating recursion", str.getPosition());
-//			}
-//			
-////			StringChoice top = (String)
-//			
-//			return null;
-//		}
-//		
-//	}
-	
 	/**
 	 * It's assumed, that abstract string is constructed so that all refursive references are descendants
 	 * of their target node. Note that this str can be a branch of a bigger abstract string, 
@@ -124,7 +83,7 @@ public class RecursionConverter {
 	 * 
 	 * 
 	 */
-	public static StringChoice recursionToRepetition(IAbstractString str) {
+	public static IAbstractString recursionToRepetition(IAbstractString str) {
 		
 		// simple Abstract Strings
 		if (str instanceof StringConstant
@@ -132,7 +91,7 @@ public class RecursionConverter {
 				|| str instanceof StringCharacterSet
 				|| str instanceof StringRecursion // this will be handled somewhere else in call stack 
 				) {
-			return new StringChoice(new DummyPosition(), str);			
+			return str;			
 		}
 		else if (str instanceof StringRepetition) {
 			// TODO just now i'm assuming that there's no further recursion inside a repetition
@@ -141,7 +100,7 @@ public class RecursionConverter {
 				throw new UnsupportedStringOpEx("internal problem: Recursion in repetition", str.getPosition());
 			}
 			else {
-				return new StringChoice(new DummyPosition(), str);			
+				return str;			
 			}
 		}
 		
@@ -153,7 +112,14 @@ public class RecursionConverter {
 			// In case of Option, merge processed children together into new set of options
 			if (str instanceof StringChoice) {
 				for (IAbstractString item : ((StringChoice)str).getItems()) {
-					options.addAll(recursionToRepetition(item).getItems());
+					IAbstractString processedChild = recursionToRepetition(item);
+					if (processedChild instanceof StringChoice) {
+						// "linearize" nested options
+						options.addAll(((StringChoice) processedChild).getItems());
+					}
+					else {
+						options.add(processedChild);						
+					}
 				}
 			}
 			
@@ -163,23 +129,36 @@ public class RecursionConverter {
 				// Should treat branches without rec-refs differently (those may contain inner choices)
 				
 				for (IAbstractString item : ((StringSequence)str).getItems()) {
-					List<IAbstractString> itemOptions = recursionToRepetition(item).getItems();
-					assert ! itemOptions.isEmpty();
+					IAbstractString processedChild = recursionToRepetition(item);
+					assert ! processedChild.isEmpty(); // just in case ...
 					
-					// options from first piece of the sequence go to the result as they are
-					if (options.isEmpty()) { 
-						options.addAll(itemOptions);
+					// processed version of first piece of the sequence go to the result as they are
+					if (options.isEmpty()) {
+						if (processedChild instanceof StringChoice) {
+							// linearize nested options
+							options.addAll(((StringChoice) processedChild).getItems());
+						}
+						else {
+							options.add(processedChild);
+						}
 					}
-					// later options should be appended by "multiplying" with existing sequences
-					// ie. each result option remains linear, but amount of options is multiplied 
+					// later items need more care:
+					//   - simple items or sequences should be appended to all options
+					//   - choices should be "multiplied" with existing choices
+					// Each item in 'options' remains linear, but number of options may increase 
 					else { 
 						// concatenate each option from 'options' with each option in 'itemOptions'
 						// and the result of this becomes new 'options'
 						List<IAbstractString> tempOptions = new ArrayList<IAbstractString>();
 						
 						for (IAbstractString oldOption: options) {
-							for (IAbstractString newOption: itemOptions) {
-								tempOptions.add(createLinearSequence(oldOption, newOption));
+							if (processedChild instanceof StringChoice) {
+								for (IAbstractString newOption: ((StringChoice) processedChild).getItems()) {
+									tempOptions.add(createLinearSequence(oldOption, newOption));
+								}
+							}
+							else {
+								tempOptions.add(createLinearSequence(oldOption, processedChild));
 							}
 						}
 						options = tempOptions;
@@ -187,7 +166,9 @@ public class RecursionConverter {
 				}
 			}
 			
-			return preparedRecursionToRepetition(options);
+			//System.out.println("intermediate: " + new StringChoice(str.getPosition(), options));
+			
+			return preparedRecursionToRepetition(str.getPosition(), options);
 		}
 		
 		else {
@@ -196,69 +177,143 @@ public class RecursionConverter {
 		
 		
 		// TODO after creating a resulting repetition, check that there's no recursion in it
-		// I just don't know how to deal with it
 	}
 	
-	private static StringChoice preparedRecursionToRepetition(List<IAbstractString> options) {
-		/*
-		 * Now the structure is normalized in 'options' -- if there is recursive references
-		 * somewhere then they are easy to find.
-		 * If this node (str) is target to some recursive references, then try to translate
-		 * thCan remove those recursion if pos of 'str' is mentioned in one of options
-		 * 
-		 * can handle only cases without mixed-recursion (ie all rec-refs are either leftmost
-		 * items in sequences or all rightmost.
-		 *  
-		 */
+	/**
+	 *  'pos' is position of the string being converted (here pos is used as primary key).
+	 * 
+	 *  The structure of the string is given as set of linear options. An item in 'options'
+	 *  can be either a "simple" node (constant, recursion, ...) or "linear sequence" (ie. sequence 
+	 *  of simple nodes).
+	 *  
+	 *  Somewhere in 'options' can be recursive reference to 'pos': 
+	 *    - If it doesn't occur, then it means this node is not target for some recursive references
+	 *    
+	 *    - if rec-ref to pos occurs only in the beginnings of sequences (or alone) then
+	 *      the grammar is left-regular (left-linear). 
+	 *      The choice of tails (T) of those sequences becomes a repetition and result is seq of 
+	 *      remaining nonrecursive choices (N) and T* ie. (N T*)
+	 *      Final result needs to use + instead of *, so result will be (N | (N T+))
+	 *       
+	 *    - analoguous if rec-ref occurs only in ends of the sequences (or alone)
+	 *     
+	 *    - if position of rec-ref varies (or there is several different recursive references)
+	 *      then throw exception
+	 *      TODO maybe I can handle different recursive references???
+	 *  
+	 */
+	private static IAbstractString preparedRecursionToRepetition(IPosition pos, List<IAbstractString> options) {
+		List<IAbstractString> suffixes = new ArrayList<IAbstractString>(); // tails of sequences where pos reference is in first position
+		List<IAbstractString> prefixes = new ArrayList<IAbstractString>(); // beginnings of sequences where pos reference is in last position
+		List<IAbstractString> nonrec = new ArrayList<IAbstractString>(); // options not containing rec ref to pos
+		boolean hasOnlyRecOptions = false; // set if some option is just recursive reference to pos
+		
+		for (IAbstractString option : options) {
+			if (option instanceof StringConstant
+					|| option instanceof StringParameter
+					|| option instanceof StringCharacterSet) {
+				nonrec.add(option);
+			}
+			else if (option instanceof StringRecursion) { 
+				if (((StringRecursion) option).getTarget().equals(pos)) {
+					hasOnlyRecOptions = true;
+				} 
+			}
+			else if (option instanceof StringSequence) {
+				StringSequence seq = (StringSequence) option;
+				boolean optionHasThisRec = false;
+				boolean optionHasOtherRec = false;
+				
+				for (int i = 0; i < seq.getItems().size(); i++) {
+					if (seq.get(i) instanceof StringRecursion) {
+						StringRecursion rec = (StringRecursion)seq.get(i);
+						if (!rec.getTarget().equals(pos)) {
+							optionHasOtherRec = true;
+						} 
+						else {
+							optionHasThisRec = true;
+							int size = seq.getItems().size();
+							if (i == 0) {
+								suffixes.add(partOfSequence(seq, 1, size));
+							}
+							else if (i == size-1) {
+								prefixes.add(partOfSequence(seq, 0, size-1));
+							}
+							else {
+								throw new UnsupportedStringOpEx("Unsupported recursion in abstract string (middle position)", pos);
+							}
+						}
+						
+					}
+				}
+				
+				if (optionHasThisRec && optionHasOtherRec) {
+					// TODO maybe it's not so bad
+					throw new UnsupportedStringOpEx("Unsupported (mutual) recursion in abstract string", pos);
+				}
+				else if (!optionHasThisRec) {
+					nonrec.add(option);
+				}
+			}
+			else {
+				throw new IllegalArgumentException("Wrong abstract string in prepared option: " + option.getClass());
+			}
+			
+		}
 		
 		
-		// partition options into 5 sets
-		
-		return new StringChoice(new DummyPosition(), options);		
+		// now analyze the results
+		if (suffixes.isEmpty() && prefixes.isEmpty() && !hasOnlyRecOptions) {
+			// no recursive calls to pos, just return (as choice)
+			// assert options.equals(nonrec); 
+			return new StringChoice(pos, options);
+		}
+		else if (hasOnlyRecOptions && suffixes.isEmpty() && prefixes.isEmpty() && nonrec.isEmpty()) {
+			throw new UnsupportedStringOpEx("Unsupported recursion in abstract string (diverging)", pos);
+		}
+		else if (!suffixes.isEmpty() && !prefixes.isEmpty()) {
+			throw new UnsupportedStringOpEx("Unsupported recursion in abstract string (mixed position)", pos);
+		}
+		else { // great success! can convert recursion to repetition!
+			assert !suffixes.isEmpty() || !prefixes.isEmpty();
+			
+			List<IAbstractString> repItems = null;
+			if  (!suffixes.isEmpty()) {
+				repItems = suffixes;
+			} else {
+				repItems = prefixes;
+			}
+			
+			StringRepetition rep = new StringRepetition(new DummyPosition(), 
+					new StringChoice(new DummyPosition(), repItems));
+			
+			if (nonrec.isEmpty()) {
+				// ie. no nonrepetive starting or ending parts
+				return new StringChoice(new DummyPosition(), 
+						new EmptyStringConstant(), rep);
+			}
+			else {
+				IAbstractString nonrep = new StringChoice(new DummyPosition(), nonrec);
+				StringSequence starVersion = null;
+				if (!suffixes.isEmpty()) {
+					starVersion = new StringSequence(new DummyPosition(), nonrep, rep);
+				} 
+				else {
+					starVersion = new StringSequence(new DummyPosition(), rep, nonrep);
+				}
+				
+				// starVersion would be fine, if StringRepetition meant 0 or more
+				// now need to include choice that doesn't include any repetition
+				return new StringChoice(new DummyPosition(), nonrep, starVersion);
+				
+			}
+		}
 	}
-	
-//	/* Restructures str into options of a choice so that all recursive refs 
-//	 * are brought up into top-level of it's option (eg. if option is a sequence and it 
-//	 * contains a ref-rec, then it should be as direct child of the sequence)
-//	 * 
-//	 * Options are grouped according to the position of rec-ref
-//	 * 
-//	 * TODO: If recursion is fully contained in str (ie. target of rec-ref is in str) then 
-//	 * recursion is replaced with equivalent repetition or exception is raised
-//	 * 
-//	 *
-//	 */
-//	private static StringChoicesByKind bubbleUpRecursion(IAbstractString str) {
-//		List<IAbstractString> noRec    = new ArrayList<IAbstractString>();
-//		List<IAbstractString> onlyRec  = new ArrayList<IAbstractString>();
-//		List<IAbstractString> leftRec  = new ArrayList<IAbstractString>();
-//		List<IAbstractString> rightRec = new ArrayList<IAbstractString>();
-//		List<IAbstractString> badRec   = new ArrayList<IAbstractString>();
-//		
-//		if (!str.containsRecursion()) {
-//			noRec.add(str);
-//		}
-////		else if (str instanceof RecRef) {
-////			onlyRec.add(str);
-////		}
-//		else if (str instanceof StringChoice) {
-//			for (IAbstractString option : ((StringChoice) str).getItems()) {
-//				
-//			}
-//		}
-//		else { // bring recursive references as high as possible
-//			assert str instanceof AbstractStringCollection;
-//			
-//		}
-//		
-////		return new StringChoicesByKind(noRec, onlyRec, leftRec, rightRec, badRec);
-//		ret
-//	}
 	
 	/**
 	 * 
-	 * @param left should be already linear
-	 * @param right should be already linear
+	 * @param left is assumed to be already linear
+	 * @param right is assumed to be already linear
 	 * @return
 	 */
 	private static StringSequence createLinearSequence(IAbstractString left, IAbstractString right) {
@@ -280,30 +335,13 @@ public class RecursionConverter {
 		
 		return new StringSequence(null, items);
 	}
-
-//	/* A helper data structure */
-//	private class StringChoicesByKind {
-//		public final List<IAbstractString> noRec;
-//		public final List<IAbstractString> onlyRec;
-//		public final List<IAbstractString> leftRec;
-//		public final List<IAbstractString> rightRec;
-//		
-//		// badRec contains recursive reference in the middle of the sequence 
-//		// or contains several recursive references
-//		public final List<IAbstractString> badRec;  
-//
-//		public StringChoicesByKind(
-//				List<IAbstractString> noRec,
-//				List<IAbstractString> onlyRec,
-//				List<IAbstractString> leftRec,
-//				List<IAbstractString> rightRec,
-//				List<IAbstractString> badRec) {
-//			this.noRec = noRec;
-//			this.onlyRec = onlyRec;
-//			this.leftRec = leftRec;
-//			this.rightRec = rightRec;
-//			this.badRec = badRec;
-//		}
-//	}
-//	
+	
+	private static IAbstractString partOfSequence(StringSequence seq, int fromIndex, int toIndex) {
+		if (fromIndex - toIndex == 1) {
+			return seq.get(fromIndex);
+		}
+		else {
+			return new StringSequence(seq.getPosition(), seq.getItems().subList(fromIndex, toIndex));
+		}
+	}
 }
