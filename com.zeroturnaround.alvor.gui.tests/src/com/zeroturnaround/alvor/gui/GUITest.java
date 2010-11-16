@@ -37,6 +37,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.junit.Assert;
 
 import com.zeroturnaround.alvor.cache.PositionUtil;
 import com.zeroturnaround.alvor.checkers.INodeDescriptor;
@@ -79,9 +80,9 @@ public abstract class GUITest {
 		return (IJavaProject)GUITest.getProject(projectName).getNature(JavaCore.NATURE_ID);
 	}
 	
-	protected void testAbstractStringsClean(IJavaElement element) throws FileNotFoundException {
+	protected String testAbstractStringsClean(IJavaElement element) throws FileNotFoundException {
 		List<INodeDescriptor> hotspots = checker.performCleanCheck(element, new IJavaElement[] {element});
-		writeAndTestHotspots(hotspots, getElementDescriptor(element));
+		return writeAndTestHotspots(hotspots, getElementDescriptor(element));
 	}
 	
 	/*
@@ -92,7 +93,7 @@ public abstract class GUITest {
 		res.touch(null);
 	}
 	
-	protected void writeAndTestMarkers(IJavaElement element, String markerType, String testTitle,
+	protected String writeAndTestMarkers(IJavaElement element, String markerType, String testTitle,
 			boolean includeLocationInfo) throws FileNotFoundException {
 		try {
 			List<String> lines = new ArrayList<String>();
@@ -110,13 +111,14 @@ public abstract class GUITest {
 				lines.add(line);
 			}
 			Collections.sort(lines);
-			writeAndCompare(lines, getElementDescriptor(element) + "_" + testTitle);
+			return writeAndCompare(lines, getElementDescriptor(element) + "_" + testTitle);
 		} catch (CoreException e) {
 			e.printStackTrace();
+			return e.getMessage();
 		}
 	}
 
-	private void writeAndTestHotspots(List<INodeDescriptor> hotspots, String elementId) throws FileNotFoundException {
+	private String writeAndTestHotspots(List<INodeDescriptor> hotspots, String elementId) throws FileNotFoundException {
 		List<String> abstractLines = new ArrayList<String>();
 		List<String> concreteLines = new ArrayList<String>();
 		
@@ -126,7 +128,12 @@ public abstract class GUITest {
 			if (desc instanceof IStringNodeDescriptor) {
 				IAbstractString aStr = ((IStringNodeDescriptor)desc).getAbstractValue(); 
 				abstractLines.add(start + aStr.toString());
-				concreteLines.addAll(SampleGenerator.getConcreteStrings(aStr));
+				try {
+					concreteLines.addAll(SampleGenerator.getConcreteStrings(aStr));
+				} catch (Exception e) {
+					concreteLines.add("ERROR GENERATING SAMPLES: " + e.getMessage()
+							+ ", POS=" + aStr.getPosition() + ", ABS_STR=" + aStr);
+				}
 			}
 			else if (desc instanceof UnsupportedNodeDescriptor) {
 				abstractLines.add(start + "unsupported: " 
@@ -138,8 +145,8 @@ public abstract class GUITest {
 		}
 		
 		Collections.sort(concreteLines);
-		writeAndCompare(concreteLines, elementId + "_concrete");
-		writeAndCompare(abstractLines, elementId + "_abstract");
+		return writeAndCompare(concreteLines, elementId + "_concrete") + 
+			writeAndCompare(abstractLines, elementId + "_abstract");
 	}
 	
 	public static IJavaElement getSourceFolder(IJavaProject project, String folderName) {
@@ -159,7 +166,7 @@ public abstract class GUITest {
 		}
 	}
 	
-	private void writeAndCompare(List<String> items, String testId) throws FileNotFoundException {
+	private String writeAndCompare(List<String> items, String testId) throws FileNotFoundException {
 		
 		String filePrefix = "results/" + getWorkspaceName() + "_" + testId;
 		File outFile = new File(filePrefix + "_found.txt");
@@ -173,8 +180,12 @@ public abstract class GUITest {
 		outStream.close();
 		
 		File expectedFile = new File(filePrefix + "_expected.txt");
-		assertTrue(filePrefix + ": found strings != expected strings", 
-				filesAreEqual(outFile, expectedFile));
+		if (!filesAreEqual(outFile, expectedFile)) {
+			return filePrefix + ": found strings != expected strings; ";
+		} 
+		else {
+			return "";
+		}
 	}
 	
 	boolean filesAreEqual(File a, File b) throws FileNotFoundException {
@@ -194,5 +205,14 @@ public abstract class GUITest {
 	
 	public String getWorkspaceName() {
 		return ResourcesPlugin.getWorkspace().getRoot().getLocation().toFile().getName();
+	}
+	
+	void normalTest(IJavaElement element) throws FileNotFoundException {
+		String err = testAbstractStringsClean(element)
+			+ writeAndTestMarkers(element, GuiChecker.ERROR_MARKER_ID, "errors", true)
+			+ writeAndTestMarkers(element, GuiChecker.WARNING_MARKER_ID, "warnings", true);
+		if (!err.isEmpty()) {
+			Assert.fail(err);
+		}
 	}
 }
