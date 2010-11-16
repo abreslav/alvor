@@ -8,6 +8,7 @@ import com.zeroturnaround.alvor.string.IAbstractStringVisitor;
 import com.zeroturnaround.alvor.string.StringCharacterSet;
 import com.zeroturnaround.alvor.string.StringChoice;
 import com.zeroturnaround.alvor.string.StringConstant;
+import com.zeroturnaround.alvor.string.StringRecursion;
 import com.zeroturnaround.alvor.string.StringRepetition;
 import com.zeroturnaround.alvor.string.StringSequence;
 import com.zeroturnaround.alvor.string.StringParameter;
@@ -66,6 +67,12 @@ public class ArgumentApplier {
 			}
 			
 			return new StringSequence(stringSequence.getPosition(), items);
+		}
+
+		@Override
+		public IAbstractString visitStringRecursion(
+				StringRecursion stringRecursion, List<IAbstractString> data) {
+			return stringRecursion;
 		}
 	};
 

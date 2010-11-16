@@ -13,7 +13,7 @@ public class StringRecursion extends PositionedString {
 	@Override
 	public <R, D> R accept(
 			IAbstractStringVisitor<? extends R, ? super D> visitor, D data) {
-		return null;
+		return visitor.visitStringRecursion(this, data);
 	}
 
 	@Override

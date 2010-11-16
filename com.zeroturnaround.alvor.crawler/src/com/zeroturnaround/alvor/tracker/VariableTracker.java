@@ -334,8 +334,17 @@ public class VariableTracker {
 			return null;
 		}
 		else {
+			assert target == null;
 			NameUsage usage = getLastModIn(var, ASTUtil.getLoopBody(loop));
-			return usage;
+			
+			if (usage == null) {
+				return null;
+			} 
+			else {
+				// loop may not be executed, therefore it can be thought to have
+				// an hidden empty 'else' branch 
+				return new NameUsageChoice(loop, usage, null);
+			}
 		}
 	}
 

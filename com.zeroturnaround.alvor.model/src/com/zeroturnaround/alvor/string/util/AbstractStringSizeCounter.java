@@ -9,6 +9,7 @@ import com.zeroturnaround.alvor.string.StringCharacterSet;
 import com.zeroturnaround.alvor.string.StringChoice;
 import com.zeroturnaround.alvor.string.StringConstant;
 import com.zeroturnaround.alvor.string.StringParameter;
+import com.zeroturnaround.alvor.string.StringRecursion;
 import com.zeroturnaround.alvor.string.StringRepetition;
 import com.zeroturnaround.alvor.string.StringSequence;
 
@@ -58,7 +59,12 @@ public final class AbstractStringSizeCounter {
 		@Override
 		public Integer visitStringParameter(StringParameter stringParameter,
 				Void data) {
-			throw new IllegalArgumentException();
+			return BASE;
+		}
+
+		@Override
+		public Integer visitStringRecursion(StringRecursion stringRecursion, Void data) {
+			return BASE;
 		}
 	};
 

@@ -46,7 +46,6 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 	private boolean checkAbstractString(IStringNodeDescriptor descriptor,
 			ISQLErrorHandler errorHandler, SQLStringAnalyzer analyzer) {
 
-		int totalConcrete = 0;
 		boolean allOK = true;
 		Map<String, Integer> concretes = new HashMap<String, Integer>();
 
@@ -61,13 +60,19 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 			return false;
 		} 
 		else { 
-			List<String> concreteStr = SampleGenerator.getConcreteStrings(descriptor.getAbstractValue());
-			totalConcrete += concreteStr.size();
+			List<String> concreteStrings = null;
+			try {
+				concreteStrings = SampleGenerator.getConcreteStrings(descriptor.getAbstractValue());
+			} catch (Exception e) {
+				errorHandler.handleSQLError("Sample generation failed: " + e.getMessage()
+						+ ", str=" + descriptor.getAbstractValue(), descriptor.getPosition());
+				return false;
+			}
 
 			int duplicates = 0;
 			// maps error msg to all concrete strings that cause this message
 
-			for (String s: concreteStr) {
+			for (String s: concreteStrings) {
 				Integer countSoFar = concretes.get(s);
 				duplicates = 0;
 				if (countSoFar == null) {
@@ -95,8 +100,7 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 			}
 
 			for (Entry<String, String> entry : errorMap.entrySet()) {
-				String message = entry.getKey().trim() + "\nSQL: \n" 
-				+ entry.getValue();
+				String message = entry.getKey().trim() + "\nSQL: \n" + entry.getValue();
 				errorHandler.handleSQLError("SQL test failed  - " + message, descriptor.getPosition());
 			}
 

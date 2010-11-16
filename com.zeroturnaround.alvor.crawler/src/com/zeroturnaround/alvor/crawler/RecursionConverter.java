@@ -62,6 +62,17 @@ import com.zeroturnaround.alvor.string.StringSequence;
  * 
  */
 public class RecursionConverter {
+	
+	public static IAbstractString checkRecursionToRepetition(IAbstractString str) {
+		if (str.containsRecursion()) {
+			//throw new UnsupportedStringOpEx("Unsupported modification scheme in loop", str.getPosition());
+			return recursionToRepetition(str);
+		}
+		else {
+			return str;
+		}
+	}
+	
 	/**
 	 * It's assumed, that abstract string is constructed so that all refursive references are descendants
 	 * of their target node. Note that this str can be a branch of a bigger abstract string, 
@@ -84,7 +95,7 @@ public class RecursionConverter {
 	 * 
 	 * 
 	 */
-	public static IAbstractString recursionToRepetition(IAbstractString str) {
+	/* package */ static IAbstractString recursionToRepetition(IAbstractString str) {
 		
 		// simple Abstract Strings
 		if (str instanceof StringConstant
@@ -131,7 +142,6 @@ public class RecursionConverter {
 				
 				for (IAbstractString item : ((StringSequence)str).getItems()) {
 					IAbstractString processedChild = recursionToRepetition(item);
-					assert ! processedChild.isEmpty(); // just in case ...
 					
 					// processed version of first piece of the sequence go to the result as they are
 					if (options.isEmpty()) {
@@ -210,9 +220,7 @@ public class RecursionConverter {
 		boolean hasOnlyRecOptions = false; // set if some option is just recursive reference to pos
 		
 		for (IAbstractString option : options) {
-			if (option instanceof StringConstant
-					|| option instanceof StringParameter
-					|| option instanceof StringCharacterSet) {
+			if (!option.containsRecursion()) {
 				nonrec.add(option);
 			}
 			else if (option instanceof StringRecursion) { 
@@ -257,7 +265,8 @@ public class RecursionConverter {
 				}
 			}
 			else {
-				throw new IllegalArgumentException("Wrong abstract string in prepared option: " + option.getClass());
+				throw new IllegalArgumentException("Wrong abstract string in prepared option: " + option.getClass()
+						+ "\noption=" + option + "\n\nall options=" + options);
 			}
 			
 		}
@@ -267,7 +276,7 @@ public class RecursionConverter {
 		if (suffixes.isEmpty() && prefixes.isEmpty() && !hasOnlyRecOptions) {
 			// no recursive calls to pos, just return (as choice)
 			// assert options.equals(nonrec); 
-			return new StringChoice(pos, options);
+			return createChoiceIfNecessary(pos, options);
 		}
 		else if (hasOnlyRecOptions && suffixes.isEmpty() && prefixes.isEmpty() && nonrec.isEmpty()) {
 			throw new UnsupportedStringOpEx("Unsupported recursion in abstract string (diverging)", pos);
@@ -286,7 +295,7 @@ public class RecursionConverter {
 			}
 			
 			StringRepetition rep = new StringRepetition(new DummyPosition(), 
-					new StringChoice(new DummyPosition(), repItems));
+					createChoiceIfNecessary(new DummyPosition(), repItems));
 			
 			if (nonrec.isEmpty()) {
 				// ie. no nonrepetive starting or ending parts
@@ -294,7 +303,8 @@ public class RecursionConverter {
 						new EmptyStringConstant(), rep);
 			}
 			else {
-				IAbstractString nonrep = new StringChoice(new DummyPosition(), nonrec);
+				IAbstractString nonrep = createChoiceIfNecessary(new DummyPosition(), nonrec);
+				
 				StringSequence starVersion = null;
 				if (!suffixes.isEmpty()) {
 					starVersion = new StringSequence(new DummyPosition(), nonrep, rep);
@@ -334,7 +344,7 @@ public class RecursionConverter {
 			items.add(right);
 		}
 		
-		return new StringSequence(null, items);
+		return new StringSequence(new DummyPosition(), items);
 	}
 	
 	private static IAbstractString partOfSequence(StringSequence seq, int fromIndex, int toIndex) {
@@ -343,6 +353,15 @@ public class RecursionConverter {
 		}
 		else {
 			return new StringSequence(seq.getPosition(), seq.getItems().subList(fromIndex, toIndex));
+		}
+	}
+	
+	private static IAbstractString createChoiceIfNecessary(IPosition pos, List<IAbstractString> options) {
+		if (options.size() == 1) {
+			return options.get(0);
+		}
+		else {
+			return new StringChoice(pos, options);
 		}
 	}
 }
