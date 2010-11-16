@@ -13,9 +13,7 @@ public class GuiTestArk extends GUITest {
 	public void testStringsAndMarkers() throws FileNotFoundException, CoreException {
 		IJavaProject javaProject = GUITest.getJavaProject("ark"); 
 		IJavaElement element = GUITest.getSourceFolder(javaProject, "src");
-		testAbstractStringsClean(element);
-		writeAndTestMarkers(element, GuiChecker.ERROR_MARKER_ID, "errors", true);
-		writeAndTestMarkers(element, GuiChecker.WARNING_MARKER_ID, "warnings", true);
+		this.normalTest(element);
 	}
 
 }
