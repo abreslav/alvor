@@ -67,7 +67,6 @@ public class AbstractStringPrinter implements IEditorActionDelegate{
 			CacheService.getCacheService().setNocache(false);
 			IAbstractString abstr = AbstractStringEvaluator.evaluateExpression((Expression)node); 
 			LOG.message("Abstract value is: " + abstr.toString());
-			LOG.message("Converted value is: " + RecursionConverter.checkRecursionToRepetition(abstr).toString());
 		} 
 		else {
 			assert LOG.message("Selection is not expression, but: "
