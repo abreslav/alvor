@@ -13,6 +13,7 @@ import com.zeroturnaround.alvor.string.StringCharacterSet;
 import com.zeroturnaround.alvor.string.StringChoice;
 import com.zeroturnaround.alvor.string.StringConstant;
 import com.zeroturnaround.alvor.string.StringParameter;
+import com.zeroturnaround.alvor.string.StringRecursion;
 import com.zeroturnaround.alvor.string.StringRepetition;
 import com.zeroturnaround.alvor.string.StringSequence;
 
@@ -93,6 +94,12 @@ public class AbstractStringOptimizer {
 				}
 			}
 			return stringChoice;
+		}
+
+		@Override
+		public IAbstractString visitStringRecursion(
+				StringRecursion stringRecursion, Void data) {
+			return stringRecursion;
 		}
 	};
 

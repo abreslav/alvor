@@ -27,6 +27,7 @@ import com.zeroturnaround.alvor.string.StringCharacterSet;
 import com.zeroturnaround.alvor.string.StringChoice;
 import com.zeroturnaround.alvor.string.StringConstant;
 import com.zeroturnaround.alvor.string.StringParameter;
+import com.zeroturnaround.alvor.string.StringRecursion;
 import com.zeroturnaround.alvor.string.StringRepetition;
 import com.zeroturnaround.alvor.string.StringSequence;
 
@@ -42,8 +43,16 @@ public final class CacheServiceImpl implements ICacheService {
 		int PARAMETER = 7;
 	}
 	
+	boolean nocache = false;
+	
 	private final static ILog LOG = Logs.getLog(ICacheService.class);
 	private static final Integer MANY_PARENTS = -1;
+
+	private final IDBLayer dbLayer;
+	private final DBQueries queries;
+	private final Connection connection;
+	private final IScopedCache<IHotspotPattern, IPosition> usageCache = new UsageCache();	
+	private final IScopedCache<MethodInvocationDescriptor, IAbstractString> methodTemplateCache = new MethodTemplateCache();	
 
 	private class DBQueries {
 		private final PreparedStatement queryGetAbstractString;
@@ -115,14 +124,6 @@ public final class CacheServiceImpl implements ICacheService {
 		}
 		
 	}
-	
-	private final IDBLayer dbLayer;
-	private final DBQueries queries;
-	private final Connection connection;
-	private final IScopedCache<IHotspotPattern, IPosition> usageCache = new UsageCache();	
-	private final IScopedCache<MethodInvocationDescriptor, IAbstractString> methodTemplateCache = new MethodTemplateCache();	
-
-	boolean nocache = false;
 	
 	public void setNocache(boolean value) {
 		nocache = value;
@@ -294,6 +295,12 @@ public final class CacheServiceImpl implements ICacheService {
 				} catch (SQLException e) {
 					throw new RethrowException(e);
 				}
+			}
+
+			@Override
+			public Integer visitStringRecursion(
+					StringRecursion stringRecursion, Void data) {
+				throw new IllegalArgumentException();
 			}
 
 

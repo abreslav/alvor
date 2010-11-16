@@ -5,6 +5,7 @@ import com.zeroturnaround.alvor.string.IAbstractStringVisitor;
 import com.zeroturnaround.alvor.string.StringCharacterSet;
 import com.zeroturnaround.alvor.string.StringChoice;
 import com.zeroturnaround.alvor.string.StringConstant;
+import com.zeroturnaround.alvor.string.StringRecursion;
 import com.zeroturnaround.alvor.string.StringRepetition;
 import com.zeroturnaround.alvor.string.StringSequence;
 import com.zeroturnaround.alvor.string.StringParameter;
@@ -22,7 +23,7 @@ public class AsbtractStringUtils {
 		@Override
 		public Boolean visitStringParameter(
 				StringParameter stringParameter, Void data) {
-			throw new IllegalArgumentException();
+			return false;
 		}
 	
 		@Override
@@ -57,6 +58,11 @@ public class AsbtractStringUtils {
 				}
 			}
 			return false;
+		}
+
+		@Override
+		public Boolean visitStringRecursion(StringRecursion stringRecursion, Void data) {
+			throw new IllegalArgumentException();
 		}
 	};
 

@@ -105,4 +105,9 @@ public class AbstractStringEqualsVisitor implements
 		return areEqual(a.getPosition(), b.getPosition());
 	}
 
+	@Override
+	public Boolean visitStringRecursion(StringRecursion me, IAbstractString data) {
+		return (data instanceof StringRecursion) && positionEquals(me, data);
+	}
+
 }

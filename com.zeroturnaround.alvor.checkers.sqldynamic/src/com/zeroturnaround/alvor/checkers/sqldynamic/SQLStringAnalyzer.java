@@ -66,7 +66,7 @@ public class SQLStringAnalyzer {
 	}
 	
 	public void testOracleSQL(String sql) throws SQLException {
-		boolean isSelect = sql.substring(0, 6).toLowerCase().equals("select");
+		boolean isSelect = sql.length() >= 6 && sql.substring(0, 6).toLowerCase().equals("select");
 		PreparedStatement stmt = null;
 		try {
 			if (isSelect) {

@@ -64,9 +64,8 @@ import com.zeroturnaround.alvor.tracker.VariableTracker;
  */
 public class AbstractStringEvaluator {
 	private static int maxLevel = 4;
-	private static boolean supportLoops = true;
 	private static boolean supportInvocations = true;
-	private static boolean optimizeChoice = false; // TODO 'true' doesn't work at the moment
+	private static boolean optimizeChoice = true;
 	
 	private int ipLevel; // level of interprocedural calls
 	private IJavaElement[] scope;
@@ -137,7 +136,7 @@ public class AbstractStringEvaluator {
 		if (result == null) {
 			try {
 				logMessage("EVALUATING", ipLevel, node);
-				result = doEval(node, context);
+				result = RecursionConverter.checkRecursionToRepetition(doEval(node, context));
 				if (result.getPosition() == null) {
 					LOG.exception(new IllegalArgumentException("Got null position"));
 				}
@@ -172,7 +171,6 @@ public class AbstractStringEvaluator {
 		if (context != null && context.contains(pos)) { 
 			// ie. i'm already computing the value of this node lower in the call stack
 			// ie. it's recursion!
-			System.err.println("FOUND RECURSION");
 			return new StringRecursion(pos);			
 		}
 		
@@ -236,7 +234,9 @@ public class AbstractStringEvaluator {
 					eval(((ConditionalExpression)node).getThenExpression(), new ContextLink(node, context)),
 					eval(((ConditionalExpression)node).getElseExpression(), new ContextLink(node, context)));
 
-			if (optimizeChoice) {
+			if (optimizeChoice /*&& !choice.containsRecursion()*/) {
+				// Recursion removal procedure assumes certain structure
+				// TODO
 				return StringConverter.optimizeChoice(choice);
 			} else {
 				return choice;
@@ -530,7 +530,7 @@ public class AbstractStringEvaluator {
 			return evalNameAfterEvaluatingArgument(name, (NameInArgument)usage, context);
 		}
 		else if (usage instanceof NameInMethodCallExpression) {
-			return evalNameAfterEvaluatingCallExpression(name, (NameInMethodCallExpression)usage, context);
+			return evalNameAfterCallingItsMethod(name, (NameInMethodCallExpression)usage, context);
 		}
 		else {
 			throw new UnsupportedStringOpEx("Unsupported NameUsage: " + usage.getClass(), usage.getNode());
@@ -565,7 +565,10 @@ public class AbstractStringEvaluator {
 		}
 	}
 	
-	private IAbstractString evalNameAfterEvaluatingCallExpression(Name name, 
+	/*
+	 * Meant for analyzing mutating method calls on name
+	 */
+	private IAbstractString evalNameAfterCallingItsMethod(Name name, 
 			NameInMethodCallExpression usage, ContextLink context) {
 		if (ASTUtil.isString(name.resolveTypeBinding())) {
 			// this usage doesn't affect it
@@ -575,13 +578,38 @@ public class AbstractStringEvaluator {
 		else {
 			assert ASTUtil.isStringBuilderOrBuffer(name.resolveTypeBinding());
 			MethodInvocation inv = usage.getInv();
-			if (inv.getName().getIdentifier().equals("append")) {
+			String methodName = inv.getName().getIdentifier(); 
+			
+			if (methodName.equals("append")) {
+				// extra recursion check because concatenation expression is implicit
+				// and i can't pass it's node to eval (for normal recursion check)
+				IPosition pos = PositionUtil.getPosition(inv);
+				if (context != null && context.contains(pos)) { 
+					return new StringRecursion(pos);			
+				}
+				
 				return new StringSequence(
 						PositionUtil.getPosition(inv),
 						eval(inv.getExpression(), new ContextLink(inv, context)),
 						eval((Expression)inv.arguments().get(0), new ContextLink(inv, context)));
 			}
-			else if (inv.getName().getIdentifier().equals("toString")) {
+			// non-modifying method calls
+			else if (methodName.equals("toString")
+					|| methodName.equals("capacity")
+					|| methodName.equals("charAt")
+					|| methodName.equals("codePointAt")
+					|| methodName.equals("codePointBefore")
+					|| methodName.equals("codePointCount")
+					|| methodName.equals("ensureCapacity")
+					|| methodName.equals("getChars")
+					|| methodName.equals("indexOf")
+					|| methodName.equals("lastIndexOf")
+					|| methodName.equals("length")
+					|| methodName.equals("offsetByCodePoints")
+					|| methodName.equals("subSequence")
+					|| methodName.equals("substring")
+					|| methodName.equals("trimToSize")
+					) {
 				return eval(inv.getExpression(), new ContextLink(inv, context));
 			}
 			else {
@@ -596,10 +624,19 @@ public class AbstractStringEvaluator {
 			return eval(usage.getRightHandSide(), context);
 		}
 		else if (usage.getOperator() == Assignment.Operator.PLUS_ASSIGN) {
+			// extra recursion check because concatenation expression is implicit
+			// and i can't pass it's node to eval (for common recursion check)
+			IPosition pos = PositionUtil.getPosition(usage.getNode());
+			if (context != null && context.contains(pos)) { 
+				// ie. i'm already computing the value of this node lower in the call stack
+				// ie. it's recursion!
+				return new StringRecursion(pos);			
+			}
+			
 			return new StringSequence(
 					PositionUtil.getPosition(usage.getNode()),
-					eval(usage.getLeftHandSide(), context),
-					eval(usage.getRightHandSide(), context));
+					eval(usage.getLeftHandSide(), new ContextLink(usage.getNode(), context)),
+					eval(usage.getRightHandSide(), new ContextLink(usage.getNode(), context)));
 		}
 		else {
 			throw new UnsupportedStringOpEx("Unknown assignment operator: " + usage.getOperator(), usage.getNode());

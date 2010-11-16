@@ -35,6 +35,7 @@ import com.zeroturnaround.alvor.string.StringCharacterSet;
 import com.zeroturnaround.alvor.string.StringChoice;
 import com.zeroturnaround.alvor.string.StringConstant;
 import com.zeroturnaround.alvor.string.StringParameter;
+import com.zeroturnaround.alvor.string.StringRecursion;
 import com.zeroturnaround.alvor.string.StringRepetition;
 import com.zeroturnaround.alvor.string.StringSequence;
 import com.zeroturnaround.alvor.string.util.AbstractStringOptimizer;
@@ -244,6 +245,12 @@ public class GuiChecker implements ISQLErrorHandler {
 				for (IAbstractString s : stringSequence.getItems()) {
 					s.accept(this, null);
 				}
+				return null;
+			}
+
+			@Override
+			public Void visitStringRecursion(StringRecursion stringRecursion,
+					Void data) {
 				return null;
 			}
 		};
