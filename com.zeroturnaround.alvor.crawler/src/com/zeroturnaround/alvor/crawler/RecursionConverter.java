@@ -1,5 +1,6 @@
 package com.zeroturnaround.alvor.crawler;
 
+import java.awt.geom.FlatteningPathIterator;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,7 +67,12 @@ public class RecursionConverter {
 	public static IAbstractString checkRecursionToRepetition(IAbstractString str) {
 		if (str.containsRecursion()) {
 			//throw new UnsupportedStringOpEx("Unsupported modification scheme in loop", str.getPosition());
-			return recursionToRepetition(str);
+			
+			IAbstractString result = recursionToRepetition(str);
+			if (result instanceof StringChoice) {
+				result = StringConverter.optimizeChoice((StringChoice) result);
+			}
+			return StringConverter.flattenStringCollections(result);
 		}
 		else {
 			return str;
