@@ -16,7 +16,7 @@
       </viewerContribution>
       <viewerContribution
             id="com.zeroturnaround.alvor.gui.ShowConnSourceContribution"
-            targetID="#CompilationUnitEditorContext">
+            targetID="#CompilationUnitEditorContext_">
          <action
                class="com.zeroturnaround.alvor.gui.ConnectionSourceFinder"
                id="com.zeroturnaround.alvor.ShowConnSource"
@@ -83,22 +83,6 @@
 		 <command
                commandId="com.zeroturnaround.alvor.plugin.CheckProject"
                label="Check SQL in selected elements"
-               style="push">
-			<visibleWhen>
-				<iterate>
-					<adapt
-						type="org.eclipse.core.resources.IResource">
-						<test
-							property="org.eclipse.core.resources.projectNature"
-							value="com.zeroturnaround.alvor.javaproject.esqlNature">
-						</test>
-					</adapt>
-				</iterate>
-			</visibleWhen>
-         </command>
-         <command
-               commandId="com.zeroturnaround.alvor.gui.clearCache"
-               label="Clear SQL Analyzer Cache"
                style="push">
 			<visibleWhen>
 				<iterate>
