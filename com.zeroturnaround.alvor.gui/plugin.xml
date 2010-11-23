@@ -48,7 +48,7 @@
          point="org.eclipse.ui.commands">
       <command
             categoryId="org.eclipse.jdt.ui.category.source"
-            defaultHandler="com.zeroturnaround.alvor.gui.CleanCheckProjectHandler"
+            defaultHandler="com.zeroturnaround.alvor.gui.CleanCheckElementHandler"
             description="Checks SQL usage in selected element"
             id="com.zeroturnaround.alvor.plugin.CheckProject"
             name="Check SQL">
@@ -66,6 +66,13 @@
             description="Checks ResultSet-s"
             id="com.zeroturnaround.alvor.gui.checkResultSets"
             name="Check ResultSet-s">
+      </command>
+      <command
+            categoryId="org.eclipse.jdt.ui.category.source"
+            defaultHandler="com.zeroturnaround.alvor.gui.CleanCheckCurrentProjectHandler"
+            description="Checks SQL in current project"
+            id="com.zeroturnaround.alvor.plugin.CheckCurrentProject"
+            name="Check SQL in current project">
       </command>
    </extension>
    

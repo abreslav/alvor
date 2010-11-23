@@ -37,10 +37,6 @@ public class JavaElementChecker {
 	private static final ILog LOG = Logs.getLog(JavaElementChecker.class);
 	private static final ILog HOTSPOTS_LOG = Logs.getLog("Hotspots");
 	
-	// NB! smartChecking==true can hide problems with static checker
-	// so for testing it should be set false
-	private boolean smartChecking = false;
-
 	/*
 	 * The map must contain an entry 
 	 * hotspots=className,methodName,index;className,methodName,index;...
@@ -143,7 +139,16 @@ public class JavaElementChecker {
 		}
 		
 		try {
-			if (this.smartChecking) {
+			String strategy = options.get("checkingStrategy");
+			if (strategy == null || strategy.isEmpty()) {
+				strategy = "preferStatic";
+			}
+			if (strategy.equals("allCheckers")) {
+				assert LOG.message("Checking with all checkers");
+				checkValidHotspotsWithAllCheckers(hotspots, errorHandler, checkers, options);
+			}
+			
+			else {
 				// TODO maybe it's better to get specific checkers more directly
 				// (current scheme was made for checking everything with all checkers
 				// and for dynamic addition of new checkers) 
@@ -159,10 +164,18 @@ public class JavaElementChecker {
 				}
 				
 				assert (dynamicChecker != null && staticChecker != null);
-				checkValidHotspotsSmartly(hotspots, errorHandler, dynamicChecker, staticChecker, options);
-			}
-			else {
-				checkValidHotspotsFully(hotspots, errorHandler, checkers, options);
+				if (strategy.equals("preferDynamic")) {
+					assert LOG.message("Prefering dynamic checker");
+					checkValidHotspotsPreferDynamic(hotspots, errorHandler, dynamicChecker, staticChecker, options);
+				}
+				else if (strategy.equals("preferStatic")) { 
+					assert LOG.message("Prefering static checker");
+					checkValidHotspotsPreferStatic(hotspots, errorHandler, dynamicChecker, staticChecker, options);
+				}
+				else {
+					throw new CheckerException("Unknown checking strategy",
+							new Position(options.get("SourceFileName"), 0, 0));
+				}
 			}
 		}
 		catch (CheckerException e) {
@@ -172,7 +185,7 @@ public class JavaElementChecker {
 		timer.printTime();
 	}
 	
-	private void checkValidHotspotsFully(
+	private void checkValidHotspotsWithAllCheckers(
 			List<IStringNodeDescriptor> hotspots, 
 			ISQLErrorHandler errorHandler, 
 			List<IAbstractStringChecker> checkers, 
@@ -198,7 +211,7 @@ public class JavaElementChecker {
 			&& options.get("DBDriverName") != null && !options.get("DBDriverName").trim().isEmpty();
 	}
 	
-	private void checkValidHotspotsSmartly(
+	private void checkValidHotspotsPreferDynamic(
 			List<IStringNodeDescriptor> descriptors, 
 			ISQLErrorHandler errorHandler, 
 			IAbstractStringChecker dynamicChecker, 
@@ -218,6 +231,28 @@ public class JavaElementChecker {
 				}
 			} else {
 				staticChecker.checkAbstractString(descriptor, errorHandler, options);
+			}
+		}
+	}
+	
+	
+	private void checkValidHotspotsPreferStatic(
+			List<IStringNodeDescriptor> descriptors, 
+			ISQLErrorHandler errorHandler, 
+			IAbstractStringChecker dynamicChecker, 
+			IAbstractStringChecker staticChecker, 
+			Map<String, String> options) throws CheckerException {
+		
+		for (IStringNodeDescriptor descriptor : descriptors) {
+			// use dynamic only when static didn't find anything wrong, or when it crashed
+			// note that logic is different compared to PreferDynamic case
+			boolean staticResult = true;
+			try {
+				staticResult = staticChecker.checkAbstractString(descriptor, errorHandler, options);
+			} finally {
+				if (staticResult && dynamicCheckerIsConfigured(options)) {
+					dynamicChecker.checkAbstractString(descriptor, errorHandler, options);
+				}
 			}
 		}
 	}
@@ -257,9 +292,4 @@ public class JavaElementChecker {
 		}
 		return requests;
 	}
-	
-	public void setSmartChecking(boolean smartChecking) {
-		this.smartChecking = smartChecking;
-	}
-	
 }

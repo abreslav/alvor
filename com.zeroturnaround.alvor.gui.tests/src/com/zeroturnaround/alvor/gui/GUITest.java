@@ -64,7 +64,6 @@ public abstract class GUITest {
 //	}
 	
 	public GUITest() {
-		checker.setSmartChecking(false); // ie. test all hotspots with both (all) checkers
 	}
 	
 	protected static IProject getProject(String projectName) throws CoreException {
