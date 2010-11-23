@@ -1,0 +1,222 @@
+<?xml version="1.0"?>
+
+<bison-xml-report version="2.4.1">
+
+  <filename>grammar/binexp.bg</filename>
+
+  <grammar>
+    <rules>
+      <rule number="0" usefulness="useful">
+        <lhs>$accept</lhs>
+        <rhs>
+          <symbol>select</symbol>
+          <symbol>$end</symbol>
+        </rhs>
+      </rule>
+      <rule number="1" usefulness="useful">
+        <lhs>select</lhs>
+        <rhs>
+          <symbol>SELECT</symbol>
+          <symbol>NUMBER</symbol>
+          <symbol>'-'</symbol>
+          <symbol>NUMBER</symbol>
+          <symbol>FROM</symbol>
+          <symbol>ID</symbol>
+        </rhs>
+      </rule>
+    </rules>
+    <terminals>
+      <terminal symbol-number="0" token-number="0" name="$end" usefulness="useful"/>
+      <terminal symbol-number="56" token-number="42" name="'*'" usefulness="unused-in-grammar" prec="7" assoc="left"/>
+      <terminal symbol-number="54" token-number="43" name="'+'" usefulness="unused-in-grammar" prec="6" assoc="left"/>
+      <terminal symbol-number="53" token-number="45" name="'-'" usefulness="useful" prec="6" assoc="left"/>
+      <terminal symbol-number="55" token-number="47" name="'/'" usefulness="unused-in-grammar" prec="7" assoc="left"/>
+      <terminal symbol-number="52" token-number="60" name="'&lt;'" usefulness="unused-in-grammar" prec="5" assoc="left"/>
+      <terminal symbol-number="50" token-number="61" name="'='" usefulness="unused-in-grammar" prec="5" assoc="left"/>
+      <terminal symbol-number="51" token-number="62" name="'&gt;'" usefulness="unused-in-grammar" prec="5" assoc="left"/>
+      <terminal symbol-number="1" token-number="256" name="error" usefulness="useful"/>
+      <terminal symbol-number="3" token-number="258" name="VALUES" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="4" token-number="259" name="ESCAPE" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="5" token-number="260" name="SELECT" usefulness="useful"/>
+      <terminal symbol-number="6" token-number="261" name="INSERT" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="7" token-number="262" name="WHERE" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="8" token-number="263" name="ORDER" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="9" token-number="264" name="OUTER" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="10" token-number="265" name="GROUP" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="11" token-number="266" name="RIGHT" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="12" token-number="267" name="INNER" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="13" token-number="268" name="FROM" usefulness="useful"/>
+      <terminal symbol-number="14" token-number="269" name="JOIN" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="15" token-number="270" name="LEFT" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="16" token-number="271" name="WHEN" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="17" token-number="272" name="THEN" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="18" token-number="273" name="ELSE" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="19" token-number="274" name="CASE" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="20" token-number="275" name="INTO" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="21" token-number="276" name="FULL" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="22" token-number="277" name="DESC" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="23" token-number="278" name="ASC" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="24" token-number="279" name="AND" usefulness="unused-in-grammar" prec="2" assoc="left"/>
+      <terminal symbol-number="25" token-number="280" name="END" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="26" token-number="281" name="XOR" usefulness="unused-in-grammar" prec="1" assoc="left"/>
+      <terminal symbol-number="27" token-number="282" name="NOT" usefulness="unused-in-grammar" prec="4" assoc="right"/>
+      <terminal symbol-number="28" token-number="283" name="OR" usefulness="unused-in-grammar" prec="1" assoc="left"/>
+      <terminal symbol-number="29" token-number="284" name="ON" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="30" token-number="285" name="BY" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="31" token-number="286" name="AS" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="32" token-number="287" name="IN" usefulness="unused-in-grammar" prec="3" assoc="nonassoc"/>
+      <terminal symbol-number="33" token-number="288" name="IS" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="34" token-number="289" name="NULL" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="35" token-number="290" name="DIGAL_ERR" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="36" token-number="291" name="STRING_DQ" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="37" token-number="292" name="STRING_DQ_ERR" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="38" token-number="293" name="STRING_SQ" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="39" token-number="294" name="STRING_SQ_ERR" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="40" token-number="295" name="NUMBER" usefulness="useful"/>
+      <terminal symbol-number="41" token-number="296" name="ID" usefulness="useful"/>
+      <terminal symbol-number="42" token-number="297" name="DISTINCT" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="43" token-number="298" name="UNKNOWN_CHARACTER_ERR" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="44" token-number="299" name="NE" usefulness="unused-in-grammar" prec="5" assoc="left"/>
+      <terminal symbol-number="45" token-number="300" name="LE" usefulness="unused-in-grammar" prec="5" assoc="left"/>
+      <terminal symbol-number="46" token-number="301" name="GE" usefulness="unused-in-grammar" prec="5" assoc="left"/>
+      <terminal symbol-number="47" token-number="302" name="CONCAT" usefulness="unused-in-grammar" prec="7" assoc="left"/>
+      <terminal symbol-number="48" token-number="303" name="TABLE" usefulness="unused-in-grammar"/>
+      <terminal symbol-number="49" token-number="304" name="LIKE" usefulness="unused-in-grammar"/>
+    </terminals>
+    <nonterminals>
+      <nonterminal symbol-number="57" name="$accept" usefulness="useful"/>
+      <nonterminal symbol-number="58" name="select" usefulness="useful"/>
+    </nonterminals>
+  </grammar>
+
+  <automaton>
+
+    <state number="0">
+      <itemset>
+        <item rule-number="0" point="0"/>
+        <item rule-number="1" point="0"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="SELECT" state="1"/>
+          <transition type="goto" symbol="select" state="2"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="1">
+      <itemset>
+        <item rule-number="1" point="1"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="NUMBER" state="3"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="2">
+      <itemset>
+        <item rule-number="0" point="1"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="$end" state="4"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="3">
+      <itemset>
+        <item rule-number="1" point="2"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="'-'" state="5"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="4">
+      <itemset>
+        <item rule-number="0" point="2"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="accept" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="5">
+      <itemset>
+        <item rule-number="1" point="3"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="NUMBER" state="6"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="6">
+      <itemset>
+        <item rule-number="1" point="4"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="FROM" state="7"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="7">
+      <itemset>
+        <item rule-number="1" point="5"/>
+      </itemset>
+      <actions>
+        <transitions>
+          <transition type="shift" symbol="ID" state="8"/>
+        </transitions>
+        <errors/>
+        <reductions/>
+      </actions>
+      <solved-conflicts/>
+    </state>
+
+    <state number="8">
+      <itemset>
+        <item rule-number="1" point="6"/>
+      </itemset>
+      <actions>
+        <transitions/>
+        <errors/>
+        <reductions>
+          <reduction symbol="$default" rule="1" enabled="true"/>
+        </reductions>
+      </actions>
+      <solved-conflicts/>
+    </state>
+  </automaton>
+</bison-xml-report>
