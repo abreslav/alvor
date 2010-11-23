@@ -266,8 +266,4 @@ public class GuiChecker implements ISQLErrorHandler {
 	public void handleSQLWarning(String message, IPosition position) {
 		createMarker(message, WARNING_MARKER_ID, position);		
 	}
-	
-	public void setSmartChecking(boolean value) {
-		projectChecker.setSmartChecking(value);
-	}
 }

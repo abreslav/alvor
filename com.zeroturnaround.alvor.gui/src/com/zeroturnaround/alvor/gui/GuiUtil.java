@@ -3,14 +3,21 @@ package com.zeroturnaround.alvor.gui;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
@@ -86,5 +93,26 @@ public class GuiUtil {
 				}
 			});
 		}
+	}
+	
+	public static IProject getCurrentProject() {
+		IEditorPart editor = 
+			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+		IEditorInput input = editor.getEditorInput();
+		
+		IFile file = null;
+		if (input instanceof IFileEditorInput) {
+			file = ((IFileEditorInput)input).getFile();
+		}
+		if (file==null) {
+			return null;
+		} else {
+			IProject project = file.getProject();
+			return project;
+		}
+	}
+	
+	public static IJavaProject getCurrentJavaProject() {
+		return JavaCore.create(getCurrentProject());
 	}
 }
