@@ -513,7 +513,10 @@ public class AbstractStringEvaluator {
 	}
 	
 	private IAbstractString evalNameAfter(Name name, NameUsage usage, ContextLink context) {
-		assert usage != null;
+		if (usage == null) {
+			throw new UnsupportedStringOpEx("internal error: Can't find definition for '" + name + "'", 
+					PositionUtil.getPosition(name));
+		}
 		assert usage.getNode() != null;
 		
 		
