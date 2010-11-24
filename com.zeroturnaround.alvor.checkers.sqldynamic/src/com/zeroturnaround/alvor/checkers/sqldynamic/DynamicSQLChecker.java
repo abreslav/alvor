@@ -136,7 +136,7 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 							options.get("DBUsername").toString(),
 							options.get("DBPassword").toString());
 				}
-				if (options.get("DBDriverName").contains("mysql")) {
+				else if (options.get("DBDriverName").contains("mysql")) {
 					tester = new MySqlSqlTester(				
 							options.get("DBDriverName").toString(),
 							options.get("DBUrl").toString(),
