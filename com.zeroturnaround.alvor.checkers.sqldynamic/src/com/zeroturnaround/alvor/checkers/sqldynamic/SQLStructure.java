@@ -5,6 +5,8 @@ import java.sql.ResultSetMetaData;
 /**
  * Describes structure of a SQL statement / result
  * or error message
+ * 
+ * Used for resultset analysis
  */
 public class SQLStructure {
 	public ResultSetMetaData resultSetMD;

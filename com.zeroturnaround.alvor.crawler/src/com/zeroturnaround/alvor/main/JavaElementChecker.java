@@ -226,7 +226,13 @@ public class JavaElementChecker {
 					dynResult = dynamicChecker.checkAbstractString(descriptor, errorHandler, options);
 				} finally {
 					if (!dynResult) {
-						staticChecker.checkAbstractString(descriptor, errorHandler, options);
+						try {
+							staticChecker.checkAbstractString(descriptor, errorHandler, options);
+						} catch (Exception e) {
+							// should be able to proceed with next descriptors using dynamic checker
+							errorHandler.handleSQLWarning("Error during checking: " + e.getMessage(), 
+									descriptor.getPosition());
+						}
 					}
 				}
 			} else {
@@ -251,7 +257,14 @@ public class JavaElementChecker {
 				staticResult = staticChecker.checkAbstractString(descriptor, errorHandler, options);
 			} finally {
 				if (staticResult && dynamicCheckerIsConfigured(options)) {
-					dynamicChecker.checkAbstractString(descriptor, errorHandler, options);
+					try {
+						dynamicChecker.checkAbstractString(descriptor, errorHandler, options);
+					}
+					catch (Exception e) {
+						// should be able to proceed with next descriptors using static checker
+						errorHandler.handleSQLWarning("Error during checking: " + e.getMessage(), 
+								descriptor.getPosition());
+					}
 				}
 			}
 		}
