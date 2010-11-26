@@ -46,6 +46,7 @@
    
    <extension
          point="org.eclipse.ui.commands">
+      <!-- The "CheckProject id is really a misnomer, hopefully? -->
       <command
             categoryId="org.eclipse.jdt.ui.category.source"
             defaultHandler="com.zeroturnaround.alvor.gui.CleanCheckProjectHandler"
