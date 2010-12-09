@@ -18,7 +18,7 @@ public class NameInMethodCallExpression extends NameUsage {
 	}
 	
 	public ASTNode getNode() {
-		return expression;
+		return expression; // TODO maybe inv is more appropriate answer here
 	}
 	
 }

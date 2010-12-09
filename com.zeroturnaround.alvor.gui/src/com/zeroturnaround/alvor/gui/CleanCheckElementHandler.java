@@ -9,9 +9,9 @@ import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.common.logging.Timer;
 
-public class CleanCheckProjectHandler extends AbstractHandler {
+public class CleanCheckElementHandler extends AbstractHandler {
 	GuiChecker checker = new GuiChecker();
-	private static final ILog LOG = Logs.getLog(CleanCheckProjectHandler.class);
+	private static final ILog LOG = Logs.getLog(CleanCheckElementHandler.class);
 	
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -28,7 +28,7 @@ public class CleanCheckProjectHandler extends AbstractHandler {
 			IJavaElement element = GuiUtil.getSingleSelectedJavaElement();
 			checker.performCleanCheck(element, new IJavaElement[] {element});
 		} 
-		catch (IllegalAccessException e) {
+		catch (IllegalAccessException e) { // exceptions about wrong state, TODO: rewrite using command disabling
 			String msg = e.getMessage();
 			Throwable cause = e.getCause();
 			if (cause != null) {

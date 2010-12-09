@@ -44,4 +44,14 @@ public abstract class AbstractStringCollection extends PositionedString {
 		return true;
 	}
 
+	@Override
+	public boolean containsRecursion() {
+		for (IAbstractString item : this.getItems()) {
+			if (item.containsRecursion()) {
+				return true;
+			}
+		}
+		return false;
+	};
+	
 }

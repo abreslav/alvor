@@ -9,6 +9,7 @@ import com.zeroturnaround.alvor.string.StringCharacterSet;
 import com.zeroturnaround.alvor.string.StringChoice;
 import com.zeroturnaround.alvor.string.StringConstant;
 import com.zeroturnaround.alvor.string.StringParameter;
+import com.zeroturnaround.alvor.string.StringRecursion;
 import com.zeroturnaround.alvor.string.StringRepetition;
 import com.zeroturnaround.alvor.string.StringSequence;
 
@@ -16,11 +17,11 @@ public class CommonNotationRenderer {
 
 	public static String render(IAbstractString string) {
 		StringBuilder builder = new StringBuilder();
-		string.accept(OPTIMIZER, builder);
+		string.accept(STR_BUILDER, builder);
 		return builder.toString();
 	}
 	
-	private static final IAbstractStringVisitor<Void, StringBuilder> OPTIMIZER  = new IAbstractStringVisitor<Void, StringBuilder>() {
+	private static final IAbstractStringVisitor<Void, StringBuilder> STR_BUILDER  = new IAbstractStringVisitor<Void, StringBuilder>() {
 	
 		@Override
 		public Void visitStringCharacterSet(StringCharacterSet characterSet,
@@ -65,7 +66,8 @@ public class CommonNotationRenderer {
 		@Override
 		public Void visitStringParameter(StringParameter stringParameter,
 				StringBuilder builder) {
-			throw new UnsupportedOperationException();
+			builder.append("<" + stringParameter.getIndex() + ">");
+			return null;
 		}
 
 		@Override
@@ -102,6 +104,12 @@ public class CommonNotationRenderer {
 				iterator.next().accept(this, builder);
 			}
 			return null;
+		}
+
+		@Override
+		public Void visitStringRecursion(StringRecursion stringRecursion,
+				StringBuilder data) {
+			throw new UnsupportedOperationException();
 		}
 		
 	};

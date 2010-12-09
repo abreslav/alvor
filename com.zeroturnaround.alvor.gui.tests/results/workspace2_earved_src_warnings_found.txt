@@ -1,3 +1,4 @@
+Error during checking: SQL syntax checker: internal error: java.lang.IllegalArgumentException, at: /earved/src/ee/post/earved/dao/invoice/AttachmentDAO.java:156
 Unsupported SQL construction: No declarations found for: DomainEnum.BANK.name() at: /earved/src/ee/post/earved/dao/bankAccount/BankDAO.java:18, at: /earved/src/ee/post/earved/dao/bankAccount/BankDAO.java:18
 Unsupported SQL construction: No declarations found for: DomainValueEnum.INVOICE_EVENT_SENDING.name() at: /earved/src/ee/post/earved/dao/invoice/HistoryDAO.java:131, at: /earved/src/ee/post/earved/dao/invoice/HistoryDAO.java:133
 Unsupported SQL construction: No declarations found for: DomainValueEnum.INVOICE_EVENT_VIEWING.name() at: /earved/src/ee/post/earved/dao/invoice/HistoryDAO.java:115, at: /earved/src/ee/post/earved/dao/invoice/HistoryDAO.java:118
@@ -8,22 +9,4 @@ Unsupported SQL construction: No declarations found for: StringUtils.join(dimens
 Unsupported SQL construction: No declarations found for: StringUtils.join(dimensionIds,",") at: /earved/src/ee/post/earved/dao/accountCard/AccountCardDAO.java:240, at: /earved/src/ee/post/earved/dao/accountCard/AccountCardDAO.java:239
 Unsupported SQL construction: No declarations found for: StringUtils.join(invoiceIds,',') at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:818, at: /earved/src/ee/post/earved/dao/invoice/InvoiceDAO.java:820
 Unsupported SQL construction: Possible problem, no callsites found in current project for: ee.post.earved.dao.accountCard.AccountCardDAO.getAccountCardCodesForAdding(String) at: /earved/src/ee/post/earved/dao/accountCard/AccountCardDAO.java:176, at: /earved/src/ee/post/earved/dao/accountCard/AccountCardDAO.java:178
-Unsupported SQL construction: Unsupported modification scheme in loop at: /earved/src/ee/post/earved/dao/dimension/DimensionDataDAO.java:46, at: /earved/src/ee/post/earved/dao/dimension/DimensionDataDAO.java:35
-Unsupported SQL construction: Unsupported modification scheme in loop at: /earved/src/ee/post/earved/util/StringUtil.java:92, at: /earved/src/ee/post/earved/dao/client/ClientRegisterAccountDAO.java:44
-Unsupported SQL construction: Unsupported modification scheme in loop at: /earved/src/ee/post/earved/util/StringUtil.java:92, at: /earved/src/ee/post/earved/dao/confirm/pattern/ConfirmPatternConfirmerDAO.java:120
-Unsupported SQL construction: Unsupported modification scheme in loop at: /earved/src/ee/post/earved/util/StringUtil.java:92, at: /earved/src/ee/post/earved/dao/confirm/pattern/ConfirmPatternConfirmerDAO.java:130
-Unsupported SQL construction: Unsupported modification scheme in loop at: /earved/src/ee/post/earved/util/StringUtil.java:92, at: /earved/src/ee/post/earved/dao/confirm/pattern/ConfirmPatternDAO.java:279
-Unsupported SQL construction: Unsupported modification scheme in loop at: /earved/src/ee/post/earved/util/StringUtil.java:92, at: /earved/src/ee/post/earved/dao/dimension/DimensionDataConnectionDAO.java:68
-Unsupported SQL construction: Unsupported modification scheme in loop at: /earved/src/ee/post/earved/util/StringUtil.java:92, at: /earved/src/ee/post/earved/dao/dimension/DimensionDataDAO.java:122
-Unsupported SQL construction: Unsupported modification scheme in loop at: /earved/src/ee/post/earved/util/StringUtil.java:92, at: /earved/src/ee/post/earved/dao/integration/DvkDAO.java:71
-Unsupported SQL construction: Unsupported modification scheme in loop at: /earved/src/ee/post/earved/util/StringUtil.java:92, at: /earved/src/ee/post/earved/dao/integration/XmlBasedInvoiceExportDAO.java:61
-Unsupported SQL construction: Unsupported modification scheme in loop at: /earved/src/ee/post/earved/util/StringUtil.java:92, at: /earved/src/ee/post/earved/dao/invoice/AdditionDAO.java:54
-Unsupported SQL construction: Unsupported modification scheme in loop at: /earved/src/ee/post/earved/util/StringUtil.java:92, at: /earved/src/ee/post/earved/dao/invoice/AttachmentDAO.java:156
-Unsupported SQL construction: Unsupported modification scheme in loop at: /earved/src/ee/post/earved/util/StringUtil.java:92, at: /earved/src/ee/post/earved/dao/invoice/BankExportDAO.java:103
-Unsupported SQL construction: Unsupported modification scheme in loop at: /earved/src/ee/post/earved/util/StringUtil.java:92, at: /earved/src/ee/post/earved/dao/invoice/ConfirmDAO.java:835
-Unsupported SQL construction: Unsupported modification scheme in loop at: /earved/src/ee/post/earved/util/StringUtil.java:92, at: /earved/src/ee/post/earved/dao/invoice/ConfirmDAO.java:847
-Unsupported SQL construction: Unsupported modification scheme in loop at: /earved/src/ee/post/earved/util/StringUtil.java:92, at: /earved/src/ee/post/earved/dao/journal/JournalEntryDAO.java:96
-Unsupported SQL construction: Unsupported modification scheme in loop at: /earved/src/ee/post/earved/util/StringUtil.java:92, at: /earved/src/ee/post/earved/dao/person/PersonDAO.java:471
-Unsupported SQL construction: Unsupported modification scheme in loop at: /earved/src/ee/post/earved/util/StringUtil.java:92, at: /earved/src/ee/post/earved/dao/vat/VatCodePersonDAO.java:83
-Unsupported SQL construction: Unsupported modification scheme in loop at: /earved/src/ee/post/earved/util/StringUtil.java:92, at: /earved/src/ee/post/earved/dao/vat/VatCodesDAO.java:83
 Unsupported SQL construction: Unsupported type of Name: java.util.Set<java.lang.Long> at: /earved/src/ee/post/earved/dao/vat/VatCodesDAO.java:32, at: /earved/src/ee/post/earved/dao/vat/VatCodesDAO.java:40

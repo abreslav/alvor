@@ -11,6 +11,7 @@ package com.zeroturnaround.alvor.string;
 public class StringRepetition extends PositionedString {
 	private final IAbstractString body;
 	
+	
 	public StringRepetition(IAbstractString subStr) {
 		this(null, subStr);
 	}
@@ -36,5 +37,10 @@ public class StringRepetition extends PositionedString {
 	@Override
 	public boolean isEmpty() {
 		return body.isEmpty();
+	}
+
+	@Override
+	public boolean containsRecursion() {
+		return body.containsRecursion();
 	}
 }
