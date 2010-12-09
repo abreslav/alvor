@@ -13,6 +13,8 @@ public interface IAbstractStringVisitor<R, D> {
 
 	R visitStringRepetition(StringRepetition stringRepetition, D data);
 	
+	R visitStringRecursion(StringRecursion stringRecursion, D data);
+
 	R visitStringParameter(StringParameter stringParameter, D data);
 
 }

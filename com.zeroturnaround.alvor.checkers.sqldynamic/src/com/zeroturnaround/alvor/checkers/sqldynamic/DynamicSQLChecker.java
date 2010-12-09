@@ -12,6 +12,10 @@ import com.zeroturnaround.alvor.checkers.ISQLErrorHandler;
 import com.zeroturnaround.alvor.checkers.IStringNodeDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
+import com.zeroturnaround.alvor.db.SqlTester;
+import com.zeroturnaround.alvor.db.generic.GenericSqlTester;
+import com.zeroturnaround.alvor.db.mysql.MySqlSqlTester;
+import com.zeroturnaround.alvor.db.oracle.OracleSqlTester;
 import com.zeroturnaround.alvor.string.Position;
 import com.zeroturnaround.alvor.string.samplegen.SampleGenerator;
 import com.zeroturnaround.alvor.string.util.AbstractStringSizeCounter;
@@ -21,7 +25,7 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 	private static final int SIZE_LIMIT = 10000;
 	
 	// analyzers indexed by hash-code of options map
-	Map<Integer, SQLStringAnalyzer> analyzers = new HashMap<Integer, SQLStringAnalyzer>();
+	Map<Integer, SqlTester> testers = new HashMap<Integer, SqlTester>();
 
 	@Override
 	public void checkAbstractStrings(List<IStringNodeDescriptor> descriptors,
@@ -30,9 +34,9 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 			return;
 		}
 		
-		SQLStringAnalyzer analyzer = this.getAnalyzer(options);
+		SqlTester tester = this.getAnalyzer(options);
 		for (IStringNodeDescriptor descriptor: descriptors) {
-			this.checkAbstractString(descriptor, errorHandler, analyzer);
+			this.checkAbstractString(descriptor, errorHandler, tester);
 		}
 	}
 	
@@ -44,9 +48,8 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 	
 	
 	private boolean checkAbstractString(IStringNodeDescriptor descriptor,
-			ISQLErrorHandler errorHandler, SQLStringAnalyzer analyzer) {
+			ISQLErrorHandler errorHandler, SqlTester tester) {
 
-		int totalConcrete = 0;
 		boolean allOK = true;
 		Map<String, Integer> concretes = new HashMap<String, Integer>();
 
@@ -61,19 +64,25 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 			return false;
 		} 
 		else { 
-			List<String> concreteStr = SampleGenerator.getConcreteStrings(descriptor.getAbstractValue());
-			totalConcrete += concreteStr.size();
+			List<String> concreteStrings = null;
+			try {
+				concreteStrings = SampleGenerator.getConcreteStrings(descriptor.getAbstractValue());
+			} catch (Exception e) {
+				errorHandler.handleSQLError("Sample generation failed: " + e.getMessage()
+						+ ", str=" + descriptor.getAbstractValue(), descriptor.getPosition());
+				return false;
+			}
 
 			int duplicates = 0;
 			// maps error msg to all concrete strings that cause this message
 
-			for (String s: concreteStr) {
+			for (String s: concreteStrings) {
 				Integer countSoFar = concretes.get(s);
 				duplicates = 0;
 				if (countSoFar == null) {
 					assert LOG.message("CON: " + s);
 					try {
-						analyzer.validate(s);
+						tester.testSql(s);
 					} catch (SQLException e) {
 						allOK = false;
 						assert LOG.message("    ERR: " + e.getMessage());
@@ -95,8 +104,7 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 			}
 
 			for (Entry<String, String> entry : errorMap.entrySet()) {
-				String message = entry.getKey().trim() + "\nSQL: \n" 
-				+ entry.getValue();
+				String message = entry.getKey().trim() + "\nSQL: \n" + entry.getValue();
 				errorHandler.handleSQLError("SQL test failed  - " + message, descriptor.getPosition());
 			}
 
@@ -106,12 +114,12 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 		}
 	}
 
-	private SQLStringAnalyzer getAnalyzer(Map<String, String> options) throws CheckerException {
+	private SqlTester getAnalyzer(Map<String, String> options) throws CheckerException {
 		// give different analyzer for different options
 		// first search for cached version
-		SQLStringAnalyzer analyzer = this.analyzers.get(options.hashCode());
+		SqlTester tester = this.testers.get(options.hashCode());
 		
-		if (analyzer == null) {
+		if (tester == null) {
 			if (options.get("DBDriverName") == null || options.get("DBUrl") == null
 					|| options.get("DBUsername") == null || options.get("DBPassword") == null
 					|| options.get("DBDriverName").toString().isEmpty()
@@ -121,21 +129,36 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 			}
 			
 			try {
-				analyzer = new SQLStringAnalyzer(				
-					options.get("DBDriverName").toString(),
-					options.get("DBUrl").toString(),
-					options.get("DBUsername").toString(),
-					options.get("DBPassword").toString());
+				if (options.get("DBDriverName").contains("oracle")) {
+					tester = new OracleSqlTester(				
+							options.get("DBDriverName").toString(),
+							options.get("DBUrl").toString(),
+							options.get("DBUsername").toString(),
+							options.get("DBPassword").toString());
+				}
+				else if (options.get("DBDriverName").contains("mysql")) {
+					tester = new MySqlSqlTester(				
+							options.get("DBDriverName").toString(),
+							options.get("DBUrl").toString(),
+							options.get("DBUsername").toString(),
+							options.get("DBPassword").toString());
+				}
+				else {
+					tester = new GenericSqlTester(				
+							options.get("DBDriverName").toString(),
+							options.get("DBUrl").toString(),
+							options.get("DBUsername").toString(),
+							options.get("DBPassword").toString());
+				}
 			} catch (Exception e) {
 				LOG.exception(e);
 				throw new CheckerException("SQL checker: can't connect with test database: "
 						+ e.getMessage(), new Position(options.get("SourceFileName"), 0, 0));
 			}
 			
-			this.analyzers.put(options.hashCode(), analyzer);
+			this.testers.put(options.hashCode(), tester);
 		}
 		
-		return analyzer;
-		
+		return tester;
 	}
 }

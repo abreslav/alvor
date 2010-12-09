@@ -16,7 +16,7 @@
       </viewerContribution>
       <viewerContribution
             id="com.zeroturnaround.alvor.gui.ShowConnSourceContribution"
-            targetID="#CompilationUnitEditorContext">
+            targetID="#CompilationUnitEditorContext_">
          <action
                class="com.zeroturnaround.alvor.gui.ConnectionSourceFinder"
                id="com.zeroturnaround.alvor.ShowConnSource"
@@ -49,7 +49,7 @@
       <!-- The "CheckProject id is really a misnomer, hopefully? -->
       <command
             categoryId="org.eclipse.jdt.ui.category.source"
-            defaultHandler="com.zeroturnaround.alvor.gui.CleanCheckProjectHandler"
+            defaultHandler="com.zeroturnaround.alvor.gui.CleanCheckElementHandler"
             description="Checks SQL usage in selected element"
             id="com.zeroturnaround.alvor.plugin.CheckProject"
             name="Check SQL">
@@ -68,6 +68,13 @@
             id="com.zeroturnaround.alvor.gui.checkResultSets"
             name="Check ResultSet-s">
       </command>
+      <command
+            categoryId="org.eclipse.jdt.ui.category.source"
+            defaultHandler="com.zeroturnaround.alvor.gui.CleanCheckCurrentProjectHandler"
+            description="Checks SQL in current project"
+            id="com.zeroturnaround.alvor.plugin.CheckCurrentProject"
+            name="Check SQL in current project">
+      </command>
    </extension>
    
    <extension
@@ -77,22 +84,6 @@
 		 <command
                commandId="com.zeroturnaround.alvor.plugin.CheckProject"
                label="Check SQL in selected elements"
-               style="push">
-			<visibleWhen>
-				<iterate>
-					<adapt
-						type="org.eclipse.core.resources.IResource">
-						<test
-							property="org.eclipse.core.resources.projectNature"
-							value="com.zeroturnaround.alvor.javaproject.esqlNature">
-						</test>
-					</adapt>
-				</iterate>
-			</visibleWhen>
-         </command>
-         <command
-               commandId="com.zeroturnaround.alvor.gui.clearCache"
-               label="Clear SQL Analyzer Cache"
                style="push">
 			<visibleWhen>
 				<iterate>

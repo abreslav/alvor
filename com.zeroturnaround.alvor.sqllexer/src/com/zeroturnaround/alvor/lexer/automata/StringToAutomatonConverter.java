@@ -12,6 +12,7 @@ import com.zeroturnaround.alvor.string.StringCharacterSet;
 import com.zeroturnaround.alvor.string.StringChoice;
 import com.zeroturnaround.alvor.string.StringConstant;
 import com.zeroturnaround.alvor.string.StringParameter;
+import com.zeroturnaround.alvor.string.StringRecursion;
 import com.zeroturnaround.alvor.string.StringRepetition;
 import com.zeroturnaround.alvor.string.StringSequence;
 
@@ -161,6 +162,12 @@ public class StringToAutomatonConverter {
 				current = newCurrent;
 			}
 			return current;
+		}
+
+		@Override
+		public Set<State> visitStringRecursion(StringRecursion stringRecursion,
+				State data) {
+			throw new IllegalArgumentException();
 		}
 		
 	}

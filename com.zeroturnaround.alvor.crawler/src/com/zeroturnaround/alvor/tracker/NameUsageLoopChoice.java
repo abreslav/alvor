@@ -2,6 +2,7 @@ package com.zeroturnaround.alvor.tracker;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 
+@Deprecated
 public class NameUsageLoopChoice extends NameUsage {
 	private NameUsage startUsage;
 	private NameUsage loopUsage;

@@ -74,4 +74,9 @@ public class StringCharacterSet extends PositionedString {
 	public boolean isEmpty() {
 		return set.isEmpty();
 	}
+
+	@Override
+	public boolean containsRecursion() {
+		return false;
+	}
 }

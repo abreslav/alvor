@@ -27,6 +27,7 @@ import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
 import com.zeroturnaround.alvor.crawler.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.main.JavaElementChecker;
 import com.zeroturnaround.alvor.main.OptionLoader;
+import com.zeroturnaround.alvor.string.DummyPosition;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.IAbstractStringVisitor;
 import com.zeroturnaround.alvor.string.IPosition;
@@ -34,6 +35,7 @@ import com.zeroturnaround.alvor.string.StringCharacterSet;
 import com.zeroturnaround.alvor.string.StringChoice;
 import com.zeroturnaround.alvor.string.StringConstant;
 import com.zeroturnaround.alvor.string.StringParameter;
+import com.zeroturnaround.alvor.string.StringRecursion;
 import com.zeroturnaround.alvor.string.StringRepetition;
 import com.zeroturnaround.alvor.string.StringSequence;
 import com.zeroturnaround.alvor.string.util.AbstractStringOptimizer;
@@ -128,8 +130,13 @@ public class GuiChecker implements ISQLErrorHandler {
 
 	public static void createMarker(String message, String markerType,
 			IPosition pos, Map<String, Comparable<?>> map) {
+		
 		// dummy positions are created in string conversion when no actual position fits
-		if (pos.getPath().equals("__dummy__")) {
+		// or when new nodes are created in string transformings
+		// FIXME This actually shouldnt occur or
+		// maybe this should create a marker for the whole workspace ??
+		if (pos instanceof DummyPosition) {
+			LOG.exception(new IllegalArgumentException("Warning: Dummy position in 'createMarker'"));
 			return;
 		}
 		
@@ -240,6 +247,12 @@ public class GuiChecker implements ISQLErrorHandler {
 				}
 				return null;
 			}
+
+			@Override
+			public Void visitStringRecursion(StringRecursion stringRecursion,
+					Void data) {
+				return null;
+			}
 		};
 		abstractValue.accept(visitor, null);
 	}
@@ -252,9 +265,5 @@ public class GuiChecker implements ISQLErrorHandler {
 	@Override
 	public void handleSQLWarning(String message, IPosition position) {
 		createMarker(message, WARNING_MARKER_ID, position);		
-	}
-	
-	public void setSmartChecking(boolean value) {
-		projectChecker.setSmartChecking(value);
 	}
 }

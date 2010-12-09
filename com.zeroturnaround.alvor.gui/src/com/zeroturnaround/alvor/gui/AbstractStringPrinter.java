@@ -18,6 +18,8 @@ import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.crawler.ASTUtil;
 import com.zeroturnaround.alvor.crawler.AbstractStringEvaluator;
 import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
+import com.zeroturnaround.alvor.crawler.RecursionConverter;
+import com.zeroturnaround.alvor.string.IAbstractString;
 
 public class AbstractStringPrinter implements IEditorActionDelegate{
 	
@@ -57,14 +59,14 @@ public class AbstractStringPrinter implements IEditorActionDelegate{
 			LOG.error("ERROR: Did not find node", null);
 		}
 		else if (node instanceof Expression) {
-			assert LOG.message("###############################");
-			assert LOG.message("Selection is : " + node.getClass().getName());
-			assert LOG.message("Abstract value is: ");
+			LOG.message("###############################");
+			LOG.message("Selection is : " + node.getClass().getName());
 			
 			NodeSearchEngine.clearASTCache();
 			CacheService.getCacheService().clearAll();
-			LOG.message(AbstractStringEvaluator.evaluateExpression
-					((Expression)node).toString());
+			CacheService.getCacheService().setNocache(false);
+			IAbstractString abstr = AbstractStringEvaluator.evaluateExpression((Expression)node); 
+			LOG.message("Abstract value is: " + abstr.toString());
 		} 
 		else {
 			assert LOG.message("Selection is not expression, but: "

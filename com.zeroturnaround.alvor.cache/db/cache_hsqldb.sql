@@ -96,7 +96,7 @@ CREATE TABLE
 	*/
 	type TINYINT NOT NULL, 
 	a INTEGER DEFAULT NULL,
-	sourceRange INTEGER REFERENCES SourceRanges(id) ON DELETE CASCADE UNIQUE NOT NULL -- position
+	sourceRange INTEGER REFERENCES SourceRanges(id) ON DELETE CASCADE NOT NULL -- position
 );;;
 
 

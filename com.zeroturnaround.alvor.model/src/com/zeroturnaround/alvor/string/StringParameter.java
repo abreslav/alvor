@@ -26,11 +26,16 @@ public class StringParameter extends PositionedString {
 
 	@Override
 	public boolean isEmpty() {
-		throw new UnsupportedOperationException();
+		return false;
 	}
 	
 	@Override
 	public String toString() {
 		return "Param(" + index + ")";
+	}
+
+	@Override
+	public boolean containsRecursion() {
+		return false;
 	}
 }
