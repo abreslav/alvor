@@ -36,6 +36,7 @@ import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.jdt.core.search.SearchParticipant;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
+import org.eclipse.jdt.internal.core.SourceType;
 
 import com.zeroturnaround.alvor.cache.CacheService;
 import com.zeroturnaround.alvor.cache.ICacheService;
@@ -147,7 +148,13 @@ public class NodeSearchEngine {
 		SearchRequestor requestor = new SearchRequestor() {
 			@SuppressWarnings("rawtypes")
 			public void acceptSearchMatch(SearchMatch match) {
-				assert match.getElement() instanceof IMethod;
+				if (!(match.getElement() instanceof IMethod)) {
+					// Can be method reference in javadoc @Link
+					
+					//LOG.error("NodeRequest=" + nodeRequest + ", search match is not method: " 
+					//		+ match.getElement() + ", class=" + match.getElement().getClass(), null);
+					return;
+				}
 				
 				ASTNode node = getASTNode(match);
 				
