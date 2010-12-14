@@ -57,7 +57,7 @@ public class EmptyTransitionEliminator {
 		Map<State, Set<State>> stateSets = new HashMap<State, Set<State>>();
 		Set<State> accepting = new HashSet<State>();
 		for (State state : states) {
-			Set<State> reachableByEmpty = new HashSet<State>();
+			Set<State> reachableByEmpty = new LinkedHashSet<State>();
 			if (close(state, state, reachableByEmpty, emptinessExpert)) {
 				accepting.add(state);
 			}

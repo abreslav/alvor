@@ -1,6 +1,5 @@
 package com.zeroturnaround.alvor.checkers.sqlstatic;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -61,22 +60,29 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 			ParserSimulator.getGLRInstance().checkAutomaton(automaton, new IParseErrorHandler() {
 				
 				@Override
-				public void unexpectedItem(IAbstractInputItem item) {
+				public void unexpectedItem(IAbstractInputItem item,
+						List<? extends IAbstractInputItem> counterExampleList) {
+					String counterExample = PositionedCharacterUtil.renderCounterExample(counterExampleList);
 					Collection<IPosition> markerPositions = PositionedCharacterUtil.getMarkerPositions(((Token) item).getText());
 					for (IPosition pos : markerPositions) {
-						errorHandler.handleSQLError("SQL syntax checker: Unexpected token: " + PositionedCharacterUtil.render(item), pos);
+						errorHandler.handleSQLError(
+								"SQL syntax checker: Unexpected token: " + PositionedCharacterUtil.render(item) + "\n" + 
+								"Counter example: " + counterExample, 
+								pos);
 						results.add(false);
 					}
 				}
 
 				@Override
-				public void other() {
+				public void other(
+						List<? extends IAbstractInputItem> counterExample) {
 					errorHandler.handleSQLError("SQL syntax checker: Syntax error. Most likely, unfinished query", descriptor.getPosition());
 					results.add(false);
 				}
 
 				@Override
-				public void overabstraction() {
+				public void overabstraction(
+						List<? extends IAbstractInputItem> counterExample) {
 					errorHandler.handleSQLError("SQL syntax checker: Syntactic analysis failed: nesting is too deep in this sentence", descriptor.getPosition());
 					results.add(false);
 				}

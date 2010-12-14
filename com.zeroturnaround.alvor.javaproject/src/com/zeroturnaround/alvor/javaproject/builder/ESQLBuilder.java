@@ -96,6 +96,7 @@ public class ESQLBuilder extends IncrementalProjectBuilder {
 			cleanBuild(monitor);
 			break;
 		default:
+//			cleanBuild(monitor);
 			IResourceDelta delta = getDelta(getProject());
 			if (delta == null) {
 				fullBuild(monitor);

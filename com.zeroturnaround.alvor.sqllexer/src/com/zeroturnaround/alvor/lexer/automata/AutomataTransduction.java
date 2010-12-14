@@ -2,9 +2,9 @@ package com.zeroturnaround.alvor.lexer.automata;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -251,7 +251,7 @@ public class AutomataTransduction {
 				IAbstractInputItem expectedChar = transition.getInChar();
 				
 				if (converter.convert(inChar.getCode()) == expectedChar.getCode()) {
-					for (ISequence<IAbstractInputItem> text : new HashSet<ISequence<IAbstractInputItem>>(texts)) {
+					for (ISequence<IAbstractInputItem> text : new LinkedHashSet<ISequence<IAbstractInputItem>>(texts)) {
 						List<IAbstractOutputItem> output = transition.getOutput();
 						List<IAbstractInputItem> effect = new ArrayList<IAbstractInputItem>();
 						ISequence<IAbstractInputItem> newText = interpreter.processOutputCommands(text, inChar, output, effect);
@@ -278,7 +278,7 @@ public class AutomataTransduction {
 	public static <K, V> Set<V> getSet(Map<K, Set<V>> map, K key) {
 		Set<V> set = map.get(key);
 		if (set == null) {
-			set = new HashSet<V>();
+			set = new LinkedHashSet<V>();
 			map.put(key, set);
 		}
 		return set;

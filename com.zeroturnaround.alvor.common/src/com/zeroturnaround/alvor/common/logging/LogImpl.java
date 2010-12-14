@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 
 import com.zeroturnaround.alvor.common.AlvorCommonPlugin;
@@ -15,10 +15,15 @@ public class LogImpl implements ILog {
 	private PrintStream fileStream;
 	
 	public LogImpl(String name) {
-		IPath logFolder = AlvorCommonPlugin.getDefault().getStateLocation();
-		File f = logFolder.append(name + ".log").toFile();
+		File logFolder;
+		if (Platform.isRunning()) {
+			logFolder = AlvorCommonPlugin.getDefault().getStateLocation().toFile();			
+		} else {
+			logFolder = new File(".");
+		}
+		File f = new File(logFolder, name + ".log");
 		try {
-			f.createNewFile(); // creates if it doesn't exist yet 
+			f.getParentFile().mkdirs(); // creates if it doesn't exist yet 
 			fileStream = new PrintStream(f);
 		} catch (IOException e) {
 			throw new IllegalStateException(e);

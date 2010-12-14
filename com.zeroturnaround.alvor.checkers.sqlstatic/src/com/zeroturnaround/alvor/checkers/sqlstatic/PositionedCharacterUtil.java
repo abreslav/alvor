@@ -96,6 +96,15 @@ public class PositionedCharacterUtil {
 		}
 		return item.toString();
 	}
+
+	public static String renderCounterExample(
+			List<? extends IAbstractInputItem> counterExampleList) {
+		StringBuilder counterExampleBuilder = new StringBuilder();
+		for (IAbstractInputItem token : counterExampleList) {
+			counterExampleBuilder.append(render(token)).append(" ");
+		}
+		return counterExampleBuilder.toString();
+	}
 	
 	
 }

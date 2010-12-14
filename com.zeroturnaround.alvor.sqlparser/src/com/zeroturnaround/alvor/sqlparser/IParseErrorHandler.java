@@ -1,5 +1,7 @@
 package com.zeroturnaround.alvor.sqlparser;
 
+import java.util.List;
+
 import com.zeroturnaround.alvor.lexer.alphabet.IAbstractInputItem;
 
 /**
@@ -14,33 +16,35 @@ public interface IParseErrorHandler {
 	 * A default strategy that ignores all errors
 	 */
 	IParseErrorHandler NONE = new IParseErrorHandler() {
-		
+
 		@Override
-		public void unexpectedItem(IAbstractInputItem item) {
+		public void other(List<? extends IAbstractInputItem> counterExample) {
 		}
-		
+
 		@Override
-		public void other() {
+		public void overabstraction(
+				List<? extends IAbstractInputItem> counterExample) {
 		}
-		
+
 		@Override
-		public void overabstraction() {
+		public void unexpectedItem(IAbstractInputItem item,
+				List<? extends IAbstractInputItem> counterExample) {
 		}
 	};
 	
 	/**
 	 * This method is called if an unexpected token was met
 	 */
-	void unexpectedItem(IAbstractInputItem item);
+	void unexpectedItem(IAbstractInputItem item, List<? extends IAbstractInputItem> counterExample);
 	
 	/**
 	 * This method is called if an overabstraction was detected, e.g., a bounded-depth stack reached 
 	 * the TRUNCATED element
 	 */
-	void overabstraction();
+	void overabstraction(List<? extends IAbstractInputItem> counterExample);
 	
 	/**
 	 * This method is called in case of all other errors, e.g., unexpected end of input
 	 */
-	void other();
+	void other(List<? extends IAbstractInputItem> counterExample);
 }

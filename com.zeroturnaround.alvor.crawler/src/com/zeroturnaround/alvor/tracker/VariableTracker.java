@@ -275,11 +275,12 @@ public class VariableTracker {
 			IVariableBinding var, ASTNode target, MethodDeclaration decl) {
 		assert target == null ||  target == decl.getBody();
 		
+		NameUsage result = null;
 		if (target == null) {
-			return getLastModIn(var, decl.getBody());
+			result = getLastModIn(var, decl.getBody());
 		}
-		else {
-			assert target == decl.getBody();
+		
+		if (target != null || result == null) {
 			if (!var.isParameter()) {
 				throw new UnsupportedStringOpEx("Non-parameter var ("
 						+ var+ ") asked from MethodDeclaration ("
@@ -288,12 +289,10 @@ public class VariableTracker {
 			
 			int idx = ASTUtil.getParamIndex0(decl, var);
 			assert(idx != -1);
-//			if (idx == -1) {
-//				throw new UnsupportedStringOpEx("Parameter ("
-//						+ var+ ") not found in ("
-//						+ decl.getName().getFullyQualifiedName() + ")"); 
-//			}
 			return new NameInParameter(decl, idx);
+		}
+		else {
+			return result;
 		}
 	}
 

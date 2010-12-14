@@ -566,9 +566,12 @@ else
 	| /*empty*/
 	;
 simExList
-	: /*empty*/
-	| simpleExpr
-	| simExList ',' simpleExpr
+    : /*empty*/
+    | nonemptySimExList
+    ;	
+nonemptySimExList
+	: simpleExpr
+	| nonemptySimExList ',' simpleExpr
 	;
 partition
 	: '(' PARTITION BY ident orderBy ')'

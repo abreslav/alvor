@@ -117,6 +117,8 @@ public class GuiChecker implements ISQLErrorHandler {
 	}
 	
 	private static void createMarker(String message, String markerType, IPosition pos) {
+		if (pos instanceof DummyPosition)
+			return;
 		Map<String, Comparable<?>> map = new HashMap<String, Comparable<?>>();
 	
 		if (!HOTSPOT_MARKER_ID.equals(markerType)) {
@@ -182,7 +184,7 @@ public class GuiChecker implements ISQLErrorHandler {
 					message = message.substring(0, Character.MAX_VALUE - 3) + "...";
 				}
 				markerId = HOTSPOT_MARKER_ID;
-//				markConstants(abstractValue);
+				markConstants(abstractValue);
 			} else if (hotspot instanceof UnsupportedNodeDescriptor) {
 				UnsupportedNodeDescriptor und = (UnsupportedNodeDescriptor) hotspot;
 				message = "Unsupported construction: " + und.getProblemMessage();
