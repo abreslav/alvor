@@ -1,19 +1,19 @@
-DROP TRIGGER DeleteCollectionContentsRow;;;
-DROP TRIGGER DeleteCollectionContentsStmt;;;
---DROP TABLE Log;; ;
-DROP TABLE MethodImplementations;;;
-DROP TABLE MethodImplementationScope;;;
-DROP TABLE Signatures;;;
-DROP TABLE Unsupported;;;
-DROP TABLE Hotspots;;;
-DROP TABLE MethodUsageScope;;;
-DROP TABLE Methods;;;
-DROP TABLE CollectionContents;;;
-DROP TABLE AbstractStrings;;;
-DROP TABLE CharacterSets;;;
-DROP TABLE StringConstants;;;
-DROP TABLE SourceRanges;;;
-DROP TABLE Files;;;
+DROP TRIGGER DeleteCollectionContentsRow if exists;;;
+DROP TRIGGER DeleteCollectionContentsStmt if exists;;;
+--DROP TABLE Log if exists;; ;
+DROP TABLE MethodImplementations if exists;;;
+DROP TABLE MethodImplementationScope if exists;;;
+DROP TABLE Signatures if exists;;;
+DROP TABLE Unsupported if exists;;;
+DROP TABLE Hotspots if exists;;;
+DROP TABLE MethodUsageScope if exists;;;
+DROP TABLE Methods if exists;;;
+DROP TABLE CollectionContents if exists;;;
+DROP TABLE AbstractStrings if exists;;;
+DROP TABLE CharacterSets if exists;;;
+DROP TABLE StringConstants if exists;;;
+DROP TABLE SourceRanges if exists;;;
+DROP TABLE Files if exists;;;
 
 SET FILES LOG FALSE;;;
 
