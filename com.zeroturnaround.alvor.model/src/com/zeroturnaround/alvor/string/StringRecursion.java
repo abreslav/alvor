@@ -7,7 +7,7 @@ public class StringRecursion extends PositionedString {
 
 	public StringRecursion(IPosition position) {
 		super(position);
-		assert !(position instanceof DummyPosition); 
+		assert ! DummyPosition.isDummyPosition(position); 
 	}
 
 	@Override

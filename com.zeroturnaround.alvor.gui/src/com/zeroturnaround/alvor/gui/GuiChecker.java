@@ -17,6 +17,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
 import com.zeroturnaround.alvor.cache.CacheService;
+import com.zeroturnaround.alvor.cache.PositionUtil;
 import com.zeroturnaround.alvor.checkers.AbstractStringCheckerManager;
 import com.zeroturnaround.alvor.checkers.INodeDescriptor;
 import com.zeroturnaround.alvor.checkers.ISQLErrorHandler;
@@ -117,8 +118,6 @@ public class GuiChecker implements ISQLErrorHandler {
 	}
 	
 	private static void createMarker(String message, String markerType, IPosition pos) {
-		if (pos instanceof DummyPosition)
-			return;
 		Map<String, Comparable<?>> map = new HashMap<String, Comparable<?>>();
 	
 		if (!HOTSPOT_MARKER_ID.equals(markerType)) {
@@ -137,11 +136,10 @@ public class GuiChecker implements ISQLErrorHandler {
 		// or when new nodes are created in string transformings
 		// FIXME This actually shouldnt occur or
 		// maybe this should create a marker for the whole workspace ??
-		if (pos instanceof DummyPosition) {
+		if (DummyPosition.isDummyPosition(pos)) {
 			LOG.exception(new IllegalArgumentException("Warning: Dummy position in 'createMarker'"));
 			return;
 		}
-		
 		
 		if (map == null) {
 			map = new HashMap<String, Comparable<?>>();
