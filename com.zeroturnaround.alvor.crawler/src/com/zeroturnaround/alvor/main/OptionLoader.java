@@ -37,8 +37,8 @@ public class OptionLoader {
         return (IFile)project.findMember("/" + OptionLoader.CONF_FILE_NAME);
     }
 
-    public static boolean propertiesFileExists(IProject project) {
-    	return project.findMember("/" + OptionLoader.CONF_FILE_NAME) != null;
-    }
+//    public static boolean propertiesFileExists(IProject project) {
+//    	return project.findMember("/" + OptionLoader.CONF_FILE_NAME) != null;
+//    }
 
 }

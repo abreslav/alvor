@@ -1,0 +1,23 @@
+<alvor>
+    <hotspotPatterns>
+    	<hotspot 
+    		class=""
+    		method=""
+    		argumentIndex="1"/>
+    </hotspotPatterns>
+    
+    <dataSources>
+        <dataSource 
+            pattern="..." 
+            driverName=""
+            url=""
+            userName=""
+            password=""/>
+    </dataSources>
+    
+    <analyzerSettings
+    	enableLoops="true"
+    	maxDepth="5"
+    	preferTesting="true"    	
+    	/>
+</alvor>

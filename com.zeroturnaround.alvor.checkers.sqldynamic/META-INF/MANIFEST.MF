@@ -6,10 +6,10 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: com.zeroturnaround.alvor.checkers;bundle-version="1.0.0",
  com.zeroturnaround.alvor.model;bundle-version="1.0.0",
- com.zeroturnaround.alvor.common;bundle-version="1.0.0"
+ com.zeroturnaround.alvor.common;bundle-version="1.0.0",
+ com.zeroturnaround.alvor.db;bundle-version="1.0.0",
+ com.zeroturnaround.alvor.db.mysql;bundle-version="1.0.0",
+ com.zeroturnaround.alvor.db.oracle;bundle-version="1.0.0",
+ com.zeroturnaround.alvor.db.generic;bundle-version="1.0.0"
 Export-Package: com.zeroturnaround.alvor.checkers.sqldynamic
-Bundle-ClassPath: .,
- lib/ojdbc6.jar,
- lib/hsqldb.jar,
- lib/postgresql-8.4-701.jdbc4.jar,
- lib/mysql-connector-java-5.1.13-bin.jar
+Bundle-ClassPath: .

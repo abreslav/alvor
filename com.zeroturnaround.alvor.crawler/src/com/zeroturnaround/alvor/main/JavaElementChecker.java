@@ -216,21 +216,27 @@ public class JavaElementChecker {
 			ISQLErrorHandler errorHandler, 
 			IAbstractStringChecker dynamicChecker, 
 			IAbstractStringChecker staticChecker, 
-			Map<String, String> options) throws CheckerException {
+			Map<String, String> options) {
 		
 		for (IStringNodeDescriptor descriptor : descriptors) {
-			if (dynamicCheckerIsConfigured(options)) { 
-				// use staticChecker only when dynamic gives error
-				boolean dynResult = false;
-				try {
-					dynResult = dynamicChecker.checkAbstractString(descriptor, errorHandler, options);
-				} finally {
-					if (!dynResult) {
-						staticChecker.checkAbstractString(descriptor, errorHandler, options);
+			try {
+				if (dynamicCheckerIsConfigured(options)) { 
+					// use staticChecker only when dynamic gives error
+					boolean dynResult = false;
+					try {
+						dynResult = dynamicChecker.checkAbstractString(descriptor, errorHandler, options);
+					} finally {
+						if (!dynResult) {
+							staticChecker.checkAbstractString(descriptor, errorHandler, options);
+						}
 					}
+				} else {
+					staticChecker.checkAbstractString(descriptor, errorHandler, options);
 				}
-			} else {
-				staticChecker.checkAbstractString(descriptor, errorHandler, options);
+			} catch (Exception e) {
+				LOG.exception(e);
+				errorHandler.handleSQLWarning("Error during checking: " + e.getMessage(), 
+						descriptor.getPosition());
 			}
 		}
 	}
@@ -241,18 +247,25 @@ public class JavaElementChecker {
 			ISQLErrorHandler errorHandler, 
 			IAbstractStringChecker dynamicChecker, 
 			IAbstractStringChecker staticChecker, 
-			Map<String, String> options) throws CheckerException {
+			Map<String, String> options) {
 		
 		for (IStringNodeDescriptor descriptor : descriptors) {
-			// use dynamic only when static didn't find anything wrong, or when it crashed
-			// note that logic is different compared to PreferDynamic case
-			boolean staticResult = true;
 			try {
-				staticResult = staticChecker.checkAbstractString(descriptor, errorHandler, options);
-			} finally {
-				if (staticResult && dynamicCheckerIsConfigured(options)) {
-					dynamicChecker.checkAbstractString(descriptor, errorHandler, options);
+				// use dynamic only when static didn't find anything wrong, or when it crashed
+				// note that logic is different compared to PreferDynamic case
+				boolean staticResult = true;
+				try {
+					staticResult = staticChecker.checkAbstractString(descriptor, errorHandler, options);
+				} finally {
+					if (staticResult && dynamicCheckerIsConfigured(options)) {
+						dynamicChecker.checkAbstractString(descriptor, errorHandler, options);
+					}
 				}
+			} catch (Exception e) {
+				// should be able to proceed with next descriptors using static checker
+				LOG.exception(e);
+				errorHandler.handleSQLWarning("Error during checking: " + e.getMessage(), 
+						descriptor.getPosition());
 			}
 		}
 	}

@@ -572,7 +572,7 @@ simExList
 nonemptySimExList
 	: simpleExpr
 	| nonemptySimExList ',' simpleExpr
-	;
+   ;
 partition
 	: '(' PARTITION BY ident orderBy ')'
 	;
