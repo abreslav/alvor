@@ -14,6 +14,7 @@
          </run>
       </builder>
    </extension>
+   
    <extension
          id="esqlNature"
          name="Alvor SQL Checker Nature"
@@ -35,21 +36,26 @@
             objectClass="org.eclipse.core.resources.IProject"
             nameFilter="*"
             id="com.zeroturnaround.alvor.javaproject.contribution1">
+            
+         <!-- I'm just hiding this for now... //-->
          <action
-               label="Enable/Disable Alvor SQL Checker Nature"
+               label=" "
                class="com.zeroturnaround.alvor.javaproject.builder.ToggleNatureAction"
                menubarPath="additions"
                enablesFor="+"
                id="com.zeroturnaround.alvor.javaproject.addRemoveNatureAction">
          </action>
+         
+
+         <!-- Generate configuration, and enable nature... would want to open it too //-->
          <action
-               label="Generate Alvor sqlchecker.properties file"
-               class="com.zeroturnaround.alvor.javaproject.builder.GeneratePropertiesFile"
+               label="Generate and enable Alvor SQL checker configuration"
+               class="com.zeroturnaround.alvor.javaproject.builder.GenerateEnableConfAction"
                menubarPath="additions"
                enablesFor="+"
-               id="com.zeroturnaround.alvor.javaproject.generatePropertiesFileAction">
+               id="com.zeroturnaround.alvor.javaproject.generateEnableConfAction">
          </action>
+         
       </objectContribution>
    </extension>
-
 </plugin>
