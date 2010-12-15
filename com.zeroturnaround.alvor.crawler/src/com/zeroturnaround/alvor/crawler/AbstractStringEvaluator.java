@@ -530,7 +530,7 @@ public class AbstractStringEvaluator {
 			return evalNameAfterMethodEntryInParameter((NameInParameter)usage, context);
 		}
 		else if (usage instanceof NameInArgument) {
-			return evalNameAfterEvaluatingArgument(name, (NameInArgument)usage, context);
+			return evalNameAfterBeingArgument(name, (NameInArgument)usage, context);
 		}
 		else if (usage instanceof NameInMethodCallExpression) {
 			return evalNameAfterCallingItsMethod(name, (NameInMethodCallExpression)usage, context);
@@ -647,7 +647,7 @@ public class AbstractStringEvaluator {
 	}
 
  
-	private IAbstractString evalNameAfterEvaluatingArgument(Name name, NameInArgument usage, ContextLink context) {
+	private IAbstractString evalNameAfterBeingArgument(Name name, NameInArgument usage, ContextLink context) {
 		if (ASTUtil.isString(name.resolveTypeBinding())) {
 			// this usage doesn't affect it, keep looking
 			return evalNameBefore(name, usage.getNode(), context);
