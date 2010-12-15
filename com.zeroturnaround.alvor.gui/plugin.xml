@@ -242,6 +242,15 @@
             id="com.zeroturnaround.alvor.gui.AlvorPropertiesEditor"
             name="Alvor Properties Editor">
       </editor>
+      <editor
+            class="com.zeroturnaround.alvor.gui.configuration.AlvorXmlEditor"
+            contributorClass="com.zeroturnaround.alvor.gui.configuration.AlvorXmlEditorContributor"
+            default="true"
+            filenames="alvor.xml"
+            icon="icons/configure.gif"
+            id="com.zeroturnaround.alvor.gui.editor.AlvorXmlEditor"
+            name="Alvor configuration editor">
+      </editor>
    </extension>
 </plugin>
 
