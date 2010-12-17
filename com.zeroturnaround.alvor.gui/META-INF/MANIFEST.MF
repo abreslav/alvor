@@ -33,3 +33,4 @@ Export-Package: com.zeroturnaround.alvor.gui;
    com.zeroturnaround.alvor.checkers,
    org.eclipse.swt.widgets,
    org.eclipse.ui.editors.text"
+Bundle-Activator: com.zeroturnaround.alvor.gui.AlvorGuiPlugin
