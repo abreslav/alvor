@@ -244,13 +244,27 @@
       </editor>
       <editor
             class="com.zeroturnaround.alvor.gui.configuration.AlvorXmlEditor"
-            contributorClass="com.zeroturnaround.alvor.gui.configuration.AlvorXmlEditorContributor"
             default="true"
             filenames="alvor.xml"
             icon="icons/configure.gif"
             id="com.zeroturnaround.alvor.gui.editor.AlvorXmlEditor"
             name="Alvor configuration editor">
       </editor>
+   </extension>
+   <extension
+         point="org.eclipse.help.toc">
+      <toc
+            file="help/toc.xml"
+            primary="true">
+      </toc>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="com.zeroturnaround.alvor.gui.configuration.AlvorPreferencePage"
+            id="com.zeroturnaround.alvor.gui.configuration.AlvorPreferencePage"
+            name="Alvor SQL checker">
+      </page>
    </extension>
 </plugin>
 
