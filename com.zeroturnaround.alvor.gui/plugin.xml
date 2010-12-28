@@ -261,9 +261,49 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="com.zeroturnaround.alvor.gui.configuration.AlvorPreferencePage"
+            class="com.zeroturnaround.alvor.gui.configuration.MainPreferencePage"
             id="com.zeroturnaround.alvor.gui.configuration.AlvorPreferencePage"
             name="Alvor SQL checker">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="com.zeroturnaround.alvor.gui.configuration.MainPropertyPage"
+            id="com.zeroturnaround.alvor.gui.configuration.MainPropertyPage"
+            name="Alvor SQL Checker"
+            nameFilter="*"
+            >
+         <filter name="nature" value="org.eclipse.jdt.core.javanature">
+         </filter>
+         <enabledWhen>
+            <instanceof value="org.eclipse.core.resources.IProject">
+            </instanceof>
+         </enabledWhen>
+      </page>
+      <page
+            category="com.zeroturnaround.alvor.gui.configuration.MainPropertyPage"
+            class="com.zeroturnaround.alvor.gui.configuration.HotspotsPropertyPage"
+            id="com.zeroturnaround.alvor.gui.configuration.HotspotsPropertyPage"
+            name="Hotspots">
+         <filter name="nature" value="org.eclipse.jdt.core.javanature">
+         </filter>
+         <enabledWhen>
+            <instanceof value="org.eclipse.core.resources.IProject">
+            </instanceof>
+         </enabledWhen>
+      </page>
+      <page
+            category="com.zeroturnaround.alvor.gui.configuration.MainPropertyPage"
+            class="com.zeroturnaround.alvor.gui.configuration.DatabasesPropertyPage"
+            id="com.zeroturnaround.alvor.gui.configuration.DatabasesPropertyPage"
+            name="Databases">
+         <filter name="nature" value="org.eclipse.jdt.core.javanature">
+         </filter>
+         <enabledWhen>
+            <instanceof value="org.eclipse.core.resources.IProject">
+            </instanceof>
+         </enabledWhen>
       </page>
    </extension>
 </plugin>

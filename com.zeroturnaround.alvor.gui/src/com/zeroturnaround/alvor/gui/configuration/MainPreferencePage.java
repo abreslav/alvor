@@ -8,14 +8,15 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class AlvorPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+public class MainPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 
 	@Override
 	protected Control createContents(Composite parent) {
 		noDefaultAndApplyButton();
 		
 		Label label = new Label(parent, SWT.WRAP);
-		label.setText("Alvor is configured project-wise. Right-click on project and ...");
+		label.setText("Alvor is configured project-wise. Right-click on project and" +
+				" select 'Properties' -> 'Alvor SQL Checker'");
 		return null;
 	}
 
