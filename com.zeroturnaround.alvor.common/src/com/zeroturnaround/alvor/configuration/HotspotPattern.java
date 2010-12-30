@@ -1,5 +1,7 @@
 package com.zeroturnaround.alvor.configuration;
 
+import com.zeroturnaround.alvor.common.IHotspotPattern;
+
 public class HotspotPattern implements IHotspotPattern {
 	private int argumentIndex;
 	private String methodName;
@@ -33,5 +35,10 @@ public class HotspotPattern implements IHotspotPattern {
 	
 	public void setArgumentIndex(int argumentIndex) {
 		this.argumentIndex = argumentIndex;
+	}
+	
+	@Override
+	public String toString() {
+		return "Argument " + getArgumentIndex() + " of " + getClassName() + "." +  getMethodName();
 	}
 }

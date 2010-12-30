@@ -28,8 +28,9 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
-import com.zeroturnaround.alvor.crawler.ASTUtil;
 import com.zeroturnaround.alvor.string.IPosition;
+import com.zeroturnaround.alvor.util.ASTUtil;
+import com.zeroturnaround.alvor.util.UnsupportedStringOpExAtNode;
 
 /*
  * getLastReachingModIn* methods stay in given scope
@@ -188,7 +189,7 @@ public class VariableTracker {
 			return null;
 		}
 		else {
-			throw new UnsupportedStringOpEx("getLastReachingModIn " + scope.getClass(), scope);
+			throw new UnsupportedStringOpExAtNode("getLastReachingModIn " + scope.getClass(), scope);
 		}
 	}
 
@@ -242,7 +243,7 @@ public class VariableTracker {
 		// ++ or --
 		if (target == null) {
 			if (ASTUtil.sameBinding(postfix.getOperand(), var)) {
-				throw new UnsupportedStringOpEx("Postfix operand", postfix);
+				throw new UnsupportedStringOpExAtNode("Postfix operand", postfix);
 			}
 		}
 		return getLastReachingModIn(var, target, postfix.getOperand());
@@ -282,7 +283,7 @@ public class VariableTracker {
 		
 		if (target != null || result == null) {
 			if (!var.isParameter()) {
-				throw new UnsupportedStringOpEx("Non-parameter var ("
+				throw new UnsupportedStringOpExAtNode("Non-parameter var ("
 						+ var+ ") asked from MethodDeclaration ("
 						+ decl.getName().getFullyQualifiedName() + ")", decl); 
 			}

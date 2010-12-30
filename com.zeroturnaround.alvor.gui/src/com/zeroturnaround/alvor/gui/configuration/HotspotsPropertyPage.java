@@ -13,8 +13,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import com.zeroturnaround.alvor.common.IHotspotPattern;
 import com.zeroturnaround.alvor.configuration.HotspotPattern;
-import com.zeroturnaround.alvor.configuration.IHotspotPattern;
 import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
 
 public class HotspotsPropertyPage extends CommonPropertyPage {

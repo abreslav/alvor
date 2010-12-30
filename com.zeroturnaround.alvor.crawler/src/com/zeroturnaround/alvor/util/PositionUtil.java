@@ -1,4 +1,4 @@
-package com.zeroturnaround.alvor.common.util;
+package com.zeroturnaround.alvor.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;

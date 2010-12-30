@@ -14,10 +14,10 @@ import org.eclipse.ui.IEditorPart;
 
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
-import com.zeroturnaround.alvor.common.util.PositionUtil;
 import com.zeroturnaround.alvor.conntracker.ConnectionDescriptor;
 import com.zeroturnaround.alvor.conntracker.ConnectionTracker;
-import com.zeroturnaround.alvor.crawler.ASTUtil;
+import com.zeroturnaround.alvor.util.ASTUtil;
+import com.zeroturnaround.alvor.util.PositionUtil;
 
 public class ConnectionSourceFinder implements IEditorActionDelegate {
 	private static final ILog LOG = Logs.getLog(ConnectionSourceFinder.class);

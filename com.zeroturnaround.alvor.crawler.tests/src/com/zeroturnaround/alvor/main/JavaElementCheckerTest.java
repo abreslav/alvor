@@ -21,14 +21,14 @@ import org.eclipse.jdt.core.JavaCore;
 import org.junit.Test;
 
 import com.zeroturnaround.alvor.cache.CacheService;
-import com.zeroturnaround.alvor.checkers.INodeDescriptor;
-import com.zeroturnaround.alvor.checkers.IStringNodeDescriptor;
-import com.zeroturnaround.alvor.common.util.PositionUtil;
+import com.zeroturnaround.alvor.common.INodeDescriptor;
+import com.zeroturnaround.alvor.common.IStringNodeDescriptor;
+import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.configuration.ConfigurationManager;
 import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
-import com.zeroturnaround.alvor.crawler.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.samplegen.SampleGenerator;
+import com.zeroturnaround.alvor.util.PositionUtil;
 
 public class JavaElementCheckerTest {
 	JavaElementChecker checker = new JavaElementChecker();

@@ -24,10 +24,10 @@ import com.zeroturnaround.alvor.cache.CacheService;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.common.logging.Timer;
-import com.zeroturnaround.alvor.common.util.PositionUtil;
 import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
 import com.zeroturnaround.alvor.gui.GuiChecker;
 import com.zeroturnaround.alvor.string.IPosition;
+import com.zeroturnaround.alvor.util.PositionUtil;
 
 public class ESQLBuilder extends IncrementalProjectBuilder {
 	GuiChecker checker = null; // seems I can't initialize it here (?)

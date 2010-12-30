@@ -3,8 +3,7 @@ package com.zeroturnaround.alvor.cache;
 import java.util.Collection;
 import java.util.Set;
 
-import com.zeroturnaround.alvor.common.MethodInvocationDescriptor;
-import com.zeroturnaround.alvor.configuration.IHotspotPattern;
+import com.zeroturnaround.alvor.common.IHotspotPattern;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.IPosition;
 

@@ -39,12 +39,12 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.junit.Assert;
 
-import com.zeroturnaround.alvor.checkers.INodeDescriptor;
-import com.zeroturnaround.alvor.checkers.IStringNodeDescriptor;
-import com.zeroturnaround.alvor.common.util.PositionUtil;
-import com.zeroturnaround.alvor.crawler.UnsupportedNodeDescriptor;
+import com.zeroturnaround.alvor.common.INodeDescriptor;
+import com.zeroturnaround.alvor.common.IStringNodeDescriptor;
+import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.samplegen.SampleGenerator;
+import com.zeroturnaround.alvor.util.PositionUtil;
 
 public abstract class GUITest {
 	GuiChecker checker = new GuiChecker();

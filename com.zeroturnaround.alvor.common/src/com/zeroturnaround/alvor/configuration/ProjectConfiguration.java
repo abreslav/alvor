@@ -6,6 +6,8 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 
+import com.zeroturnaround.alvor.common.IHotspotPattern;
+
 public class ProjectConfiguration {
 	public enum CheckingStrategy {PREFER_STATIC, PREFER_DYNAMIC, ALL_CHECKERS}
 	

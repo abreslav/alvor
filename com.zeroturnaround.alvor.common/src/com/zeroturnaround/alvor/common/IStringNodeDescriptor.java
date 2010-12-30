@@ -1,4 +1,4 @@
-package com.zeroturnaround.alvor.checkers;
+package com.zeroturnaround.alvor.common;
 
 import com.zeroturnaround.alvor.string.IAbstractString;
 

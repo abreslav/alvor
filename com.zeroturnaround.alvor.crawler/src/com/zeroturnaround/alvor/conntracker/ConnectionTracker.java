@@ -7,13 +7,13 @@ import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 
-import com.zeroturnaround.alvor.common.util.PositionUtil;
 import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
 import com.zeroturnaround.alvor.string.IPosition;
 import com.zeroturnaround.alvor.tracker.NameAssignment;
 import com.zeroturnaround.alvor.tracker.NameInParameter;
 import com.zeroturnaround.alvor.tracker.NameUsage;
 import com.zeroturnaround.alvor.tracker.VariableTracker;
+import com.zeroturnaround.alvor.util.PositionUtil;
 
 public class ConnectionTracker {
 	public static ConnectionDescriptor getConnectionDescriptorForHotspot(IPosition pos) {

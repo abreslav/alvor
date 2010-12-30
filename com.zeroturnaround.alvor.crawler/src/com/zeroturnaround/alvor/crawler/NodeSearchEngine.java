@@ -39,13 +39,14 @@ import org.eclipse.jdt.core.search.SearchRequestor;
 
 import com.zeroturnaround.alvor.cache.CacheService;
 import com.zeroturnaround.alvor.cache.ICacheService;
+import com.zeroturnaround.alvor.common.IHotspotPattern;
 import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.common.logging.Measurements;
-import com.zeroturnaround.alvor.common.util.PositionUtil;
-import com.zeroturnaround.alvor.configuration.IHotspotPattern;
 import com.zeroturnaround.alvor.string.IPosition;
+import com.zeroturnaround.alvor.util.ASTUtil;
+import com.zeroturnaround.alvor.util.PositionUtil;
 
 /**
  * Implements some Java searches + Node searches required by AbstractStringEvaluator
