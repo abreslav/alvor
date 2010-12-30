@@ -1,4 +1,4 @@
-package com.zeroturnaround.alvor.configuration;
+package com.zeroturnaround.alvor.common;
 
 public interface IHotspotPattern {
 

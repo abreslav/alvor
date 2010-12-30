@@ -2,8 +2,8 @@ package com.zeroturnaround.alvor.crawler;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 
-import com.zeroturnaround.alvor.common.util.PositionUtil;
 import com.zeroturnaround.alvor.string.IPosition;
+import com.zeroturnaround.alvor.util.PositionUtil;
 
 /*
  * Used for recording chain of analysis steps 

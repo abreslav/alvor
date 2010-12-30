@@ -1,6 +1,5 @@
-package com.zeroturnaround.alvor.crawler;
+package com.zeroturnaround.alvor.common;
 
-import com.zeroturnaround.alvor.checkers.INodeDescriptor;
 import com.zeroturnaround.alvor.string.IPosition;
 
 public class NodeDescriptor implements INodeDescriptor {

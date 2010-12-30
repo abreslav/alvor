@@ -2,6 +2,7 @@ package com.zeroturnaround.alvor.checkers;
 
 import java.util.List;
 
+import com.zeroturnaround.alvor.common.IStringNodeDescriptor;
 import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
 
 public interface IAbstractStringChecker {

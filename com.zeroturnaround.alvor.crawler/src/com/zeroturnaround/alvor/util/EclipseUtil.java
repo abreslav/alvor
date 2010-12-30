@@ -1,4 +1,4 @@
-package com.zeroturnaround.alvor.crawler;
+package com.zeroturnaround.alvor.util;
 
 import java.util.HashSet;
 import java.util.Set;

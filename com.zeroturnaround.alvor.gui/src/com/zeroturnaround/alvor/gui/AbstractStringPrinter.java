@@ -15,10 +15,10 @@ import org.eclipse.ui.IEditorPart;
 import com.zeroturnaround.alvor.cache.CacheService;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
-import com.zeroturnaround.alvor.crawler.ASTUtil;
 import com.zeroturnaround.alvor.crawler.AbstractStringEvaluator;
 import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
 import com.zeroturnaround.alvor.string.IAbstractString;
+import com.zeroturnaround.alvor.util.ASTUtil;
 
 public class AbstractStringPrinter implements IEditorActionDelegate{
 	

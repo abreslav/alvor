@@ -1,4 +1,4 @@
-package com.zeroturnaround.alvor.crawler;
+package com.zeroturnaround.alvor.util;
 
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
@@ -42,7 +42,6 @@ import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
-import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
 
 public class ASTUtil {
 	public static TypeDeclaration getContainingTypeDeclaration(ASTNode node) {
@@ -108,7 +107,7 @@ public class ASTUtil {
 			return false;
 		}
 		else {
-			throw new UnsupportedStringOpEx("Checking whether var is mentioned. "
+			throw new UnsupportedStringOpExAtNode("Checking whether var is mentioned. "
 					+ "Unsupported expression: "
 					+ expr.getClass(), expr);
 		}
@@ -146,7 +145,7 @@ public class ASTUtil {
 			return getPrevStmt((TryStatement)node.getParent());
 		}
 		else { 
-			throw new UnsupportedStringOpEx("getPrevStatement(" + node.getClass().getName() 
+			throw new UnsupportedStringOpExAtNode("getPrevStatement(" + node.getClass().getName() 
 				+ ", parent is " + node.getParent().getClass().getName() + ")", node);
 		}
 	}
