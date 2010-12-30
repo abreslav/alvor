@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-Bundle-ManifestVersion: 2
-Bundle-Name: Configuration
-Bundle-SymbolicName: com.zeroturnaround.alvor.configuration
-Bundle-Version: 1.0.0.qualifier
-Bundle-Vendor: ZEROTURNAROUND
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
