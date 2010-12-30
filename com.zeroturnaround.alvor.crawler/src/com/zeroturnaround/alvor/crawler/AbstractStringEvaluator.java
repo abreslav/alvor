@@ -31,12 +31,13 @@ import org.eclipse.jdt.core.dom.TagElement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 import com.zeroturnaround.alvor.cache.CacheService;
-import com.zeroturnaround.alvor.cache.PositionUtil;
-import com.zeroturnaround.alvor.cache.UnsupportedStringOpEx;
 import com.zeroturnaround.alvor.checkers.INodeDescriptor;
 import com.zeroturnaround.alvor.checkers.IStringNodeDescriptor;
+import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
+import com.zeroturnaround.alvor.common.util.PositionUtil;
+import com.zeroturnaround.alvor.configuration.IHotspotPattern;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.IPosition;
 import com.zeroturnaround.alvor.string.StringChoice;
@@ -93,9 +94,9 @@ public class AbstractStringEvaluator {
 	}
 	
 	public static List<INodeDescriptor> evaluateMethodArgumentAtCallSites
-		(Collection<NodeRequest> requests, IJavaElement[] scope, int level, ContextLink context) {
+		(Collection<IHotspotPattern> requests, IJavaElement[] scope, int level, ContextLink context) {
 		logMessage("SEARCHING", level, null);
-		for (NodeRequest nodeRequest : requests) {
+		for (IHotspotPattern nodeRequest : requests) {
 			logMessage(nodeRequest, level, null);
 		}
 		
@@ -721,7 +722,7 @@ public class AbstractStringEvaluator {
 			
 			List<INodeDescriptor> descList = evaluateMethodArgumentAtCallSites(
 					Collections.singleton(
-							new NodeRequest(
+							(IHotspotPattern)new NodeRequest(
 									ASTUtil.getMethodClassName(method), 
 									methodName,
 									usage.getIndex()+1)), 

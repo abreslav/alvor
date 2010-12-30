@@ -9,7 +9,6 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 import org.eclipse.core.resources.IProject;
@@ -22,9 +21,11 @@ import org.eclipse.jdt.core.JavaCore;
 import org.junit.Test;
 
 import com.zeroturnaround.alvor.cache.CacheService;
-import com.zeroturnaround.alvor.cache.PositionUtil;
 import com.zeroturnaround.alvor.checkers.INodeDescriptor;
 import com.zeroturnaround.alvor.checkers.IStringNodeDescriptor;
+import com.zeroturnaround.alvor.common.util.PositionUtil;
+import com.zeroturnaround.alvor.configuration.ConfigurationManager;
+import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
 import com.zeroturnaround.alvor.crawler.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.samplegen.SampleGenerator;
@@ -89,8 +90,8 @@ public class JavaElementCheckerTest {
 	}
 	
 	private void testJavaElementAbstractStrings(IJavaElement element, String id) throws IOException {
-		Map<String, String> options = OptionLoader.getElementSqlCheckerProperties(element);
-		List<INodeDescriptor> hotspots = checker.findAndEvaluateHotspots(new IJavaElement[] {element}, options);
+		ProjectConfiguration conf = ConfigurationManager.readProjectConfiguration(element.getJavaProject().getProject(), true);
+		List<INodeDescriptor> hotspots = checker.findAndEvaluateHotspots(new IJavaElement[] {element}, conf);
 		
 		// assuming current folder is folder of the project containing this test
 		String filePrefix = "tests/" + id;

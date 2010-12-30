@@ -3,7 +3,6 @@ package com.zeroturnaround.alvor.checkers.sqlstatic;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.zeroturnaround.alvor.checkers.CheckerException;
@@ -12,6 +11,7 @@ import com.zeroturnaround.alvor.checkers.ISQLErrorHandler;
 import com.zeroturnaround.alvor.checkers.IStringNodeDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
+import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
 import com.zeroturnaround.alvor.lexer.alphabet.IAbstractInputItem;
 import com.zeroturnaround.alvor.lexer.alphabet.Token;
 import com.zeroturnaround.alvor.lexer.automata.State;
@@ -40,9 +40,9 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 	
 	@Override
 	public void checkAbstractStrings(List<IStringNodeDescriptor> descriptors,
-			final ISQLErrorHandler errorHandler, Map<String, String> options) throws CheckerException {
+			final ISQLErrorHandler errorHandler, ProjectConfiguration configuration) throws CheckerException {
 		for (final IStringNodeDescriptor descriptor : descriptors) {
-			checkAbstractString(descriptor, errorHandler, options);
+			checkAbstractString(descriptor, errorHandler, configuration);
 		}
 	}
 
@@ -115,7 +115,7 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 
 	@Override
 	public boolean checkAbstractString(IStringNodeDescriptor descriptor,
-			ISQLErrorHandler errorHandler, Map<String, String> options)
+			ISQLErrorHandler errorHandler, ProjectConfiguration configuration)
 			throws CheckerException {
 		
 		IAbstractString abstractString = descriptor.getAbstractValue();

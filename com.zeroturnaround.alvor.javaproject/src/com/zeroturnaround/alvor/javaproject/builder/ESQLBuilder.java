@@ -21,14 +21,12 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaCore;
 
 import com.zeroturnaround.alvor.cache.CacheService;
-import com.zeroturnaround.alvor.cache.PositionUtil;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.common.logging.Timer;
+import com.zeroturnaround.alvor.common.util.PositionUtil;
 import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
 import com.zeroturnaround.alvor.gui.GuiChecker;
-import com.zeroturnaround.alvor.gui.GuiUtil;
-import com.zeroturnaround.alvor.main.OptionLoader;
 import com.zeroturnaround.alvor.string.IPosition;
 
 public class ESQLBuilder extends IncrementalProjectBuilder {
@@ -136,14 +134,6 @@ public class ESQLBuilder extends IncrementalProjectBuilder {
 		DeltaVisitor visitor = new DeltaVisitor();
 		delta.accept(visitor);
 		
-		// if SQL-checker got modified, then re-check everything
-		// TODO: this should be more graceful 
-		if (invalidatedFiles.contains(OptionLoader.getElementSqlCheckerPropertiesRes(this.getProject()))) {
-			//this.cleanBuild(monitor);
-			GuiUtil.ShowInfoDialog("Please do full analysis after changing SQL checker configuration");
-			return;
-		}
-		
 		// it's supposedly more efficient to remove all files together from cache 
 		Set<String> filesToRecheck = new HashSet<String>();
 		for (IFile f : invalidatedFiles) {
@@ -200,7 +190,7 @@ public class ESQLBuilder extends IncrementalProjectBuilder {
 			if (checker == null) {
 				checker = new GuiChecker();
 			}
-			checker.performIncrementalCheck(JavaCore.create(getProject()), elements);
+			checker.performIncrementalCheck(getProject(), elements);
 		} catch (Throwable e) {
 			LOG.error("ESQLBuilder.checkResources", e);
 		} 

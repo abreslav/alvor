@@ -232,26 +232,6 @@
    </extension>
    
    <extension
-         point="org.eclipse.ui.editors">
-      <editor
-	        default="true"
-            class="com.zeroturnaround.alvor.gui.AlvorPropertiesEditor"
-            contributorClass="com.zeroturnaround.alvor.gui.AlvorPropertiesEditorContributor"
-            filenames="sqlchecker.properties"
-            icon="icons/sample.gif"
-            id="com.zeroturnaround.alvor.gui.AlvorPropertiesEditor"
-            name="Alvor Properties Editor">
-      </editor>
-      <editor
-            class="com.zeroturnaround.alvor.gui.configuration.AlvorXmlEditor"
-            default="true"
-            filenames="alvor.xml"
-            icon="icons/configure.gif"
-            id="com.zeroturnaround.alvor.gui.editor.AlvorXmlEditor"
-            name="Alvor configuration editor">
-      </editor>
-   </extension>
-   <extension
          point="org.eclipse.help.toc">
       <toc
             file="help/toc.xml"

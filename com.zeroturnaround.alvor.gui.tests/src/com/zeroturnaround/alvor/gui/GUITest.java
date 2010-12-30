@@ -39,9 +39,9 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.junit.Assert;
 
-import com.zeroturnaround.alvor.cache.PositionUtil;
 import com.zeroturnaround.alvor.checkers.INodeDescriptor;
 import com.zeroturnaround.alvor.checkers.IStringNodeDescriptor;
+import com.zeroturnaround.alvor.common.util.PositionUtil;
 import com.zeroturnaround.alvor.crawler.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.samplegen.SampleGenerator;
@@ -80,7 +80,7 @@ public abstract class GUITest {
 	}
 	
 	protected String testAbstractStringsClean(IJavaElement element) throws FileNotFoundException {
-		List<INodeDescriptor> hotspots = checker.performCleanCheck(element, new IJavaElement[] {element});
+		List<INodeDescriptor> hotspots = checker.performCleanCheck(element.getJavaProject().getProject(), new IJavaElement[] {element});
 		return writeAndTestHotspots(hotspots, getElementDescriptor(element));
 	}
 	

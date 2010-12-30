@@ -1,11 +1,11 @@
 package com.zeroturnaround.alvor.configuration;
 
-public class HotspotProperties {
+public class HotspotPattern implements IHotspotPattern {
 	private int argumentIndex;
 	private String methodName;
 	private String className;
 
-	public HotspotProperties(String className, String methodName, int argumentIndex) {
+	public HotspotPattern(String className, String methodName, int argumentIndex) {
 		this.className = className;
 		this.methodName = methodName;
 		this.argumentIndex = argumentIndex;

@@ -1,6 +1,5 @@
 package com.zeroturnaround.alvor.gui;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,26 +7,26 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
 import com.zeroturnaround.alvor.cache.CacheService;
-import com.zeroturnaround.alvor.cache.PositionUtil;
 import com.zeroturnaround.alvor.checkers.AbstractStringCheckerManager;
 import com.zeroturnaround.alvor.checkers.INodeDescriptor;
 import com.zeroturnaround.alvor.checkers.ISQLErrorHandler;
 import com.zeroturnaround.alvor.checkers.IStringNodeDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
+import com.zeroturnaround.alvor.configuration.ConfigurationManager;
+import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
 import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
 import com.zeroturnaround.alvor.crawler.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.main.JavaElementChecker;
-import com.zeroturnaround.alvor.main.OptionLoader;
 import com.zeroturnaround.alvor.string.DummyPosition;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.IAbstractStringVisitor;
@@ -52,7 +51,7 @@ public class GuiChecker implements ISQLErrorHandler {
 	
 	private JavaElementChecker projectChecker = new JavaElementChecker();
 	
-	public List<INodeDescriptor> performCleanCheck(IJavaElement optionsFrom, IJavaElement[] scope) {
+	public List<INodeDescriptor> performCleanCheck(IProject optionsFrom, IJavaElement[] scope) {
 		NodeSearchEngine.clearASTCache();
 		CacheService.getCacheService().clearAll();
 		return performIncrementalCheck(optionsFrom, scope);
@@ -64,40 +63,30 @@ public class GuiChecker implements ISQLErrorHandler {
 	 * 
 	 * Also, it's assumed that sqlchecker.properties for the project exists
 	 */
-	public List<INodeDescriptor> performIncrementalCheck(IJavaElement optionsFrom, IJavaElement[] scope) {
+	public List<INodeDescriptor> performIncrementalCheck(IProject optionsFrom, IJavaElement[] scope) {
 		
 		if (scope.length == 0) {
 			return new ArrayList<INodeDescriptor>();
 		}
 		
 		cleanMarkers(scope);
-		cleanConfigurationMarkers(optionsFrom.getJavaProject());
+		cleanConfigurationMarkers(optionsFrom);
 		
-		try {
-			Map<String, String> options = OptionLoader.getElementSqlCheckerProperties(optionsFrom);
-			List<INodeDescriptor> hotspots = projectChecker.findAndEvaluateHotspots(scope, options);
-			markHotspots(hotspots);
-			
-			projectChecker.processHotspots(hotspots, this,
-					AbstractStringCheckerManager.INSTANCE.getCheckers(),
-					options
-			);
-			
-			return hotspots;
-		}
-		catch (IOException e) {
-			LOG.exception(e);
-			return new ArrayList<INodeDescriptor>();
-		}
+		ProjectConfiguration conf = ConfigurationManager.readProjectConfiguration(optionsFrom, true);
+		List<INodeDescriptor> hotspots = projectChecker.findAndEvaluateHotspots(scope, conf);
+		markHotspots(hotspots);
+		
+		projectChecker.processHotspots(hotspots, this,
+				AbstractStringCheckerManager.INSTANCE.getCheckers(), conf);
+		
+		return hotspots;
 	}
 
 	
-	private void cleanConfigurationMarkers(IJavaProject project) {
+	private void cleanConfigurationMarkers(IProject project) {
 		try {
-			OptionLoader.getElementSqlCheckerPropertiesRes(project.getProject()).deleteMarkers(ERROR_MARKER_ID, 
-					true, IResource.DEPTH_ZERO);
-			OptionLoader.getElementSqlCheckerPropertiesRes(project.getProject()).deleteMarkers(WARNING_MARKER_ID, 
-					true, IResource.DEPTH_ZERO);
+			project.deleteMarkers(ERROR_MARKER_ID, true, IResource.DEPTH_ONE);
+			project.deleteMarkers(WARNING_MARKER_ID, true, IResource.DEPTH_ONE);
 		} catch (CoreException e) {
 			LOG.error("Cleaning markers", e);
 		}

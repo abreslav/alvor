@@ -1,4 +1,4 @@
-package com.zeroturnaround.alvor.cache;
+package com.zeroturnaround.alvor.common;
 
 import org.eclipse.jdt.core.dom.MethodInvocation;
 

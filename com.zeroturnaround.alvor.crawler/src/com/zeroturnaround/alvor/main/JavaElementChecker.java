@@ -1,13 +1,10 @@
 package com.zeroturnaround.alvor.main;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.jdt.core.IJavaElement;
 
-import com.zeroturnaround.alvor.cache.PositionUtil;
 import com.zeroturnaround.alvor.checkers.CheckerException;
 import com.zeroturnaround.alvor.checkers.IAbstractStringChecker;
 import com.zeroturnaround.alvor.checkers.INodeDescriptor;
@@ -19,8 +16,11 @@ import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.common.logging.Measurements;
 import com.zeroturnaround.alvor.common.logging.Timer;
+import com.zeroturnaround.alvor.common.util.PositionUtil;
+import com.zeroturnaround.alvor.configuration.DataSourceProperties;
+import com.zeroturnaround.alvor.configuration.IHotspotPattern;
+import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
 import com.zeroturnaround.alvor.crawler.AbstractStringEvaluator;
-import com.zeroturnaround.alvor.crawler.NodeRequest;
 import com.zeroturnaround.alvor.crawler.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.string.Position;
 
@@ -33,7 +33,6 @@ import com.zeroturnaround.alvor.string.Position;
  */
 public class JavaElementChecker {
 
-	private static final String HOTSPOTS = "hotspots";
 	private static final ILog LOG = Logs.getLog(JavaElementChecker.class);
 	private static final ILog HOTSPOTS_LOG = Logs.getLog("Hotspots");
 	
@@ -48,12 +47,12 @@ public class JavaElementChecker {
 	 * (or markers for unsupported cases)  
 	 * TODO rename?
 	 */
-	public List<INodeDescriptor> findAndEvaluateHotspots(IJavaElement[] scope, Map<String, String> options) {
+	public List<INodeDescriptor> findAndEvaluateHotspots(IJavaElement[] scope, ProjectConfiguration conf) {
 		Measurements.resetAll();
 		
 		Timer timer = new Timer();
 		timer.start("TIMER: string construction");
-		List<NodeRequest> requests = parseNodeRequests(options);
+		List<IHotspotPattern> requests = conf.getHotspots();
 		if (requests.isEmpty()) {
 			throw new IllegalArgumentException("No hotspot definitions found in options");
 		}
@@ -71,7 +70,7 @@ public class JavaElementChecker {
 		List<INodeDescriptor> hotspots, 
 		ISQLErrorHandler errorHandler, 
 		List<IAbstractStringChecker> checkers, 
-		Map<String, String> options) {
+		ProjectConfiguration configuration) {
 		
 //		Map<String, Integer> connMap = new Hashtable<String, Integer>();
 		int unsupportedCount = 0;
@@ -109,7 +108,7 @@ public class JavaElementChecker {
 				throw new IllegalArgumentException("Unknown type of INodeTypeDescriptor: " + hotspot.getClass().getName());
 			}
 		}
-		checkValidHotspots(validHotspots, errorHandler, checkers, options);
+		checkValidHotspots(validHotspots, errorHandler, checkers, configuration);
 		
 		LOG.message("Processed " + hotspots.size() + " node descriptors, "
 				+ validHotspots.size() + " of them with valid abstract strings, "
@@ -127,25 +126,21 @@ public class JavaElementChecker {
 			List<IStringNodeDescriptor> hotspots, 
 			ISQLErrorHandler errorHandler, 
 			List<IAbstractStringChecker> checkers, 
-			Map<String, String> options) {
+			ProjectConfiguration configuration) {
 		
 		Timer timer = new Timer();
 		timer.start("TIMER checking");
 		
-		if (!dynamicCheckerIsConfigured(options)) {
+		if (!dynamicCheckerIsConfigured(configuration)) {
 			errorHandler.handleSQLWarning(
 					"SQL checker: Test-database is not configured, SQL testing is not performed",
-					new Position(options.get("SourceFileName"), 0, 0));
+					new Position(configuration.getProjectPath(), 0, 0));
 		}
 		
 		try {
-			String strategy = options.get("checkingStrategy");
-			if (strategy == null || strategy.isEmpty()) {
-				strategy = "preferStatic";
-			}
-			if (strategy.equals("allCheckers")) {
+			if (configuration.getCheckingStrategy() == ProjectConfiguration.CheckingStrategy.ALL_CHECKERS) {
 				assert LOG.message("Checking with all checkers");
-				checkValidHotspotsWithAllCheckers(hotspots, errorHandler, checkers, options);
+				checkValidHotspotsWithAllCheckers(hotspots, errorHandler, checkers, configuration);
 			}
 			
 			else {
@@ -164,17 +159,17 @@ public class JavaElementChecker {
 				}
 				
 				assert (dynamicChecker != null && staticChecker != null);
-				if (strategy.equals("preferDynamic")) {
+				if (configuration.getCheckingStrategy() == ProjectConfiguration.CheckingStrategy.PREFER_DYNAMIC) {
 					assert LOG.message("Prefering dynamic checker");
-					checkValidHotspotsPreferDynamic(hotspots, errorHandler, dynamicChecker, staticChecker, options);
+					checkValidHotspotsPreferDynamic(hotspots, errorHandler, dynamicChecker, staticChecker, configuration);
 				}
-				else if (strategy.equals("preferStatic")) { 
+				else if (configuration.getCheckingStrategy() == ProjectConfiguration.CheckingStrategy.PREFER_STATIC) { 
 					assert LOG.message("Prefering static checker");
-					checkValidHotspotsPreferStatic(hotspots, errorHandler, dynamicChecker, staticChecker, options);
+					checkValidHotspotsPreferStatic(hotspots, errorHandler, dynamicChecker, staticChecker, configuration);
 				}
 				else {
 					throw new CheckerException("Unknown checking strategy",
-							new Position(options.get("SourceFileName"), 0, 0));
+							new Position(configuration.getProjectPath(), 0, 0));
 				}
 			}
 		}
@@ -189,26 +184,27 @@ public class JavaElementChecker {
 			List<IStringNodeDescriptor> hotspots, 
 			ISQLErrorHandler errorHandler, 
 			List<IAbstractStringChecker> checkers, 
-			Map<String, String> options) throws CheckerException {
+			ProjectConfiguration configuration) throws CheckerException {
 		
 		for (IAbstractStringChecker checker : checkers) {
 			if (checker instanceof DynamicSQLChecker 
-					&& !dynamicCheckerIsConfigured(options)) {
+					&& !dynamicCheckerIsConfigured(configuration)) {
 				errorHandler.handleSQLWarning("SQL checker: testing database is not configured", 
-						new Position(options.get("SourceFileName"), 0, 0));
+						new Position(configuration.getProjectPath(), 0, 0));
 				
 			} else {
 				Timer timer = new Timer();
 				timer.start("TIMER checker=" + checker.getClass().getName());
-				checker.checkAbstractStrings(hotspots, errorHandler, options);
+				checker.checkAbstractStrings(hotspots, errorHandler, configuration);
 				timer.printTime();
 			}
 		}
 	}
 	
-	private boolean dynamicCheckerIsConfigured(Map<String, String> options) {
-		return options.get("DBUrl") != null && !options.get("DBUrl").trim().isEmpty()
-			&& options.get("DBDriverName") != null && !options.get("DBDriverName").trim().isEmpty();
+	private boolean dynamicCheckerIsConfigured(ProjectConfiguration configuration) {
+		DataSourceProperties props = configuration.getDefaultDataSource();
+		return props.getUrl() != null && !props.getUrl().trim().isEmpty()
+			&& props.getDriverName() != null && !props.getDriverName().trim().isEmpty();
 	}
 	
 	private void checkValidHotspotsPreferDynamic(
@@ -216,22 +212,22 @@ public class JavaElementChecker {
 			ISQLErrorHandler errorHandler, 
 			IAbstractStringChecker dynamicChecker, 
 			IAbstractStringChecker staticChecker, 
-			Map<String, String> options) {
+			ProjectConfiguration configuration) {
 		
 		for (IStringNodeDescriptor descriptor : descriptors) {
 			try {
-				if (dynamicCheckerIsConfigured(options)) { 
+				if (dynamicCheckerIsConfigured(configuration)) { 
 					// use staticChecker only when dynamic gives error
 					boolean dynResult = false;
 					try {
-						dynResult = dynamicChecker.checkAbstractString(descriptor, errorHandler, options);
+						dynResult = dynamicChecker.checkAbstractString(descriptor, errorHandler, configuration);
 					} finally {
 						if (!dynResult) {
-							staticChecker.checkAbstractString(descriptor, errorHandler, options);
+							staticChecker.checkAbstractString(descriptor, errorHandler, configuration);
 						}
 					}
 				} else {
-					staticChecker.checkAbstractString(descriptor, errorHandler, options);
+					staticChecker.checkAbstractString(descriptor, errorHandler, configuration);
 				}
 			} catch (Exception e) {
 				LOG.exception(e);
@@ -247,7 +243,7 @@ public class JavaElementChecker {
 			ISQLErrorHandler errorHandler, 
 			IAbstractStringChecker dynamicChecker, 
 			IAbstractStringChecker staticChecker, 
-			Map<String, String> options) {
+			ProjectConfiguration configuration) {
 		
 		for (IStringNodeDescriptor descriptor : descriptors) {
 			try {
@@ -255,10 +251,10 @@ public class JavaElementChecker {
 				// note that logic is different compared to PreferDynamic case
 				boolean staticResult = true;
 				try {
-					staticResult = staticChecker.checkAbstractString(descriptor, errorHandler, options);
+					staticResult = staticChecker.checkAbstractString(descriptor, errorHandler, configuration);
 				} finally {
-					if (staticResult && dynamicCheckerIsConfigured(options)) {
-						dynamicChecker.checkAbstractString(descriptor, errorHandler, options);
+					if (staticResult && dynamicCheckerIsConfigured(configuration)) {
+						dynamicChecker.checkAbstractString(descriptor, errorHandler, configuration);
 					}
 				}
 			} catch (Exception e) {
@@ -270,39 +266,4 @@ public class JavaElementChecker {
 		}
 	}
 	
-	private List<NodeRequest> parseNodeRequests(Map<String, String> options) {
-		if (options == null) {
-			return Collections.emptyList();
-		}
-		Object option = options.get(HOTSPOTS);
-		if (option == null) {
-			return Collections.emptyList();
-		}
-		String allHotspots = option.toString();
-		
-		assert LOG.message("Hotspots:");
-		List<NodeRequest> requests = new ArrayList<NodeRequest>();
-		for (String hotspot : allHotspots.split(";")) {
-			if (hotspot.length() == 0) {
-				continue;
-			}
-			String[] split = hotspot.split(",");
-			if (split.length != 3) {
-				assert LOG.message("Malformed hotspot: " + hotspot);
-				continue;
-			}
-			String className = split[0];
-			String methodName = split[1];
-			String argumentIndex = split[2];
-			try {
-				int index = Integer.parseInt(argumentIndex);
-				NodeRequest nodeRequest = new NodeRequest(className, methodName, index);
-				requests.add(nodeRequest);
-				assert LOG.message(nodeRequest);
-			} catch (NumberFormatException e) {
-				assert LOG.message("Number format error: " + argumentIndex);
-			}
-		}
-		return requests;
-	}
 }

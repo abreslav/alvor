@@ -8,7 +8,7 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
 import com.zeroturnaround.alvor.cache.CacheService;
-import com.zeroturnaround.alvor.cache.MethodInvocationDescriptor;
+import com.zeroturnaround.alvor.common.MethodInvocationDescriptor;
 import com.zeroturnaround.alvor.string.IAbstractString;
 
 public class MethodTemplateSearcher extends CachedSearcher<MethodInvocationDescriptor, IAbstractString> {

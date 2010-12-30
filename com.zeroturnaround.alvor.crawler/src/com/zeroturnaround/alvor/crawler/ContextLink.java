@@ -2,7 +2,7 @@ package com.zeroturnaround.alvor.crawler;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 
-import com.zeroturnaround.alvor.cache.PositionUtil;
+import com.zeroturnaround.alvor.common.util.PositionUtil;
 import com.zeroturnaround.alvor.string.IPosition;
 
 /*

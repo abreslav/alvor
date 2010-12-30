@@ -1,4 +1,4 @@
-package com.zeroturnaround.alvor.cache;
+package com.zeroturnaround.alvor.common.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,7 +17,6 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
-import com.zeroturnaround.alvor.string.DummyPosition;
 import com.zeroturnaround.alvor.string.IPosition;
 import com.zeroturnaround.alvor.string.Position;
 

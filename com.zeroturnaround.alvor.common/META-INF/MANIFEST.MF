@@ -4,8 +4,13 @@ Bundle-Name: Common
 Bundle-SymbolicName: com.zeroturnaround.alvor.common;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: com.zeroturnaround.alvor.common.logging
+Export-Package: com.zeroturnaround.alvor.common,
+ com.zeroturnaround.alvor.common.logging,
+ com.zeroturnaround.alvor.common.util,
+ com.zeroturnaround.alvor.configuration
 Require-Bundle: org.eclipse.core.resources;bundle-version="3.5.0",
- org.eclipse.core.runtime;bundle-version="3.5.0"
+ org.eclipse.core.runtime;bundle-version="3.5.0",
+ org.eclipse.jdt.core;bundle-version="3.5.0",
+ com.zeroturnaround.alvor.model;bundle-version="1.0.0"
 Bundle-Activator: com.zeroturnaround.alvor.common.AlvorCommonPlugin
 Bundle-ActivationPolicy: lazy

@@ -1,6 +1,6 @@
 package com.zeroturnaround.alvor.crawler;
 
-import com.zeroturnaround.alvor.cache.IHotspotPattern;
+import com.zeroturnaround.alvor.configuration.IHotspotPattern;
 
 /**
  * Tells {@link NodeSearchEngine} which methods to look for and which arguments to process for each method

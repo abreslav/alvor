@@ -27,7 +27,7 @@ import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
-import com.zeroturnaround.alvor.cache.UnsupportedStringOpEx;
+import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
 import com.zeroturnaround.alvor.crawler.ASTUtil;
 import com.zeroturnaround.alvor.string.IPosition;
 
