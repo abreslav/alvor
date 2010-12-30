@@ -26,7 +26,7 @@ public class CleanCheckElementHandler extends AbstractHandler {
 		
 		try {
 			IJavaElement element = GuiUtil.getSingleSelectedJavaElement();
-			checker.performCleanCheck(element, new IJavaElement[] {element});
+			checker.performCleanCheck(element.getJavaProject().getProject(), new IJavaElement[] {element});
 		} 
 		catch (IllegalAccessException e) { // exceptions about wrong state, TODO: rewrite using command disabling
 			String msg = e.getMessage();

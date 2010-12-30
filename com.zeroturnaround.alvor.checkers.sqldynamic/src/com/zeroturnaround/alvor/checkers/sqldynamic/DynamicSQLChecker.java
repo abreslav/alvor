@@ -12,6 +12,8 @@ import com.zeroturnaround.alvor.checkers.ISQLErrorHandler;
 import com.zeroturnaround.alvor.checkers.IStringNodeDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
+import com.zeroturnaround.alvor.configuration.DataSourceProperties;
+import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
 import com.zeroturnaround.alvor.db.SqlTester;
 import com.zeroturnaround.alvor.db.generic.GenericSqlTester;
 import com.zeroturnaround.alvor.db.mysql.MySqlSqlTester;
@@ -29,12 +31,12 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 
 	@Override
 	public void checkAbstractStrings(List<IStringNodeDescriptor> descriptors,
-			ISQLErrorHandler errorHandler, Map<String, String> options) throws CheckerException {
+			ISQLErrorHandler errorHandler, ProjectConfiguration configuration) throws CheckerException {
 		if (descriptors.size() == 0) {
 			return;
 		}
 		
-		SqlTester tester = this.getAnalyzer(options);
+		SqlTester tester = this.getAnalyzer(configuration);
 		for (IStringNodeDescriptor descriptor: descriptors) {
 			this.checkAbstractString(descriptor, errorHandler, tester);
 		}
@@ -42,8 +44,8 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 	
 	@Override
 	public boolean checkAbstractString(IStringNodeDescriptor descriptor,
-			ISQLErrorHandler errorHandler, Map<String, String> options) throws CheckerException {
-		return checkAbstractString(descriptor, errorHandler, this.getAnalyzer(options));
+			ISQLErrorHandler errorHandler, ProjectConfiguration configuration) throws CheckerException {
+		return checkAbstractString(descriptor, errorHandler, this.getAnalyzer(configuration));
 	}
 	
 	
@@ -114,46 +116,49 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 		}
 	}
 
-	private SqlTester getAnalyzer(Map<String, String> options) throws CheckerException {
+	private SqlTester getAnalyzer(ProjectConfiguration configuration) throws CheckerException {
 		// give different analyzer for different options
 		// first search for cached version
+		
+		DataSourceProperties options = configuration.getDefaultDataSource();
+		
 		SqlTester tester = this.testers.get(options.hashCode());
 		
+		
 		if (tester == null) {
-			if (options.get("DBDriverName") == null || options.get("DBUrl") == null
-					|| options.get("DBUsername") == null || options.get("DBPassword") == null
-					|| options.get("DBDriverName").toString().isEmpty()
-					|| options.get("DBDriverName").toString().isEmpty()) {
+			if (options.getDriverName() == null || options.getUrl() == null
+					|| options.getUserName() == null || options.getPassword() == null
+					|| options.getDriverName().toString().isEmpty()) {
 				throw new CheckerException("SQL checker: Test database configuration is not complete", 
-						new Position(options.get("SourceFileName"), 0, 0));
+						new Position(configuration.getProjectPath(), 0, 0));
 			}
 			
 			try {
-				if (options.get("DBDriverName").contains("oracle")) {
+				if (options.getDriverName().contains("oracle")) {
 					tester = new OracleSqlTester(				
-							options.get("DBDriverName").toString(),
-							options.get("DBUrl").toString(),
-							options.get("DBUsername").toString(),
-							options.get("DBPassword").toString());
+							options.getDriverName().toString(),
+							options.getUrl().toString(),
+							options.getUserName().toString(),
+							options.getPassword().toString());
 				}
-				else if (options.get("DBDriverName").contains("mysql")) {
+				else if (options.getDriverName().contains("mysql")) {
 					tester = new MySqlSqlTester(				
-							options.get("DBDriverName").toString(),
-							options.get("DBUrl").toString(),
-							options.get("DBUsername").toString(),
-							options.get("DBPassword").toString());
+							options.getDriverName().toString(),
+							options.getUrl().toString(),
+							options.getUserName().toString(),
+							options.getPassword().toString());
 				}
 				else {
 					tester = new GenericSqlTester(				
-							options.get("DBDriverName").toString(),
-							options.get("DBUrl").toString(),
-							options.get("DBUsername").toString(),
-							options.get("DBPassword").toString());
+							options.getDriverName().toString(),
+							options.getUrl().toString(),
+							options.getUserName().toString(),
+							options.getPassword().toString());
 				}
 			} catch (Exception e) {
 				LOG.exception(e);
 				throw new CheckerException("SQL checker: can't connect with test database: "
-						+ e.getMessage(), new Position(options.get("SourceFileName"), 0, 0));
+						+ e.getMessage(), new Position(configuration.getProjectPath(), 0, 0));
 			}
 			
 			this.testers.put(options.hashCode(), tester);

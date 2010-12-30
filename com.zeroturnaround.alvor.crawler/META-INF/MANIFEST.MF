@@ -13,7 +13,6 @@ Require-Bundle: org.eclipse.jdt.core;bundle-version="3.5.0",
  com.zeroturnaround.alvor.cache;bundle-version="1.0.0",
  com.zeroturnaround.alvor.checkers.sqldynamic;bundle-version="1.0.0",
  com.zeroturnaround.alvor.checkers.sqlstatic;bundle-version="1.0.0"
-Export-Package: com.zeroturnaround.alvor.configuration,
- com.zeroturnaround.alvor.conntracker,
+Export-Package: com.zeroturnaround.alvor.conntracker,
  com.zeroturnaround.alvor.crawler,
  com.zeroturnaround.alvor.main

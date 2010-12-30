@@ -1,7 +1,8 @@
-package com.zeroturnaround.alvor.cache;
+package com.zeroturnaround.alvor.common;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 
+import com.zeroturnaround.alvor.common.util.PositionUtil;
 import com.zeroturnaround.alvor.string.IPosition;
 
 public class UnsupportedStringOpEx extends UnsupportedOperationException {

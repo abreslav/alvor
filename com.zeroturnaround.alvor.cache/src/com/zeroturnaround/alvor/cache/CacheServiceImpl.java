@@ -16,8 +16,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.zeroturnaround.alvor.common.MethodInvocationDescriptor;
+import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
+import com.zeroturnaround.alvor.configuration.IHotspotPattern;
 import com.zeroturnaround.alvor.string.AbstractStringCollection;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.IAbstractStringVisitor;

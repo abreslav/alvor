@@ -1,11 +1,6 @@
 package com.zeroturnaround.alvor.gui.configuration;
 
-import java.io.File;
-
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PropertyPage;
 
@@ -21,17 +16,11 @@ public abstract class CommonPropertyPage extends PropertyPage implements IWorkbe
 
 	
 	protected ProjectConfiguration readConfiguration() {
-		return ConfigurationManager.readProjectConfiguration(this.getSelectedJavaProject(), true);
+		return ConfigurationManager.readProjectConfiguration(this.getSelectedProject().getProject(), true);
 	}
 	
-	private File getSelectedProjectConfigurationFile() {
-		IAdaptable elem = this.getElement(); // the thing that was right-clicked for getting this page
-		assert elem != null && elem instanceof IProject;
-		return ConfigurationManager.getProjectConfigurationFile((IProject)elem); 
-	}
-	
-	protected IJavaProject getSelectedJavaProject() {
-		return JavaCore.create((IProject)this.getElement());
+	protected IProject getSelectedProject() {
+		return (IProject)this.getElement();
 	}
 	
 	protected abstract void mergeChanges(ProjectConfiguration base);
@@ -40,7 +29,7 @@ public abstract class CommonPropertyPage extends PropertyPage implements IWorkbe
 		try {
 			ProjectConfiguration conf = this.readConfiguration();
 			this.mergeChanges(conf);
-			ConfigurationManager.saveToFile(conf, getSelectedProjectConfigurationFile());
+			ConfigurationManager.saveToProjectConfigurationFile(conf, this.getSelectedProject());
 			this.hasChanges = false;
 			return true;
 		} catch (Exception e) {
@@ -53,6 +42,7 @@ public abstract class CommonPropertyPage extends PropertyPage implements IWorkbe
 	@Override
 	public boolean performOk() {
 		if (this.hasChanges) {
+			GuiUtil.ShowInfoDialog("Please do full analysis after changing SQL checker configuration");
 			return this.saveState();
 		}
 		else {

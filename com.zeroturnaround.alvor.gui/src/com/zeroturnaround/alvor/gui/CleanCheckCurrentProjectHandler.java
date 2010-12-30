@@ -18,7 +18,7 @@ public class CleanCheckCurrentProjectHandler extends AbstractHandler {
 		try {
 			IJavaElement element = GuiUtil.getCurrentJavaProject();
 			LOG.message("Checking project: " + element.getElementName());
-			checker.performCleanCheck(element, new IJavaElement[] {element});
+			checker.performCleanCheck(element.getJavaProject().getProject(), new IJavaElement[] {element});
 		} 
 		catch (Exception e) {
 			LOG.exception(e);

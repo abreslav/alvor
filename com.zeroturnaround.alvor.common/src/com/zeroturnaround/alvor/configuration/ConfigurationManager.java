@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -17,9 +19,9 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.jdt.core.IJavaElement;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -38,8 +40,8 @@ public class ConfigurationManager {
 	/**
 	 * if customized conf file exists, then loads this. Otherwise loads default conf.
 	 */
-	public static ProjectConfiguration readProjectConfiguration(IJavaElement element, boolean fallbackToDefault)  {
-		File file = getProjectConfigurationFile(element.getJavaProject().getProject());
+	public static ProjectConfiguration readProjectConfiguration(IProject project, boolean fallbackToDefault)  {
+		File file = getProjectConfigurationFile(project);
 		
 		if (!file.exists() && fallbackToDefault) {
 			try {
@@ -48,27 +50,27 @@ public class ConfigurationManager {
 				LOG.exception(e);
 			}
 		}
-		return readFromFile(file);
+		return readFromFile(file, project);
 	}
 
 	public static File getProjectConfigurationFile(IProject project) {
 		return project.getLocation().append("/" + CONF_FILE_NAME).toFile();
 	}
 
-	public static ProjectConfiguration readFromFile(File file) {
+	private static ProjectConfiguration readFromFile(File file, IProject project) {
 		try {
-			return doReadFromFile(file);
+			return doReadFromFile(file, project);
 		} catch (Exception e) {
 			LOG.error("Can't load configuration", e);
 			throw new IllegalStateException("Can't load configuration", e);
 		}	
 	}
 	
-	private static ProjectConfiguration doReadFromFile(File file) throws ParserConfigurationException, 
+	private static ProjectConfiguration doReadFromFile(File file, IProject project) throws ParserConfigurationException, 
 		SAXException, IOException {
 		
 		List<DataSourceProperties> dataSources = new ArrayList<DataSourceProperties>();
-		List<HotspotProperties> hotspots = new ArrayList<HotspotProperties>();
+		List<IHotspotPattern> hotspots = new ArrayList<IHotspotPattern>();
 		
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = dbf.newDocumentBuilder(); 
@@ -78,7 +80,7 @@ public class ConfigurationManager {
 		NodeList hotspotNodes = doc.getElementsByTagName("hotspot");
 		for (int i = 0; i < hotspotNodes.getLength(); i++) {
 			Element node = (Element)hotspotNodes.item(i);
-			hotspots.add (new HotspotProperties(
+			hotspots.add (new HotspotPattern(
 					node.getAttribute("className"),
 					node.getAttribute("methodName"), 
 					Integer.valueOf(node.getAttribute("argumentIndex"))));
@@ -94,21 +96,37 @@ public class ConfigurationManager {
 					node.getAttribute("userName"), 
 					node.getAttribute("password")));
 		}
+		
+		// get attributes
+		Map<String, String> attributes = new HashMap<String, String>();
+		NamedNodeMap nnm = doc.getDocumentElement().getAttributes();
+		for (int i = 0; i < nnm.getLength(); i++) {
+			attributes.put(nnm.item(i).getNodeName(), nnm.item(i).getNodeValue());
+		}
 
-		return new ProjectConfiguration(hotspots, dataSources);
+		return new ProjectConfiguration(hotspots, dataSources, attributes, project);
 	}
 
-	public static void saveToFile(ProjectConfiguration conf, File file) throws ParserConfigurationException, TransformerException {
+	public static void saveToProjectConfigurationFile(ProjectConfiguration conf, IProject project) {
+		try {
+			saveToFile(conf, getProjectConfigurationFile(project));
+		} catch (Exception e) {
+			LOG.error("Problem saving configuration", e);
+			throw new IllegalStateException(e);
+		}
+	}
+	
+	private static void saveToFile(ProjectConfiguration conf, File file) throws ParserConfigurationException, TransformerException {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = dbf.newDocumentBuilder(); 
 		Document doc = db.newDocument();
 
-		Element root = doc.createElement("alvor");
-		doc.appendChild(root);
+		Element docElement = doc.createElement("alvor");
+		doc.appendChild(docElement);
 
 		Element hotspotNodes = doc.createElement("hotspots"); 
-		root.appendChild(hotspotNodes);
-		for (HotspotProperties hotspot : conf.getHotspots()) {
+		docElement.appendChild(hotspotNodes);
+		for (IHotspotPattern hotspot : conf.getHotspots()) {
 			Element node = doc.createElement("hotspot");
 			node.setAttribute("className", hotspot.getClassName());
 			node.setAttribute("methodName", hotspot.getMethodName());
@@ -117,7 +135,7 @@ public class ConfigurationManager {
 		}
 
 		Element dataSourceNodes = doc.createElement("dataSources");
-		root.appendChild(dataSourceNodes);
+		docElement.appendChild(dataSourceNodes);
 		for (DataSourceProperties dataSource : conf.getDataSources()) {
 			Element node = doc.createElement("dataSource");
 			node.setAttribute("pattern", dataSource.getPattern());
@@ -126,6 +144,10 @@ public class ConfigurationManager {
 			node.setAttribute("username", dataSource.getUserName());
 			node.setAttribute("password", dataSource.getPassword());
 			dataSourceNodes.appendChild(node);
+		}
+		
+		for (Map.Entry<String, String> entry : conf.getProperties().entrySet()) {
+			docElement.setAttribute(entry.getKey(), entry.getValue());
 		}
 
 		// write to file

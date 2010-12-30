@@ -39,11 +39,12 @@ import org.eclipse.jdt.core.search.SearchRequestor;
 
 import com.zeroturnaround.alvor.cache.CacheService;
 import com.zeroturnaround.alvor.cache.ICacheService;
-import com.zeroturnaround.alvor.cache.PositionUtil;
-import com.zeroturnaround.alvor.cache.UnsupportedStringOpEx;
+import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.common.logging.Measurements;
+import com.zeroturnaround.alvor.common.util.PositionUtil;
+import com.zeroturnaround.alvor.configuration.IHotspotPattern;
 import com.zeroturnaround.alvor.string.IPosition;
 
 /**
@@ -54,12 +55,12 @@ import com.zeroturnaround.alvor.string.IPosition;
 public class NodeSearchEngine {
 	private static final ILog LOG = Logs.getLog(NodeSearchEngine.class);
 	
-	private static final CachedSearcher<NodeRequest, IPosition> ARGUMENT_NODES_SEARCHER = 
-			new CachedSearcher<NodeRequest, IPosition>() {
+	private static final CachedSearcher<IHotspotPattern, IPosition> ARGUMENT_NODES_SEARCHER = 
+			new CachedSearcher<IHotspotPattern, IPosition>() {
 
 		@Override
 		protected void performSearchInScope(List<IJavaElement> scopeToSearchIn,
-				NodeRequest key, List<? super IPosition> values) {
+				IHotspotPattern key, List<? super IPosition> values) {
 			NodeSearchEngine.performArgumentSearchInScope(key, scopeToSearchIn, values);
 			
 		}
@@ -76,7 +77,7 @@ public class NodeSearchEngine {
 		astCache.remove(JavaCore.createCompilationUnitFrom(file));
 	}
 	
-	public static List<IPosition> findArgumentNodes(IJavaElement[] scope, final Collection<NodeRequest> requests) {
+	public static List<IPosition> findArgumentNodes(IJavaElement[] scope, final Collection<IHotspotPattern> requests) {
 		// No requests -- no results
 		if (requests.isEmpty()) {
 			return Collections.emptyList();
@@ -88,7 +89,7 @@ public class NodeSearchEngine {
 		final List<IFile> allFilesInScope = getAllFilesInScope(scope);
 
 		final List<IPosition> result = new ArrayList<IPosition>();
-		for (NodeRequest nodeRequest : requests) {
+		for (IHotspotPattern nodeRequest : requests) {
 			assert LOG.message("Request " + nodeRequest);
 			
 			ARGUMENT_NODES_SEARCHER.performCachedSearch(
@@ -128,7 +129,7 @@ public class NodeSearchEngine {
 	}
 
 	private static void performArgumentSearchInScope(
-			final NodeRequest nodeRequest, List<IJavaElement> scopeToSearchIn,
+			final IHotspotPattern nodeRequest, List<IJavaElement> scopeToSearchIn,
 			final List<? super IPosition> result) {
 		
 		int searchFor = IJavaSearchConstants.METHOD;
@@ -136,7 +137,7 @@ public class NodeSearchEngine {
 			searchFor = IJavaSearchConstants.CONSTRUCTOR;
 		}
 		SearchPattern pattern = SearchPattern.createPattern(
-				nodeRequest.getPatternString(), searchFor,
+				getHotspotPatternSearchPatternString(nodeRequest), searchFor,
 				IJavaSearchConstants.REFERENCES, 
 				SearchPattern.R_ERASURE_MATCH | SearchPattern.R_CASE_SENSITIVE);
 		assert LOG.message(pattern);
@@ -182,7 +183,7 @@ public class NodeSearchEngine {
 					+ "." + methodBinding.getMethodDeclaration().getName();
 				
 				if (node instanceof MethodInvocation 
-						&& !nodeRequest.signatureMatches(signature)) {
+						&& ! signaturesMatch(nodeRequest, signature)) {
 					assert LOG.message("Signature does not match: " + methodBinding);
 					return;
 				}					
@@ -201,7 +202,7 @@ public class NodeSearchEngine {
 				if (arg instanceof Expression) {
 					IPosition position = PositionUtil.getPosition(arg);
 					result.add(position);
-					assert LOG.message("PATTERN=" + nodeRequest.getPatternString()
+					assert LOG.message("PATTERN=" + getHotspotPatternSearchPatternString(nodeRequest)
 							+ ", accepted match=" + PositionUtil.getLineString(position)
 							+ ", invocation=" + invoc);
 					CacheService.getCacheService().getHotspotCache().add(nodeRequest, position);
@@ -214,7 +215,7 @@ public class NodeSearchEngine {
 		executeSearch(pattern, requestor, scope);
 		Measurements.argumentSearchTimer.stop();
 		
-		assert LOG.message("Searched callsites of '" + nodeRequest.getPatternString() + "', found "
+		assert LOG.message("Searched callsites of '" + getHotspotPatternSearchPatternString(nodeRequest) + "', found "
 				+ (result.size()-resultStartSize) + " matches");
 	}
 
@@ -402,5 +403,26 @@ public class NodeSearchEngine {
 		Runtime rt = Runtime.getRuntime();
 		long used = rt.totalMemory() - rt.freeMemory();
 		return rt.maxMemory() - used;
+	}
+	
+	private static String getHotspotPatternSearchPatternString(IHotspotPattern hp) {
+		String patternString = hp.getMethodName();
+		
+		if (hp.getMethodName().equals("new")) {
+			patternString = hp.getClassName(); // maybe constructor name is faster ???
+		}
+		return patternString;
+	}
+	
+	private static boolean signaturesMatch(IHotspotPattern hp, String signatureA) {
+		String signatureB = (!hp.getClassName().isEmpty() ? hp.getClassName() + "." : "") 
+			+ hp.getMethodName();
+		
+		// TODO: where "(" can come from ???
+		if (signatureB.contains("(")) {
+			signatureB = signatureB.substring(0, signatureB.indexOf('('));
+		}
+		
+		return signatureA.endsWith(signatureB);
 	}
 }

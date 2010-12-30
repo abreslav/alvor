@@ -42,7 +42,7 @@ import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
-import com.zeroturnaround.alvor.cache.UnsupportedStringOpEx;
+import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
 
 public class ASTUtil {
 	public static TypeDeclaration getContainingTypeDeclaration(ASTNode node) {

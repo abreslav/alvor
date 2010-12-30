@@ -1,10 +1,9 @@
 package com.zeroturnaround.alvor.crawler;
 
-import java.awt.geom.FlatteningPathIterator;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.zeroturnaround.alvor.cache.UnsupportedStringOpEx;
+import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
 import com.zeroturnaround.alvor.string.AbstractStringCollection;
 import com.zeroturnaround.alvor.string.DummyPosition;
 import com.zeroturnaround.alvor.string.IAbstractString;
