@@ -2,6 +2,7 @@ package com.zeroturnaround.alvor.configuration;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,34 +16,56 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.IJavaElement;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class ConfigurationHandler {
+import com.zeroturnaround.alvor.common.logging.ILog;
+import com.zeroturnaround.alvor.common.logging.Logs;
+
+/*
+ * 1) Loads and saves configuration files 
+ * 2) Knows about configuration-file locations 
+ */
+public class ConfigurationManager {
 	private static final String CONF_FILE_NAME = "alvor.xml";
+	private static final String SAMPLE_CONF = "res/default-configuration.xml"; 
+	protected final static ILog LOG = Logs.getLog(ConfigurationManager.class);
 
-	public static ProjectConfiguration loadProjectConfiguration(IJavaElement element) {
-		IResource propsRes = getConfigurationResource(element.getJavaProject().getProject()); 
-//		assert LOG.message("Loading configuration from: " + propsRes);
-		try {
-			return loadFromFile(propsRes.getLocation().toFile());
-		} catch (Exception e) {
-			throw new IllegalArgumentException("Can't load configuration", e);
+	/**
+	 * if customized conf file exists, then loads this. Otherwise loads default conf.
+	 */
+	public static ProjectConfiguration readProjectConfiguration(IJavaElement element, boolean fallbackToDefault)  {
+		File file = getProjectConfigurationFile(element.getJavaProject().getProject());
+		
+		if (!file.exists() && fallbackToDefault) {
+			try {
+				file = new File(ConfigurationManager.class.getClassLoader().getResource(SAMPLE_CONF).toURI());
+			} catch (URISyntaxException e) {
+				LOG.exception(e);
+			}
 		}
+		return readFromFile(file);
 	}
 
-	public static IFile getConfigurationResource(IProject project) {
-		return (IFile)project.findMember("/" + CONF_FILE_NAME);
+	public static File getProjectConfigurationFile(IProject project) {
+		return project.getLocation().append("/" + CONF_FILE_NAME).toFile();
 	}
 
-	public static ProjectConfiguration loadFromFile(File file) throws ParserConfigurationException, 
-			SAXException, IOException {
+	public static ProjectConfiguration readFromFile(File file) {
+		try {
+			return doReadFromFile(file);
+		} catch (Exception e) {
+			LOG.error("Can't load configuration", e);
+			throw new IllegalStateException("Can't load configuration", e);
+		}	
+	}
+	
+	private static ProjectConfiguration doReadFromFile(File file) throws ParserConfigurationException, 
+		SAXException, IOException {
 		
 		List<DataSourceProperties> dataSources = new ArrayList<DataSourceProperties>();
 		List<HotspotProperties> hotspots = new ArrayList<HotspotProperties>();
@@ -56,13 +79,13 @@ public class ConfigurationHandler {
 		for (int i = 0; i < hotspotNodes.getLength(); i++) {
 			Element node = (Element)hotspotNodes.item(i);
 			hotspots.add (new HotspotProperties(
-					node.getAttribute("className"), 
+					node.getAttribute("className"),
 					node.getAttribute("methodName"), 
 					Integer.valueOf(node.getAttribute("argumentIndex"))));
 		}
 
 		NodeList dataSourceNodes = doc.getElementsByTagName("dataSource");
-		for (int i = 0; i < hotspotNodes.getLength(); i++) {
+		for (int i = 0; i < dataSourceNodes.getLength(); i++) {
 			Element node = (Element)dataSourceNodes.item(i);
 			dataSources.add (new DataSourceProperties(
 					node.getAttribute("pattern"), 
@@ -71,8 +94,8 @@ public class ConfigurationHandler {
 					node.getAttribute("userName"), 
 					node.getAttribute("password")));
 		}
-		
-		return new ProjectConfiguration(hotspots, dataSources, file);
+
+		return new ProjectConfiguration(hotspots, dataSources);
 	}
 
 	public static void saveToFile(ProjectConfiguration conf, File file) throws ParserConfigurationException, TransformerException {
@@ -97,6 +120,7 @@ public class ConfigurationHandler {
 		root.appendChild(dataSourceNodes);
 		for (DataSourceProperties dataSource : conf.getDataSources()) {
 			Element node = doc.createElement("dataSource");
+			node.setAttribute("pattern", dataSource.getPattern());
 			node.setAttribute("driverName", dataSource.getDriverName());
 			node.setAttribute("url", dataSource.getUrl());
 			node.setAttribute("username", dataSource.getUserName());
