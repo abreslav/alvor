@@ -1,19 +1,15 @@
 package com.zeroturnaround.alvor.configuration;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ProjectConfiguration {
 	private List<HotspotProperties> hotspots = new ArrayList<HotspotProperties>();
 	private List<DataSourceProperties> dataSources = new ArrayList<DataSourceProperties>();
-	private File sourceFile;
 
-	public ProjectConfiguration(List<HotspotProperties> hotspots, List<DataSourceProperties> dataSources,
-			File sourceFile) {
+	public ProjectConfiguration(List<HotspotProperties> hotspots, List<DataSourceProperties> dataSources) {
 		this.hotspots = hotspots;
 		this.dataSources = dataSources;
-		this.sourceFile = sourceFile;
 	}
 	
 	public List<DataSourceProperties> getDataSources() {
@@ -24,9 +20,12 @@ public class ProjectConfiguration {
 		return hotspots;
 	}
 	
-	public File getSourceFile() {
-		return sourceFile;
+	public void setHotspots(List<HotspotProperties> hotspots) {
+		this.hotspots = hotspots;
 	}
-	
+
+	public void setDataSources(List<DataSourceProperties> dataSources) {
+		this.dataSources = dataSources;
+	}
 	
 }

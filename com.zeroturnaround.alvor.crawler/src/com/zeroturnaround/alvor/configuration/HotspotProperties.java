@@ -1,9 +1,9 @@
 package com.zeroturnaround.alvor.configuration;
 
 public class HotspotProperties {
-	private final int argumentIndex;
-	private final String methodName;
-	private final String className;
+	private int argumentIndex;
+	private String methodName;
+	private String className;
 
 	public HotspotProperties(String className, String methodName, int argumentIndex) {
 		this.className = className;
@@ -21,5 +21,17 @@ public class HotspotProperties {
 	
 	public String getMethodName() {
 		return methodName;
+	}
+	
+	public void setClassName(String className) {
+		this.className = className;
+	}
+	
+	public void setMethodName(String methodName) {
+		this.methodName = methodName;
+	}
+	
+	public void setArgumentIndex(int argumentIndex) {
+		this.argumentIndex = argumentIndex;
 	}
 }
