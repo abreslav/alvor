@@ -21,8 +21,8 @@ import org.eclipse.jdt.core.JavaCore;
 import org.junit.Test;
 
 import com.zeroturnaround.alvor.cache.CacheService;
-import com.zeroturnaround.alvor.common.INodeDescriptor;
-import com.zeroturnaround.alvor.common.IStringNodeDescriptor;
+import com.zeroturnaround.alvor.common.NodeDescriptor;
+import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.configuration.ConfigurationManager;
 import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
@@ -91,7 +91,7 @@ public class JavaElementCheckerTest {
 	
 	private void testJavaElementAbstractStrings(IJavaElement element, String id) throws IOException {
 		ProjectConfiguration conf = ConfigurationManager.readProjectConfiguration(element.getJavaProject().getProject(), true);
-		List<INodeDescriptor> hotspots = checker.findAndEvaluateHotspots(new IJavaElement[] {element}, conf);
+		List<NodeDescriptor> hotspots = checker.findAndEvaluateHotspots(new IJavaElement[] {element}, conf);
 		
 		// assuming current folder is folder of the project containing this test
 		String filePrefix = "tests/" + id;
@@ -109,11 +109,11 @@ public class JavaElementCheckerTest {
 		List<String> abstractLines = new ArrayList<String>();
 		List<String> concreteLines = new ArrayList<String>();
 		
-		for (INodeDescriptor desc : hotspots) {
+		for (NodeDescriptor desc : hotspots) {
 			String start = PositionUtil.getLineString(desc.getPosition()) + ", ";
 			
-			if (desc instanceof IStringNodeDescriptor) {
-				IAbstractString aStr = ((IStringNodeDescriptor)desc).getAbstractValue(); 
+			if (desc instanceof StringNodeDescriptor) {
+				IAbstractString aStr = ((StringNodeDescriptor)desc).getAbstractValue(); 
 				abstractLines.add(start + aStr.toString());
 				concreteLines.addAll(SampleGenerator.getConcreteStrings(aStr));
 			}

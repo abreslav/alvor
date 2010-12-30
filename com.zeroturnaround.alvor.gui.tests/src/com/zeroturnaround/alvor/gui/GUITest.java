@@ -39,8 +39,8 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.junit.Assert;
 
-import com.zeroturnaround.alvor.common.INodeDescriptor;
-import com.zeroturnaround.alvor.common.IStringNodeDescriptor;
+import com.zeroturnaround.alvor.common.NodeDescriptor;
+import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.samplegen.SampleGenerator;
@@ -80,7 +80,7 @@ public abstract class GUITest {
 	}
 	
 	protected String testAbstractStringsClean(IJavaElement element) throws FileNotFoundException {
-		List<INodeDescriptor> hotspots = checker.performCleanCheck(element.getJavaProject().getProject(), new IJavaElement[] {element});
+		List<NodeDescriptor> hotspots = checker.performCleanCheck(element.getJavaProject().getProject(), new IJavaElement[] {element});
 		return writeAndTestHotspots(hotspots, getElementDescriptor(element));
 	}
 	
@@ -117,15 +117,15 @@ public abstract class GUITest {
 		}
 	}
 
-	private String writeAndTestHotspots(List<INodeDescriptor> hotspots, String elementId) throws FileNotFoundException {
+	private String writeAndTestHotspots(List<NodeDescriptor> hotspots, String elementId) throws FileNotFoundException {
 		List<String> abstractLines = new ArrayList<String>();
 		List<String> concreteLines = new ArrayList<String>();
 		
-		for (INodeDescriptor desc : hotspots) {
+		for (NodeDescriptor desc : hotspots) {
 			String start = PositionUtil.getLineString(desc.getPosition()) + ", ";
 			
-			if (desc instanceof IStringNodeDescriptor) {
-				IAbstractString aStr = ((IStringNodeDescriptor)desc).getAbstractValue(); 
+			if (desc instanceof StringNodeDescriptor) {
+				IAbstractString aStr = ((StringNodeDescriptor)desc).getAbstractValue(); 
 				abstractLines.add(start + aStr.toString());
 				try {
 					concreteLines.addAll(SampleGenerator.getConcreteStrings(aStr));

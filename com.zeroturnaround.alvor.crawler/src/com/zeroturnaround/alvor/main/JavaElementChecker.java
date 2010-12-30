@@ -10,9 +10,9 @@ import com.zeroturnaround.alvor.checkers.IAbstractStringChecker;
 import com.zeroturnaround.alvor.checkers.ISQLErrorHandler;
 import com.zeroturnaround.alvor.checkers.sqldynamic.DynamicSQLChecker;
 import com.zeroturnaround.alvor.checkers.sqlstatic.SyntacticalSQLChecker;
-import com.zeroturnaround.alvor.common.IHotspotPattern;
-import com.zeroturnaround.alvor.common.INodeDescriptor;
-import com.zeroturnaround.alvor.common.IStringNodeDescriptor;
+import com.zeroturnaround.alvor.common.HotspotPattern;
+import com.zeroturnaround.alvor.common.NodeDescriptor;
+import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
@@ -47,16 +47,16 @@ public class JavaElementChecker {
 	 * (or markers for unsupported cases)  
 	 * TODO rename?
 	 */
-	public List<INodeDescriptor> findAndEvaluateHotspots(IJavaElement[] scope, ProjectConfiguration conf) {
+	public List<NodeDescriptor> findAndEvaluateHotspots(IJavaElement[] scope, ProjectConfiguration conf) {
 		Measurements.resetAll();
 		
 		Timer timer = new Timer();
 		timer.start("TIMER: string construction");
-		List<IHotspotPattern> requests = conf.getHotspots();
+		List<HotspotPattern> requests = conf.getHotspots();
 		if (requests.isEmpty()) {
 			throw new IllegalArgumentException("No hotspot definitions found in options");
 		}
-		List<INodeDescriptor> result = AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(requests, scope, 0, null);
+		List<NodeDescriptor> result = AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(requests, scope, 0, null);
 		timer.printTime(); // String construction
 		
 		LOG.message(Measurements.parseTimer);
@@ -67,7 +67,7 @@ public class JavaElementChecker {
 	}
 
 	public void processHotspots(
-		List<INodeDescriptor> hotspots, 
+		List<NodeDescriptor> hotspots, 
 		ISQLErrorHandler errorHandler, 
 		List<IAbstractStringChecker> checkers, 
 		ProjectConfiguration configuration) {
@@ -75,13 +75,13 @@ public class JavaElementChecker {
 //		Map<String, Integer> connMap = new Hashtable<String, Integer>();
 		int unsupportedCount = 0;
 		
-		List<IStringNodeDescriptor> validHotspots = new ArrayList<IStringNodeDescriptor>();
-		for (INodeDescriptor hotspot : hotspots) {
-			if (hotspot instanceof IStringNodeDescriptor) {
-				validHotspots.add((IStringNodeDescriptor) hotspot);
+		List<StringNodeDescriptor> validHotspots = new ArrayList<StringNodeDescriptor>();
+		for (NodeDescriptor hotspot : hotspots) {
+			if (hotspot instanceof StringNodeDescriptor) {
+				validHotspots.add((StringNodeDescriptor) hotspot);
 				// TODO this makes log quite big
 				HOTSPOTS_LOG.message("STRING node desc, file=" + PositionUtil.getLineString(hotspot.getPosition())
-						+ ", str=" + ((IStringNodeDescriptor) hotspot).getAbstractValue());
+						+ ", str=" + ((StringNodeDescriptor) hotspot).getAbstractValue());
 				
 				
 //				// collect connection info
@@ -123,7 +123,7 @@ public class JavaElementChecker {
 	}
 
 	private void checkValidHotspots(
-			List<IStringNodeDescriptor> hotspots, 
+			List<StringNodeDescriptor> hotspots, 
 			ISQLErrorHandler errorHandler, 
 			List<IAbstractStringChecker> checkers, 
 			ProjectConfiguration configuration) {
@@ -181,7 +181,7 @@ public class JavaElementChecker {
 	}
 	
 	private void checkValidHotspotsWithAllCheckers(
-			List<IStringNodeDescriptor> hotspots, 
+			List<StringNodeDescriptor> hotspots, 
 			ISQLErrorHandler errorHandler, 
 			List<IAbstractStringChecker> checkers, 
 			ProjectConfiguration configuration) throws CheckerException {
@@ -208,13 +208,13 @@ public class JavaElementChecker {
 	}
 	
 	private void checkValidHotspotsPreferDynamic(
-			List<IStringNodeDescriptor> descriptors, 
+			List<StringNodeDescriptor> descriptors, 
 			ISQLErrorHandler errorHandler, 
 			IAbstractStringChecker dynamicChecker, 
 			IAbstractStringChecker staticChecker, 
 			ProjectConfiguration configuration) {
 		
-		for (IStringNodeDescriptor descriptor : descriptors) {
+		for (StringNodeDescriptor descriptor : descriptors) {
 			try {
 				if (dynamicCheckerIsConfigured(configuration)) { 
 					// use staticChecker only when dynamic gives error
@@ -239,13 +239,13 @@ public class JavaElementChecker {
 	
 	
 	private void checkValidHotspotsPreferStatic(
-			List<IStringNodeDescriptor> descriptors, 
+			List<StringNodeDescriptor> descriptors, 
 			ISQLErrorHandler errorHandler, 
 			IAbstractStringChecker dynamicChecker, 
 			IAbstractStringChecker staticChecker, 
 			ProjectConfiguration configuration) {
 		
-		for (IStringNodeDescriptor descriptor : descriptors) {
+		for (StringNodeDescriptor descriptor : descriptors) {
 			try {
 				// use dynamic only when static didn't find anything wrong, or when it crashed
 				// note that logic is different compared to PreferDynamic case

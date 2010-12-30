@@ -25,7 +25,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.zeroturnaround.alvor.common.IHotspotPattern;
+import com.zeroturnaround.alvor.common.HotspotPattern;
+import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 
@@ -71,7 +72,7 @@ public class ConfigurationManager {
 		SAXException, IOException {
 		
 		List<DataSourceProperties> dataSources = new ArrayList<DataSourceProperties>();
-		List<IHotspotPattern> hotspots = new ArrayList<IHotspotPattern>();
+		List<HotspotPattern> hotspots = new ArrayList<HotspotPattern>();
 		
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = dbf.newDocumentBuilder(); 
@@ -127,7 +128,7 @@ public class ConfigurationManager {
 
 		Element hotspotNodes = doc.createElement("hotspots"); 
 		docElement.appendChild(hotspotNodes);
-		for (IHotspotPattern hotspot : conf.getHotspots()) {
+		for (HotspotPattern hotspot : conf.getHotspots()) {
 			Element node = doc.createElement("hotspot");
 			node.setAttribute("className", hotspot.getClassName());
 			node.setAttribute("methodName", hotspot.getMethodName());

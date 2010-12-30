@@ -18,8 +18,8 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
 import com.zeroturnaround.alvor.cache.CacheService;
 import com.zeroturnaround.alvor.checkers.AbstractStringCheckerManager;
 import com.zeroturnaround.alvor.checkers.ISQLErrorHandler;
-import com.zeroturnaround.alvor.common.INodeDescriptor;
-import com.zeroturnaround.alvor.common.IStringNodeDescriptor;
+import com.zeroturnaround.alvor.common.NodeDescriptor;
+import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
@@ -51,7 +51,7 @@ public class GuiChecker implements ISQLErrorHandler {
 	
 	private JavaElementChecker projectChecker = new JavaElementChecker();
 	
-	public List<INodeDescriptor> performCleanCheck(IProject optionsFrom, IJavaElement[] scope) {
+	public List<NodeDescriptor> performCleanCheck(IProject optionsFrom, IJavaElement[] scope) {
 		NodeSearchEngine.clearASTCache();
 		CacheService.getCacheService().clearAll();
 		return performIncrementalCheck(optionsFrom, scope);
@@ -63,17 +63,17 @@ public class GuiChecker implements ISQLErrorHandler {
 	 * 
 	 * Also, it's assumed that sqlchecker.properties for the project exists
 	 */
-	public List<INodeDescriptor> performIncrementalCheck(IProject optionsFrom, IJavaElement[] scope) {
+	public List<NodeDescriptor> performIncrementalCheck(IProject optionsFrom, IJavaElement[] scope) {
 		
 		if (scope.length == 0) {
-			return new ArrayList<INodeDescriptor>();
+			return new ArrayList<NodeDescriptor>();
 		}
 		
 		cleanMarkers(scope);
 		cleanConfigurationMarkers(optionsFrom);
 		
 		ProjectConfiguration conf = ConfigurationManager.readProjectConfiguration(optionsFrom, true);
-		List<INodeDescriptor> hotspots = projectChecker.findAndEvaluateHotspots(scope, conf);
+		List<NodeDescriptor> hotspots = projectChecker.findAndEvaluateHotspots(scope, conf);
 		markHotspots(hotspots);
 		
 		projectChecker.processHotspots(hotspots, this,
@@ -159,12 +159,12 @@ public class GuiChecker implements ISQLErrorHandler {
 		}
 	}
 
-	private void markHotspots(List<INodeDescriptor> hotspots) {
-		for (INodeDescriptor hotspot : hotspots) {
+	private void markHotspots(List<NodeDescriptor> hotspots) {
+		for (NodeDescriptor hotspot : hotspots) {
 			String message;
 			String markerId;
-			if (hotspot instanceof IStringNodeDescriptor) {
-				IStringNodeDescriptor snd = (IStringNodeDescriptor) hotspot;
+			if (hotspot instanceof StringNodeDescriptor) {
+				StringNodeDescriptor snd = (StringNodeDescriptor) hotspot;
 				IAbstractString abstractValue = snd.getAbstractValue();
 				message = "Abstract string: " + CommonNotationRenderer.render(AbstractStringOptimizer.optimize(abstractValue));
 				if (message.length() > Character.MAX_VALUE) {
