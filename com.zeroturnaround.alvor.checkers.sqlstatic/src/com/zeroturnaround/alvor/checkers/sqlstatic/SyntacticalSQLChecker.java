@@ -8,7 +8,7 @@ import java.util.Set;
 import com.zeroturnaround.alvor.checkers.CheckerException;
 import com.zeroturnaround.alvor.checkers.IAbstractStringChecker;
 import com.zeroturnaround.alvor.checkers.ISQLErrorHandler;
-import com.zeroturnaround.alvor.common.IStringNodeDescriptor;
+import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
@@ -39,16 +39,16 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 	private static int SIZE_THRESHOLD = 25000;
 	
 	@Override
-	public void checkAbstractStrings(List<IStringNodeDescriptor> descriptors,
+	public void checkAbstractStrings(List<StringNodeDescriptor> descriptors,
 			final ISQLErrorHandler errorHandler, ProjectConfiguration configuration) throws CheckerException {
-		for (final IStringNodeDescriptor descriptor : descriptors) {
+		for (final StringNodeDescriptor descriptor : descriptors) {
 			checkAbstractString(descriptor, errorHandler, configuration);
 		}
 	}
 
 	private boolean checkStringOfAppropriateSize(
 			final ISQLErrorHandler errorHandler,
-			final IStringNodeDescriptor descriptor,
+			final StringNodeDescriptor descriptor,
 			IAbstractString abstractString) throws CheckerException {
 		
 		// need something mutable to get information from closures
@@ -114,7 +114,7 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 	}
 
 	@Override
-	public boolean checkAbstractString(IStringNodeDescriptor descriptor,
+	public boolean checkAbstractString(StringNodeDescriptor descriptor,
 			ISQLErrorHandler errorHandler, ProjectConfiguration configuration)
 			throws CheckerException {
 		

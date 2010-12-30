@@ -57,7 +57,7 @@ package com.zeroturnaround.alvor.cache;
 import java.util.Collection;
 import java.util.Set;
 
-import com.zeroturnaround.alvor.common.IHotspotPattern;
+import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.IPosition;
 
@@ -108,7 +108,7 @@ public class CacheServiceImpl2 implements ICacheService {
 	}
 
 	@Override
-	public IScopedCache<IHotspotPattern, IPosition> getHotspotCache() {
+	public IScopedCache<HotspotPattern, IPosition> getHotspotCache() {
 		return null;
 	}
 

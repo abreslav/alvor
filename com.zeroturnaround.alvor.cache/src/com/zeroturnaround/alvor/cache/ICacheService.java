@@ -3,7 +3,7 @@ package com.zeroturnaround.alvor.cache;
 import java.util.Collection;
 import java.util.Set;
 
-import com.zeroturnaround.alvor.common.IHotspotPattern;
+import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.IPosition;
@@ -43,7 +43,7 @@ public interface ICacheService {
 	void addAbstractString(IPosition position, IAbstractString result);
 	void addUnsupported(IPosition position, String message);
 
-	IScopedCache<IHotspotPattern, IPosition> getHotspotCache();
+	IScopedCache<HotspotPattern, IPosition> getHotspotCache();
 	IScopedCache<MethodInvocationDescriptor, IAbstractString> getMethodTemplateCache();
 
 	

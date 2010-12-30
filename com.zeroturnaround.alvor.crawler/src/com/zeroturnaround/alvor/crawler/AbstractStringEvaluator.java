@@ -31,15 +31,15 @@ import org.eclipse.jdt.core.dom.TagElement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 import com.zeroturnaround.alvor.cache.CacheService;
-import com.zeroturnaround.alvor.common.IHotspotPattern;
-import com.zeroturnaround.alvor.common.INodeDescriptor;
-import com.zeroturnaround.alvor.common.IStringNodeDescriptor;
+import com.zeroturnaround.alvor.common.HotspotPattern;
+import com.zeroturnaround.alvor.common.HotspotPattern;
+import com.zeroturnaround.alvor.common.NodeDescriptor;
+import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
-import com.zeroturnaround.alvor.configuration.HotspotPattern;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.IPosition;
 import com.zeroturnaround.alvor.string.StringChoice;
@@ -99,16 +99,16 @@ public class AbstractStringEvaluator {
 		return evaluator.eval(node, null);
 	}
 	
-	public static List<INodeDescriptor> evaluateMethodArgumentAtCallSites
-		(Collection<IHotspotPattern> requests, IJavaElement[] scope, int level, ContextLink context) {
+	public static List<NodeDescriptor> evaluateMethodArgumentAtCallSites
+		(Collection<HotspotPattern> requests, IJavaElement[] scope, int level, ContextLink context) {
 		logMessage("SEARCHING", level, null);
-		for (IHotspotPattern nodeRequest : requests) {
-			logMessage(nodeRequest, level, null);
+		for (HotspotPattern hotspotPattern : requests) {
+			logMessage(hotspotPattern, level, null);
 		}
 		
 		Collection<IPosition> argumentPositions = NodeSearchEngine.findArgumentNodes(scope, requests);
 		AbstractStringEvaluator evaluator = new AbstractStringEvaluator(level, scope, false);
-		List<INodeDescriptor> result = new ArrayList<INodeDescriptor>();
+		List<NodeDescriptor> result = new ArrayList<NodeDescriptor>();
 		for (IPosition pos: argumentPositions) {
 			try {
 				result.add(new StringNodeDescriptor(pos, evaluator.eval(pos, context)));
@@ -724,9 +724,9 @@ public class AbstractStringEvaluator {
 			String methodName = method.getName().toString();
 			methodName += ASTUtil.getArgumentTypesString(method.resolveBinding());
 			
-			List<INodeDescriptor> descList = evaluateMethodArgumentAtCallSites(
+			List<NodeDescriptor> descList = evaluateMethodArgumentAtCallSites(
 					Collections.singleton(
-							(IHotspotPattern)new HotspotPattern(
+							(HotspotPattern)new HotspotPattern(
 									ASTUtil.getMethodClassName(method), 
 									methodName,
 									usage.getIndex()+1)), 
@@ -736,9 +736,9 @@ public class AbstractStringEvaluator {
 			
 			List<IAbstractString> choices = new ArrayList<IAbstractString>();
 			
-			for (INodeDescriptor choiceDesc: descList) {
-				if (choiceDesc instanceof IStringNodeDescriptor) {
-					choices.add(((IStringNodeDescriptor)choiceDesc).getAbstractValue());
+			for (NodeDescriptor choiceDesc: descList) {
+				if (choiceDesc instanceof StringNodeDescriptor) {
+					choices.add(((StringNodeDescriptor)choiceDesc).getAbstractValue());
 				}
 				else if (choiceDesc instanceof UnsupportedNodeDescriptor) {
 					throw new UnsupportedStringOpExAtNode(((UnsupportedNodeDescriptor)choiceDesc).getProblemMessage(),

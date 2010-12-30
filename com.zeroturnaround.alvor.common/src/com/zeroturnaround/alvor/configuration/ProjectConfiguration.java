@@ -6,17 +6,17 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 
-import com.zeroturnaround.alvor.common.IHotspotPattern;
+import com.zeroturnaround.alvor.common.HotspotPattern;
 
 public class ProjectConfiguration {
 	public enum CheckingStrategy {PREFER_STATIC, PREFER_DYNAMIC, ALL_CHECKERS}
 	
-	private List<IHotspotPattern> hotspots = new ArrayList<IHotspotPattern>();
+	private List<HotspotPattern> hotspots = new ArrayList<HotspotPattern>();
 	private List<DataSourceProperties> dataSources = new ArrayList<DataSourceProperties>();
 	private Map<String, String> properties;
 	private final IProject project;
 
-	public ProjectConfiguration(List<IHotspotPattern> hotspots, List<DataSourceProperties> dataSources,
+	public ProjectConfiguration(List<HotspotPattern> hotspots, List<DataSourceProperties> dataSources,
 			Map<String, String> properties, IProject project) {
 		this.hotspots = hotspots;
 		this.dataSources = dataSources;
@@ -28,11 +28,11 @@ public class ProjectConfiguration {
 		return dataSources;
 	}
 	
-	public List<IHotspotPattern> getHotspots() {
+	public List<HotspotPattern> getHotspots() {
 		return hotspots;
 	}
 	
-	public void setHotspots(List<IHotspotPattern> hotspots) {
+	public void setHotspots(List<HotspotPattern> hotspots) {
 		this.hotspots = hotspots;
 	}
 
@@ -43,9 +43,9 @@ public class ProjectConfiguration {
 	public CheckingStrategy getCheckingStrategy() {
 		String result = properties.get("checkingStrategy");
 		
-		if (result.equals("allCheckers")) {
+		if (result != null && result.equals("allCheckers")) {
 			return CheckingStrategy.ALL_CHECKERS; 
-		} else if (result.equals("preferStatic")) {
+		} else if (result != null && result.equals("preferStatic")) {
 			return CheckingStrategy.PREFER_STATIC; 
 		} else {
 			return CheckingStrategy.PREFER_DYNAMIC;

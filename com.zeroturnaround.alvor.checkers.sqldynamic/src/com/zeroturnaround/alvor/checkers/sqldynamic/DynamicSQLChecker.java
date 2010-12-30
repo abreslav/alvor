@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 import com.zeroturnaround.alvor.checkers.CheckerException;
 import com.zeroturnaround.alvor.checkers.IAbstractStringChecker;
 import com.zeroturnaround.alvor.checkers.ISQLErrorHandler;
-import com.zeroturnaround.alvor.common.IStringNodeDescriptor;
+import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.configuration.DataSourceProperties;
@@ -30,26 +30,26 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 	Map<Integer, SqlTester> testers = new HashMap<Integer, SqlTester>();
 
 	@Override
-	public void checkAbstractStrings(List<IStringNodeDescriptor> descriptors,
+	public void checkAbstractStrings(List<StringNodeDescriptor> descriptors,
 			ISQLErrorHandler errorHandler, ProjectConfiguration configuration) throws CheckerException {
 		if (descriptors.size() == 0) {
 			return;
 		}
 		
 		SqlTester tester = this.getAnalyzer(configuration);
-		for (IStringNodeDescriptor descriptor: descriptors) {
+		for (StringNodeDescriptor descriptor: descriptors) {
 			this.checkAbstractString(descriptor, errorHandler, tester);
 		}
 	}
 	
 	@Override
-	public boolean checkAbstractString(IStringNodeDescriptor descriptor,
+	public boolean checkAbstractString(StringNodeDescriptor descriptor,
 			ISQLErrorHandler errorHandler, ProjectConfiguration configuration) throws CheckerException {
 		return checkAbstractString(descriptor, errorHandler, this.getAnalyzer(configuration));
 	}
 	
 	
-	private boolean checkAbstractString(IStringNodeDescriptor descriptor,
+	private boolean checkAbstractString(StringNodeDescriptor descriptor,
 			ISQLErrorHandler errorHandler, SqlTester tester) {
 
 		boolean allOK = true;

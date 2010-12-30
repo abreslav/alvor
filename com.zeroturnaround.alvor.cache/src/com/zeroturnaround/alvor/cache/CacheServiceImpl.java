@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.zeroturnaround.alvor.common.IHotspotPattern;
+import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
@@ -53,7 +53,7 @@ public final class CacheServiceImpl implements ICacheService {
 	private final IDBLayer dbLayer;
 	private final DBQueries queries;
 	private final Connection connection;
-	private final IScopedCache<IHotspotPattern, IPosition> usageCache = new UsageCache();	
+	private final IScopedCache<HotspotPattern, IPosition> usageCache = new UsageCache();	
 	private final IScopedCache<MethodInvocationDescriptor, IAbstractString> methodTemplateCache = new MethodTemplateCache();	
 
 	private class DBQueries {
@@ -97,7 +97,7 @@ public final class CacheServiceImpl implements ICacheService {
 			return queryGetAbstractString;
 		}
 
-		public PreparedStatement getMethodQuery(IHotspotPattern pattern) throws SQLException {
+		public PreparedStatement getMethodQuery(HotspotPattern pattern) throws SQLException {
 			queryGetMethod.setString(1, pattern.getClassName());
 			queryGetMethod.setString(2, pattern.getMethodName());
 
@@ -694,7 +694,7 @@ public final class CacheServiceImpl implements ICacheService {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@Override
-	public IScopedCache<IHotspotPattern, IPosition> getHotspotCache() {
+	public IScopedCache<HotspotPattern, IPosition> getHotspotCache() {
 		return usageCache;
 	}
 
@@ -820,10 +820,10 @@ public final class CacheServiceImpl implements ICacheService {
 	}
 
 	
-	private final class UsageCache implements IScopedCache<IHotspotPattern, IPosition> {
+	private final class UsageCache implements IScopedCache<HotspotPattern, IPosition> {
 
 		@Override
-		public void add(IHotspotPattern pattern, IPosition position) {
+		public void add(HotspotPattern pattern, IPosition position) {
 			if (nocache) 
 				return;
 			try {
@@ -843,7 +843,7 @@ public final class CacheServiceImpl implements ICacheService {
 			}
 		}
 		
-		private int createMethod(IHotspotPattern pattern) throws SQLException {
+		private int createMethod(HotspotPattern pattern) throws SQLException {
 			PreparedStatement query = queries.getMethodQuery(pattern);
 			PreparedStatement insert = connection.prepareStatement(
 					"INSERT INTO Methods(class, name) VALUES (?, ?)",
@@ -856,7 +856,7 @@ public final class CacheServiceImpl implements ICacheService {
 
 		@Override
 		public void getCachedResultsInScope(Set<Integer> scope,
-				IHotspotPattern pattern, Collection<? super IPosition> result) {
+				HotspotPattern pattern, Collection<? super IPosition> result) {
 			if (nocache) 
 				return;
 			try {
@@ -889,7 +889,7 @@ public final class CacheServiceImpl implements ICacheService {
 		}
 
 		@Override
-		public Map<String, Integer> getCachedScope(IHotspotPattern pattern) {
+		public Map<String, Integer> getCachedScope(HotspotPattern pattern) {
 			if (nocache) 
 				return Collections.emptyMap();
 			try {
@@ -920,7 +920,7 @@ public final class CacheServiceImpl implements ICacheService {
 		}
 
 		@Override
-		public void markScopeAsCached(IHotspotPattern pattern, Set<String> scope) {
+		public void markScopeAsCached(HotspotPattern pattern, Set<String> scope) {
 			if (nocache) 
 				return;
 			try {

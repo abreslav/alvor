@@ -13,8 +13,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import com.zeroturnaround.alvor.common.IHotspotPattern;
-import com.zeroturnaround.alvor.configuration.HotspotPattern;
+import com.zeroturnaround.alvor.common.HotspotPattern;
+import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
 
 public class HotspotsPropertyPage extends CommonPropertyPage {
@@ -45,18 +45,18 @@ public class HotspotsPropertyPage extends CommonPropertyPage {
 		return desc;
 	}
 	
-	private String unparseHotspots(List<IHotspotPattern> hotspots) {
+	private String unparseHotspots(List<HotspotPattern> hotspots) {
 		String result = "";
-		for (IHotspotPattern hp : hotspots) {
+		for (HotspotPattern hp : hotspots) {
 			result += hp.getClassName() + "," + hp.getMethodName() + "," + hp.getArgumentIndex() + "\n"; 
 		}
 		return result;
 	}
 	
-	private List<IHotspotPattern> parseHotspots(String text) {
+	private List<HotspotPattern> parseHotspots(String text) {
 		Scanner sc = new Scanner(text);
 		
-		List<IHotspotPattern> list = new ArrayList<IHotspotPattern>();
+		List<HotspotPattern> list = new ArrayList<HotspotPattern>();
 		int i = 1;
 		while (sc.hasNextLine()) {
 			String line = sc.nextLine();

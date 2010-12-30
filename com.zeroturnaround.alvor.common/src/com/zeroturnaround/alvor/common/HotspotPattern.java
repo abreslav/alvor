@@ -1,8 +1,7 @@
-package com.zeroturnaround.alvor.configuration;
+package com.zeroturnaround.alvor.common;
 
-import com.zeroturnaround.alvor.common.IHotspotPattern;
 
-public class HotspotPattern implements IHotspotPattern {
+public class HotspotPattern {
 	private int argumentIndex;
 	private String methodName;
 	private String className;
