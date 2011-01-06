@@ -91,7 +91,7 @@
 						type="org.eclipse.core.resources.IResource">
 						<test
 							property="org.eclipse.core.resources.projectNature"
-							value="com.zeroturnaround.alvor.javaproject.esqlNature">
+							value="com.zeroturnaround.alvor.builder.AlvorNature">
 						</test>
 					</adapt>
 				</iterate>
@@ -285,6 +285,35 @@
             </instanceof>
          </enabledWhen>
       </page>
+   </extension>
+   <extension
+         id="com.zeroturnaround.alvor.builder.AlvorBuilder"
+         name="Alvor SQL Checker"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            callOnEmptyDelta="false"
+            hasNature="true"
+            isConfigurable="true">
+         <run
+               class="com.zeroturnaround.alvor.builder.AlvorBuilder">
+         </run>
+      </builder>
+   </extension>
+   <extension
+         id="com.zeroturnaround.alvor.builder.AlvorNature"
+         name="Alvor nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="com.zeroturnaround.alvor.builder.AlvorNature">
+         </run>
+      </runtime>
+      <requires-nature
+            id="org.eclipse.jdt.core.javanature">
+      </requires-nature>
+      <builder
+            id="com.zeroturnaround.alvor.builder.AlvorBuilder">
+      </builder>
    </extension>
 </plugin>
 

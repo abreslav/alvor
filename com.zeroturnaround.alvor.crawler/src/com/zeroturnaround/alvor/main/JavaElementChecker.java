@@ -203,7 +203,7 @@ public class JavaElementChecker {
 	
 	private boolean dynamicCheckerIsConfigured(ProjectConfiguration configuration) {
 		DataSourceProperties props = configuration.getDefaultDataSource();
-		return props.getUrl() != null && !props.getUrl().trim().isEmpty()
+		return props != null && props.getUrl() != null && !props.getUrl().trim().isEmpty()
 			&& props.getDriverName() != null && !props.getDriverName().trim().isEmpty();
 	}
 	

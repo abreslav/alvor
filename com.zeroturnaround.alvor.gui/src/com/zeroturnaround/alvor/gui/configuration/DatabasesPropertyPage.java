@@ -162,7 +162,7 @@ public class DatabasesPropertyPage extends CommonPropertyPage {
 	@Override
 	protected Label createDescriptionLabel(Composite parent) {
 		Label desc = new Label(parent, SWT.WRAP);
-		desc.setText("Here you can specify connection properties for test-database(s)");
+		desc.setText("Here you can specify database specific preferences");
 		return desc;
 	}
 	
