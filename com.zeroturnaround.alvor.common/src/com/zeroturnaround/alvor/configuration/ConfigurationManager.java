@@ -143,7 +143,7 @@ public class ConfigurationManager {
 			node.setAttribute("pattern", dataSource.getPattern());
 			node.setAttribute("driverName", dataSource.getDriverName());
 			node.setAttribute("url", dataSource.getUrl());
-			node.setAttribute("username", dataSource.getUserName());
+			node.setAttribute("userName", dataSource.getUserName());
 			node.setAttribute("password", dataSource.getPassword());
 			dataSourceNodes.appendChild(node);
 		}

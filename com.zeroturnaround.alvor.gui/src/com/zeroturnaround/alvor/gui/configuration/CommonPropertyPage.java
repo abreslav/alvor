@@ -42,7 +42,8 @@ public abstract class CommonPropertyPage extends PropertyPage implements IWorkbe
 	@Override
 	public boolean performOk() {
 		if (this.hasChanges) {
-			GuiUtil.ShowInfoDialog("Please do full analysis after changing SQL checker configuration");
+			//GuiUtil.ShowInfoDialog("Please do full analysis after changing SQL checker configuration");
+			// TODO, should I initiate full (or partial) reanalysis? Clean the cache?
 			return this.saveState();
 		}
 		else {

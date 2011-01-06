@@ -8,12 +8,12 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
 
@@ -31,7 +31,6 @@ public class HotspotsPropertyPage extends CommonPropertyPage {
 			@Override
 			public void modifyText(ModifyEvent e) {
 				// TODO validate lines after entering a newline
-				HotspotsPropertyPage.this.setErrorMessage("erromerro");
 				hasChanges = true;
 			}
 		});
@@ -40,8 +39,10 @@ public class HotspotsPropertyPage extends CommonPropertyPage {
 	
 	@Override
 	protected Label createDescriptionLabel(Composite parent) {
-		Label desc = new Label(parent, SWT.WRAP);
-		desc.setText("Here you should list methods and argument indexes (1-based) which shoud be searched for SQL");
+		Label desc = new Label(parent, SWT.NONE);
+		desc.setText("Describe which arguments to which method calls should Alvor analyze.\n\n" +
+				"On each line give class name, method name and argument index (1-based), eg:\n" +
+				"java.sql.Connection, prepareStatement, 1");
 		return desc;
 	}
 	
@@ -81,5 +82,10 @@ public class HotspotsPropertyPage extends CommonPropertyPage {
 	@Override
 	protected void mergeChanges(ProjectConfiguration base) {
 		base.setHotspots(parseHotspots(memo.getText()));
+	}
+	
+	@Override
+	public Point computeSize() {
+		return new Point(550, 400);
 	}
 }

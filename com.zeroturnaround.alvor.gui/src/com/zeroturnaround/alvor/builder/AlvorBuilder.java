@@ -1,4 +1,4 @@
-package com.zeroturnaround.alvor.javaproject.builder;
+package com.zeroturnaround.alvor.builder;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,10 +29,12 @@ import com.zeroturnaround.alvor.gui.GuiChecker;
 import com.zeroturnaround.alvor.string.IPosition;
 import com.zeroturnaround.alvor.util.PositionUtil;
 
-public class ESQLBuilder extends IncrementalProjectBuilder {
+public class AlvorBuilder extends IncrementalProjectBuilder {
+	public static final String BUILDER_ID = "com.zeroturnaround.alvor.builder.AlvorBuilder";
+
 	GuiChecker checker = null; // seems I can't initialize it here (?)
 	
-	private static ILog LOG = Logs.getLog(ESQLBuilder.class);
+	private static ILog LOG = Logs.getLog(AlvorBuilder.class);
 	private Set<IFile> invalidatedFiles = new HashSet<IFile>();
 
 	private class DeltaVisitor implements IResourceDeltaVisitor {
@@ -80,8 +82,6 @@ public class ESQLBuilder extends IncrementalProjectBuilder {
 			return resources;
 		};
 	}
-
-	public static final String BUILDER_ID = "com.zeroturnaround.alvor.javaproject.esqlBuilder";
 
 	@SuppressWarnings("rawtypes")
 	@Override
