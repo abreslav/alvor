@@ -25,15 +25,6 @@
          </action>
       </viewerContribution>
    </extension>
-   
-   <extension
-         id="sqlerror"
-         name="SQL error marker" 
-         point="org.eclipse.core.resources.markers">
-      <super type="org.eclipse.core.resources.problemmarker" />
-      <super type="org.eclipse.core.resources.textmarker" />
-      <persistent value="true"/>
-   </extension>
 
    <extension
          id="sqlwarning"
@@ -45,35 +36,42 @@
    </extension>
    
    <extension
+         id="sqlerror"
+         name="SQL error marker" 
+         point="org.eclipse.core.resources.markers">
+      <super type="org.eclipse.core.resources.problemmarker" />
+      <super type="org.eclipse.core.resources.textmarker" />
+      <persistent value="true"/>
+   </extension>
+    
+	<extension 
+         point="org.eclipse.ui.editors.annotationTypes">
+         <type
+             name="unsupported"
+             super="org.eclipse.ui.workbench.texteditor.info"
+             markerType="com.zeroturnaround.alvor.gui.unsupported">
+         </type>
+   </extension>
+   
+   <extension
          point="org.eclipse.ui.commands">
-      <!-- The "CheckProject id is really a misnomer, hopefully? -->
-      <command
-            categoryId="org.eclipse.jdt.ui.category.source"
-            defaultHandler="com.zeroturnaround.alvor.gui.CleanCheckElementHandler"
-            description="Checks SQL usage in selected element"
-            id="com.zeroturnaround.alvor.plugin.CheckProject"
-            name="Check SQL">
-      </command>
       <command
             categoryId="org.eclipse.jdt.ui.category.source"
             defaultHandler="com.zeroturnaround.alvor.gui.ClearCacheHandler"
-            description="Clears SQL checker cache for the workspace"
             id="com.zeroturnaround.alvor.gui.clearCache"
             name="Clear SQL checker cache">
       </command>
       <command
             categoryId="org.eclipse.jdt.ui.category.source"
             defaultHandler="com.zeroturnaround.alvor.gui.CheckResultSetsHandler"
-            description="Checks ResultSet-s"
             id="com.zeroturnaround.alvor.gui.checkResultSets"
             name="Check ResultSet-s">
       </command>
       <command
             categoryId="org.eclipse.jdt.ui.category.source"
-            defaultHandler="com.zeroturnaround.alvor.gui.CleanCheckCurrentProjectHandler"
-            description="Checks SQL in current project"
-            id="com.zeroturnaround.alvor.plugin.CheckCurrentProject"
-            name="Check SQL in current project">
+            defaultHandler="com.zeroturnaround.alvor.gui.CleanCheckHandler"
+            id="com.zeroturnaround.alvor.plugin.CleanCheck"
+            name="Check SQL">
       </command>
    </extension>
    
@@ -82,20 +80,16 @@
       <menuContribution
             locationURI="popup:org.eclipse.jdt.ui.PackageExplorer?after=additions">
 		 <command
-               commandId="com.zeroturnaround.alvor.plugin.CheckProject"
-               label="Check SQL in selected elements"
+               commandId="com.zeroturnaround.alvor.plugin.CleanCheck"
                style="push">
-			<visibleWhen>
-				<iterate>
-					<adapt
-						type="org.eclipse.core.resources.IResource">
-						<test
-							property="org.eclipse.core.resources.projectNature"
-							value="com.zeroturnaround.alvor.builder.AlvorNature">
-						</test>
-					</adapt>
-				</iterate>
-			</visibleWhen>
+      <visibleWhen
+            checkEnabled="false">
+         <iterate>
+            <adapt
+                  type="org.eclipse.jdt.core.IJavaProject">
+            </adapt>
+         </iterate>
+      </visibleWhen>
          </command>
       </menuContribution>
    </extension>
@@ -175,35 +169,6 @@
     </extension>
    
    <extension
-         id="sqlstring"
-         name="SQL string marker"
-         point="org.eclipse.core.resources.markers">
-      <super
-            type="org.eclipse.core.resources.textmarker">
-      </super>
-      <persistent value="true"/>
-    </extension>
-
-   <extension
-         id="unsupported"
-         name="SQL unsupported marker"
-         point="org.eclipse.core.resources.markers">
-      <super
-            type="org.eclipse.core.resources.textmarker">
-      </super>
-      <persistent value="true"/>
-    </extension>
-    
-	<extension 
-         point="org.eclipse.ui.editors.annotationTypes">
-         <type
-             name="unsupported"
-             super="org.eclipse.ui.workbench.texteditor.info"
-             markerType="com.zeroturnaround.alvor.gui.unsupported">
-         </type>
-   </extension>
-   
-   <extension
          point="org.eclipse.ui.editors.markerAnnotationSpecification">
          <specification
                annotationType="sqlstring"
@@ -225,11 +190,25 @@
     </extension>
    
    <extension
-         point="org.eclipse.ui.startup">
-      <startup
-            class="com.zeroturnaround.alvor.gui.AlvorGuiStartup">
-      </startup>
-   </extension>
+         id="sqlstring"
+         name="SQL string marker"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+      <persistent value="true"/>
+    </extension>
+
+   <extension
+         id="unsupported"
+         name="SQL unsupported marker"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+      <persistent value="true"/>
+    </extension>
+   
    
    <extension
          point="org.eclipse.help.toc">

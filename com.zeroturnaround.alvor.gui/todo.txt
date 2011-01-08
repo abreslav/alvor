@@ -1,0 +1,30 @@
+By Jan 15
+---------
+* Test and Fix new bugs
+* Investigate Andrey's addition
+* Complete configuration UI
+* Add change tests?
+
+By Jan 22
+---------
+* Get more projects from WM
+* Do more demos in WM
+
+
+By Jan 29
+---------
+* Do more demos in WM
+* Prepare Update-site
+* Prepare website 
+* Write help documents
+
+
+
+End of Feb
+----------
+* Path-sensitivity hacks
+* New "cache"
+
+Sometime
+----------
+* Make Cache independent of JDT
