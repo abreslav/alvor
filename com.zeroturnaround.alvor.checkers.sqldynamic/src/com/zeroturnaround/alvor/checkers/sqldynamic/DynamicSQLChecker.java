@@ -18,7 +18,6 @@ import com.zeroturnaround.alvor.db.SqlTester;
 import com.zeroturnaround.alvor.db.generic.GenericSqlTester;
 import com.zeroturnaround.alvor.db.mysql.MySqlSqlTester;
 import com.zeroturnaround.alvor.db.oracle.OracleSqlTester;
-import com.zeroturnaround.alvor.string.Position;
 import com.zeroturnaround.alvor.string.samplegen.SampleGenerator;
 import com.zeroturnaround.alvor.string.util.AbstractStringSizeCounter;
 
@@ -130,7 +129,7 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 					|| options.getUserName() == null || options.getPassword() == null
 					|| options.getDriverName().toString().isEmpty()) {
 				throw new CheckerException("SQL checker: Test database configuration is not complete", 
-						new Position(configuration.getProjectPath(), 0, 0));
+						null);
 			}
 			
 			try {
@@ -158,7 +157,7 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 			} catch (Exception e) {
 				LOG.exception(e);
 				throw new CheckerException("SQL checker: can't connect with test database: "
-						+ e.getMessage(), new Position(configuration.getProjectPath(), 0, 0));
+						+ e.getMessage(), null);
 			}
 			
 			this.testers.put(options.hashCode(), tester);

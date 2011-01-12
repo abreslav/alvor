@@ -1,6 +1,7 @@
 package com.zeroturnaround.alvor.common;
 
 
+
 public class HotspotPattern {
 	private int argumentIndex;
 	private String methodName;
@@ -39,5 +40,22 @@ public class HotspotPattern {
 	@Override
 	public String toString() {
 		return "Argument " + getArgumentIndex() + " of " + getClassName() + "." +  getMethodName();
+	}
+	
+	@Override
+	public int hashCode() {
+		int result = 22;
+		result = result * 31 + className.hashCode();
+		result = result * 31 + methodName.hashCode();
+		result = result * 31 + argumentIndex;
+		return result;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return this == obj 
+		|| obj != null 
+		   && obj instanceof HotspotPattern 
+		   && this.hashCode() == obj.hashCode();
 	}
 }

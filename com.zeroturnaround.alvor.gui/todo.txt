@@ -1,13 +1,26 @@
 By Jan 15
 ---------
-* Test and Fix new bugs
-* Investigate Andrey's addition
-* Complete configuration UI
+# Investigate current tests, start adding missing ones and get a nicer big picture 
 * Add change tests?
+* Find and fix cache problems
+
+* Test and Fix new bugs
+* Fix the terms/meanings of hotspot vs hotspot-method
+
+(* Investigate Andrey's addition)
+(* Separate grammars)
+
+	- Create a GUI change test (base class with helpers and subclasses 
+	  with specific starting state), re-use helpers from crawler tests
+	- Tidy up example workspace
+	
+
 
 By Jan 22
 ---------
 * Get more projects from WM
+* Complete configuration UI
+* Write separate Oracle grammar
 * Do more demos in WM
 
 
@@ -23,7 +36,9 @@ By Jan 29
 End of Feb
 ----------
 * Path-sensitivity hacks
-* New "cache"
+* New "cache" ??
+* Multiconnection ??
+* SQL-builders
 
 Sometime
 ----------

@@ -21,7 +21,6 @@ import com.zeroturnaround.alvor.common.logging.Timer;
 import com.zeroturnaround.alvor.configuration.DataSourceProperties;
 import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
 import com.zeroturnaround.alvor.crawler.AbstractStringEvaluator;
-import com.zeroturnaround.alvor.string.Position;
 import com.zeroturnaround.alvor.util.PositionUtil;
 
 /**
@@ -134,7 +133,7 @@ public class JavaElementChecker {
 		if (!dynamicCheckerIsConfigured(configuration)) {
 			errorHandler.handleSQLWarning(
 					"SQL checker: Test-database is not configured, SQL testing is not performed",
-					new Position(configuration.getProjectPath(), 0, 0));
+					null);
 		}
 		
 		try {
@@ -168,8 +167,7 @@ public class JavaElementChecker {
 					checkValidHotspotsPreferStatic(hotspots, errorHandler, dynamicChecker, staticChecker, configuration);
 				}
 				else {
-					throw new CheckerException("Unknown checking strategy",
-							new Position(configuration.getProjectPath(), 0, 0));
+					throw new CheckerException("Unknown checking strategy", null);
 				}
 			}
 		}
@@ -190,7 +188,7 @@ public class JavaElementChecker {
 			if (checker instanceof DynamicSQLChecker 
 					&& !dynamicCheckerIsConfigured(configuration)) {
 				errorHandler.handleSQLWarning("SQL checker: testing database is not configured", 
-						new Position(configuration.getProjectPath(), 0, 0));
+						null);
 				
 			} else {
 				Timer timer = new Timer();

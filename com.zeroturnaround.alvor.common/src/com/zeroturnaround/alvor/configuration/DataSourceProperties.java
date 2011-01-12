@@ -54,4 +54,23 @@ public class DataSourceProperties {
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
+	
+	
+	@Override
+	public boolean equals(Object obj) {
+		return obj != null 
+			&& obj instanceof DataSourceProperties 
+			&& this.hashCode() == obj.hashCode();
+	}
+	
+	@Override
+	public int hashCode() {
+		int result = 1;
+		result = result * 31 + pattern.hashCode();
+		result = result * 31 + driverName.hashCode();
+		result = result * 31 + url.hashCode();
+		result = result * 31 + userName.hashCode();
+		result = result * 31 + password.hashCode();
+		return result;
+	}
 }
