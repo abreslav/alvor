@@ -89,13 +89,6 @@
          unpack="false"/>
 
    <plugin
-         id="com.zeroturnaround.alvor.javaproject"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="com.zeroturnaround.alvor.model"
          download-size="0"
          install-size="0"

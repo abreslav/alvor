@@ -5,6 +5,9 @@ What can happen when file is changed:
 	- interprocedural stuff
 		- new call-sites appear to some method in another (unchanged) file containing hotspot ...
 		- ... or such call-sites can disappear
+		- a method body can be altered so that this method becomes a new hotspot
+			- callers of this method will not be aware of this, because interface is not changed
+			- need to search *all files* for calls to this new hotspot
 		- a method implementation called from other files can appear/disappear/change:
 			- if it disappears then code breaks and we can expect user to modify other files soon,
            or if it's an overridden method (one of many implementations) then other implementations

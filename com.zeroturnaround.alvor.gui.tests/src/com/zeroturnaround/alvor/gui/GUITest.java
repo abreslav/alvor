@@ -16,8 +16,6 @@ package com.zeroturnaround.alvor.gui;
  * 		 
  */
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
@@ -187,7 +185,7 @@ public abstract class GUITest {
 		}
 	}
 	
-	boolean filesAreEqual(File a, File b) throws FileNotFoundException {
+	public static boolean filesAreEqual(File a, File b) throws FileNotFoundException {
 		assert a.exists() && b.exists();
 		
 		Scanner scA = new Scanner(a);

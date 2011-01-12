@@ -31,6 +31,7 @@ import com.zeroturnaround.alvor.string.DummyPosition;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.IAbstractStringVisitor;
 import com.zeroturnaround.alvor.string.IPosition;
+import com.zeroturnaround.alvor.string.Position;
 import com.zeroturnaround.alvor.string.StringCharacterSet;
 import com.zeroturnaround.alvor.string.StringChoice;
 import com.zeroturnaround.alvor.string.StringConstant;
@@ -48,6 +49,9 @@ public class GuiChecker implements ISQLErrorHandler {
 	public static final String STRING_MARKER_ID = "com.zeroturnaround.alvor.gui.sqlstring";
 
 	private static final ILog LOG = Logs.getLog(GuiChecker.class);
+	
+	@Deprecated
+	private IProject currentProject;
 	
 	private JavaElementChecker projectChecker = new JavaElementChecker();
 	
@@ -68,6 +72,8 @@ public class GuiChecker implements ISQLErrorHandler {
 		if (scope.length == 0) {
 			return new ArrayList<NodeDescriptor>();
 		}
+		
+		this.currentProject = optionsFrom;
 		
 		cleanMarkers(scope);
 		cleanConfigurationMarkers(optionsFrom);
@@ -120,15 +126,6 @@ public class GuiChecker implements ISQLErrorHandler {
 
 	public static void createMarker(String message, String markerType,
 			IPosition pos, Map<String, Comparable<?>> map) {
-		
-		// dummy positions are created in string conversion when no actual position fits
-		// or when new nodes are created in string transformings
-		// FIXME This actually shouldnt occur or
-		// maybe this should create a marker for the whole workspace ??
-		if (DummyPosition.isDummyPosition(pos)) {
-			LOG.exception(new IllegalArgumentException("Warning: Dummy position in 'createMarker'"));
-			return;
-		}
 		
 		if (map == null) {
 			map = new HashMap<String, Comparable<?>>();
@@ -189,14 +186,13 @@ public class GuiChecker implements ISQLErrorHandler {
 	/*
 	 * This method makes things slow on big projects, although on small ones the markers look nice
 	 */
-	@SuppressWarnings("unused")
 	private void markConstants(IAbstractString abstractValue) {
 		IAbstractStringVisitor<Void, Void> visitor = new IAbstractStringVisitor<Void, Void>() {
 
 			@Override
 			public Void visitStringCharacterSet(
 					StringCharacterSet characterSet, Void data) {
-				createMarker("", STRING_MARKER_ID, characterSet.getPosition());
+				createMarker("", STRING_MARKER_ID, preparePosition(characterSet.getPosition()));
 				return null;
 			}
 
@@ -211,7 +207,7 @@ public class GuiChecker implements ISQLErrorHandler {
 			@Override
 			public Void visitStringConstant(StringConstant stringConstant,
 					Void data) {
-				createMarker("", STRING_MARKER_ID, stringConstant.getPosition());
+				createMarker("", STRING_MARKER_ID, preparePosition(stringConstant.getPosition()));
 				return null;
 			}
 
@@ -248,11 +244,26 @@ public class GuiChecker implements ISQLErrorHandler {
 
 	@Override
 	public void handleSQLError(String message, IPosition position) {
-		createMarker(message, ERROR_MARKER_ID, position);		
+		createMarker(message, ERROR_MARKER_ID, preparePosition(position));		
 	}
 
 	@Override
 	public void handleSQLWarning(String message, IPosition position) {
-		createMarker(message, WARNING_MARKER_ID, position);		
+		createMarker(message, WARNING_MARKER_ID, preparePosition(position));		
+	}
+	
+	private IPosition preparePosition(IPosition pos) {
+		if (pos == null) {
+			return new Position(this.currentProject.getFullPath().toPortableString(), 0, 0);
+		}
+		
+		// dummy positions are created in string conversion when no actual position fits
+		// or when new nodes are created in string transformings
+		// FIXME This actually shouldnt occur or
+		// maybe this should create a marker for the whole workspace ??
+		else if (DummyPosition.isDummyPosition(pos)) {
+			LOG.exception(new IllegalArgumentException("Warning: Dummy position in 'createMarker'"));
+		}
+		return pos;
 	}
 }

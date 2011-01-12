@@ -26,7 +26,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.zeroturnaround.alvor.common.HotspotPattern;
-import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 
@@ -52,23 +51,23 @@ public class ConfigurationManager {
 				LOG.exception(e);
 			}
 		}
-		return readFromFile(file, project);
+		return readFromFile(file);
 	}
 
 	public static File getProjectConfigurationFile(IProject project) {
 		return project.getLocation().append("/" + CONF_FILE_NAME).toFile();
 	}
 
-	private static ProjectConfiguration readFromFile(File file, IProject project) {
+	static ProjectConfiguration readFromFile(File file) {
 		try {
-			return doReadFromFile(file, project);
+			return doReadFromFile(file);
 		} catch (Exception e) {
 			LOG.error("Can't load configuration", e);
 			throw new IllegalStateException("Can't load configuration", e);
 		}	
 	}
 	
-	private static ProjectConfiguration doReadFromFile(File file, IProject project) throws ParserConfigurationException, 
+	private static ProjectConfiguration doReadFromFile(File file) throws ParserConfigurationException, 
 		SAXException, IOException {
 		
 		List<DataSourceProperties> dataSources = new ArrayList<DataSourceProperties>();
@@ -106,7 +105,7 @@ public class ConfigurationManager {
 			attributes.put(nnm.item(i).getNodeName(), nnm.item(i).getNodeValue());
 		}
 
-		return new ProjectConfiguration(hotspots, dataSources, attributes, project);
+		return new ProjectConfiguration(hotspots, dataSources, attributes);
 	}
 
 	public static void saveToProjectConfigurationFile(ProjectConfiguration conf, IProject project) {
@@ -118,7 +117,7 @@ public class ConfigurationManager {
 		}
 	}
 	
-	private static void saveToFile(ProjectConfiguration conf, File file) throws ParserConfigurationException, TransformerException {
+	static void saveToFile(ProjectConfiguration conf, File file) throws ParserConfigurationException, TransformerException {
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = dbf.newDocumentBuilder(); 
 		Document doc = db.newDocument();

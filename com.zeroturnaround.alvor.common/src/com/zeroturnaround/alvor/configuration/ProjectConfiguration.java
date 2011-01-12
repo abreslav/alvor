@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IProject;
-
 import com.zeroturnaround.alvor.common.HotspotPattern;
 
 public class ProjectConfiguration {
@@ -14,14 +12,12 @@ public class ProjectConfiguration {
 	private List<HotspotPattern> hotspots = new ArrayList<HotspotPattern>();
 	private List<DataSourceProperties> dataSources = new ArrayList<DataSourceProperties>();
 	private Map<String, String> properties;
-	private final IProject project;
 
 	public ProjectConfiguration(List<HotspotPattern> hotspots, List<DataSourceProperties> dataSources,
-			Map<String, String> properties, IProject project) {
+			Map<String, String> properties) {
 		this.hotspots = hotspots;
 		this.dataSources = dataSources;
 		this.properties = properties;
-		this.project = project;
 	}
 	
 	public List<DataSourceProperties> getDataSources() {
@@ -74,11 +70,19 @@ public class ProjectConfiguration {
 		return null;
 	}
 	
-	public IProject getProject() {
-		return project;
+	@Override
+	public boolean equals(Object obj) {
+		return obj != null 
+			&& obj instanceof ProjectConfiguration 
+			&& this.hashCode() == obj.hashCode();
 	}
 	
-	public String getProjectPath() {
-		return this.project.getFullPath().toPortableString();
+	@Override
+	public int hashCode() {
+		int result = 17;
+		result = result * 31 + dataSources.hashCode();
+		result = result * 31 + hotspots.hashCode();
+		result = result * 31 + properties.hashCode();
+		return result;
 	}
 }
