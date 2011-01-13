@@ -45,7 +45,8 @@ In particular, if correct markers are computed for the project, then after a dum
 (eg. adding a space to the end), the resulting set of markers should be equivalent to previous
 set of markers.
 
-TODO test the effect of refactoring the target project
+TODO test the effect of refactoring the target project, including renaming a wrapper (non-fixed) hotspot
+also renaming a fixed hotspot (in code).
 
 Edge cases
 ----------

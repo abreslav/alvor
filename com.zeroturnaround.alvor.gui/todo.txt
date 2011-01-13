@@ -7,6 +7,8 @@ By Jan 15
 * Test and Fix new bugs
 * Fix the terms/meanings of hotspot vs hotspot-method
 
+* What's the ratio of right/wrong search matches ?
+
 (* Investigate Andrey's addition)
 (* Separate grammars)
 
@@ -14,7 +16,8 @@ By Jan 15
 	  with specific starting state), re-use helpers from crawler tests
 	- Tidy up example workspace
 	
-
+* change builder to first store names of changed files and process them only
+  when there's no java errors and automatic checking is configured
 
 By Jan 22
 ---------
@@ -30,6 +33,7 @@ By Jan 29
 * Prepare Update-site
 * Prepare website 
 * Write help documents
+  - describe how to test whether checker is working OK
 
 
 
