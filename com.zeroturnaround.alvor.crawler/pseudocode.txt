@@ -1,0 +1,51 @@
+fun fullCheckProject(project, conf) = 
+	files = project.getFiles()
+	hotspots = conf.fixedHotspots
+	strings = findStringsFromManyFilesForManyHotspots(files, hotspots, project)
+	check(strings)
+
+
+fun checkFileAfterEdit(file, project, conf) = 
+	cache.removeFileEntries(file)  // marks dependent strings as unchecked
+	hotspots = conf.fixedHotspots ++ cache.getSecondaryHotspots
+	strings1 = findStringsFromOneFileForManyHotspots(file, hotspots)
+	check(strings1)
+	
+	// some base Hotspot entries from other files now got modified and need to be rechecked 
+	strings2 = cache.getUncheckedStrings()
+	check(strings2) 
+
+------------------------------------------------------------------------------------------
+fun findStringsFromManyFilesForManyHotspots(files, hotspots) =
+	result = [] 
+	for file <- files:
+		result.addAll(findStringsFromOneFileForManyHotspots(file, hotspots))
+		
+	return result
+	
+fun findStringsFromOneFileForManyHotspots(file, hotspots) =
+	result = []
+	hotspotsToBeSearched = []
+	 
+	for hotspot <- hotspots:
+	    if cache.hasEntryFor(file, hotspot):
+	        result.addAll(getFromCache(file, hotspot))
+	    else:
+	    	hotspotsToBeSearched.add(hotspot)
+	
+	
+	for node <- findCorrespondingNodes(file, hotspotsToBeSearched):
+		str = evaluate(node)
+	    result.add(str)
+	    cache.addEntryFor(str, file, hotspot) // marks dependent strings as unchecked
+	
+	return result
+
+fun evaluate(node, project) =
+	// this doesn't use cache (directly)
+    ...
+    if node is Parameter:
+    	files = project.getAllFiles()
+    	return findStringsFromManyFilesForManyHotspots(files, [node as hotspot])
+    
+    ...
