@@ -1,8 +1,10 @@
 package com.zeroturnaround.alvor.configuration;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URISyntaxException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,12 +21,16 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
+import org.osgi.framework.Bundle;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.zeroturnaround.alvor.common.AlvorCommonPlugin;
 import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
@@ -35,39 +41,64 @@ import com.zeroturnaround.alvor.common.logging.Logs;
  */
 public class ConfigurationManager {
 	private static final String CONF_FILE_NAME = "alvor.xml";
-	private static final String SAMPLE_CONF = "res/default-configuration.xml"; 
+	private static final String SAMPLE_CONF = "/res/default-configuration.xml"; 
 	protected final static ILog LOG = Logs.getLog(ConfigurationManager.class);
 
 	/**
 	 * if customized conf file exists, then loads this. Otherwise loads default conf.
 	 */
 	public static ProjectConfiguration readProjectConfiguration(IProject project, boolean fallbackToDefault)  {
+		try {
+			InputStream stream = openProjectConfigurationStream(project, fallbackToDefault);
+			try {
+				return readFromStream(stream);
+			} finally {
+				stream.close();
+			}
+		} catch (Exception e) {
+			LOG.error("Can't load configuration", e);
+			throw new IllegalStateException(e);
+		}
+	}
+	
+	private static InputStream openDefaultConfigurationStream(IProject project) throws IOException {
+		Bundle bundle = AlvorCommonPlugin.getDefault().getBundle(); 
+		return FileLocator.openStream(bundle, new Path(SAMPLE_CONF), false);
+	}
+	
+	private static InputStream openProjectConfigurationStream(IProject project, boolean fallbackToDefault) throws IOException {
 		File file = getProjectConfigurationFile(project);
 		
-		if (!file.exists() && fallbackToDefault) {
-			try {
-				file = new File(ConfigurationManager.class.getClassLoader().getResource(SAMPLE_CONF).toURI());
-			} catch (URISyntaxException e) {
-				LOG.exception(e);
-			}
+		if (file.exists()) {
+			return new FileInputStream(file);
 		}
-		return readFromFile(file);
+		else if (fallbackToDefault) {
+			return openDefaultConfigurationStream(project);
+		}
+		else {
+			throw new FileNotFoundException("Configuration file ("+ file +") not found");
+		}
 	}
 
 	public static File getProjectConfigurationFile(IProject project) {
 		return project.getLocation().append("/" + CONF_FILE_NAME).toFile();
 	}
 
-	static ProjectConfiguration readFromFile(File file) {
+	/* package */ static ProjectConfiguration readFromFile(File file) {
 		try {
-			return doReadFromFile(file);
+			InputStream stream = new FileInputStream(file);
+			try {
+				return readFromStream(stream);
+			} finally {
+				stream.close();
+			}
 		} catch (Exception e) {
 			LOG.error("Can't load configuration", e);
 			throw new IllegalStateException("Can't load configuration", e);
 		}	
 	}
 	
-	private static ProjectConfiguration doReadFromFile(File file) throws ParserConfigurationException, 
+	private static ProjectConfiguration readFromStream(InputStream stream) throws ParserConfigurationException, 
 		SAXException, IOException {
 		
 		List<DataSourceProperties> dataSources = new ArrayList<DataSourceProperties>();
@@ -75,7 +106,7 @@ public class ConfigurationManager {
 		
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = dbf.newDocumentBuilder(); 
-		Document doc = db.parse(file);
+		Document doc = db.parse(stream);
 
 		// ignoring the structure for simplicity -- elements may appear wherever
 		NodeList hotspotNodes = doc.getElementsByTagName("hotspot");
@@ -108,7 +139,7 @@ public class ConfigurationManager {
 		return new ProjectConfiguration(hotspots, dataSources, attributes);
 	}
 
-	public static void saveToProjectConfigurationFile(ProjectConfiguration conf, IProject project) {
+	public static void saveProjectConfiguration(ProjectConfiguration conf, IProject project) {
 		try {
 			saveToFile(conf, getProjectConfigurationFile(project));
 		} catch (Exception e) {
