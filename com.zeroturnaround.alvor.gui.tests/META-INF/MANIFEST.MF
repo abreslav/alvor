@@ -15,4 +15,5 @@ Require-Bundle: com.zeroturnaround.alvor.gui;bundle-version="1.0.0",
  com.zeroturnaround.alvor.checkers;bundle-version="1.0.0",
  com.zeroturnaround.alvor.model;bundle-version="1.0.0",
  com.zeroturnaround.alvor.cache;bundle-version="1.0.0",
- com.zeroturnaround.alvor.common;bundle-version="1.0.0"
+ com.zeroturnaround.alvor.common;bundle-version="1.0.0",
+ com.zeroturnaround.alvor.crawler.tests;bundle-version="1.0.0"

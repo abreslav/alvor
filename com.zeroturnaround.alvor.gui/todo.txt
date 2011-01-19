@@ -1,3 +1,10 @@
+TODO
+-------
+* add string tests
+* add counterexamples
+
+
+
 By Jan 15
 ---------
 # Investigate current tests, start adding missing ones and get a nicer big picture 
@@ -18,6 +25,17 @@ By Jan 15
 	
 * change builder to first store names of changed files and process them only
   when there's no java errors and automatic checking is configured
+
+
+* make checkers return errors instead of calling handlers
+
+* "A full rebuild is required to ..., do the build now?"
+
+* organize options like "loops enabled"
+
+* tie marker tests with crawler test
+
+* stack overflow in sql-bus
 
 By Jan 22
 ---------
@@ -40,6 +58,7 @@ By Jan 29
 End of Feb
 ----------
 * Path-sensitivity hacks
+* Restore loop support (in RecursionConverter)
 * New "cache" ??
 * Multiconnection ??
 * SQL-builders

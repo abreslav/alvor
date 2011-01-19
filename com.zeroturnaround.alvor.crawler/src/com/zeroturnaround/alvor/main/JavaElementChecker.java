@@ -36,12 +36,6 @@ public class JavaElementChecker {
 	private static final ILog HOTSPOTS_LOG = Logs.getLog("Hotspots");
 	
 	/*
-	 * The map must contain an entry 
-	 * hotspots=className,methodName,index;className,methodName,index;...
-	 * E.g.:
-	 * hotspots=java.util.Connection,prepareStatement,1;blah.blah.Blah,blah,5
-	 * Trailing ';' is not required 
-	 * 
 	 * Actually returns abstract strings corresponding to hotspots
 	 * (or markers for unsupported cases)  
 	 * TODO rename?

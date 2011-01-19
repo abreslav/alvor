@@ -1,122 +1,3 @@
- (?, ?, ?)
- (?, ?, ?)
- (?, ?, ?)
- (?, ?, ?)
- (?, ?, ?)
- (?, ?, ?)
- (?, ?, ?)
- (?, ?, ?)
- (?, ?, ?)
- (?, ?, ?)
- (?, ?, ?)
- (?, ?, ?)
- (?, ?, ?))
- (?, ?, ?)) and  dd.code in  (?, ?, ?))
- (?, ?, ?)) and )
- (?, ?, ?)) confirm set confirm.REF_CONFIRM_PATTERN_CONFIRMER=null
- (?, ?, ?)) confirm set confirm.REF_CONFIRM_PATTERN_CONFIRMER=null
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or 
- or )
- or )
- or )
- or )
- or )
- or )
- or ) and  dd.code in  (?, ?, ?))
- or ) and  dd.code in  (?, ?, ?))
- or ) and  dd.code in  (?, ?, ?))
- or ) and  dd.code in  (?, ?, ?))
- or ) and  dd.code in  (?, ?, ?))
- or ) and  dd.code in  (?, ?, ?))
- or ) and )
- or ) and )
- or ) and )
- or ) and )
- or ) and )
- or ) and )
- or ) confirm set confirm.REF_CONFIRM_PATTERN_CONFIRMER=null
- or ) confirm set confirm.REF_CONFIRM_PATTERN_CONFIRMER=null
- or ) confirm set confirm.REF_CONFIRM_PATTERN_CONFIRMER=null
- or ) confirm set confirm.REF_CONFIRM_PATTERN_CONFIRMER=null
- or ) confirm set confirm.REF_CONFIRM_PATTERN_CONFIRMER=null
- or ) confirm set confirm.REF_CONFIRM_PATTERN_CONFIRMER=null
- or ) confirm set confirm.REF_CONFIRM_PATTERN_CONFIRMER=null
- or ) confirm set confirm.REF_CONFIRM_PATTERN_CONFIRMER=null
- or ) confirm set confirm.REF_CONFIRM_PATTERN_CONFIRMER=null
- or ) confirm set confirm.REF_CONFIRM_PATTERN_CONFIRMER=null
- or ) confirm set confirm.REF_CONFIRM_PATTERN_CONFIRMER=null
- or ) confirm set confirm.REF_CONFIRM_PATTERN_CONFIRMER=null
 DELETE FROM BANK_ACCOUNT WHERE ID = ?
 DELETE FROM VAT_CODES WHERE ID = ?
 DELETE FROM VAT_CODE_PERSON WHERE ID = ?
@@ -127,26 +8,10 @@ DELETE FROM address WHERE id = ?
 DELETE FROM attachment WHERE id=?
 DELETE FROM campaign_code WHERE id = ?
 DELETE FROM dimension_data WHERE id = ?
-DELETE FROM dimension_data WHERE id IN ()
-DELETE FROM dimension_data WHERE id IN (, 666)
-DELETE FROM dimension_data WHERE id IN (, 666, 666)
-DELETE FROM dimension_data WHERE id IN (, 666, 666, 666)
-DELETE FROM dimension_data WHERE id IN (, 666, 666666)
-DELETE FROM dimension_data WHERE id IN (, 666666)
-DELETE FROM dimension_data WHERE id IN (, 666666, 666)
-DELETE FROM dimension_data WHERE id IN (, 666666666)
-DELETE FROM dimension_data WHERE id IN (666)
-DELETE FROM dimension_data WHERE id IN (666, 666)
-DELETE FROM dimension_data WHERE id IN (666, 666, 666)
-DELETE FROM dimension_data WHERE id IN (666, 666666)
-DELETE FROM dimension_data WHERE id IN (666666)
-DELETE FROM dimension_data WHERE id IN (666666, 666)
-DELETE FROM dimension_data WHERE id IN (666666666)
 DELETE FROM dimension_data WHERE ref_dimensions = ?
 DELETE FROM notifications WHERE id = ?
 DELETE FROM pricelist_campaign_code WHERE ref_pricelist = ?
 DELETE FROM pricelist_campaign_code WHERE ref_pricelist=? AND ref_campaign_code=?
-ERROR GENERATING SAMPLES: getConcreteStrings, class=class com.zeroturnaround.alvor.string.StringParameter, POS=/earved/src/ee/post/earved/dao/invoice/AttachmentDAO.java:6767(72), ABS_STR={{{"" " (?, ?, ?)" , {"", "", "", "", "", ""} " or " }, {"" "select * from (select rownum rnum, att.* from (SELECT id, ref_invoice, external, page_count, file_name, ref_id, file_type, invoice, content, buy_attachment " "FROM attachment WHERE id in (select attachment_id from ERP_ATTACHMENT_V where "   " "  "invoice_id"  " in "  " (?, ?, ?)" , "" "select * from (select rownum rnum, att.* from (SELECT id, ref_invoice, external, page_count, file_name, ref_id, file_type, invoice, content, buy_attachment " "FROM attachment WHERE id in (select attachment_id from ERP_ATTACHMENT_V where "  }} " and buyer_id=?"  " AND invoice=1 " , {{"" " (?, ?, ?)" , {"", "", "", "", "", ""} " or " }, {Param(0) " "  Param(1)  " in "  " (?, ?, ?)" , Param(0)}} " and buyer_id=?" } " ) order by id asc) att where rownum <= ?) where rnum >= ?" 
 INSERT INTO B_CARD_QUERIES (ID, QUERY_DATE, QUERY_RESULT, REF_PERSON) VALUES (SEQ_B_CARD_QUERIES.NEXTVAL, SYSDATE, ?, ?) 
 INSERT INTO INTEGRATION_ERROR(id, ref_integration_item, error_type, error, ref_dom_integration_error) VALUES (seq_integration_error.nextval,?,?,?,?)
 INSERT INTO INTEGRATION_ITEM(id, type, ref_upload, status, invoice_number, is_sent) VALUES (?,?,?,?,?,?)
@@ -392,8 +257,6 @@ SELECT 1 FROM person_list_v WHERE code = ? AND person_state = ? AND is_juridical
 SELECT 1 FROM person_list_v WHERE code = ? AND person_state = ? AND rownum = 1
 SELECT 1 FROM person_list_v WHERE person_id = ? AND person_state = ? AND is_juridical_person = 1 AND rownum = 1
 SELECT 1 FROM person_list_v WHERE person_id = ? AND person_state = ? AND rownum = 1
-SELECT CODE,PERSON_STATE FROM PERSON_LIST_V WHERE 
-SELECT CODE,PERSON_STATE FROM PERSON_LIST_V WHERE  CODE in  (?, ?, ?)
 SELECT ID, HEADING, HELP_TEXT, WIDGET FROM help WHERE WIDGET=?
 SELECT PERSON_STATE FROM PERSON_LIST_V WHERE CODE = ?
 SELECT SEQ_REFERENCE_NUMBER_BASE.nextval from dual
@@ -644,24 +507,12 @@ delete from bank_export  where ref_invoice in  (?, ?, ?) and bank_code=? and fai
 delete from channel_preference_sender where ref_invoice_channel_preference = ? 
 delete from client_register where id in  (?, ?, ?)
 delete from client_register where ref_person = ? 
-delete from client_register_account where 
-delete from client_register_account where  ref_client_register in  (?, ?, ?)
 delete from client_register_account where ref_client_register in (select id from client_register where ref_person = ?)
 delete from confirm_log where ref_confirm = ?
-delete from confirm_pattern where
-delete from confirm_pattern where id in  (?, ?, ?)
-delete from confirm_pattern_confirmer where
-delete from confirm_pattern_confirmer where
-delete from confirm_pattern_confirmer where id in  (?, ?, ?)
 delete from confirm_pattern_confirmer where ref_confirm_pattern = ?
-delete from confirm_pattern_confirmer where ref_confirm_pattern in  (?, ?, ?)
 delete from deputy where id = ?
 delete from dimension_data_conn_import ddci where ddci.ref_person=?
 delete from dimension_data_connections ddc where exists  (select 1 from dimension_data_conn_import ddci          where ddc.ref_dimensions_from =(select id from dimensions d where d.ref_person = ? and d.dimension_name = ddci.dimensions_from_name)            and ddc.ref_dimension_data_from =(select id from dimension_data dd where dd.ref_dimensions = ddc.ref_dimensions_from and dd.code = ddci.dimension_data_from_code))
-delete from dimension_data_connections ddc where exists (select 1 from dimension_data dd where (dd.id=ddc.ref_dimension_data_from or dd.id=ddc.ref_dimension_data_to) and dd.ref_dimensions in (select d.id from dimensions d where d.ref_person=? and  d.dimension_name in  (?, ?, ?)) and  dd.code in  (?, ?, ?))
-delete from dimension_data_connections ddc where exists (select 1 from dimension_data dd where (dd.id=ddc.ref_dimension_data_from or dd.id=ddc.ref_dimension_data_to) and dd.ref_dimensions in (select d.id from dimensions d where d.ref_person=? and  d.dimension_name in  (?, ?, ?)) and )
-delete from dimension_data_connections ddc where exists (select 1 from dimension_data dd where (dd.id=ddc.ref_dimension_data_from or dd.id=ddc.ref_dimension_data_to) and dd.ref_dimensions in (select d.id from dimensions d where d.ref_person=? and ) and  dd.code in  (?, ?, ?))
-delete from dimension_data_connections ddc where exists (select 1 from dimension_data dd where (dd.id=ddc.ref_dimension_data_from or dd.id=ddc.ref_dimension_data_to) and dd.ref_dimensions in (select d.id from dimensions d where d.ref_person=? and ) and )
 delete from dvk_organization
 delete from extension where REF_INVOICE_ITEM_ITEM_RESERVE = ?
 delete from extension where REF_INVOICE_ITEM_ITEM_RESERVE in (?, ?, ?)
@@ -721,8 +572,6 @@ select  ID, REF_CONFIRM, DESCRIPTION, SUM_BEFORE_VAT, ACCOUNTING_ACCOUNT_CODE, C
 select  ID, REF_INVOICE, ORDER_NR, REF_PERSON_CONFIRMER, COMMENT_TO_CONFIRMER, SENT_TO_CONFIRM_TIME, REF_DOM_CONFIRM_DECISION, DECISION_COMMENT, DECISION_TIME, CANCELED, PREVIOUS, REF_CONFIRM_PATTERN_CONFIRMER  from confirm where ref_invoice=? and canceled = 0 and REF_DOM_CONFIRM_DECISION in  (?, ?, ?)
 select  ID, REF_INVOICE, ORDER_NR, REF_PERSON_CONFIRMER, PERSON_CONFIRMER_FULL_NAME, COMMENT_TO_CONFIRMER  from confirm_v where id in (select id from confirm where ref_invoice = ? and previous = 1) order by order_nr, id
 select  ID, REF_PERSON, REF_VAT_CODES, ERP_CODE, ERP_DESCRIPTION, IS_DEFAULT from vat_code_person where ref_person = ?
-select  ID, SHORT_DESCRIPTION, DESCRIPTION, REFERENCE, TYPE, IS_DEFAULT, default_vat, DATE_CREATED, IS_DELETED, CODE, RATE  from vat_codes where 
-select  ID, SHORT_DESCRIPTION, DESCRIPTION, REFERENCE, TYPE, IS_DEFAULT, default_vat, DATE_CREATED, IS_DELETED, CODE, RATE  from vat_codes where  id in  (?, ?, ?)
 select  ID, SHORT_DESCRIPTION, DESCRIPTION, REFERENCE, TYPE, IS_DEFAULT, default_vat, DATE_CREATED, IS_DELETED, CODE, RATE  from vat_codes where id = ?
 select  ic.id as channel_id,ic.BANK_PERSON_CODE, ic.ACCOUNT_NUMBER, ic.REF_DOM_CHANNEL, ic.REF_DOM_CHANNEL_COUNTRY, nvl(dv.NAME,ic.country) as COUNTRY_NAME, ic.CITY, ic.EMAIL_ADDRESS, ic.ref_invoice, ic.POSTAL_ADDRESS_1, ic.POSTAL_ADDRESS_2, ic.POSTAL_CODE, ic.REG_NUMBER, ic.REF_DOM_BANK, ic.is_sent, ic.ref_invoice_channel_additional, ica.additional_text  from invoice_channel ic  left outer join domain_value dv on (dv.value_code = ic.ref_dom_channel_country) left outer join invoice_channel_additional ica on ic.ref_invoice_channel_additional=ica.id where ic.ref_invoice = ? and ic.ref_invoice_automatic is not null
 select  ic.id as channel_id,ic.BANK_PERSON_CODE, ic.ACCOUNT_NUMBER, ic.REF_DOM_CHANNEL, ic.REF_DOM_CHANNEL_COUNTRY, nvl(dv.NAME,ic.country) as COUNTRY_NAME, ic.CITY, ic.EMAIL_ADDRESS, ic.ref_invoice, ic.POSTAL_ADDRESS_1, ic.POSTAL_ADDRESS_2, ic.POSTAL_CODE, ic.REG_NUMBER, ic.REF_DOM_BANK, ic.is_sent, ic.ref_invoice_channel_additional, ica.additional_text  from invoice_channel ic  left outer join domain_value dv on (dv.value_code = ic.ref_dom_channel_country) left outer join invoice_channel_additional ica on ic.ref_invoice_channel_additional=ica.id where ic.ref_invoice = ? and ic.ref_invoice_automatic is null
@@ -734,8 +583,6 @@ select  id, name, ref_person, reg_number, supplier_code, client_code  from clien
 select  id, name, ref_person, reg_number, supplier_code, client_code  from client_register where ref_person = ? and reg_number = ? and supplier_code is not null 
 select  id, name, ref_person, reg_number, supplier_code, client_code  from client_register where ref_person = ? and reg_number in  (?, ?, ?)
 select  id, name, ref_person, reg_number, supplier_code, client_code  from client_register where ref_person=? and (UPPER(name) like ? ESCAPE '\' or UPPER(reg_number) like ? ESCAPE '\') and rownum<=?
-select  id, ref_invoice as invoice_id , invoice_xml_part , bank_code from BANK_EXPORT where 
-select  id, ref_invoice as invoice_id , invoice_xml_part , bank_code from BANK_EXPORT where  id in  (?, ?, ?)
 select  id, ref_invoice as invoice_id , invoice_xml_part , queued, sent , file_id, bank_code from BANK_EXPORT where sent is null and export_state=? and FAILED_ATTEMPTS<? and bank_code=?
 select  id, ref_invoice as invoice_id , invoice_xml_part , queued, sent , ref_person_code_buy, invoice_number   from DVK_EXPORT where sent is null and export_state=? and FAILED_ATTEMPTS<?
 select  id, ref_invoice, description, item_unit, item_amount, item_price, item_sum, sum_before_vat, vat_rate, ref_vat_codes, vat_sum, item_total, customer_ref, accounting_account_code, accounting_account_name, accounting_opposite_account, is_unified, seller_product_id  from invoice_item where ref_invoice = ? and is_unified = ? order by created, id asc
@@ -965,11 +812,7 @@ select id, address, ref_dom_address_type, city, country, county, zip from addres
 select id, address, ref_dom_address_type, city, country, county, zip from address_explicit_v where ref_person = ? AND ref_dom_address_type = ?
 select id, code, name from SERVICES_GOODS_REGISTER where ref_person=? and (UPPER(code) like ? ESCAPE '\' or UPPER(name) like ? ESCAPE '\') and rownum<=?
 select id, code, name from dimension_data where ref_dimensions=? and (UPPER(code) like ? ESCAPE '\' or UPPER(name) like ? ESCAPE '\') and rownum<=?
-select id, code, ref_dimensions from dimension_data where 
-select id, code, ref_dimensions from dimension_data where  ref_dimensions in  (?, ?, ?)
 select id, cost_objective, cost_objective_dimension_code, cost_objective_dimension_name, order_id from journal_entry where ref_invoice_item = ? order by order_id asc
-select id, cost_objective, cost_objective_dimension_code, cost_objective_dimension_name, ref_invoice_item, order_id from journal_entry where 
-select id, cost_objective, cost_objective_dimension_code, cost_objective_dimension_name, ref_invoice_item, order_id from journal_entry where  ref_invoice_item in  (?, ?, ?)
 select id, dimension_name from dimensions where ref_person=?
 select id, file_name, description, ref_id, file_type, created, external, buy_attachment FROM attachment WHERE ref_invoice=? and invoice=1 and rownum=1
 select id, file_name, total_count, error_count, sent_count, invoice_status_after_upload from upload where id = (select max(id) from upload where ref_dom_upload_status = ? AND ref_person = ? AND ref_represented = ?)
@@ -987,8 +830,6 @@ select id, ref_inbox, file_name, mime_type from inbox_attachment where ref_inbox
 select id, ref_invoice, REF_REPRESENTATION_RIGHT, code, end_time, ref_dom_type from url where id=? and code=? and end_time >= SYSDATE
 select id, ref_invoice, subject_info from frequent_buy_invoice where ref_person=? and seller_reg_number=? and  (valid_until is null or valid_until>sysdate) 
 select id, ref_invoice_item, add_content, add_rate, add_sum from addition where ref_invoice_item = ?
-select id, ref_invoice_sum_group, ref_invoice_item, add_code, add_content, add_rate, add_sum, invoice from addition where 
-select id, ref_invoice_sum_group, ref_invoice_item, add_code, add_content, add_rate, add_sum, invoice from addition where  ref_invoice_item in  (?, ?, ?)
 select id, ref_person, code, name, canceled from invoice_additional where id = ?
 select id, ref_person, code, name, canceled from invoice_additional where ref_person = ? and canceled = 0 order by name
 select id, ref_person_representative, ref_person_represented, ref_dom_base, email, position from representation_right where ref_person_representative=? and ref_person_represented=? and from_date < sysdate AND COALESCE(until_date, sysdate) >= sysdate
@@ -1018,329 +859,11 @@ select p.erp_access from person p where p.id=? and p.erp_auth_phrase=?
 select p.id, p.name, p.code from channel_preference_sender c left join person p on p.id = c.ref_person where ref_invoice_channel_preference = ? 
 select pattern_account_id from accounting_patt_patt_acc_ids_v where account_pattern_id in (?, ?, ?)
 select person_confirmer_full_name from confirm_patt_confirmer_names_v where REF_CONFIRM_PATTERN=?
-select pvc_id, vc_id, pvc_person_id, pvc_erp_code, pvc_erp_description, pvc_is_default from PERSON_VAT_CODES_V where vc_is_deleted = 0 AND pvc_person_id = ? and 
-select pvc_id, vc_id, pvc_person_id, pvc_erp_code, pvc_erp_description, pvc_is_default from PERSON_VAT_CODES_V where vc_is_deleted = 0 AND pvc_person_id = ? and  vc_id in  (?, ?, ?)
 select ref_dimensions_to from dimension_data_conn_invalid_v where ref_dimensions_from=? and ref_dimension_data_from=?
 select ref_dom_channel from invoice_channel_preferences where ref_person_owner = ? and preference_type = 0
 select ref_invoice from bank_export where file_id=(select id from bank_export where file_id=?)
 select ref_invoice from bank_export where file_id=?
 select ref_invoice, error from invoice_sending_failed where ref_invoice in  (?, ?, ?) and client_informed = 1
-select ref_invoice, failed_attempts from bank_export where 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from bank_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where  ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
-select ref_invoice, failed_attempts from dvk_export where ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?)ref_invoice in  (?, ?, ?) or 
 select ref_invoice, person_confirmer_full_name from CONFIRM_V where SENT_TO_CONFIRM_TIME is not null and decision_time is null and ref_invoice IN  (?, ?, ?)
 select ref_invoice, person_confirmer_full_name from CONFIRM_V where ref_dom_confirm_decision = ? and ref_invoice IN  (?, ?, ?)
 select ref_invoice, ref_confirm from invoice_confirm_late
@@ -1350,10 +873,6 @@ select representative_id as id, null as code, person_full_name as name from repr
 select representative_id as id, null as code, person_full_name as name from representatives_deputies_v where represented_id = ? order by UPPER(person_full_name) 
 select representative_id as id, null as code, representative_full_name as name from representative_names_all_v where represented_id = ? order by UPPER(representative_full_name) 
 select representative_id from representative_ids_v where represented_id = ? 
-update (select confirm.REF_CONFIRM_PATTERN_CONFIRMER from confirm join confirm_pattern_confirmer confirmer on (confirm.REF_CONFIRM_PATTERN_CONFIRMER = confirmer.id) where confirmer.id in  (?, ?, ?)) confirm set confirm.REF_CONFIRM_PATTERN_CONFIRMER=null
-update (select confirm.REF_CONFIRM_PATTERN_CONFIRMER from confirm join confirm_pattern_confirmer confirmer on (confirm.REF_CONFIRM_PATTERN_CONFIRMER = confirmer.id) where confirmer.ref_confirm_pattern in  (?, ?, ?)) confirm set confirm.REF_CONFIRM_PATTERN_CONFIRMER=null
-update (select confirm.REF_CONFIRM_PATTERN_CONFIRMER from confirm join confirm_pattern_confirmer confirmer on (confirm.REF_CONFIRM_PATTERN_CONFIRMER = confirmer.id) where) confirm set confirm.REF_CONFIRM_PATTERN_CONFIRMER=null
-update (select confirm.REF_CONFIRM_PATTERN_CONFIRMER from confirm join confirm_pattern_confirmer confirmer on (confirm.REF_CONFIRM_PATTERN_CONFIRMER = confirmer.id) where) confirm set confirm.REF_CONFIRM_PATTERN_CONFIRMER=null
 update account_info set account_number = ? where ref_invoice_party = ?
 update client_register_account cra set cra.last_used=(case when cra.id=? then 1 else 0 end) where ref_client_register in (select id from client_register where ref_person=? and reg_number=?)
 update confirm set REF_DOM_CONFIRM_DECISION=NULL, SENT_TO_CONFIRM_TIME=NULL, DECISION_COMMENT=NULL, DECISION_TIME=NULL where id in  (?, ?, ?)
@@ -1366,8 +885,6 @@ update confirm set ref_dom_confirm_decision=?, decision_time=sysdate, decision_c
 update confirm_pattern_confirmer set order_no=NULL where REF_CONFIRM_PATTERN=?
 update dimension_data_conn_import ddci set ddci.dimensions_to_name=nvl((SELECT dimension_name FROM (SELECT d.dimension_name,row_number() over(ORDER BY d.id asc) rn FROM dimensions d where d.ref_person=?) WHERE rn=ddci.dimensions_to_name),ddci.dimensions_to_name) where ddci.ref_person=?
 update dimensions set is_main=0 where ref_person=? and is_main=1
-update dvk_export set sent=?, export_state=? where 
-update dvk_export set sent=?, export_state=? where  id in  (?, ?, ?)
 update extension set information_name=?, information_content=? where id=?
 update history set modified = sysdate, modified_by = ? where ref_invoice = ? and ref_dom_invoice_event = ? and ref_dom_invoice_state = ?
 update invoice set ACCOUNTING_TRANSACTION_DATE=? where id=? and accounting_transaction_date is null

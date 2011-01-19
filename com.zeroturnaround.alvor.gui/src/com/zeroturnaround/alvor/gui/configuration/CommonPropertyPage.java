@@ -29,7 +29,7 @@ public abstract class CommonPropertyPage extends PropertyPage implements IWorkbe
 		try {
 			ProjectConfiguration conf = this.readConfiguration();
 			this.mergeChanges(conf);
-			ConfigurationManager.saveToProjectConfigurationFile(conf, this.getSelectedProject());
+			ConfigurationManager.saveProjectConfiguration(conf, this.getSelectedProject());
 			this.hasChanges = false;
 			return true;
 		} catch (Exception e) {

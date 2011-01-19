@@ -1,3 +1,44 @@
+First read the tool-paper.
+
+Definitions
+-----------
+TODO
+
+Simple explanation
+------------------
+Alvor searches for all hotspots in all project files
+For each matching string node, it constructs the set of it's possible values. For this, 
+it may be necessary to analyze relevant parts in other files.
+
+Interesting things a file can contain:
+---------------------------------------
+* calls to fixed hotspot patterns
+* calls to wrapper (deduced) hotspot patterns
+* definitions of new (deduced) hotspot patterns (ie. methods, which call to some hotspot-pattern,
+  but take part of the input from parameters)
+* overridden hotspot patterns
+
+* string methods which are used in some hotspot expression
+* overridden versions of such string methods
+
+Of these, other files depend on:
+	- definitions of new (possibly partial) hotspot patterns (need to search for calls to these)
+	- overriding implementations of used string methods (can be just added to cache and to 
+	  corresponding string-choices) 
+    	
+
+
+Incremental checking
+--------------------
+In order to enable incremental checking, Alvor stores certain information about each file
+in a database. When one file is changed, then cache for that file is discarded and the
+file is analyzed (almost) from scratch. When some parts are required from other files,
+then these can now be taken from cache.
+
+
+Pseudocode
+----------
+
 fun fullCheckProject(project, conf) = 
 	files = project.getFiles()
 	hotspots = conf.fixedHotspots
@@ -15,7 +56,6 @@ fun checkFileAfterEdit(file, project, conf) =
 	strings2 = cache.getUncheckedStrings()
 	check(strings2) 
 
-------------------------------------------------------------------------------------------
 fun findStringsFromManyFilesForManyHotspots(files, hotspots) =
 	result = [] 
 	for file <- files:

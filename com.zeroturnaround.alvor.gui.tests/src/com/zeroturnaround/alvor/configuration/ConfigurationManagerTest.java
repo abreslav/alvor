@@ -1,18 +1,16 @@
 package com.zeroturnaround.alvor.configuration;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.zeroturnaround.alvor.common.HotspotPattern;
-import com.zeroturnaround.alvor.gui.GUITest;
+import com.zeroturnaround.alvor.crawler.testutils.TestUtil;
 
 public class ConfigurationManagerTest {
 	
@@ -30,7 +28,7 @@ public class ConfigurationManagerTest {
 			
 			// Maybe test also ProjectConfiguration.equals ?
 			Assert.assertEquals(conf1, conf2);
-			Assert.assertTrue(GUITest.filesAreEqual(file1, file2));
+			Assert.assertTrue(TestUtil.filesAreEqual(file1, file2));
 			//printFile(file1);
 			
 			//Assert.f
@@ -44,12 +42,6 @@ public class ConfigurationManagerTest {
 		}
 	}
 	
-	private void printFile(File f) throws FileNotFoundException {
-		Scanner sc = new Scanner(f);
-		while (sc.hasNextLine()) {
-			System.out.println(sc.nextLine());
-		}
-	}
 	
 	private ProjectConfiguration createNormalConfiguration() {
 		List<HotspotPattern> hotspots = new ArrayList<HotspotPattern>();

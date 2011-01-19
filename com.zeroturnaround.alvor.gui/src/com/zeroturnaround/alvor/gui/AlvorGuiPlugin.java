@@ -7,6 +7,11 @@ import com.zeroturnaround.alvor.cache.CacheService;
 
 public class AlvorGuiPlugin extends AbstractUIPlugin {
 	public static final String ID = "com.zeroturnaround.alvor.gui";
+	public static final String ERROR_MARKER_ID = "com.zeroturnaround.alvor.gui.sqlerror";
+	public static final String WARNING_MARKER_ID = "com.zeroturnaround.alvor.gui.sqlwarning";
+	public static final String HOTSPOT_MARKER_ID = "com.zeroturnaround.alvor.gui.sqlhotspot";
+	public static final String UNSUPPORTED_MARKER_ID = "com.zeroturnaround.alvor.gui.unsupported";
+	public static final String STRING_MARKER_ID = "com.zeroturnaround.alvor.gui.sqlstring";
 	
 	public AlvorGuiPlugin() {
 	}
