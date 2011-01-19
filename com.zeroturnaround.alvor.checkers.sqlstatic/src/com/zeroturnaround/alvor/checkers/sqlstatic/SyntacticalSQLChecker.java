@@ -66,8 +66,9 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 					Collection<IPosition> markerPositions = PositionedCharacterUtil.getMarkerPositions(((Token) item).getText());
 					for (IPosition pos : markerPositions) {
 						errorHandler.handleSQLError(
-								"SQL syntax checker: Unexpected token: " + PositionedCharacterUtil.render(item) + "\n" + 
-								"Counter example: " + counterExample, 
+								"SQL syntax checker: Unexpected token: " + PositionedCharacterUtil.render(item) 
+								//+ "\n" + "Counter example: " + counterExample
+								, 
 								pos);
 						results.add(false);
 					}

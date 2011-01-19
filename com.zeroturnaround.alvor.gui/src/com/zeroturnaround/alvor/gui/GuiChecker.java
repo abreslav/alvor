@@ -42,12 +42,6 @@ import com.zeroturnaround.alvor.string.StringSequence;
 import com.zeroturnaround.alvor.string.util.AbstractStringOptimizer;
 
 public class GuiChecker implements ISQLErrorHandler {
-	public static final String ERROR_MARKER_ID = "com.zeroturnaround.alvor.gui.sqlerror";
-	public static final String WARNING_MARKER_ID = "com.zeroturnaround.alvor.gui.sqlwarning";
-	public static final String HOTSPOT_MARKER_ID = "com.zeroturnaround.alvor.gui.sqlhotspot";
-	public static final String UNSUPPORTED_MARKER_ID = "com.zeroturnaround.alvor.gui.unsupported";
-	public static final String STRING_MARKER_ID = "com.zeroturnaround.alvor.gui.sqlstring";
-
 	private static final ILog LOG = Logs.getLog(GuiChecker.class);
 	
 	@Deprecated
@@ -91,8 +85,8 @@ public class GuiChecker implements ISQLErrorHandler {
 	
 	private void cleanConfigurationMarkers(IProject project) {
 		try {
-			project.deleteMarkers(ERROR_MARKER_ID, true, IResource.DEPTH_ONE);
-			project.deleteMarkers(WARNING_MARKER_ID, true, IResource.DEPTH_ONE);
+			project.deleteMarkers(AlvorGuiPlugin.ERROR_MARKER_ID, true, IResource.DEPTH_ONE);
+			project.deleteMarkers(AlvorGuiPlugin.WARNING_MARKER_ID, true, IResource.DEPTH_ONE);
 		} catch (CoreException e) {
 			LOG.error("Cleaning markers", e);
 		}
@@ -101,11 +95,11 @@ public class GuiChecker implements ISQLErrorHandler {
 	private void cleanMarkers(IJavaElement[] scope) {
 		try {
 			for (IJavaElement element : scope) {
-				element.getResource().deleteMarkers(ERROR_MARKER_ID, true, IResource.DEPTH_INFINITE);
-				element.getResource().deleteMarkers(WARNING_MARKER_ID, true, IResource.DEPTH_INFINITE);
-				element.getResource().deleteMarkers(HOTSPOT_MARKER_ID, true, IResource.DEPTH_INFINITE);
-				element.getResource().deleteMarkers(UNSUPPORTED_MARKER_ID, true, IResource.DEPTH_INFINITE);
-				element.getResource().deleteMarkers(STRING_MARKER_ID, true, IResource.DEPTH_INFINITE);
+				element.getResource().deleteMarkers(AlvorGuiPlugin.ERROR_MARKER_ID, true, IResource.DEPTH_INFINITE);
+				element.getResource().deleteMarkers(AlvorGuiPlugin.WARNING_MARKER_ID, true, IResource.DEPTH_INFINITE);
+				element.getResource().deleteMarkers(AlvorGuiPlugin.HOTSPOT_MARKER_ID, true, IResource.DEPTH_INFINITE);
+				element.getResource().deleteMarkers(AlvorGuiPlugin.UNSUPPORTED_MARKER_ID, true, IResource.DEPTH_INFINITE);
+				element.getResource().deleteMarkers(AlvorGuiPlugin.STRING_MARKER_ID, true, IResource.DEPTH_INFINITE);
 			}
 		} catch (Exception e) {
 			LOG.exception(e);
@@ -115,8 +109,8 @@ public class GuiChecker implements ISQLErrorHandler {
 	private static void createMarker(String message, String markerType, IPosition pos) {
 		Map<String, Comparable<?>> map = new HashMap<String, Comparable<?>>();
 	
-		if (!HOTSPOT_MARKER_ID.equals(markerType)) {
-			int severity = markerType.equals(WARNING_MARKER_ID) ? 
+		if (!AlvorGuiPlugin.HOTSPOT_MARKER_ID.equals(markerType)) {
+			int severity = markerType.equals(AlvorGuiPlugin.WARNING_MARKER_ID) ? 
 					IMarker.SEVERITY_WARNING : IMarker.SEVERITY_ERROR;
 			map.put(IMarker.SEVERITY, new Integer(severity));
 		}
@@ -124,8 +118,14 @@ public class GuiChecker implements ISQLErrorHandler {
 		createMarker(message, markerType, pos, map);
 	}
 
-	public static void createMarker(String message, String markerType,
+	private static void createMarker(String message, String markerType,
 			IPosition pos, Map<String, Comparable<?>> map) {
+		
+		if (DummyPosition.isDummyPosition(pos)) {
+			// TODO get rid of this situation
+			LOG.message("Warning: Dummy position in 'createMarker'");
+			return;
+		}
 		
 		if (map == null) {
 			map = new HashMap<String, Comparable<?>>();
@@ -167,12 +167,12 @@ public class GuiChecker implements ISQLErrorHandler {
 				if (message.length() > Character.MAX_VALUE) {
 					message = message.substring(0, Character.MAX_VALUE - 3) + "...";
 				}
-				markerId = HOTSPOT_MARKER_ID;
+				markerId = AlvorGuiPlugin.HOTSPOT_MARKER_ID;
 				markConstants(abstractValue);
 			} else if (hotspot instanceof UnsupportedNodeDescriptor) {
 				UnsupportedNodeDescriptor und = (UnsupportedNodeDescriptor) hotspot;
 				message = "Unsupported construction: " + und.getProblemMessage();
-				markerId = UNSUPPORTED_MARKER_ID;
+				markerId = AlvorGuiPlugin.UNSUPPORTED_MARKER_ID;
 			} else {
 				throw new IllegalArgumentException(hotspot + "");
 			}
@@ -192,7 +192,7 @@ public class GuiChecker implements ISQLErrorHandler {
 			@Override
 			public Void visitStringCharacterSet(
 					StringCharacterSet characterSet, Void data) {
-				createMarker("", STRING_MARKER_ID, preparePosition(characterSet.getPosition()));
+				createMarker("", AlvorGuiPlugin.STRING_MARKER_ID, preparePosition(characterSet.getPosition()));
 				return null;
 			}
 
@@ -207,7 +207,7 @@ public class GuiChecker implements ISQLErrorHandler {
 			@Override
 			public Void visitStringConstant(StringConstant stringConstant,
 					Void data) {
-				createMarker("", STRING_MARKER_ID, preparePosition(stringConstant.getPosition()));
+				createMarker("", AlvorGuiPlugin.STRING_MARKER_ID, preparePosition(stringConstant.getPosition()));
 				return null;
 			}
 
@@ -244,26 +244,20 @@ public class GuiChecker implements ISQLErrorHandler {
 
 	@Override
 	public void handleSQLError(String message, IPosition position) {
-		createMarker(message, ERROR_MARKER_ID, preparePosition(position));		
+		createMarker(message, AlvorGuiPlugin.ERROR_MARKER_ID, preparePosition(position));		
 	}
 
 	@Override
 	public void handleSQLWarning(String message, IPosition position) {
-		createMarker(message, WARNING_MARKER_ID, preparePosition(position));		
+		createMarker(message, AlvorGuiPlugin.WARNING_MARKER_ID, preparePosition(position));		
 	}
 	
 	private IPosition preparePosition(IPosition pos) {
 		if (pos == null) {
 			return new Position(this.currentProject.getFullPath().toPortableString(), 0, 0);
 		}
-		
-		// dummy positions are created in string conversion when no actual position fits
-		// or when new nodes are created in string transformings
-		// FIXME This actually shouldnt occur or
-		// maybe this should create a marker for the whole workspace ??
-		else if (DummyPosition.isDummyPosition(pos)) {
-			LOG.exception(new IllegalArgumentException("Warning: Dummy position in 'createMarker'"));
+		else {
+			return pos;
 		}
-		return pos;
 	}
 }
