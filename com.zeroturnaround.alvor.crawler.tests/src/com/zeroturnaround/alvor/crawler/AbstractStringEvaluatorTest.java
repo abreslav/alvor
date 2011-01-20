@@ -17,7 +17,6 @@ import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.configuration.ConfigurationManager;
 import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
-import com.zeroturnaround.alvor.crawler.testutils.TestUtil;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.samplegen.SampleGenerator;
 import com.zeroturnaround.alvor.util.PositionUtil;
@@ -30,7 +29,7 @@ public abstract class AbstractStringEvaluatorTest {
 	protected void findAndValidateNodeDescriptors(String projectName) {
 		try {
 			List<NodeDescriptor> descriptors;
-			IProject project = TestUtil.getProject(projectName);
+			IProject project = CrawlerTestUtil.getProject(projectName);
 			descriptors = getNodeDescriptors(project);
 			validateNodeDescriptors(descriptors, project);
 		} catch (Exception e) {
@@ -73,11 +72,11 @@ public abstract class AbstractStringEvaluatorTest {
 		
 		Collections.sort(concreteLines);
 		
-		File folder = TestUtil.getAndPrepareTestResultsFolder(project);
+		File folder = CrawlerTestUtil.getAndPrepareTestResultsFolder(project);
 		
-		boolean concreteResult = TestUtil.stringsAreExpected(concreteLines, 
+		boolean concreteResult = CrawlerTestUtil.stringsAreExpected(concreteLines, 
 				folder.getAbsolutePath() + "/concrete_strings");
-		boolean abstractResult = TestUtil.stringsAreExpected(descriptorLines, 
+		boolean abstractResult = CrawlerTestUtil.stringsAreExpected(descriptorLines, 
 				folder.getAbsolutePath() + "/node_descriptors");
 		
 		if (!abstractResult) {

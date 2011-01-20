@@ -1,14 +1,17 @@
 package com.zeroturnaround.alvor.checkers.sqldynamic;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.zeroturnaround.alvor.checkers.AbstractStringCheckingResult;
+import com.zeroturnaround.alvor.checkers.AbstractStringError;
 import com.zeroturnaround.alvor.checkers.CheckerException;
 import com.zeroturnaround.alvor.checkers.IAbstractStringChecker;
-import com.zeroturnaround.alvor.checkers.ISQLErrorHandler;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
@@ -29,29 +32,28 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 	Map<Integer, SqlTester> testers = new HashMap<Integer, SqlTester>();
 
 	@Override
-	public void checkAbstractStrings(List<StringNodeDescriptor> descriptors,
-			ISQLErrorHandler errorHandler, ProjectConfiguration configuration) throws CheckerException {
-		if (descriptors.size() == 0) {
-			return;
-		}
-		
+	public Collection<AbstractStringCheckingResult> checkAbstractStrings(List<StringNodeDescriptor> descriptors,
+			ProjectConfiguration configuration) throws CheckerException {
 		SqlTester tester = this.getAnalyzer(configuration);
+		List<AbstractStringCheckingResult> result = new ArrayList<AbstractStringCheckingResult>();
+		
 		for (StringNodeDescriptor descriptor: descriptors) {
-			this.checkAbstractString(descriptor, errorHandler, tester);
+			result.addAll(this.checkAbstractString(descriptor, tester));
 		}
+		return result;
 	}
 	
 	@Override
-	public boolean checkAbstractString(StringNodeDescriptor descriptor,
-			ISQLErrorHandler errorHandler, ProjectConfiguration configuration) throws CheckerException {
-		return checkAbstractString(descriptor, errorHandler, this.getAnalyzer(configuration));
+	public Collection<AbstractStringCheckingResult> checkAbstractString(StringNodeDescriptor descriptor,
+			ProjectConfiguration configuration) throws CheckerException {
+		return checkAbstractString(descriptor, this.getAnalyzer(configuration));
 	}
 	
 	
-	private boolean checkAbstractString(StringNodeDescriptor descriptor,
-			ISQLErrorHandler errorHandler, SqlTester tester) {
+	private Collection<AbstractStringCheckingResult> checkAbstractString(StringNodeDescriptor descriptor,
+			SqlTester tester) {
 
-		boolean allOK = true;
+		List<AbstractStringCheckingResult> errors = new ArrayList<AbstractStringCheckingResult>();
 		Map<String, Integer> concretes = new HashMap<String, Integer>();
 
 		assert LOG.message("DYN CHECK ABS: " + descriptor.getAbstractValue());
@@ -60,18 +62,16 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 
 		Map<String, String> errorMap = new HashMap<String, String>();
 		if (AbstractStringSizeCounter.size(descriptor.getAbstractValue()) > SIZE_LIMIT) {
-			errorHandler.handleSQLWarning("Dynamic SQL checker: SQL string has too many possible variations", 
-					descriptor.getPosition());
-			return false;
+			errors.add(new AbstractStringError("Dynamic SQL checker: SQL string has too many possible variations", 
+					descriptor.getPosition()));
 		} 
 		else { 
 			List<String> concreteStrings = null;
 			try {
 				concreteStrings = SampleGenerator.getConcreteStrings(descriptor.getAbstractValue());
 			} catch (Exception e) {
-				errorHandler.handleSQLError("Sample generation failed: " + e.getMessage()
-						+ ", str=" + descriptor.getAbstractValue(), descriptor.getPosition());
-				return false;
+				errors.add(new AbstractStringError("Sample generation failed: " + e.getMessage()
+						+ ", str=" + descriptor.getAbstractValue(), descriptor.getPosition()));
 			}
 
 			int duplicates = 0;
@@ -85,7 +85,6 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 					try {
 						tester.testSql(s);
 					} catch (SQLException e) {
-						allOK = false;
 						assert LOG.message("    ERR: " + e.getMessage());
 
 						String errStrings = errorMap.get(e.getMessage());
@@ -106,13 +105,13 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 
 			for (Entry<String, String> entry : errorMap.entrySet()) {
 				String message = entry.getKey().trim() + "\nSQL: \n" + entry.getValue();
-				errorHandler.handleSQLError("SQL test failed  - " + message, descriptor.getPosition());
+				errors.add(new AbstractStringError("SQL test failed  - " + message, descriptor.getPosition()));
 			}
 
 			assert LOG.message("DUPLICATES: " + duplicates);
 			assert LOG.message("____________________________________________");
-			return allOK;
 		}
+		return errors;
 	}
 
 	private SqlTester getAnalyzer(ProjectConfiguration configuration) throws CheckerException {

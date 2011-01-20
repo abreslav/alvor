@@ -1,9 +1,8 @@
 TODO
 -------
-* add string tests
-* add counterexamples
-
-
+* make checkers return errors instead of calling handlers
+* get rid of main ??
+* create markers for passed strings
 
 By Jan 15
 ---------
@@ -27,7 +26,6 @@ By Jan 15
   when there's no java errors and automatic checking is configured
 
 
-* make checkers return errors instead of calling handlers
 
 * "A full rebuild is required to ..., do the build now?"
 

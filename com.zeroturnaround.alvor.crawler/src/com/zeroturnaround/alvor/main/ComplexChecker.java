@@ -1,26 +1,25 @@
 package com.zeroturnaround.alvor.main;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.jdt.core.IJavaElement;
-
+import com.zeroturnaround.alvor.checkers.AbstractStringCheckerManager;
+import com.zeroturnaround.alvor.checkers.AbstractStringCheckingResult;
+import com.zeroturnaround.alvor.checkers.AbstractStringError;
+import com.zeroturnaround.alvor.checkers.AbstractStringWarning;
 import com.zeroturnaround.alvor.checkers.CheckerException;
 import com.zeroturnaround.alvor.checkers.IAbstractStringChecker;
-import com.zeroturnaround.alvor.checkers.ISQLErrorHandler;
 import com.zeroturnaround.alvor.checkers.sqldynamic.DynamicSQLChecker;
 import com.zeroturnaround.alvor.checkers.sqlstatic.SyntacticalSQLChecker;
-import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.common.NodeDescriptor;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
-import com.zeroturnaround.alvor.common.logging.Measurements;
 import com.zeroturnaround.alvor.common.logging.Timer;
 import com.zeroturnaround.alvor.configuration.DataSourceProperties;
 import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
-import com.zeroturnaround.alvor.crawler.AbstractStringEvaluator;
 import com.zeroturnaround.alvor.util.PositionUtil;
 
 /**
@@ -30,43 +29,20 @@ import com.zeroturnaround.alvor.util.PositionUtil;
  * - runs checkers 
  * 
  */
-public class JavaElementChecker {
+public class ComplexChecker {
 
-	private static final ILog LOG = Logs.getLog(JavaElementChecker.class);
+	private static final ILog LOG = Logs.getLog(ComplexChecker.class);
 	private static final ILog HOTSPOTS_LOG = Logs.getLog("Hotspots");
 	
-	/*
-	 * Actually returns abstract strings corresponding to hotspots
-	 * (or markers for unsupported cases)  
-	 * TODO rename?
-	 */
-	public List<NodeDescriptor> findAndEvaluateHotspots(IJavaElement[] scope, ProjectConfiguration conf) {
-		Measurements.resetAll();
-		
-		Timer timer = new Timer();
-		timer.start("TIMER: string construction");
-		List<HotspotPattern> requests = conf.getHotspots();
-		if (requests.isEmpty()) {
-			throw new IllegalArgumentException("No hotspot definitions found in options");
-		}
-		List<NodeDescriptor> result = AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(requests, scope, 0, null);
-		timer.printTime(); // String construction
-		
-		LOG.message(Measurements.parseTimer);
-		LOG.message(Measurements.methodDeclSearchTimer);
-		LOG.message(Measurements.argumentSearchTimer);
-		
-		return result;
-	}
 
-	public void processHotspots(
-		List<NodeDescriptor> hotspots, 
-		ISQLErrorHandler errorHandler, 
-		List<IAbstractStringChecker> checkers, 
+	public Collection<AbstractStringCheckingResult> checkNodeDescriptors(List<NodeDescriptor> hotspots, 
 		ProjectConfiguration configuration) {
 		
 //		Map<String, Integer> connMap = new Hashtable<String, Integer>();
 		int unsupportedCount = 0;
+		
+		Collection<AbstractStringCheckingResult> results = new ArrayList<AbstractStringCheckingResult>();
+		List<IAbstractStringChecker> checkers = AbstractStringCheckerManager.INSTANCE.getCheckers();
 		
 		List<StringNodeDescriptor> validHotspots = new ArrayList<StringNodeDescriptor>();
 		for (NodeDescriptor hotspot : hotspots) {
@@ -95,13 +71,13 @@ public class JavaElementChecker {
 				if (und.getErrorPosition() != null && !und.getPosition().equals(und.getErrorPosition())) {
 					msg += " at: " + PositionUtil.getLineString(und.getErrorPosition());
 				}
-				errorHandler.handleSQLWarning(msg, hotspot.getPosition());
+				results.add(new AbstractStringWarning(msg, hotspot.getPosition()));
 			}
 			else {
 				throw new IllegalArgumentException("Unknown type of INodeTypeDescriptor: " + hotspot.getClass().getName());
 			}
 		}
-		checkValidHotspots(validHotspots, errorHandler, checkers, configuration);
+		results.addAll(checkStringNodeDescriptors(validHotspots, checkers, configuration));
 		
 		LOG.message("Processed " + hotspots.size() + " node descriptors, "
 				+ validHotspots.size() + " of them with valid abstract strings, "
@@ -113,27 +89,29 @@ public class JavaElementChecker {
 //		for (Map.Entry<String, Integer> entry : connMap.entrySet()) {
 //			LOG.message("COUNT: " + entry.getValue() + ", EXP: " + entry.getKey());
 //		}
+		
+		return results;
 	}
 
-	private void checkValidHotspots(
+	private Collection<AbstractStringCheckingResult> checkStringNodeDescriptors(
 			List<StringNodeDescriptor> hotspots, 
-			ISQLErrorHandler errorHandler, 
 			List<IAbstractStringChecker> checkers, 
 			ProjectConfiguration configuration) {
 		
 		Timer timer = new Timer();
 		timer.start("TIMER checking");
 		
+		Collection<AbstractStringCheckingResult> results = new ArrayList<AbstractStringCheckingResult>();
+		
 		if (!dynamicCheckerIsConfigured(configuration)) {
-			errorHandler.handleSQLWarning(
-					"SQL checker: Test-database is not configured, SQL testing is not performed",
-					null);
+			results.add(new AbstractStringWarning("SQL checker: Test-database is not configured, SQL testing is not performed",
+					null));
 		}
 		
 		try {
 			if (configuration.getCheckingStrategy() == ProjectConfiguration.CheckingStrategy.ALL_CHECKERS) {
 				assert LOG.message("Checking with all checkers");
-				checkValidHotspotsWithAllCheckers(hotspots, errorHandler, checkers, configuration);
+				results.addAll(checkStringNodeDescriptorsWithAllCheckers(hotspots,checkers, configuration));
 			}
 			
 			else {
@@ -154,11 +132,11 @@ public class JavaElementChecker {
 				assert (dynamicChecker != null && staticChecker != null);
 				if (configuration.getCheckingStrategy() == ProjectConfiguration.CheckingStrategy.PREFER_DYNAMIC) {
 					assert LOG.message("Prefering dynamic checker");
-					checkValidHotspotsPreferDynamic(hotspots, errorHandler, dynamicChecker, staticChecker, configuration);
+					results.addAll(checkStringNodeDescriptorsPreferDynamic(hotspots, dynamicChecker, staticChecker, configuration));
 				}
 				else if (configuration.getCheckingStrategy() == ProjectConfiguration.CheckingStrategy.PREFER_STATIC) { 
 					assert LOG.message("Prefering static checker");
-					checkValidHotspotsPreferStatic(hotspots, errorHandler, dynamicChecker, staticChecker, configuration);
+					results.addAll(checkStringNodeDescriptorsPreferStatic(hotspots, dynamicChecker, staticChecker, configuration));
 				}
 				else {
 					throw new CheckerException("Unknown checking strategy", null);
@@ -166,31 +144,32 @@ public class JavaElementChecker {
 			}
 		}
 		catch (CheckerException e) {
-			errorHandler.handleSQLError("SQL checker exception: " + e.getMessage(), e.getPosition());
+			results.add(new AbstractStringError("SQL checker exception: " + e.getMessage(), e.getPosition()));
 		}
 		
 		timer.printTime();
+		return results;
 	}
 	
-	private void checkValidHotspotsWithAllCheckers(
+	private Collection<AbstractStringCheckingResult> checkStringNodeDescriptorsWithAllCheckers(
 			List<StringNodeDescriptor> hotspots, 
-			ISQLErrorHandler errorHandler, 
 			List<IAbstractStringChecker> checkers, 
 			ProjectConfiguration configuration) throws CheckerException {
 		
+		Collection<AbstractStringCheckingResult> results = new ArrayList<AbstractStringCheckingResult>();
 		for (IAbstractStringChecker checker : checkers) {
 			if (checker instanceof DynamicSQLChecker 
 					&& !dynamicCheckerIsConfigured(configuration)) {
-				errorHandler.handleSQLWarning("SQL checker: testing database is not configured", 
-						null);
+				results.add(new AbstractStringWarning("SQL checker: testing database is not configured", null));
 				
 			} else {
 				Timer timer = new Timer();
 				timer.start("TIMER checker=" + checker.getClass().getName());
-				checker.checkAbstractStrings(hotspots, errorHandler, configuration);
+				results.addAll(checker.checkAbstractStrings(hotspots, configuration));
 				timer.printTime();
 			}
 		}
+		return results;
 	}
 	
 	private boolean dynamicCheckerIsConfigured(ProjectConfiguration configuration) {
@@ -199,63 +178,68 @@ public class JavaElementChecker {
 			&& props.getDriverName() != null && !props.getDriverName().trim().isEmpty();
 	}
 	
-	private void checkValidHotspotsPreferDynamic(
+	private Collection<AbstractStringCheckingResult> checkStringNodeDescriptorsPreferDynamic(
 			List<StringNodeDescriptor> descriptors, 
-			ISQLErrorHandler errorHandler, 
 			IAbstractStringChecker dynamicChecker, 
 			IAbstractStringChecker staticChecker, 
 			ProjectConfiguration configuration) {
 		
+		Collection<AbstractStringCheckingResult> results = new ArrayList<AbstractStringCheckingResult>();
 		for (StringNodeDescriptor descriptor : descriptors) {
+			Collection<AbstractStringCheckingResult> nodeResults = new ArrayList<AbstractStringCheckingResult>();
 			try {
-				if (dynamicCheckerIsConfigured(configuration)) { 
+				if (dynamicCheckerIsConfigured(configuration)) {
 					// use staticChecker only when dynamic gives error
-					boolean dynResult = false;
 					try {
-						dynResult = dynamicChecker.checkAbstractString(descriptor, errorHandler, configuration);
+						nodeResults.addAll(dynamicChecker.checkAbstractString(descriptor, configuration));
 					} finally {
-						if (!dynResult) {
-							staticChecker.checkAbstractString(descriptor, errorHandler, configuration);
+						if (!nodeResults.isEmpty()) {
+							nodeResults.addAll(staticChecker.checkAbstractString(descriptor, configuration));
 						}
 					}
 				} else {
-					staticChecker.checkAbstractString(descriptor, errorHandler, configuration);
+					nodeResults.addAll(staticChecker.checkAbstractString(descriptor, configuration));
 				}
 			} catch (Exception e) {
 				LOG.exception(e);
-				errorHandler.handleSQLWarning("Error during checking: " + e.getMessage(), 
-						descriptor.getPosition());
+				nodeResults.add(new AbstractStringWarning("Error during checking: " + e.getMessage(), 
+						descriptor.getPosition()));
 			}
+			results.addAll(nodeResults);
 		}
+		return results;
 	}
 	
 	
-	private void checkValidHotspotsPreferStatic(
+	private Collection<AbstractStringCheckingResult> checkStringNodeDescriptorsPreferStatic(
 			List<StringNodeDescriptor> descriptors, 
-			ISQLErrorHandler errorHandler, 
 			IAbstractStringChecker dynamicChecker, 
 			IAbstractStringChecker staticChecker, 
 			ProjectConfiguration configuration) {
 		
+		Collection<AbstractStringCheckingResult> results = new ArrayList<AbstractStringCheckingResult>();
 		for (StringNodeDescriptor descriptor : descriptors) {
+			Collection<AbstractStringCheckingResult> nodeResults = new ArrayList<AbstractStringCheckingResult>();
 			try {
 				// use dynamic only when static didn't find anything wrong, or when it crashed
 				// note that logic is different compared to PreferDynamic case
-				boolean staticResult = true;
+				
 				try {
-					staticResult = staticChecker.checkAbstractString(descriptor, errorHandler, configuration);
+					nodeResults.addAll(staticChecker.checkAbstractString(descriptor, configuration));
 				} finally {
-					if (staticResult && dynamicCheckerIsConfigured(configuration)) {
-						dynamicChecker.checkAbstractString(descriptor, errorHandler, configuration);
+					if (nodeResults.isEmpty() && dynamicCheckerIsConfigured(configuration)) {
+						nodeResults.addAll(dynamicChecker.checkAbstractString(descriptor, configuration));
 					}
 				}
 			} catch (Exception e) {
 				// should be able to proceed with next descriptors using static checker
 				LOG.exception(e);
-				errorHandler.handleSQLWarning("Error during checking: " + e.getMessage(), 
-						descriptor.getPosition());
+				nodeResults.add(new AbstractStringWarning("Error during checking: " + e.getMessage(), 
+						descriptor.getPosition()));
 			}
+			results.addAll(nodeResults);
 		}
+		return results;
 	}
 	
 }

@@ -1,4 +1,4 @@
-package com.zeroturnaround.alvor.crawler.testutils;
+package com.zeroturnaround.alvor.crawler;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,7 +11,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 
-public class TestUtil {
+public class CrawlerTestUtil {
 	
 	public static boolean filesAreEqual(File a, File b) throws FileNotFoundException {
 		assert a.exists() && b.exists();
@@ -30,7 +30,7 @@ public class TestUtil {
 
 	public static boolean stringsAreExpected(List<String> items, String filePrefix) {
 		
-		File outFile = new File(filePrefix + "__found.txt");
+		File outFile = new File(filePrefix + "_found.txt");
 		if (outFile.exists()) {
 			outFile.delete();
 		}
@@ -41,9 +41,9 @@ public class TestUtil {
 			}
 			outStream.close();
 			
-			File expectedFile = new File(filePrefix + "__expected.txt");
+			File expectedFile = new File(filePrefix + "_expected.txt");
 			if (expectedFile.exists()) {
-				return TestUtil.filesAreEqual(outFile, expectedFile);
+				return CrawlerTestUtil.filesAreEqual(outFile, expectedFile);
 			} else {
 				return false;
 			}
@@ -54,7 +54,7 @@ public class TestUtil {
 	}
 	
 	public static File getAndPrepareTestResultsFolder(IProject project) {
-		File folder = project.getLocation().append("AlvorTestResults").toFile();
+		File folder = project.getLocation().append("AlvorSelfTestResults").toFile();
 		folder.mkdirs();
 		return folder;
 	}

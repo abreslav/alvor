@@ -10,7 +10,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.zeroturnaround.alvor.common.HotspotPattern;
-import com.zeroturnaround.alvor.crawler.testutils.TestUtil;
+import com.zeroturnaround.alvor.crawler.CrawlerTestUtil;
 
 public class ConfigurationManagerTest {
 	
@@ -28,7 +28,7 @@ public class ConfigurationManagerTest {
 			
 			// Maybe test also ProjectConfiguration.equals ?
 			Assert.assertEquals(conf1, conf2);
-			Assert.assertTrue(TestUtil.filesAreEqual(file1, file2));
+			Assert.assertTrue(CrawlerTestUtil.filesAreEqual(file1, file2));
 			//printFile(file1);
 			
 			//Assert.f

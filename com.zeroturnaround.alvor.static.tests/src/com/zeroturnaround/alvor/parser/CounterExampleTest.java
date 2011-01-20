@@ -7,16 +7,11 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.zeroturnaround.alvor.sqlparser.ILRParser;
-import com.zeroturnaround.alvor.sqlparser.IParserStack;
 import com.zeroturnaround.alvor.sqlparser.ParserSimulator;
-import com.zeroturnaround.alvor.sqlparser.Parsers;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.parser.AbstractStringParser;
 
 public class CounterExampleTest {
-	
-	private static ILRParser<IParserStack> parser = Parsers.getLALRParserForSQL();
 	
 	@Test
 	public void testSQL() throws Exception {
