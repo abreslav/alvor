@@ -38,6 +38,9 @@ import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
+import com.zeroturnaround.alvor.common.logging.Measurements;
+import com.zeroturnaround.alvor.common.logging.Timer;
+import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.IPosition;
 import com.zeroturnaround.alvor.string.StringChoice;
@@ -79,6 +82,29 @@ public class AbstractStringEvaluator {
 	private static final String RESULT_FOR_SQL_CHECKER = "@ResultForSQLChecker";
 	private static final ILog LOG = Logs.getLog(AbstractStringEvaluator.class);
 
+	/*
+	 * Actually returns abstract strings corresponding to hotspots
+	 * (or markers for unsupported cases)  
+	 * TODO rename?
+	 */
+	public static List<NodeDescriptor> findAndEvaluateHotspots(IJavaElement[] scope, ProjectConfiguration conf) {
+		Measurements.resetAll();
+		
+		Timer timer = new Timer();
+		timer.start("TIMER: string construction");
+		List<HotspotPattern> requests = conf.getHotspots();
+		if (requests.isEmpty()) {
+			throw new IllegalArgumentException("No hotspot definitions found in options");
+		}
+		List<NodeDescriptor> result = AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(requests, scope, 0, null);
+		timer.printTime(); // String construction
+		
+		LOG.message(Measurements.parseTimer);
+		LOG.message(Measurements.methodDeclSearchTimer);
+		LOG.message(Measurements.argumentSearchTimer);
+		
+		return result;
+	}
 	
 	private AbstractStringEvaluator(int level, IJavaElement[] scope, boolean templateConstructionMode) {
 		if (level > maxLevel) {

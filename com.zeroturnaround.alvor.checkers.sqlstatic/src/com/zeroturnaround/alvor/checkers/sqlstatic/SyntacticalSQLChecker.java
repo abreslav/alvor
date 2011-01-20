@@ -1,13 +1,14 @@
 package com.zeroturnaround.alvor.checkers.sqlstatic;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
+import com.zeroturnaround.alvor.checkers.AbstractStringCheckingResult;
+import com.zeroturnaround.alvor.checkers.AbstractStringError;
+import com.zeroturnaround.alvor.checkers.AbstractStringWarning;
 import com.zeroturnaround.alvor.checkers.CheckerException;
 import com.zeroturnaround.alvor.checkers.IAbstractStringChecker;
-import com.zeroturnaround.alvor.checkers.ISQLErrorHandler;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
@@ -39,20 +40,20 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 	private static int SIZE_THRESHOLD = 25000;
 	
 	@Override
-	public void checkAbstractStrings(List<StringNodeDescriptor> descriptors,
-			final ISQLErrorHandler errorHandler, ProjectConfiguration configuration) throws CheckerException {
+	public Collection<AbstractStringCheckingResult> checkAbstractStrings(List<StringNodeDescriptor> descriptors,
+			ProjectConfiguration configuration) throws CheckerException {
+		List<AbstractStringCheckingResult> result = new ArrayList<AbstractStringCheckingResult>();
 		for (final StringNodeDescriptor descriptor : descriptors) {
-			checkAbstractString(descriptor, errorHandler, configuration);
+			result.addAll(checkAbstractString(descriptor, configuration));
 		}
+		return result;
 	}
 
-	private boolean checkStringOfAppropriateSize(
-			final ISQLErrorHandler errorHandler,
+	private Collection<AbstractStringCheckingResult> checkStringOfAppropriateSize(
 			final StringNodeDescriptor descriptor,
 			IAbstractString abstractString) throws CheckerException {
 		
-		// need something mutable to get information from closures
-		final Set<Boolean> results = new HashSet<Boolean>(); 
+		final List<AbstractStringCheckingResult> result = new ArrayList<AbstractStringCheckingResult>();
 		
 		try {
 			State automaton = PositionedCharacterUtil.createPositionedAutomaton(abstractString);
@@ -65,27 +66,26 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 					String counterExample = PositionedCharacterUtil.renderCounterExample(counterExampleList);
 					Collection<IPosition> markerPositions = PositionedCharacterUtil.getMarkerPositions(((Token) item).getText());
 					for (IPosition pos : markerPositions) {
-						errorHandler.handleSQLError(
+						result.add(new AbstractStringError(
 								"SQL syntax checker: Unexpected token: " + PositionedCharacterUtil.render(item) 
-								//+ "\n" + "Counter example: " + counterExample
+								+ "\n" + "    Counter example: " + counterExample
 								, 
-								pos);
-						results.add(false);
+								pos));
 					}
 				}
 
 				@Override
 				public void other(
 						List<? extends IAbstractInputItem> counterExample) {
-					errorHandler.handleSQLError("SQL syntax checker: Syntax error. Most likely, unfinished query", descriptor.getPosition());
-					results.add(false);
+					result.add(new AbstractStringError("SQL syntax checker: Syntax error. Most likely, unfinished query", 
+							descriptor.getPosition()));
 				}
 
 				@Override
 				public void overabstraction(
 						List<? extends IAbstractInputItem> counterExample) {
-					errorHandler.handleSQLError("SQL syntax checker: Syntactic analysis failed: nesting is too deep in this sentence", descriptor.getPosition());
-					results.add(false);
+					result.add(new AbstractStringError("SQL syntax checker: Syntactic analysis failed: nesting is too deep in this sentence", 
+							descriptor.getPosition()));
 				}
 			});
 		} catch (MalformedStringLiteralException e) {
@@ -93,18 +93,17 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 			if (errorPosition == null) {
 				errorPosition = descriptor.getPosition(); 
 			}
-			errorHandler.handleSQLError("SQL syntax checker: Malformed literal: " + e.getMessage(), errorPosition);
-			results.add(false);
+			result.add(new AbstractStringError("SQL syntax checker: Malformed literal: " 
+					+ e.getMessage(), errorPosition));
 		} catch (StackOverflowError e) {  
 			// TODO: This hack is no good (see the method above)
 			throw e;
 		} catch (Throwable e) {
 			LOG.exception(e);
-			results.add(false);
 			throw new CheckerException("SQL syntax checker: internal error: " + e.toString(), descriptor.getPosition());
 		}
 		
-		return !results.contains(false);
+		return result;
 	}
 
 	/**
@@ -115,9 +114,11 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 	}
 
 	@Override
-	public boolean checkAbstractString(StringNodeDescriptor descriptor,
-			ISQLErrorHandler errorHandler, ProjectConfiguration configuration)
+	public Collection<AbstractStringCheckingResult> checkAbstractString(StringNodeDescriptor descriptor,
+			ProjectConfiguration configuration)
 			throws CheckerException {
+		
+		List<AbstractStringCheckingResult> errors = new ArrayList<AbstractStringCheckingResult>();
 		
 		IAbstractString abstractString = descriptor.getAbstractValue();
 		if (!hasAcceptableSize(abstractString)) {
@@ -125,44 +126,36 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 				StringChoice choice = (StringChoice) abstractString;
 				boolean hasBigSubstrings = false;
 				boolean hasSmallSubstrings = false;
-				boolean hasErrors = false;
 				for (IAbstractString option : choice.getItems()) {
 					if (!hasAcceptableSize(option)) {
 						hasBigSubstrings = true;
-						hasErrors = true;
 					} else {
 						try {
-							if (!checkStringOfAppropriateSize(errorHandler, descriptor, option)) {
-								hasErrors = true;
-							}
+							errors.addAll(checkStringOfAppropriateSize(descriptor, option));
 							hasSmallSubstrings = true;
 						} catch (StackOverflowError e) { 
 							// TODO: This hack is no good. May be it can be fixed in the FixpointParser   
 							hasBigSubstrings = true;
-							hasErrors = true;
 						}
 					}
 				}
 				if (hasBigSubstrings) {
-					errorHandler.handleSQLWarning("SQL syntax checker: SQL string has too many possible variations" + (hasSmallSubstrings ? ". Only some are checked" : ""), descriptor.getPosition());
-					return false;
-				}
-				else {
-					return !hasErrors;
+					errors.add(new AbstractStringWarning("SQL syntax checker: SQL string has too many possible variations" 
+							+ (hasSmallSubstrings ? ". Only some are checked" : ""), descriptor.getPosition()));
 				}
 			} else {
-				errorHandler.handleSQLWarning("SQL syntax checker: SQL string has too many possible variations", descriptor.getPosition());
-				return false;
+				errors.add(new AbstractStringWarning("SQL syntax checker: SQL string has too many possible variations", 
+						descriptor.getPosition()));
 			}
 		} else {
 			try {
-				return checkStringOfAppropriateSize(errorHandler, descriptor, abstractString);
+				return checkStringOfAppropriateSize(descriptor, abstractString);
 			} catch (StackOverflowError e) {
 				// The analyzer has caused a stack overflow in the dfs-based evaluation procedure.
 				// See FixpointParser class
-				errorHandler.handleSQLWarning("SQL syntax checker: SQL string has too many possible variations", descriptor.getPosition());
-				return false;
+				errors.add(new AbstractStringWarning("SQL syntax checker: SQL string has too many possible variations", descriptor.getPosition()));
 			}
 		}
+		return errors;
 	}
 }

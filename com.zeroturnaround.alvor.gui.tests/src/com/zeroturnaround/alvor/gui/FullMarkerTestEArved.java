@@ -2,7 +2,7 @@ package com.zeroturnaround.alvor.gui;
 
 import org.junit.BeforeClass;
 
-import com.zeroturnaround.alvor.crawler.testutils.TestUtil;
+import com.zeroturnaround.alvor.crawler.CrawlerTestUtil;
 
 public class FullMarkerTestEArved extends AbstractMarkerTest {
 	
@@ -11,7 +11,7 @@ public class FullMarkerTestEArved extends AbstractMarkerTest {
 		// TODO should do it via GUI
 		//GuiFacade.selectAnItemInPackageExplorer();
 		//GuiFacade.executeAlvorCleanCheck();
-		AbstractMarkerTest.selectedProject = TestUtil.getProject("earved"); 
+		AbstractMarkerTest.selectedProject = CrawlerTestUtil.getProject("earved"); 
 		GuiFacade.executeAlvorCleanCheck(AbstractMarkerTest.selectedProject);
 		
 		//GuiFacade.waitUntilAlvorHasCompleted();

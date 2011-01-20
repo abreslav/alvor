@@ -2,13 +2,13 @@ package com.zeroturnaround.alvor.gui;
 
 import org.junit.BeforeClass;
 
-import com.zeroturnaround.alvor.crawler.testutils.TestUtil;
+import com.zeroturnaround.alvor.crawler.CrawlerTestUtil;
 
 public class FullMarkerTestSqlBus extends AbstractMarkerTest {
 	
 	@BeforeClass
 	public static void prepare() throws Exception {
-		AbstractMarkerTest.selectedProject = TestUtil.getProject("sql_bus"); 
+		AbstractMarkerTest.selectedProject = CrawlerTestUtil.getProject("sql_bus"); 
 		GuiFacade.executeAlvorCleanCheck(AbstractMarkerTest.selectedProject);
 	}
 }

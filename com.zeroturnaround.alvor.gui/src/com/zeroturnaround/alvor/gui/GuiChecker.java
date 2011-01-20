@@ -1,6 +1,6 @@
 package com.zeroturnaround.alvor.gui;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,8 +16,8 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
 import com.zeroturnaround.alvor.cache.CacheService;
-import com.zeroturnaround.alvor.checkers.AbstractStringCheckerManager;
-import com.zeroturnaround.alvor.checkers.ISQLErrorHandler;
+import com.zeroturnaround.alvor.checkers.AbstractStringCheckingResult;
+import com.zeroturnaround.alvor.checkers.AbstractStringWarning;
 import com.zeroturnaround.alvor.common.NodeDescriptor;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
@@ -25,8 +25,9 @@ import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.configuration.ConfigurationManager;
 import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
+import com.zeroturnaround.alvor.crawler.AbstractStringEvaluator;
 import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
-import com.zeroturnaround.alvor.main.JavaElementChecker;
+import com.zeroturnaround.alvor.main.ComplexChecker;
 import com.zeroturnaround.alvor.string.DummyPosition;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.IAbstractStringVisitor;
@@ -41,18 +42,18 @@ import com.zeroturnaround.alvor.string.StringRepetition;
 import com.zeroturnaround.alvor.string.StringSequence;
 import com.zeroturnaround.alvor.string.util.AbstractStringOptimizer;
 
-public class GuiChecker implements ISQLErrorHandler {
+public class GuiChecker {
 	private static final ILog LOG = Logs.getLog(GuiChecker.class);
 	
 	@Deprecated
 	private IProject currentProject;
 	
-	private JavaElementChecker projectChecker = new JavaElementChecker();
+	private ComplexChecker complexChecker = new ComplexChecker();
 	
-	public List<NodeDescriptor> performCleanCheck(IProject optionsFrom, IJavaElement[] scope) {
+	public void performCleanCheck(IProject optionsFrom, IJavaElement[] scope) {
 		NodeSearchEngine.clearASTCache();
 		CacheService.getCacheService().clearAll();
-		return performIncrementalCheck(optionsFrom, scope);
+		performIncrementalCheck(optionsFrom, scope);
 	}
 	
 	/**
@@ -61,10 +62,10 @@ public class GuiChecker implements ISQLErrorHandler {
 	 * 
 	 * Also, it's assumed that sqlchecker.properties for the project exists
 	 */
-	public List<NodeDescriptor> performIncrementalCheck(IProject optionsFrom, IJavaElement[] scope) {
+	public void performIncrementalCheck(IProject optionsFrom, IJavaElement[] scope) {
 		
 		if (scope.length == 0) {
-			return new ArrayList<NodeDescriptor>();
+			return;
 		}
 		
 		this.currentProject = optionsFrom;
@@ -73,13 +74,13 @@ public class GuiChecker implements ISQLErrorHandler {
 		cleanConfigurationMarkers(optionsFrom);
 		
 		ProjectConfiguration conf = ConfigurationManager.readProjectConfiguration(optionsFrom, true);
-		List<NodeDescriptor> hotspots = projectChecker.findAndEvaluateHotspots(scope, conf);
+		List<NodeDescriptor> hotspots = AbstractStringEvaluator.findAndEvaluateHotspots(scope, conf);
 		markHotspots(hotspots);
 		
-		projectChecker.processHotspots(hotspots, this,
-				AbstractStringCheckerManager.INSTANCE.getCheckers(), conf);
+		Collection<AbstractStringCheckingResult> checkingResults = 
+			complexChecker.checkNodeDescriptors(hotspots, conf);
 		
-		return hotspots;
+		createErrorAndWarningMarkers(checkingResults);
 	}
 
 	
@@ -153,6 +154,16 @@ public class GuiChecker implements ISQLErrorHandler {
 			MarkerUtilities.createMarker(file, map, markerType);
 		} catch (Exception e) {
 			LOG.exception(e);
+		}
+	}
+	
+	private void createErrorAndWarningMarkers(Collection<AbstractStringCheckingResult> checkingResults) {
+		for (AbstractStringCheckingResult result : checkingResults) {
+			String markerId = AlvorGuiPlugin.ERROR_MARKER_ID;
+			if (result instanceof AbstractStringWarning) {
+				markerId = AlvorGuiPlugin.WARNING_MARKER_ID;
+			}
+			createMarker(result.getMessage(), markerId, preparePosition(result.getPosition()));				
 		}
 	}
 
@@ -242,16 +253,6 @@ public class GuiChecker implements ISQLErrorHandler {
 		abstractValue.accept(visitor, null);
 	}
 
-	@Override
-	public void handleSQLError(String message, IPosition position) {
-		createMarker(message, AlvorGuiPlugin.ERROR_MARKER_ID, preparePosition(position));		
-	}
-
-	@Override
-	public void handleSQLWarning(String message, IPosition position) {
-		createMarker(message, AlvorGuiPlugin.WARNING_MARKER_ID, preparePosition(position));		
-	}
-	
 	private IPosition preparePosition(IPosition pos) {
 		if (pos == null) {
 			return new Position(this.currentProject.getFullPath().toPortableString(), 0, 0);

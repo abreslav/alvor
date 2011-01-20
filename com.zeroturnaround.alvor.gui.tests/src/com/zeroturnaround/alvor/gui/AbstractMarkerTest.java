@@ -9,7 +9,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.zeroturnaround.alvor.crawler.testutils.TestUtil;
+import com.zeroturnaround.alvor.crawler.CrawlerTestUtil;
 
 /**
  * Base class for tests which check the validity of markers produced by Alvor
@@ -45,12 +45,12 @@ public abstract class AbstractMarkerTest {
 		List<String> markers = GuiFacade.getMarkersAsStrings(AbstractMarkerTest.selectedProject, markerId);
 		Collections.sort(markers);
 		
-		File folder = TestUtil.getAndPrepareTestResultsFolder(AbstractMarkerTest.selectedProject);
+		File folder = CrawlerTestUtil.getAndPrepareTestResultsFolder(AbstractMarkerTest.selectedProject);
 		String shortId = markerId.substring(markerId.lastIndexOf('.')+1);
 		String filePrefix = folder.getAbsolutePath() + "/" + shortId;
 		
 		Assert.assertTrue("Generated markers differ from expected markers",
-				TestUtil.stringsAreExpected(markers, filePrefix));
+				CrawlerTestUtil.stringsAreExpected(markers, filePrefix));
 	}
 	
 }
