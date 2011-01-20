@@ -1,4 +1,4 @@
-package com.zeroturnaround.alvor.util;
+package com.zeroturnaround.alvor.crawler.util;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 
@@ -13,6 +13,6 @@ public class UnsupportedStringOpExAtNode extends UnsupportedStringOpEx {
 	 * @param astNode
 	 */
 	public UnsupportedStringOpExAtNode(String message, ASTNode astNode) {
-		super(message, PositionUtil.getPosition(astNode));
+		super(message, ASTUtil.getPosition(astNode));
 	}
 }

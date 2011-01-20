@@ -54,7 +54,7 @@ public final class CacheServiceImpl implements ICacheService {
 	private final DBQueries queries;
 	private final Connection connection;
 	private final IScopedCache<HotspotPattern, IPosition> usageCache = new UsageCache();	
-	private final IScopedCache<MethodInvocationDescriptor, IAbstractString> methodTemplateCache = new MethodTemplateCache();	
+	private final IScopedCache<IMethodInvocationDescriptor, IAbstractString> methodTemplateCache = new MethodTemplateCache();	
 
 	private class DBQueries {
 		private final PreparedStatement queryGetAbstractString;
@@ -699,10 +699,10 @@ public final class CacheServiceImpl implements ICacheService {
 	}
 
 	
-	private final class MethodTemplateCache implements IScopedCache<MethodInvocationDescriptor, IAbstractString> {
+	private final class MethodTemplateCache implements IScopedCache<IMethodInvocationDescriptor, IAbstractString> {
 		
 		@Override
-		public void add(MethodInvocationDescriptor desc, IAbstractString str) {
+		public void add(IMethodInvocationDescriptor desc, IAbstractString str) {
 			if (nocache) 
 				return;
 			try {
@@ -733,7 +733,7 @@ public final class CacheServiceImpl implements ICacheService {
 		}
 		
 		@Override
-		public void getCachedResultsInScope(Set<Integer> scope, MethodInvocationDescriptor desc,
+		public void getCachedResultsInScope(Set<Integer> scope, IMethodInvocationDescriptor desc,
 				Collection<? super IAbstractString> values) {
 			if (nocache) 
 				return;
@@ -760,7 +760,7 @@ public final class CacheServiceImpl implements ICacheService {
 		}
 		
 		@Override
-		public Map<String, Integer> getCachedScope(MethodInvocationDescriptor desc) {
+		public Map<String, Integer> getCachedScope(IMethodInvocationDescriptor desc) {
 			if (nocache) 
 				return Collections.emptyMap();
 			try {
@@ -790,7 +790,7 @@ public final class CacheServiceImpl implements ICacheService {
 		}
 		
 		@Override
-		public void markScopeAsCached(MethodInvocationDescriptor desc, Set<String> scope) {
+		public void markScopeAsCached(IMethodInvocationDescriptor desc, Set<String> scope) {
 			if (nocache) 
 				return;
 			try {
@@ -957,7 +957,7 @@ public final class CacheServiceImpl implements ICacheService {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	@Override
-	public IScopedCache<MethodInvocationDescriptor, IAbstractString> getMethodTemplateCache() {
+	public IScopedCache<IMethodInvocationDescriptor, IAbstractString> getMethodTemplateCache() {
 		return methodTemplateCache;
 	}
 	

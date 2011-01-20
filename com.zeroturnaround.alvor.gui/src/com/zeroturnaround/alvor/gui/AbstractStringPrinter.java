@@ -17,8 +17,8 @@ import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.crawler.AbstractStringEvaluator;
 import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
+import com.zeroturnaround.alvor.crawler.util.ASTUtil;
 import com.zeroturnaround.alvor.string.IAbstractString;
-import com.zeroturnaround.alvor.util.ASTUtil;
 
 public class AbstractStringPrinter implements IEditorActionDelegate{
 	

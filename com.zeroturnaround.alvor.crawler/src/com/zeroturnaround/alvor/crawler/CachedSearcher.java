@@ -17,8 +17,11 @@ public abstract class CachedSearcher<K, V> {
 	/*
 	 * Subtracts cached files from all files and performs search on resulting files
 	 */
-	public void performCachedSearch(final List<IFile> allFilesInScope, IScopedCache<? super K, V> scopedCache,
-			K key, final List<? super V> values) {
+	public void performCachedSearch(
+			final List<IFile> allFilesInScope, 
+			IScopedCache<? super K, V> scopedCache,
+			K key, 
+			final List<? super V> values) {
 
 		Map<String, Integer> cachedScope = scopedCache.getCachedScope(key);
 		List<IJavaElement> scopeToSearchIn = new ArrayList<IJavaElement>();

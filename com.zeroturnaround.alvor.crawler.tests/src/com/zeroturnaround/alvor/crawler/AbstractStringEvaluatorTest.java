@@ -13,13 +13,13 @@ import org.eclipse.jdt.core.JavaCore;
 import org.junit.Test;
 
 import com.zeroturnaround.alvor.common.NodeDescriptor;
+import com.zeroturnaround.alvor.common.PositionUtil;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.configuration.ConfigurationManager;
 import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.samplegen.SampleGenerator;
-import com.zeroturnaround.alvor.util.PositionUtil;
 
 public abstract class AbstractStringEvaluatorTest {
 	

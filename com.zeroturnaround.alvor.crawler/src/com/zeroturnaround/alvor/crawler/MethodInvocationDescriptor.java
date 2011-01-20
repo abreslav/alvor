@@ -1,8 +1,10 @@
-package com.zeroturnaround.alvor.cache;
+package com.zeroturnaround.alvor.crawler;
 
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
-public class MethodInvocationDescriptor {
+import com.zeroturnaround.alvor.cache.IMethodInvocationDescriptor;
+
+public class MethodInvocationDescriptor implements IMethodInvocationDescriptor {
 	private String signature;
 	private int argIndex;
 	private MethodInvocation inv;
@@ -12,6 +14,10 @@ public class MethodInvocationDescriptor {
 		this.argIndex = argIndex;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.zeroturnaround.alvor.cache.IMethodInvocationDescriptor#getSignature()
+	 */
+	@Override
 	public String getSignature() {
 		if (signature == null) {
 			// TODO check the string
@@ -24,6 +30,10 @@ public class MethodInvocationDescriptor {
 		return inv;
 	}
 	
+	/* (non-Javadoc)
+	 * @see com.zeroturnaround.alvor.cache.IMethodInvocationDescriptor#getGetArgIndex()
+	 */
+	@Override
 	public int getGetArgIndex() {
 		return argIndex;
 	}
