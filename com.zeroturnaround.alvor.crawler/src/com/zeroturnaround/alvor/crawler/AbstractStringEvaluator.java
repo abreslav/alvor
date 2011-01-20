@@ -41,6 +41,9 @@ import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.common.logging.Measurements;
 import com.zeroturnaround.alvor.common.logging.Timer;
 import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
+import com.zeroturnaround.alvor.crawler.util.ASTUtil;
+import com.zeroturnaround.alvor.crawler.util.JavaProjectUtil;
+import com.zeroturnaround.alvor.crawler.util.UnsupportedStringOpExAtNode;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.IPosition;
 import com.zeroturnaround.alvor.string.StringChoice;
@@ -57,10 +60,6 @@ import com.zeroturnaround.alvor.tracker.NameInParameter;
 import com.zeroturnaround.alvor.tracker.NameUsage;
 import com.zeroturnaround.alvor.tracker.NameUsageChoice;
 import com.zeroturnaround.alvor.tracker.VariableTracker;
-import com.zeroturnaround.alvor.util.ASTUtil;
-import com.zeroturnaround.alvor.util.EclipseUtil;
-import com.zeroturnaround.alvor.util.PositionUtil;
-import com.zeroturnaround.alvor.util.UnsupportedStringOpExAtNode;
 
 
 
@@ -162,7 +161,7 @@ public class AbstractStringEvaluator {
 		IAbstractString result = null;
 		if (shouldUseCache()) {
 			// may throw UnsupportedStringOpEx instead returning
-			result = CacheService.getCacheService().getAbstractString(PositionUtil.getPosition(node));
+			result = CacheService.getCacheService().getAbstractString(ASTUtil.getPosition(node));
 		}
 		if (result == null) {
 			try {
@@ -173,13 +172,13 @@ public class AbstractStringEvaluator {
 				}
 				assert result.getPosition() != null;
 				if (shouldUseCache() && !StringConverter.includesStringExtensions(result)) {
-					CacheService.getCacheService().addAbstractString(PositionUtil.getPosition(node), result);
+					CacheService.getCacheService().addAbstractString(ASTUtil.getPosition(node), result);
 				}
 			} 
 			catch (UnsupportedStringOpEx e) {
 				logMessage("UNSUPPORTED: " + e.getMessage(), ipLevel, node);
 				if (shouldUseCache()) {
-					CacheService.getCacheService().addUnsupported(PositionUtil.getPosition(node), e.getMessage());
+					CacheService.getCacheService().addUnsupported(ASTUtil.getPosition(node), e.getMessage());
 				}
 				throw e;
 			}
@@ -198,7 +197,7 @@ public class AbstractStringEvaluator {
 	
 	private IAbstractString doEval(Expression node, ContextLink context) {
 		// recursion check
-		IPosition pos = PositionUtil.getPosition(node);
+		IPosition pos = ASTUtil.getPosition(node);
 		if (context != null && context.contains(pos)) { 
 			// ie. i'm already computing the value of this node lower in the call stack
 			// ie. it's recursion!
@@ -219,20 +218,20 @@ public class AbstractStringEvaluator {
 				|| type.getQualifiedName().equals("java.math.BigInteger")
 				|| type.getQualifiedName().equals("java.math.BigDecimal")
 				) {
-			return new StringRandomInteger(PositionUtil.getPosition(node));
+			return new StringRandomInteger(ASTUtil.getPosition(node));
 		}
 		else if (node instanceof StringLiteral) {
 			StringLiteral stringLiteral = (StringLiteral)node;
-			return new StringConstant(PositionUtil.getPosition(node), 
+			return new StringConstant(ASTUtil.getPosition(node), 
 					stringLiteral.getLiteralValue(), stringLiteral.getEscapedValue());
 		}
 		else if (node instanceof CharacterLiteral) {
 			CharacterLiteral characterLiteral = (CharacterLiteral)node;
-			return new StringConstant(PositionUtil.getPosition(node), 
+			return new StringConstant(ASTUtil.getPosition(node), 
 					String.valueOf(characterLiteral.charValue()), characterLiteral.getEscapedValue());
 		}
 		else if (node instanceof NullLiteral) {
-			return new StringConstant(PositionUtil.getPosition(node),
+			return new StringConstant(ASTUtil.getPosition(node),
 					"null", "\"null\"");
 		}
 		else if (node instanceof BooleanLiteral) {
@@ -244,7 +243,7 @@ public class AbstractStringEvaluator {
 			else {
 				bStr = "false";
 			}
-			return new StringConstant(PositionUtil.getPosition(node),
+			return new StringConstant(ASTUtil.getPosition(node),
 					bStr, "\"" + bStr + "\"");
 		}
 		else if (node instanceof Name) {
@@ -261,7 +260,7 @@ public class AbstractStringEvaluator {
 			return eval(cExp.getExpression(), context);
 		}
 		else if (node instanceof ConditionalExpression) {
-			StringChoice choice = new StringChoice(PositionUtil.getPosition(node),
+			StringChoice choice = new StringChoice(ASTUtil.getPosition(node),
 					eval(((ConditionalExpression)node).getThenExpression(), new ContextLink(node, context)),
 					eval(((ConditionalExpression)node).getElseExpression(), new ContextLink(node, context)));
 
@@ -342,7 +341,7 @@ public class AbstractStringEvaluator {
 			}
 			else if (inv.getName().getIdentifier().equals("append")) {
 				return new StringSequence(
-						PositionUtil.getPosition(inv), 
+						ASTUtil.getPosition(inv), 
 						eval(inv.getExpression(), new ContextLink(inv, context)),
 						eval((Expression)inv.arguments().get(0), new ContextLink(inv, context)));
 			}
@@ -358,7 +357,7 @@ public class AbstractStringEvaluator {
 		if (inv.getExpression() != null
 				&& ASTUtil.isIntegral(inv.getExpression().resolveTypeBinding())
 				&& inv.getName().getIdentifier().equals("toString")) {
-			return new StringRandomInteger(PositionUtil.getPosition(inv));
+			return new StringRandomInteger(ASTUtil.getPosition(inv));
 		}
 		else  {
 			return evalInvocationResultOrArgOut(inv, -1, context);
@@ -382,7 +381,7 @@ public class AbstractStringEvaluator {
 		MethodTemplateSearcher templateSearcher = new MethodTemplateSearcher(this);
 		List<IAbstractString> templates = 
 			templateSearcher.findMethodTemplates(
-					EclipseUtil.scopeToProjectAndRequiredProjectsScope(scope),
+					JavaProjectUtil.scopeToProjectAndRequiredProjectsScope(scope),
 					inv, argumentIndex);
 		
 		if (templates.size() == 0) {
@@ -415,7 +414,7 @@ public class AbstractStringEvaluator {
 			return choices.get(0);
 		}
 		else {
-			return new StringChoice(PositionUtil.getPosition(inv), choices);
+			return new StringChoice(ASTUtil.getPosition(inv), choices);
 		}
 	}
 
@@ -460,7 +459,7 @@ public class AbstractStringEvaluator {
 			return options.get(0);
 		}
 		else {
-			return new StringChoice(PositionUtil.getPosition(decl), options);
+			return new StringChoice(ASTUtil.getPosition(decl), options);
 		}
 	}
 	
@@ -492,7 +491,7 @@ public class AbstractStringEvaluator {
 				throw new UnsupportedStringOpExAtNode("Problem reading " + RESULT_FOR_SQL_CHECKER, decl);
 			} else {
 				//return new StringConstant(tagText);
-				return new StringConstant(PositionUtil.getPosition(tag), 
+				return new StringConstant(ASTUtil.getPosition(tag), 
 						tagText, '"'+tagText+'"');
 			}
 		}
@@ -513,7 +512,7 @@ public class AbstractStringEvaluator {
 				return eval(arg, context);
 			}
 			else if (arg.resolveTypeBinding().getName().equals("int")) {
-				return new EmptyStringConstant(PositionUtil.getPosition(node));
+				return new EmptyStringConstant(ASTUtil.getPosition(node));
 			}
 			else { // CharSequence
 				throw new UnsupportedStringOpExAtNode("Unknown String/StringBuilder/Buffer constructor: " 
@@ -522,7 +521,7 @@ public class AbstractStringEvaluator {
 		}
 		else {
 			assert node.arguments().size() == 0;
-			return new EmptyStringConstant(PositionUtil.getPosition(node));
+			return new EmptyStringConstant(ASTUtil.getPosition(node));
 		}
 	}
 
@@ -534,7 +533,7 @@ public class AbstractStringEvaluator {
 			for (Object operand: expr.extendedOperands()) {
 				ops.add(eval((Expression)operand, new ContextLink(expr, context)));
 			}
-			return new StringSequence(PositionUtil.getPosition(expr), ops);
+			return new StringSequence(ASTUtil.getPosition(expr), ops);
 		}
 		else {
 			throw new UnsupportedStringOpExAtNode("getValOf( infix op = " + expr.getOperator() + ")", expr);
@@ -544,7 +543,7 @@ public class AbstractStringEvaluator {
 	private IAbstractString evalNameAfter(Name name, NameUsage usage, ContextLink context) {
 		if (usage == null) {
 			throw new UnsupportedStringOpEx("internal error: Can't find definition for '" + name + "'", 
-					PositionUtil.getPosition(name));
+					ASTUtil.getPosition(name));
 		}
 		assert usage.getNode() != null;
 		
@@ -587,7 +586,7 @@ public class AbstractStringEvaluator {
 			elseStr = this.evalNameAfter(name, uc.getElseUsage(), context);
 		}
 		
-		StringChoice result = new StringChoice(PositionUtil.getPosition(uc.getNode()),
+		StringChoice result = new StringChoice(ASTUtil.getPosition(uc.getNode()),
 				thenStr, elseStr); 
 		
 		if (optimizeChoice) {
@@ -615,13 +614,13 @@ public class AbstractStringEvaluator {
 			if (methodName.equals("append")) {
 				// extra recursion check because concatenation expression is implicit
 				// and i can't pass it's node to eval (for normal recursion check)
-				IPosition pos = PositionUtil.getPosition(inv);
+				IPosition pos = ASTUtil.getPosition(inv);
 				if (context != null && context.contains(pos)) { 
 					return new StringRecursion(pos);			
 				}
 				
 				return new StringSequence(
-						PositionUtil.getPosition(inv),
+						ASTUtil.getPosition(inv),
 						eval(inv.getExpression(), new ContextLink(inv, context)),
 						eval((Expression)inv.arguments().get(0), new ContextLink(inv, context)));
 			}
@@ -658,7 +657,7 @@ public class AbstractStringEvaluator {
 		else if (usage.getOperator() == Assignment.Operator.PLUS_ASSIGN) {
 			// extra recursion check because concatenation expression is implicit
 			// and i can't pass it's node to eval (for common recursion check)
-			IPosition pos = PositionUtil.getPosition(usage.getNode());
+			IPosition pos = ASTUtil.getPosition(usage.getNode());
 			if (context != null && context.contains(pos)) { 
 				// ie. i'm already computing the value of this node lower in the call stack
 				// ie. it's recursion!
@@ -666,7 +665,7 @@ public class AbstractStringEvaluator {
 			}
 			
 			return new StringSequence(
-					PositionUtil.getPosition(usage.getNode()),
+					ASTUtil.getPosition(usage.getNode()),
 					eval(usage.getLeftHandSide(), new ContextLink(usage.getNode(), context)),
 					eval(usage.getRightHandSide(), new ContextLink(usage.getNode(), context)));
 		}
@@ -740,7 +739,7 @@ public class AbstractStringEvaluator {
 	private IAbstractString evalNameAfterMethodEntryInParameter(NameInParameter usage, ContextLink context) {
 		if (this.templateConstructionMode) {
 			return new StringParameter(
-					PositionUtil.getPosition(usage.getNode()),
+					ASTUtil.getPosition(usage.getNode()),
 					usage.getIndex());
 		}
 		else {
@@ -779,7 +778,7 @@ public class AbstractStringEvaluator {
 						usage.getNode());
 			}
 			return new StringChoice(
-					PositionUtil.getPosition(
+					ASTUtil.getPosition(
 					(ASTNode)method.parameters().get(usage.getIndex())),
 					choices);
 		}
@@ -793,8 +792,8 @@ public class AbstractStringEvaluator {
 		
 		finalMsg += msg;
 		if (node != null) {
-			finalMsg += ", file: " + PositionUtil.getFileString(node) 
-					+ ", line: " + PositionUtil.getLineNumber(node); 
+			finalMsg += ", file: " + ASTUtil.getFileString(node) 
+					+ ", line: " + ASTUtil.getLineNumber(node); 
 		}
 		assert LOG.message(finalMsg);
 	}

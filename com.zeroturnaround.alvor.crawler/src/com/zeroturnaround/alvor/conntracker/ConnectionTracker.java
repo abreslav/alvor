@@ -7,13 +7,14 @@ import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 
+import com.zeroturnaround.alvor.common.PositionUtil;
 import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
+import com.zeroturnaround.alvor.crawler.util.ASTUtil;
 import com.zeroturnaround.alvor.string.IPosition;
 import com.zeroturnaround.alvor.tracker.NameAssignment;
 import com.zeroturnaround.alvor.tracker.NameInParameter;
 import com.zeroturnaround.alvor.tracker.NameUsage;
 import com.zeroturnaround.alvor.tracker.VariableTracker;
-import com.zeroturnaround.alvor.util.PositionUtil;
 
 public class ConnectionTracker {
 	public static ConnectionDescriptor getConnectionDescriptorForHotspot(IPosition pos) {
@@ -30,18 +31,18 @@ public class ConnectionTracker {
 			return getConnectionDesc(node);
 		} 
 		catch (UnsupportedOperationException e) {
-			return new ConnectionDescriptor(PositionUtil.getPosition(node)
+			return new ConnectionDescriptor(ASTUtil.getPosition(node)
 					, "UNSUPPORTED: " + e.getMessage());
 		}
 		catch (Throwable e) {
-			return new ConnectionDescriptor(PositionUtil.getPosition(node)
+			return new ConnectionDescriptor(ASTUtil.getPosition(node)
 					, "ERROR: " + e.getMessage());
 		}
 	}
 	
 	private static ConnectionDescriptor getConnectionDesc(Expression expr) {
 		if (! isConnectionOrDataSource(expr.resolveTypeBinding())) {
-			IPosition pos = PositionUtil.getPosition(expr);
+			IPosition pos = ASTUtil.getPosition(expr);
 			int lineNo = PositionUtil.getLineNumber(pos);
 			throw new UnsupportedOperationException("getConnectionDesc, typeBinding="
 					+ expr.resolveTypeBinding().getName());
@@ -57,7 +58,7 @@ public class ConnectionTracker {
 				return getConnectionDesc(inv.getExpression());
 			}
 			else {
-				return new ConnectionDescriptor(PositionUtil.getPosition(inv),
+				return new ConnectionDescriptor(ASTUtil.getPosition(inv),
 						inv.resolveMethodBinding().toString());
 			}
 		}

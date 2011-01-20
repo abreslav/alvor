@@ -113,7 +113,7 @@ public class CacheServiceImpl2 implements ICacheService {
 	}
 
 	@Override
-	public IScopedCache<MethodInvocationDescriptor, IAbstractString> getMethodTemplateCache() {
+	public IScopedCache<IMethodInvocationDescriptor, IAbstractString> getMethodTemplateCache() {
 		return null;
 	}
 

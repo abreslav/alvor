@@ -1,7 +1,10 @@
-package com.zeroturnaround.alvor.util;
+package com.zeroturnaround.alvor.crawler.util;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -41,6 +44,10 @@ import org.eclipse.jdt.core.dom.TypeLiteral;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
+
+import com.zeroturnaround.alvor.common.PositionUtil;
+import com.zeroturnaround.alvor.string.IPosition;
+import com.zeroturnaround.alvor.string.Position;
 
 
 public class ASTUtil {
@@ -515,5 +522,28 @@ public class ASTUtil {
 		ASTNode ast = parser.createAST(null);
 		return ast;
 
+	}
+
+	public static int getLineNumber(ASTNode node) {
+		return PositionUtil.getLineNumber(ASTUtil.getPosition(node));
+	}
+
+	public static IPosition getPosition(ASTNode node) {
+		return new Position(ASTUtil.getFileString(node), node.getStartPosition(), node.getLength());
+	}
+
+	public static IFile getFile(ASTNode node) {
+		try {
+			ICompilationUnit unit = (ICompilationUnit)((CompilationUnit)node.getRoot()).getJavaElement();
+			IFile correspondingResource = (IFile) unit.getCorrespondingResource();
+			return correspondingResource;
+		} catch (JavaModelException e) {
+			throw new IllegalStateException(e);
+		}
+	}
+
+	public static String getFileString(ASTNode node) {
+		IResource file = getFile(node);
+		return PositionUtil.getFileString(file);
 	}
 }

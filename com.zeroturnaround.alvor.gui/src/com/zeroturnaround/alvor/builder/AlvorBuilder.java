@@ -21,13 +21,13 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaCore;
 
 import com.zeroturnaround.alvor.cache.CacheService;
+import com.zeroturnaround.alvor.common.PositionUtil;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.common.logging.Timer;
 import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
 import com.zeroturnaround.alvor.gui.GuiChecker;
 import com.zeroturnaround.alvor.string.IPosition;
-import com.zeroturnaround.alvor.util.PositionUtil;
 
 public class AlvorBuilder extends IncrementalProjectBuilder {
 	public static final String BUILDER_ID = "com.zeroturnaround.alvor.builder.AlvorBuilder";

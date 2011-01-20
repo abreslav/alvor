@@ -40,4 +40,25 @@ public class AbstractStringCheckerManager {
 		}
 		return checkers;
 	}
+	
+//	public IAbstractStringChecker getStaticChecker() {
+//		// TODO yes, using instanceof would be more reliable but I don't want that dependency here
+//		// maybe should reorganize whole stuff and get rid of the extension point 
+//		// and use 
+//		return getChecker("Syntactical");
+//	}
+//	
+//	public IAbstractStringChecker getDynamicChecker() {
+//		return getChecker("Dynamic");
+//	}
+//	
+//	private IAbstractStringChecker getChecker(String namePart) {
+//		List<IAbstractStringChecker> checkers = this.getCheckers();
+//		for (IAbstractStringChecker checker : checkers) {
+//			if (checker.getClass().getName().contains(namePart)) {
+//				return checker;
+//			}
+//		}
+//		throw new IllegalArgumentException("Can't find checker '"+namePart+"'");
+//	}
 }

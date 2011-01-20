@@ -44,7 +44,7 @@ public interface ICacheService {
 	void addUnsupported(IPosition position, String message);
 
 	IScopedCache<HotspotPattern, IPosition> getHotspotCache();
-	IScopedCache<MethodInvocationDescriptor, IAbstractString> getMethodTemplateCache();
+	IScopedCache<IMethodInvocationDescriptor, IAbstractString> getMethodTemplateCache();
 
 	
 }

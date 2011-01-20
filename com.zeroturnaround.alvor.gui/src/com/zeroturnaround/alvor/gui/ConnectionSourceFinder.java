@@ -12,12 +12,12 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorPart;
 
+import com.zeroturnaround.alvor.common.PositionUtil;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.conntracker.ConnectionDescriptor;
 import com.zeroturnaround.alvor.conntracker.ConnectionTracker;
-import com.zeroturnaround.alvor.util.ASTUtil;
-import com.zeroturnaround.alvor.util.PositionUtil;
+import com.zeroturnaround.alvor.crawler.util.ASTUtil;
 
 public class ConnectionSourceFinder implements IEditorActionDelegate {
 	private static final ILog LOG = Logs.getLog(ConnectionSourceFinder.class);

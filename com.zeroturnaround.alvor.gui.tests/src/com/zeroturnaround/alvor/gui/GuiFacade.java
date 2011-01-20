@@ -12,7 +12,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 
-import com.zeroturnaround.alvor.util.PositionUtil;
+import com.zeroturnaround.alvor.common.PositionUtil;
 
 public class GuiFacade {
 	public static void executeAlvorCleanCheck(IProject project) throws Exception {

@@ -28,9 +28,9 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
+import com.zeroturnaround.alvor.crawler.util.ASTUtil;
+import com.zeroturnaround.alvor.crawler.util.UnsupportedStringOpExAtNode;
 import com.zeroturnaround.alvor.string.IPosition;
-import com.zeroturnaround.alvor.util.ASTUtil;
-import com.zeroturnaround.alvor.util.UnsupportedStringOpExAtNode;
 
 /*
  * getLastReachingModIn* methods stay in given scope

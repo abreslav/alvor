@@ -8,10 +8,10 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
 import com.zeroturnaround.alvor.cache.CacheService;
-import com.zeroturnaround.alvor.cache.MethodInvocationDescriptor;
+import com.zeroturnaround.alvor.cache.IMethodInvocationDescriptor;
 import com.zeroturnaround.alvor.string.IAbstractString;
 
-public class MethodTemplateSearcher extends CachedSearcher<MethodInvocationDescriptor, IAbstractString> {
+public class MethodTemplateSearcher extends CachedSearcher<IMethodInvocationDescriptor, IAbstractString> {
 	private AbstractStringEvaluator evaluator;
 	
 	public MethodTemplateSearcher(AbstractStringEvaluator evaluator) {
@@ -21,10 +21,14 @@ public class MethodTemplateSearcher extends CachedSearcher<MethodInvocationDescr
 	
 	@Override
 	protected void performSearchInScope(List<IJavaElement> scopeToSearchIn,
-			MethodInvocationDescriptor key, List<? super IAbstractString> values) {
+			IMethodInvocationDescriptor key, List<? super IAbstractString> values) {
 		
 		IJavaElement[] elems = scopeToSearchIn.toArray(new IJavaElement[scopeToSearchIn.size()]);
-		List<MethodDeclaration> decls = NodeSearchEngine.findMethodDeclarations(elems, key.getInvocation());
+		
+		assert (key instanceof MethodInvocationDescriptor);
+		MethodInvocation inv = ((MethodInvocationDescriptor)key).getInvocation();
+		
+		List<MethodDeclaration> decls = NodeSearchEngine.findMethodDeclarations(elems, inv);
 		for (MethodDeclaration decl : decls) {
 			IAbstractString template = evaluator.getMethodTemplate(decl, key.getGetArgIndex()); 
 			values.add(template);
@@ -36,7 +40,7 @@ public class MethodTemplateSearcher extends CachedSearcher<MethodInvocationDescr
 			MethodInvocation inv, int argPos) {
 		
 		List<IAbstractString> result = new ArrayList<IAbstractString>();
-		MethodInvocationDescriptor invDesc = new MethodInvocationDescriptor(inv, argPos);
+		IMethodInvocationDescriptor invDesc = new MethodInvocationDescriptor(inv, argPos);
 		
 		performCachedSearch(
 				NodeSearchEngine.getAllFilesInScope(scope), 

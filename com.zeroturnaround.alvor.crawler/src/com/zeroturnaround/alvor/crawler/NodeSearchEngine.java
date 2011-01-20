@@ -40,13 +40,13 @@ import org.eclipse.jdt.core.search.SearchRequestor;
 import com.zeroturnaround.alvor.cache.CacheService;
 import com.zeroturnaround.alvor.cache.ICacheService;
 import com.zeroturnaround.alvor.common.HotspotPattern;
+import com.zeroturnaround.alvor.common.PositionUtil;
 import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.common.logging.Measurements;
+import com.zeroturnaround.alvor.crawler.util.ASTUtil;
 import com.zeroturnaround.alvor.string.IPosition;
-import com.zeroturnaround.alvor.util.ASTUtil;
-import com.zeroturnaround.alvor.util.PositionUtil;
 
 /**
  * Implements some Java searches + Node searches required by AbstractStringEvaluator
@@ -201,7 +201,7 @@ public class NodeSearchEngine {
 
 				ASTNode arg = (ASTNode) arguments.get(requestedArgumentIndex - 1);
 				if (arg instanceof Expression) {
-					IPosition position = PositionUtil.getPosition(arg);
+					IPosition position = ASTUtil.getPosition(arg);
 					result.add(position);
 					assert LOG.message("PATTERN=" + getHotspotPatternSearchPatternString(hotspotPattern)
 							+ ", accepted match=" + PositionUtil.getLineString(position)
@@ -233,7 +233,8 @@ public class NodeSearchEngine {
 		}
 	}
 	
-	public static List<MethodDeclaration> findMethodDeclarations(IJavaElement[] searchScope, final MethodInvocation inv) {
+	public static List<MethodDeclaration> findMethodDeclarations(IJavaElement[] searchScope, 
+			final MethodInvocation inv) {
 		final List<MethodDeclaration> result = new ArrayList<MethodDeclaration>();
 		
 		String patternStr = inv.getName().getIdentifier()

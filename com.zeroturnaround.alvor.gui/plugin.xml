@@ -63,12 +63,6 @@
       </command>
       <command
             categoryId="org.eclipse.jdt.ui.category.source"
-            defaultHandler="com.zeroturnaround.alvor.gui.CheckResultSetsHandler"
-            id="com.zeroturnaround.alvor.gui.checkResultSets"
-            name="Check ResultSet-s">
-      </command>
-      <command
-            categoryId="org.eclipse.jdt.ui.category.source"
             defaultHandler="com.zeroturnaround.alvor.gui.CleanCheckHandler"
             id="com.zeroturnaround.alvor.plugin.CleanCheck"
             name="Check SQL">

@@ -2,8 +2,8 @@ package com.zeroturnaround.alvor.crawler;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 
+import com.zeroturnaround.alvor.crawler.util.ASTUtil;
 import com.zeroturnaround.alvor.string.IPosition;
-import com.zeroturnaround.alvor.util.PositionUtil;
 
 /*
  * Used for recording chain of analysis steps 
@@ -18,7 +18,7 @@ public class ContextLink {
 	public ContextLink(ASTNode node, ContextLink prevLink) {
 		this.prevLink = prevLink;
 		this.node = node;
-		this.pos = PositionUtil.getPosition(node);
+		this.pos = ASTUtil.getPosition(node);
 	}
 	
 	public ASTNode getNode() {

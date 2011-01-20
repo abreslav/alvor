@@ -1,4 +1,4 @@
-package com.zeroturnaround.alvor.util;
+package com.zeroturnaround.alvor.crawler.util;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -12,7 +12,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 
-public class EclipseUtil {
+public class JavaProjectUtil {
 	public static Set<IJavaProject> getAllRequiredProjects(IJavaProject project) {
 		Set<IJavaProject> reqs = new HashSet<IJavaProject>();
 		try {
