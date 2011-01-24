@@ -5,13 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
@@ -20,6 +17,7 @@ import com.zeroturnaround.alvor.checkers.AbstractStringCheckingResult;
 import com.zeroturnaround.alvor.checkers.AbstractStringWarning;
 import com.zeroturnaround.alvor.checkers.complex.ComplexChecker;
 import com.zeroturnaround.alvor.common.NodeDescriptor;
+import com.zeroturnaround.alvor.common.PositionUtil;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
@@ -45,10 +43,8 @@ import com.zeroturnaround.alvor.string.util.AbstractStringOptimizer;
 public class GuiChecker {
 	private static final ILog LOG = Logs.getLog(GuiChecker.class);
 	
-	@Deprecated
-	private IProject currentProject;
-	
 	private ComplexChecker complexChecker = new ComplexChecker();
+	
 	
 	public void performCleanCheck(IProject optionsFrom, IJavaElement[] scope) {
 		NodeSearchEngine.clearASTCache();
@@ -59,28 +55,24 @@ public class GuiChecker {
 	/**
 	 * NB! Before calling this you should take care that NodeSearchEngine's ASTCache doesn't
 	 * contain old stuff (either clear it completely or remove expired AST-s)
-	 * 
-	 * Also, it's assumed that sqlchecker.properties for the project exists
 	 */
-	public void performIncrementalCheck(IProject optionsFrom, IJavaElement[] scope) {
+	public void performIncrementalCheck(IProject currentProject, IJavaElement[] scope) {
 		
 		if (scope.length == 0) {
 			return;
 		}
 		
-		this.currentProject = optionsFrom;
-		
 		cleanMarkers(scope);
-		cleanConfigurationMarkers(optionsFrom);
+		cleanConfigurationMarkers(currentProject);
 		
-		ProjectConfiguration conf = ConfigurationManager.readProjectConfiguration(optionsFrom, true);
+		ProjectConfiguration conf = ConfigurationManager.readProjectConfiguration(currentProject, true);
 		List<NodeDescriptor> hotspots = AbstractStringEvaluator.findAndEvaluateHotspots(scope, conf);
 		markHotspots(hotspots);
 		
 		Collection<AbstractStringCheckingResult> checkingResults = 
 			complexChecker.checkNodeDescriptors(hotspots, conf);
 		
-		createErrorAndWarningMarkers(checkingResults);
+		createErrorAndWarningMarkers(checkingResults, currentProject);
 	}
 
 	
@@ -108,19 +100,20 @@ public class GuiChecker {
 	}
 	
 	private static void createMarker(String message, String markerType, IPosition pos) {
-		Map<String, Comparable<?>> map = new HashMap<String, Comparable<?>>();
 	
-		if (!AlvorGuiPlugin.HOTSPOT_MARKER_ID.equals(markerType)) {
-			int severity = markerType.equals(AlvorGuiPlugin.WARNING_MARKER_ID) ? 
-					IMarker.SEVERITY_WARNING : IMarker.SEVERITY_ERROR;
-			map.put(IMarker.SEVERITY, new Integer(severity));
-		}
+		Integer severity = null;
 		
-		createMarker(message, markerType, pos, map);
+		if (markerType.equals(AlvorGuiPlugin.ERROR_MARKER_ID)) {
+			severity = IMarker.SEVERITY_ERROR;
+		}
+		else if (markerType.equals(AlvorGuiPlugin.WARNING_MARKER_ID)) {
+			severity = IMarker.SEVERITY_WARNING;
+		} 
+		
+		createMarker(message, markerType, severity, pos);
 	}
 
-	private static void createMarker(String message, String markerType,
-			IPosition pos, Map<String, Comparable<?>> map) {
+	private static void createMarker(String message, String markerType, Integer severity, IPosition pos) {
 		
 		if (DummyPosition.isDummyPosition(pos)) {
 			// TODO get rid of this situation
@@ -128,42 +121,48 @@ public class GuiChecker {
 			return;
 		}
 		
-		if (map == null) {
-			map = new HashMap<String, Comparable<?>>();
+		// collect attributes of markers into this map
+		Map<String, Comparable<?>> map = new HashMap<String, Comparable<?>>();
+		if (severity != null) {
+			map.put(IMarker.SEVERITY, severity);
 		}
 		
-		IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(Path.fromPortableString(pos.getPath()));
-		int charStart = pos.getStart();
-		int charEnd = charStart + pos.getLength();
-
-//		LOG.message("creating marker: " + message + ", file=" + file
-//				+ ", charStart=" + charStart + ", charEnd=" + charEnd + ", type=" + markerType);
-		
+		// Seems that markers with too long messages are not shown
 		String finalMessage = message;
 		if (message.length() > 800) {
 			finalMessage = message.substring(0, 800) + "...";
 		}
-		
 		MarkerUtilities.setMessage(map, finalMessage);
+		
+		
+		IResource res = PositionUtil.getPositionResource(pos);
+		map.put(IMarker.LOCATION, res.getFullPath().toString());
+		
+		
+		// include position info only when there is proper position given
+		int charStart = pos.getStart();
+		int charEnd = charStart + pos.getLength();
 		if (charStart > 0 || charEnd > 0) { 
 			MarkerUtilities.setCharStart(map, charStart);
 			MarkerUtilities.setCharEnd(map, charEnd);
 		}
-		map.put(IMarker.LOCATION, file.getFullPath().toString());
+
+		
 		try {
-			MarkerUtilities.createMarker(file, map, markerType);
+			MarkerUtilities.createMarker(res, map, markerType);
 		} catch (Exception e) {
 			LOG.exception(e);
 		}
 	}
 	
-	private void createErrorAndWarningMarkers(Collection<AbstractStringCheckingResult> checkingResults) {
+	private void createErrorAndWarningMarkers(Collection<AbstractStringCheckingResult> checkingResults,
+			IProject currentProject) {
 		for (AbstractStringCheckingResult result : checkingResults) {
 			String markerId = AlvorGuiPlugin.ERROR_MARKER_ID;
 			if (result instanceof AbstractStringWarning) {
 				markerId = AlvorGuiPlugin.WARNING_MARKER_ID;
 			}
-			createMarker(result.getMessage(), markerId, preparePosition(result.getPosition()));				
+			createMarker(result.getMessage(), markerId, preparePosition(result.getPosition(), currentProject));				
 		}
 	}
 
@@ -203,7 +202,7 @@ public class GuiChecker {
 			@Override
 			public Void visitStringCharacterSet(
 					StringCharacterSet characterSet, Void data) {
-				createMarker("", AlvorGuiPlugin.STRING_MARKER_ID, preparePosition(characterSet.getPosition()));
+				createMarker("", AlvorGuiPlugin.STRING_MARKER_ID, preparePosition(characterSet.getPosition(), null));
 				return null;
 			}
 
@@ -218,7 +217,7 @@ public class GuiChecker {
 			@Override
 			public Void visitStringConstant(StringConstant stringConstant,
 					Void data) {
-				createMarker("", AlvorGuiPlugin.STRING_MARKER_ID, preparePosition(stringConstant.getPosition()));
+				createMarker("", AlvorGuiPlugin.STRING_MARKER_ID, preparePosition(stringConstant.getPosition(), null));
 				return null;
 			}
 
@@ -253,9 +252,12 @@ public class GuiChecker {
 		abstractValue.accept(visitor, null);
 	}
 
-	private IPosition preparePosition(IPosition pos) {
+	private IPosition preparePosition(IPosition pos, IProject currentProject) {
 		if (pos == null) {
-			return new Position(this.currentProject.getFullPath().toPortableString(), 0, 0);
+			if (currentProject == null) {
+				throw new IllegalArgumentException("Can't create marker when both position and project are null");
+			}
+			return new Position(currentProject.getFullPath().toPortableString(), 0, 0);
 		}
 		else {
 			return pos;
