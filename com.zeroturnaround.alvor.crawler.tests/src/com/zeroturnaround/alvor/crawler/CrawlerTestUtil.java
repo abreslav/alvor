@@ -7,9 +7,6 @@ import java.util.List;
 import java.util.Scanner;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 
 public class CrawlerTestUtil {
 	
@@ -57,15 +54,6 @@ public class CrawlerTestUtil {
 		File folder = project.getLocation().append("AlvorSelfTestResults").toFile();
 		folder.mkdirs();
 		return folder;
-	}
-
-	public static IProject getProject(String projectName) throws CoreException {
-		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		IProject project = root.getProject(projectName);
-		if (!project.isOpen()) {
-			project.open(null);
-		}
-		return project;
 	}
 	
 }

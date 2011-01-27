@@ -13,5 +13,6 @@ public interface ILog {
 	boolean format(String format, Object... args);
 
 	void error(String message, Throwable e);
+	void error(String message);
 	void exception(Throwable e);
 }

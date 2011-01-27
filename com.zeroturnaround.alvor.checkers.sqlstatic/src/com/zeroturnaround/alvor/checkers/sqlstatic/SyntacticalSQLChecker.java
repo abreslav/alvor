@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.zeroturnaround.alvor.checkers.AbstractStringCheckingResult;
-import com.zeroturnaround.alvor.checkers.AbstractStringError;
-import com.zeroturnaround.alvor.checkers.AbstractStringWarning;
+import com.zeroturnaround.alvor.checkers.HotspotCheckingResult;
+import com.zeroturnaround.alvor.checkers.HotspotError;
+import com.zeroturnaround.alvor.checkers.HotspotWarning;
 import com.zeroturnaround.alvor.checkers.CheckerException;
 import com.zeroturnaround.alvor.checkers.IAbstractStringChecker;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
@@ -40,20 +40,20 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 	private static int SIZE_THRESHOLD = 25000;
 	
 	@Override
-	public Collection<AbstractStringCheckingResult> checkAbstractStrings(List<StringNodeDescriptor> descriptors,
+	public Collection<HotspotCheckingResult> checkAbstractStrings(List<StringNodeDescriptor> descriptors,
 			ProjectConfiguration configuration) throws CheckerException {
-		List<AbstractStringCheckingResult> result = new ArrayList<AbstractStringCheckingResult>();
+		List<HotspotCheckingResult> result = new ArrayList<HotspotCheckingResult>();
 		for (final StringNodeDescriptor descriptor : descriptors) {
 			result.addAll(checkAbstractString(descriptor, configuration));
 		}
 		return result;
 	}
 
-	private Collection<AbstractStringCheckingResult> checkStringOfAppropriateSize(
+	private Collection<HotspotCheckingResult> checkStringOfAppropriateSize(
 			final StringNodeDescriptor descriptor,
 			IAbstractString abstractString) throws CheckerException {
 		
-		final List<AbstractStringCheckingResult> result = new ArrayList<AbstractStringCheckingResult>();
+		final List<HotspotCheckingResult> result = new ArrayList<HotspotCheckingResult>();
 		
 		try {
 			State automaton = PositionedCharacterUtil.createPositionedAutomaton(abstractString);
@@ -66,7 +66,7 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 					String counterExample = PositionedCharacterUtil.renderCounterExample(counterExampleList);
 					Collection<IPosition> markerPositions = PositionedCharacterUtil.getMarkerPositions(((Token) item).getText());
 					for (IPosition pos : markerPositions) {
-						result.add(new AbstractStringError(
+						result.add(new HotspotError(
 								"SQL syntax checker: Unexpected token: " + PositionedCharacterUtil.render(item) 
 								+ "\n" + "    Counter example: " + counterExample
 								, 
@@ -77,14 +77,14 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 				@Override
 				public void other(
 						List<? extends IAbstractInputItem> counterExample) {
-					result.add(new AbstractStringError("SQL syntax checker: Syntax error. Most likely, unfinished query", 
+					result.add(new HotspotError("SQL syntax checker: Syntax error. Most likely, unfinished query", 
 							descriptor.getPosition()));
 				}
 
 				@Override
 				public void overabstraction(
 						List<? extends IAbstractInputItem> counterExample) {
-					result.add(new AbstractStringError("SQL syntax checker: Syntactic analysis failed: nesting is too deep in this sentence", 
+					result.add(new HotspotError("SQL syntax checker: Syntactic analysis failed: nesting is too deep in this sentence", 
 							descriptor.getPosition()));
 				}
 			});
@@ -93,7 +93,7 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 			if (errorPosition == null) {
 				errorPosition = descriptor.getPosition(); 
 			}
-			result.add(new AbstractStringError("SQL syntax checker: Malformed literal: " 
+			result.add(new HotspotError("SQL syntax checker: Malformed literal: " 
 					+ e.getMessage(), errorPosition));
 		} catch (StackOverflowError e) {  
 			// TODO: This hack is no good (see the method above)
@@ -114,11 +114,11 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 	}
 
 	@Override
-	public Collection<AbstractStringCheckingResult> checkAbstractString(StringNodeDescriptor descriptor,
+	public Collection<HotspotCheckingResult> checkAbstractString(StringNodeDescriptor descriptor,
 			ProjectConfiguration configuration)
 			throws CheckerException {
 		
-		List<AbstractStringCheckingResult> errors = new ArrayList<AbstractStringCheckingResult>();
+		List<HotspotCheckingResult> errors = new ArrayList<HotspotCheckingResult>();
 		
 		IAbstractString abstractString = descriptor.getAbstractValue();
 		if (!hasAcceptableSize(abstractString)) {
@@ -140,11 +140,11 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 					}
 				}
 				if (hasBigSubstrings) {
-					errors.add(new AbstractStringWarning("SQL syntax checker: SQL string has too many possible variations" 
+					errors.add(new HotspotWarning("SQL syntax checker: SQL string has too many possible variations" 
 							+ (hasSmallSubstrings ? ". Only some are checked" : ""), descriptor.getPosition()));
 				}
 			} else {
-				errors.add(new AbstractStringWarning("SQL syntax checker: SQL string has too many possible variations", 
+				errors.add(new HotspotWarning("SQL syntax checker: SQL string has too many possible variations", 
 						descriptor.getPosition()));
 			}
 		} else {
@@ -153,7 +153,7 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 			} catch (StackOverflowError e) {
 				// The analyzer has caused a stack overflow in the dfs-based evaluation procedure.
 				// See FixpointParser class
-				errors.add(new AbstractStringWarning("SQL syntax checker: SQL string has too many possible variations", descriptor.getPosition()));
+				errors.add(new HotspotWarning("SQL syntax checker: SQL string has too many possible variations", descriptor.getPosition()));
 			}
 		}
 		return errors;

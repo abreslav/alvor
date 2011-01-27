@@ -5,9 +5,10 @@ import java.util.Collection;
 import java.util.List;
 
 import com.zeroturnaround.alvor.checkers.AbstractStringCheckerManager;
-import com.zeroturnaround.alvor.checkers.AbstractStringCheckingResult;
-import com.zeroturnaround.alvor.checkers.AbstractStringError;
-import com.zeroturnaround.alvor.checkers.AbstractStringWarning;
+import com.zeroturnaround.alvor.checkers.HotspotCheckingResult;
+import com.zeroturnaround.alvor.checkers.HotspotError;
+import com.zeroturnaround.alvor.checkers.HotspotInfo;
+import com.zeroturnaround.alvor.checkers.HotspotWarning;
 import com.zeroturnaround.alvor.checkers.CheckerException;
 import com.zeroturnaround.alvor.checkers.IAbstractStringChecker;
 import com.zeroturnaround.alvor.checkers.sqldynamic.DynamicSQLChecker;
@@ -23,10 +24,7 @@ import com.zeroturnaround.alvor.configuration.DataSourceProperties;
 import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
 
 /**
- * This is main class
- * - finds hotspots
- * - creates abstract strings
- * - runs checkers 
+ * This class combines static and dynamic checking
  * 
  */
 public class ComplexChecker {
@@ -35,13 +33,12 @@ public class ComplexChecker {
 	private static final ILog HOTSPOTS_LOG = Logs.getLog("Hotspots");
 	
 
-	public Collection<AbstractStringCheckingResult> checkNodeDescriptors(List<NodeDescriptor> hotspots, 
+	public Collection<HotspotCheckingResult> checkNodeDescriptors(List<NodeDescriptor> hotspots, 
 		ProjectConfiguration configuration) {
 		
-//		Map<String, Integer> connMap = new Hashtable<String, Integer>();
 		int unsupportedCount = 0;
 		
-		Collection<AbstractStringCheckingResult> results = new ArrayList<AbstractStringCheckingResult>();
+		Collection<HotspotCheckingResult> results = new ArrayList<HotspotCheckingResult>();
 		List<IAbstractStringChecker> checkers = AbstractStringCheckerManager.INSTANCE.getCheckers();
 		
 		List<StringNodeDescriptor> validHotspots = new ArrayList<StringNodeDescriptor>();
@@ -52,14 +49,6 @@ public class ComplexChecker {
 				HOTSPOTS_LOG.message("STRING node desc, file=" + PositionUtil.getLineString(hotspot.getPosition())
 						+ ", str=" + ((StringNodeDescriptor) hotspot).getAbstractValue());
 				
-				
-//				// collect connection info
-//				ConnectionDescriptor connDesc = 
-//					ConnectionTracker.getConnectionDescriptorForHotspot(hotspot.getPosition());
-//				
-//				String exp = connDesc.getExpression();
-//				Integer prevCount = connMap.get(exp);
-//				connMap.put(exp, prevCount == null ? 1 : prevCount + 1);
 			}
 			else if (hotspot instanceof UnsupportedNodeDescriptor) {
 				UnsupportedNodeDescriptor und = (UnsupportedNodeDescriptor) hotspot; 
@@ -71,7 +60,7 @@ public class ComplexChecker {
 				if (und.getErrorPosition() != null && !und.getPosition().equals(und.getErrorPosition())) {
 					msg += " at: " + PositionUtil.getLineString(und.getErrorPosition());
 				}
-				results.add(new AbstractStringWarning(msg, hotspot.getPosition()));
+				results.add(new HotspotWarning(msg, hotspot.getPosition()));
 			}
 			else {
 				throw new IllegalArgumentException("Unknown type of INodeTypeDescriptor: " + hotspot.getClass().getName());
@@ -83,17 +72,10 @@ public class ComplexChecker {
 				+ validHotspots.size() + " of them with valid abstract strings, "
 				+ "unsupported cases: " + unsupportedCount);
 
-		
-		
-//		LOG.message("CONNECTION DESCRIPTORS");
-//		for (Map.Entry<String, Integer> entry : connMap.entrySet()) {
-//			LOG.message("COUNT: " + entry.getValue() + ", EXP: " + entry.getKey());
-//		}
-		
 		return results;
 	}
 
-	private Collection<AbstractStringCheckingResult> checkStringNodeDescriptors(
+	private Collection<HotspotCheckingResult> checkStringNodeDescriptors(
 			List<StringNodeDescriptor> hotspots, 
 			List<IAbstractStringChecker> checkers, 
 			ProjectConfiguration configuration) {
@@ -101,10 +83,10 @@ public class ComplexChecker {
 		Timer timer = new Timer();
 		timer.start("TIMER checking");
 		
-		Collection<AbstractStringCheckingResult> results = new ArrayList<AbstractStringCheckingResult>();
+		Collection<HotspotCheckingResult> results = new ArrayList<HotspotCheckingResult>();
 		
 		if (!dynamicCheckerIsConfigured(configuration)) {
-			results.add(new AbstractStringWarning("SQL checker: Test-database is not configured, SQL testing is not performed",
+			results.add(new HotspotInfo("Alvor: Test-database is not configured, SQL testing is not performed",
 					null));
 		}
 		
@@ -144,23 +126,23 @@ public class ComplexChecker {
 			}
 		}
 		catch (CheckerException e) {
-			results.add(new AbstractStringError("SQL checker exception: " + e.getMessage(), e.getPosition()));
+			results.add(new HotspotError("SQL checker exception: " + e.getMessage(), e.getPosition()));
 		}
 		
 		timer.printTime();
 		return results;
 	}
 	
-	private Collection<AbstractStringCheckingResult> checkStringNodeDescriptorsWithAllCheckers(
+	private Collection<HotspotCheckingResult> checkStringNodeDescriptorsWithAllCheckers(
 			List<StringNodeDescriptor> hotspots, 
 			List<IAbstractStringChecker> checkers, 
 			ProjectConfiguration configuration) throws CheckerException {
 		
-		Collection<AbstractStringCheckingResult> results = new ArrayList<AbstractStringCheckingResult>();
+		Collection<HotspotCheckingResult> results = new ArrayList<HotspotCheckingResult>();
 		for (IAbstractStringChecker checker : checkers) {
 			if (checker instanceof DynamicSQLChecker 
 					&& !dynamicCheckerIsConfigured(configuration)) {
-				results.add(new AbstractStringWarning("SQL checker: testing database is not configured", null));
+				results.add(new HotspotWarning("SQL checker: testing database is not configured", null));
 				
 			} else {
 				Timer timer = new Timer();
@@ -178,15 +160,15 @@ public class ComplexChecker {
 			&& props.getDriverName() != null && !props.getDriverName().trim().isEmpty();
 	}
 	
-	private Collection<AbstractStringCheckingResult> checkStringNodeDescriptorsPreferDynamic(
+	private Collection<HotspotCheckingResult> checkStringNodeDescriptorsPreferDynamic(
 			List<StringNodeDescriptor> descriptors, 
 			IAbstractStringChecker dynamicChecker, 
 			IAbstractStringChecker staticChecker, 
 			ProjectConfiguration configuration) {
 		
-		Collection<AbstractStringCheckingResult> results = new ArrayList<AbstractStringCheckingResult>();
+		Collection<HotspotCheckingResult> results = new ArrayList<HotspotCheckingResult>();
 		for (StringNodeDescriptor descriptor : descriptors) {
-			Collection<AbstractStringCheckingResult> nodeResults = new ArrayList<AbstractStringCheckingResult>();
+			Collection<HotspotCheckingResult> nodeResults = new ArrayList<HotspotCheckingResult>();
 			try {
 				if (dynamicCheckerIsConfigured(configuration)) {
 					// use staticChecker only when dynamic gives error
@@ -202,7 +184,7 @@ public class ComplexChecker {
 				}
 			} catch (Exception e) {
 				LOG.exception(e);
-				nodeResults.add(new AbstractStringWarning("Error during checking: " + e.getMessage(), 
+				nodeResults.add(new HotspotWarning("Error during checking: " + e.getMessage(), 
 						descriptor.getPosition()));
 			}
 			results.addAll(nodeResults);
@@ -211,15 +193,15 @@ public class ComplexChecker {
 	}
 	
 	
-	private Collection<AbstractStringCheckingResult> checkStringNodeDescriptorsPreferStatic(
+	private Collection<HotspotCheckingResult> checkStringNodeDescriptorsPreferStatic(
 			List<StringNodeDescriptor> descriptors, 
 			IAbstractStringChecker dynamicChecker, 
 			IAbstractStringChecker staticChecker, 
 			ProjectConfiguration configuration) {
 		
-		Collection<AbstractStringCheckingResult> results = new ArrayList<AbstractStringCheckingResult>();
+		Collection<HotspotCheckingResult> results = new ArrayList<HotspotCheckingResult>();
 		for (StringNodeDescriptor descriptor : descriptors) {
-			Collection<AbstractStringCheckingResult> nodeResults = new ArrayList<AbstractStringCheckingResult>();
+			Collection<HotspotCheckingResult> nodeResults = new ArrayList<HotspotCheckingResult>();
 			try {
 				// use dynamic only when static didn't find anything wrong, or when it crashed
 				// note that logic is different compared to PreferDynamic case
@@ -234,7 +216,7 @@ public class ComplexChecker {
 			} catch (Exception e) {
 				// should be able to proceed with next descriptors using static checker
 				LOG.exception(e);
-				nodeResults.add(new AbstractStringWarning("Error during checking: " + e.getMessage(), 
+				nodeResults.add(new HotspotWarning("Error during checking: " + e.getMessage(), 
 						descriptor.getPosition()));
 			}
 			results.addAll(nodeResults);

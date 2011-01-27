@@ -192,7 +192,7 @@ public class AlvorBuilder extends IncrementalProjectBuilder {
 			}
 			checker.performIncrementalCheck(getProject(), elements);
 		} catch (Throwable e) {
-			LOG.error("ESQLBuilder.checkResources", e);
+			LOG.error("AlvorBuilder.checkResources", e);
 		} 
 	}
 

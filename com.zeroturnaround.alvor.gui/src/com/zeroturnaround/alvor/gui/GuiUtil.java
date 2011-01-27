@@ -58,7 +58,7 @@ public class GuiUtil {
 		throw new IllegalAccessException("Can't find selected Java element");
 	}
 	
-	public static void ShowInfoDialog(final String msg) {
+	public static void showInfoDialog(final String msg) {
 		IWorkbenchWindow win = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		if (win != null) {
 			Shell shell = win.getShell();
@@ -76,7 +76,7 @@ public class GuiUtil {
 		}
 	}
 	
-	public static void ShowErrorDialog(final String msg, Throwable e) {
+	public static void showErrorDialog(final String msg, Throwable e) {
 		final IStatus status = new Status(IStatus.ERROR, "com.zeroturnaround.alvor.gui", 1, "Error", e);
 		
 		IWorkbenchWindow win = PlatformUI.getWorkbench().getActiveWorkbenchWindow();

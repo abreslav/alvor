@@ -16,6 +16,7 @@ import com.zeroturnaround.alvor.common.NodeDescriptor;
 import com.zeroturnaround.alvor.common.PositionUtil;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
+import com.zeroturnaround.alvor.common.WorkspaceUtil;
 import com.zeroturnaround.alvor.configuration.ConfigurationManager;
 import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
 import com.zeroturnaround.alvor.string.IAbstractString;
@@ -29,7 +30,7 @@ public abstract class AbstractStringEvaluatorTest {
 	protected void findAndValidateNodeDescriptors(String projectName) {
 		try {
 			List<NodeDescriptor> descriptors;
-			IProject project = CrawlerTestUtil.getProject(projectName);
+			IProject project = WorkspaceUtil.getProject(projectName);
 			descriptors = getNodeDescriptors(project);
 			validateNodeDescriptors(descriptors, project);
 		} catch (Exception e) {
