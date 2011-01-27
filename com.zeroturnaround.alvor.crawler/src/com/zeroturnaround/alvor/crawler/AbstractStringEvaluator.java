@@ -42,7 +42,7 @@ import com.zeroturnaround.alvor.common.logging.Measurements;
 import com.zeroturnaround.alvor.common.logging.Timer;
 import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
 import com.zeroturnaround.alvor.crawler.util.ASTUtil;
-import com.zeroturnaround.alvor.crawler.util.JavaProjectUtil;
+import com.zeroturnaround.alvor.crawler.util.JavaModelUtil;
 import com.zeroturnaround.alvor.crawler.util.UnsupportedStringOpExAtNode;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.IPosition;
@@ -381,7 +381,7 @@ public class AbstractStringEvaluator {
 		MethodTemplateSearcher templateSearcher = new MethodTemplateSearcher(this);
 		List<IAbstractString> templates = 
 			templateSearcher.findMethodTemplates(
-					JavaProjectUtil.scopeToProjectAndRequiredProjectsScope(scope),
+					JavaModelUtil.scopeToProjectAndRequiredProjectsScope(scope),
 					inv, argumentIndex);
 		
 		if (templates.size() == 0) {

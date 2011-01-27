@@ -78,4 +78,9 @@ public class LogImpl implements ILog {
 		fileStream.flush();
 		System.err.flush();
 	}
+
+	@Override
+	public void error(String message) {
+		error(message, null);
+	}
 }

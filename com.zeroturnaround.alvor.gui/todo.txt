@@ -1,19 +1,20 @@
 TODO
 -------
-* make checkers return errors instead of calling handlers
-* get rid of main ??
+* Use TDD to clean up cache/search/crawling 
+
+
+
 * create markers for passed strings
 
-By Jan 15
----------
 # Investigate current tests, start adding missing ones and get a nicer big picture 
 * Add change tests?
 * Find and fix cache problems
-
 * Test and Fix new bugs
 * Fix the terms/meanings of hotspot vs hotspot-method
 
 * What's the ratio of right/wrong search matches ?
+
+* Don't run static checker when dynamic gives error about names ??
 
 (* Investigate Andrey's addition)
 (* Separate grammars)
@@ -25,11 +26,12 @@ By Jan 15
 * change builder to first store names of changed files and process them only
   when there's no java errors and automatic checking is configured
 
+* get rid of zip-error in earved (try fixing NodeSearchEngine.getAllFilesInScope)
+
+* test source-file finder
 
 
 * "A full rebuild is required to ..., do the build now?"
-
-* organize options like "loops enabled"
 
 * tie marker tests with crawler test
 
@@ -41,6 +43,7 @@ By Jan 22
 * Complete configuration UI
 * Write separate Oracle grammar
 * Do more demos in WM
+* set up feedback system
 
 
 By Jan 29
@@ -64,3 +67,5 @@ End of Feb
 Sometime
 ----------
 * Make Cache independent of JDT
+* organize options like "loops enabled"
+

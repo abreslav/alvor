@@ -1,5 +1,6 @@
 package com.zeroturnaround.alvor.gui.configuration;
 
+import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -11,6 +12,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
+import com.zeroturnaround.alvor.builder.AlvorBuilder;
 import com.zeroturnaround.alvor.builder.AlvorNature;
 import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
 
@@ -29,11 +31,7 @@ public class MainPropertyPage extends CommonPropertyPage {
 		natureCheckbox = new Button(composite, SWT.CHECK);
 		natureCheckbox.setText("Plug Alvor to project's build process");
 		// initialize check-box
-		try {
-			natureCheckbox.setSelection(this.getSelectedProject().hasNature(AlvorNature.NATURE_ID));
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
+		natureCheckbox.setSelection(this.builderAndNatureAreInstalled());
 		natureCheckbox.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -62,20 +60,38 @@ public class MainPropertyPage extends CommonPropertyPage {
 	
 	@Override
 	public boolean saveState() {
-		try {
-			if (natureCheckbox.getSelection() != getSelectedProject().hasNature(AlvorNature.NATURE_ID)) {
-				AlvorNature.toggleNature(getSelectedProject());
-				// build can start at this point
-			}
-		} catch (CoreException e) {
-			e.printStackTrace();
+		if (natureCheckbox.getSelection() != this.builderAndNatureAreInstalled()) {
+			AlvorNature.toggleNature(getSelectedProject());
+			// build can start at this point
 		}
-		
 		return super.saveState();
 	}
 	
 	@Override
 	protected void mergeChanges(ProjectConfiguration base) {
 		// this page doesn't affect configuration in ProjectConfiguration
+	}
+	
+	private boolean builderAndNatureAreInstalled() {
+		try {
+			boolean natureIsInstalled = this.getSelectedProject().hasNature(AlvorNature.NATURE_ID);
+			boolean builderIsInstalled = false;
+			ICommand[] commands = this.getSelectedProject().getDescription().getBuildSpec();
+			for (int i = 0; i < commands.length; ++i) {
+				if (commands[i].getBuilderName().equals(AlvorBuilder.BUILDER_ID)) {
+					builderIsInstalled = true;
+					break;
+				}
+			}
+		
+			
+			if (natureIsInstalled && !builderIsInstalled
+					|| !natureIsInstalled && builderIsInstalled) {
+				LOG.error("Builder and Nature disagree", null);
+			}
+			return natureIsInstalled && builderIsInstalled;
+		} catch (CoreException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

@@ -40,7 +40,7 @@ import com.zeroturnaround.alvor.common.logging.Logs;
  * 2) Knows about configuration-file locations 
  */
 public class ConfigurationManager {
-	private static final String CONF_FILE_NAME = "alvor.xml";
+	private static final String CONF_FILE_NAME = ".alvor";
 	private static final String SAMPLE_CONF = "/res/default-configuration.xml"; 
 	protected final static ILog LOG = Logs.getLog(ConfigurationManager.class);
 

@@ -7,7 +7,6 @@ import org.eclipse.jdt.core.IJavaElement;
 
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
-//import com.zeroturnaround.alvor.common.logging.Timer;
 
 public class CleanCheckHandler extends AbstractHandler {
 	GuiChecker checker = new GuiChecker();
@@ -16,6 +15,7 @@ public class CleanCheckHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
+		
 		try {
 //			assert LOG.message("MEM: totalMemory() == " + Runtime.getRuntime().totalMemory());
 //			assert LOG.message("MEM: maxMemory() == " + Runtime.getRuntime().maxMemory());

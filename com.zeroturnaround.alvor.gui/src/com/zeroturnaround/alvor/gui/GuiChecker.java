@@ -13,8 +13,10 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
 import com.zeroturnaround.alvor.cache.CacheService;
-import com.zeroturnaround.alvor.checkers.AbstractStringCheckingResult;
-import com.zeroturnaround.alvor.checkers.AbstractStringWarning;
+import com.zeroturnaround.alvor.checkers.HotspotCheckingResult;
+import com.zeroturnaround.alvor.checkers.HotspotError;
+import com.zeroturnaround.alvor.checkers.HotspotInfo;
+import com.zeroturnaround.alvor.checkers.HotspotWarning;
 import com.zeroturnaround.alvor.checkers.complex.ComplexChecker;
 import com.zeroturnaround.alvor.common.NodeDescriptor;
 import com.zeroturnaround.alvor.common.PositionUtil;
@@ -57,7 +59,6 @@ public class GuiChecker {
 	 * contain old stuff (either clear it completely or remove expired AST-s)
 	 */
 	public void performIncrementalCheck(IProject currentProject, IJavaElement[] scope) {
-		
 		if (scope.length == 0) {
 			return;
 		}
@@ -69,10 +70,10 @@ public class GuiChecker {
 		List<NodeDescriptor> hotspots = AbstractStringEvaluator.findAndEvaluateHotspots(scope, conf);
 		markHotspots(hotspots);
 		
-		Collection<AbstractStringCheckingResult> checkingResults = 
+		Collection<HotspotCheckingResult> checkingResults = 
 			complexChecker.checkNodeDescriptors(hotspots, conf);
 		
-		createErrorAndWarningMarkers(checkingResults, currentProject);
+		createCheckingMarkers(checkingResults, currentProject);
 	}
 
 	
@@ -99,20 +100,6 @@ public class GuiChecker {
 		}
 	}
 	
-	private static void createMarker(String message, String markerType, IPosition pos) {
-	
-		Integer severity = null;
-		
-		if (markerType.equals(AlvorGuiPlugin.ERROR_MARKER_ID)) {
-			severity = IMarker.SEVERITY_ERROR;
-		}
-		else if (markerType.equals(AlvorGuiPlugin.WARNING_MARKER_ID)) {
-			severity = IMarker.SEVERITY_WARNING;
-		} 
-		
-		createMarker(message, markerType, severity, pos);
-	}
-
 	private static void createMarker(String message, String markerType, Integer severity, IPosition pos) {
 		
 		if (DummyPosition.isDummyPosition(pos)) {
@@ -155,14 +142,26 @@ public class GuiChecker {
 		}
 	}
 	
-	private void createErrorAndWarningMarkers(Collection<AbstractStringCheckingResult> checkingResults,
+	private void createCheckingMarkers(Collection<HotspotCheckingResult> checkingResults,
 			IProject currentProject) {
-		for (AbstractStringCheckingResult result : checkingResults) {
-			String markerId = AlvorGuiPlugin.ERROR_MARKER_ID;
-			if (result instanceof AbstractStringWarning) {
-				markerId = AlvorGuiPlugin.WARNING_MARKER_ID;
+		for (HotspotCheckingResult result : checkingResults) {
+			String markerId = null; 
+			Integer severity = null;
+			
+			if (result instanceof HotspotError) {
+				markerId = AlvorGuiPlugin.ERROR_MARKER_ID;
+				severity = IMarker.SEVERITY_ERROR;  
 			}
-			createMarker(result.getMessage(), markerId, preparePosition(result.getPosition(), currentProject));				
+			else if (result instanceof HotspotWarning) {
+				markerId = AlvorGuiPlugin.WARNING_MARKER_ID;
+				severity = IMarker.SEVERITY_WARNING;  
+			}
+			else if (result instanceof HotspotInfo) {
+				markerId = AlvorGuiPlugin.WARNING_MARKER_ID;
+				severity = IMarker.SEVERITY_INFO;  
+			}
+			createMarker(result.getMessage(), markerId, severity, 
+					preparePosition(result.getPosition(), currentProject));				
 		}
 	}
 
@@ -188,7 +187,8 @@ public class GuiChecker {
 			}
 			createMarker(
 					message, 
-					markerId, 
+					markerId,
+					IMarker.SEVERITY_INFO,
 					hotspot.getPosition());
 		}		
 	}
@@ -202,7 +202,7 @@ public class GuiChecker {
 			@Override
 			public Void visitStringCharacterSet(
 					StringCharacterSet characterSet, Void data) {
-				createMarker("", AlvorGuiPlugin.STRING_MARKER_ID, preparePosition(characterSet.getPosition(), null));
+				createMarker("", AlvorGuiPlugin.STRING_MARKER_ID, null, preparePosition(characterSet.getPosition(), null));
 				return null;
 			}
 
@@ -217,7 +217,7 @@ public class GuiChecker {
 			@Override
 			public Void visitStringConstant(StringConstant stringConstant,
 					Void data) {
-				createMarker("", AlvorGuiPlugin.STRING_MARKER_ID, preparePosition(stringConstant.getPosition(), null));
+				createMarker("", AlvorGuiPlugin.STRING_MARKER_ID, null, preparePosition(stringConstant.getPosition(), null));
 				return null;
 			}
 

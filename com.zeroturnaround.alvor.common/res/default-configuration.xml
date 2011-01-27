@@ -8,12 +8,14 @@
     </hotspotPatterns>
     
     <dataSources>
+    	<!-- 
         <dataSource 
             pattern="*" 
             driverName="driver:name"
             url="url:asdfaf"
             userName="juuser neim"
             password="passwöörd"/>
+        -->
     </dataSources>
     
     <analyzerSettings

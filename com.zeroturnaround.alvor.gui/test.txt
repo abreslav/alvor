@@ -1,5 +1,0 @@
-
-Focus can affect CleanCheck command, so test with:
-
-    * no open editors 
-    * focus in editor, different project selected in package explorer

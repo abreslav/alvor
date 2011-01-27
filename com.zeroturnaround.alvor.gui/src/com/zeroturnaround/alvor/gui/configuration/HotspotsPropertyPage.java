@@ -47,11 +47,11 @@ public class HotspotsPropertyPage extends CommonPropertyPage {
 	}
 	
 	private String unparseHotspots(List<HotspotPattern> hotspots) {
-		String result = "";
+		StringBuilder result = new StringBuilder();
 		for (HotspotPattern hp : hotspots) {
-			result += hp.getClassName() + "," + hp.getMethodName() + "," + hp.getArgumentIndex() + "\n"; 
+			result.append(hp.getClassName() + "," + hp.getMethodName() + "," + hp.getArgumentIndex() + "\n"); 
 		}
-		return result;
+		return result.toString();
 	}
 	
 	private List<HotspotPattern> parseHotspots(String text) {

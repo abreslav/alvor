@@ -1,8 +1,10 @@
-package com.zeroturnaround.alvor.gui;
+package com.zeroturnaround.alvor.gui.slowtests;
 
 import org.junit.BeforeClass;
 
-import com.zeroturnaround.alvor.crawler.CrawlerTestUtil;
+import com.zeroturnaround.alvor.common.WorkspaceUtil;
+import com.zeroturnaround.alvor.gui.AbstractMarkerTest;
+import com.zeroturnaround.alvor.gui.GuiFacade;
 
 public class FullMarkerTestEArved extends AbstractMarkerTest {
 	
@@ -11,7 +13,7 @@ public class FullMarkerTestEArved extends AbstractMarkerTest {
 		// TODO should do it via GUI
 		//GuiFacade.selectAnItemInPackageExplorer();
 		//GuiFacade.executeAlvorCleanCheck();
-		AbstractMarkerTest.selectedProject = CrawlerTestUtil.getProject("earved"); 
+		AbstractMarkerTest.selectedProject = WorkspaceUtil.getProject("earved"); 
 		GuiFacade.executeAlvorCleanCheck(AbstractMarkerTest.selectedProject);
 		
 		//GuiFacade.waitUntilAlvorHasCompleted();

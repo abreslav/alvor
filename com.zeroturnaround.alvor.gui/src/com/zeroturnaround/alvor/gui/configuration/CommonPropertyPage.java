@@ -1,6 +1,8 @@
 package com.zeroturnaround.alvor.gui.configuration;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.ui.IWorkbenchPropertyPage;
 import org.eclipse.ui.dialogs.PropertyPage;
 
@@ -20,7 +22,19 @@ public abstract class CommonPropertyPage extends PropertyPage implements IWorkbe
 	}
 	
 	protected IProject getSelectedProject() {
-		return (IProject)this.getElement();
+		IAdaptable element = this.getElement();
+		
+		// can be IProject or IJavaProject, depending on extension definition
+		// I'll handle both cases, just in case
+		if (element instanceof IProject) {
+			return (IProject)element;
+		}
+		else if (element instanceof IJavaProject) {
+			return ((IJavaProject)element).getProject();
+		}
+		else {
+			throw new IllegalStateException("Unknown element");
+		}
 	}
 	
 	protected abstract void mergeChanges(ProjectConfiguration base);
@@ -33,7 +47,7 @@ public abstract class CommonPropertyPage extends PropertyPage implements IWorkbe
 			this.hasChanges = false;
 			return true;
 		} catch (Exception e) {
-			GuiUtil.ShowErrorDialog("Problem saving configuration", e);
+			GuiUtil.showErrorDialog("Problem saving configuration", e);
 			LOG.exception(e);
 			return false;
 		}

@@ -9,6 +9,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import com.zeroturnaround.alvor.string.IPosition;
@@ -88,5 +89,10 @@ public class PositionUtil {
 
 	public static String getLineString(IPosition sr) {
 		return sr.getPath() + ":" + getLineNumber(sr);
+	}
+	
+	public static IResource getPositionResource(IPosition pos) {
+		IPath path = Path.fromPortableString(pos.getPath());
+		return ResourcesPlugin.getWorkspace().getRoot().findMember(path);
 	}
 }
