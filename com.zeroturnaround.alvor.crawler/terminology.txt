@@ -1,0 +1,41 @@
+"hotspot": String expression of interest (argument expression to certain method call)
+
+	In "Precise analysis of string expressions", http://www.brics.dk/JSA/ :
+		"A program may contain many string expressions, but typically only few 
+		expressions, called hotspots, for which we actually want to know the regular language."
+
+"primary hotspot": hotspots that are to be found and analyzed 
+
+"secondary hotspot": argument expression that affects the value of a "primary hotspot"
+
+"full hotspot": should always evaluate to full SQL sentence
+
+"partial hotspot": evaluates to part of a SQL sentence
+
+Primary hotspots should be generally full hotspots, secondary hotspots can be either full
+or partial. 
+
+-----------------------------------------------------------------------------------  
+
+"hotspot pattern": description for finding hotspots, consists of class name, method name
+	and argument index
+
+"primary hotspot pattern": one of hotspot patterns given as input to the analyzer
+
+"secondary hotspot pattern": used for finding secondary hotspots
+
+-------------------------------------------------------------------------------------
+
+"hotspot target" : target method where value of the hotspot is passed to, described
+   by hotspot pattern
+
+"hotspot container": method containing the hotspot
+
+"hotspot wrapper" : a hotspot container which gets (partial) hotspot value from parameter
+
+---------------------------------------------------------------------------------------
+
+"string method" : method which constructs and returns a string or modifies a StringBuilder
+argument. 
+
+

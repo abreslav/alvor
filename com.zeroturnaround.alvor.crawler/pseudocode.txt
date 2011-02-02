@@ -1,32 +1,29 @@
 First read the tool-paper.
 
-Definitions
------------
-TODO
-
 Simple explanation
 ------------------
-Alvor searches for all hotspots in all project files
-For each matching string node, it constructs the set of it's possible values. For this, 
+Alvor searches for all primary hotspots in all project files
+For each matching string expression, it constructs the set of it's possible values. For this, 
 it may be necessary to analyze relevant parts in other files.
 
 Interesting things a file can contain:
 ---------------------------------------
-* calls to fixed hotspot patterns
-* calls to wrapper (deduced) hotspot patterns
-* definitions of new (deduced) hotspot patterns (ie. methods, which call to some hotspot-pattern,
-  but take part of the input from parameters)
-* overridden hotspot patterns
+* primary hotspots
+* secondary hotspots
+* primary hotspot targets, ie. target methods for primary hotspots
+* secondary hotspot targets (or "hotspot wrappers") -- ie. methods containing 
+  hotspots whose value is (partly) taken from a parameter
+  
+* overridden hotspot targets (primary or secondary)
 
-* string methods which are used in some hotspot expression
+* relevant string methods (string methods which are used for constructing value of a hotspot)
 * overridden versions of such string methods
 
-Of these, other files depend on:
-	- definitions of new (possibly partial) hotspot patterns (need to search for calls to these)
-	- overriding implementations of used string methods (can be just added to cache and to 
-	  corresponding string-choices) 
-    	
-
+Checking one file
+-----------------
+From given file we want abstract values of primary hotspots. For this it might be
+necessary to analyze other files if hotspot value depends on method argument (need to find
+and analyze secondary hotspots).
 
 Incremental checking
 --------------------
@@ -34,6 +31,21 @@ In order to enable incremental checking, Alvor stores certain information about 
 in a database. When one file is changed, then cache for that file is discarded and the
 file is analyzed (almost) from scratch. When some parts are required from other files,
 then these can now be taken from cache.
+
+When one file is changed, then in addition to reanalyzing primary hotspots in this file,
+we need also to take care of hotspots in other files depending on that file. 
+In order to do this, inter-file dependencies for each primary hotspot must be published
+by registering respective secondary hotspot patterns.
+Whenever a file is changed then both primary and secondary patterns are searched and analyzed
+in it.
+
+Likewise, all "relevant string methods" must be published, so that when a file containing
+an implementation of such method is changed, then cached information about this method
+can be updated (even when that method is not used in the same file).
+
+As one project may be dependent of other projects, when a library project is changed, then
+analysis must take into account registered secondary patterns (and string methods) from all
+dependent projects. Pattern registration is organized per-project basis.
 
 
 Pseudocode
@@ -89,3 +101,15 @@ fun evaluate(node, project) =
     	return findStringsFromManyFilesForManyHotspots(files, [node as hotspot])
     
     ...
+    
+------------------------------------------------------------------------------------------
+
+Partial checking
+----------------
+If certain IJavaElement is selected for checking, then this part is searched only for primary
+hotspots. If it contains secondary hotspots, then those are analyzed only when respective
+primary hotspots are also within search/analysis scope.
+
+Secondary hotspots are searched in the same project.
+
+Implementations of string-methods are searched from all required projects.
