@@ -1,0 +1,188 @@
+First read the tool-paper.
+
+Simple explanation
+------------------
+Alvor searches for all primary hotspots in all project files
+For each matching string expression, it constructs the set of it's possible values. For this, 
+it may be necessary to analyze relevant parts in other files.
+
+Interesting things a file can contain:
+---------------------------------------
+* primary hotspots
+* secondary hotspots
+* primary hotspot targets, ie. target methods for primary hotspots
+* secondary hotspot targets (or "hotspot wrappers") -- ie. methods containing 
+  hotspots whose value is (partly) taken from a parameter
+  
+* overridden hotspot targets (primary or secondary)
+
+* relevant string methods (string methods which are used for constructing value of a hotspot)
+* overridden versions of such string methods
+
+Checking one file
+-----------------
+From given file we want abstract values of primary hotspots. For this it might be
+necessary to analyze other files if hotspot value depends on method argument (need to find
+and analyze secondary hotspots).
+
+Incremental checking
+--------------------
+In order to enable incremental checking, Alvor stores certain information about each file
+in a database. When one file is changed, then cache for that file is discarded and the
+file is analyzed (almost) from scratch. When some parts are required from other files,
+then these can now be taken from cache.
+
+When one file is changed, then in addition to reanalyzing primary hotspots in this file,
+we need also to take care of hotspots in other files depending on that file. 
+In order to do this, inter-file dependencies for each primary hotspot must be published
+by registering respective secondary hotspot patterns.
+Whenever a file is changed then both primary and secondary patterns are searched and analyzed
+in it.
+
+Likewise, all "relevant string methods" must be published, so that when a file containing
+an implementation of such method is changed, then cached information about this method
+can be updated (even when that method is not used in the same file).
+
+As one project may be dependent of other projects, when a library project is changed, then
+analysis must take into account registered secondary patterns (and string methods) from all
+dependent projects. Pattern registration is organized per-project basis.
+
+
+Pseudocode
+----------
+
+fun fullCheckProject(project, conf) = 
+	files = project.getFiles()
+	patterns = conf.primaryHotspotPatterns
+	strings = findStringsFromManyFilesForManyPatterns(files, patterns, project)
+	check(strings)
+
+
+fun checkFileAfterEdit(file, project, conf) = 
+	cache.removeFileEntries(file)  // marks dependent strings as unchecked
+	patterns = conf.primaryHotspotPatterns ++ cache.getSecondaryHotspotPatterns
+	strings1 = findStringsFromOneFileForManyPatterns(file, patterns)
+	check(strings1)
+	
+	// some base Hotspot entries from other files now got modified and need to be rechecked 
+	strings2 = cache.getUncheckedStrings()
+	check(strings2) 
+
+fun findStringsFromManyFilesForManyPatterns(files, patterns) =
+	result = [] 
+	for file <- files:
+		result.addAll(findStringsFromOneFileForManyPatterns(file, patterns))
+		
+	return result
+	
+fun findStringsFromOneFileForManyPatterns(file, patterns) =
+	result = []
+	patternsToBeSearched = []
+	 
+	for hotspotPattern <- patterns:
+	    if cache.hasEntryFor(file, hotspotPattern):
+	        result.addAll(getFromCache(file, hotspotPattern))
+	    else:
+	    	patternsToBeSearched(hotspotPattern)
+	
+	
+	for pattern <- patternsToBeSearched:
+		for node <- findCorrespondingNodes(file, pattern):
+			str = evaluate(node)
+	    	result.add(str)
+	    	cache.addEntryFor(str, file, pattern) // marks dependent strings as unchecked
+	
+	return result
+
+fun evaluate(node, project) =
+	// this doesn't use cache directly
+    ...
+    if node is Parameter:
+    	files = project.getAllFiles()
+    	return findStringsFromManyFilesForManyPatterns(files, [node as pattern])
+    
+    ...
+    
+------------------------------------------------------------------------------------------
+ALTERNATIVE PSEUDOCODE
+(focuses on building the cache, file by file, in several iterations)
+
+files = getUncheckedFiles()
+
+for file <- files:
+	review secondary patterns published by this file, remove obsolete ones
+	(but for this you need to consider other patterns)
+
+	for pattern <- activePatterns: // both primary and secondary
+		nodes = findNodes(file, pattern)
+		compute local parts of the nodes; if necessary publish new patterns
+
+
+
+Repeat until there are no new patterns
+------------------------------------------------------------------------------------------
+ALTERNATIVE 2
+
+fun initialProcessing(conf):
+	cache.addPrimaryPatternsAsBatch1(conf.getPrimaryPatterns)
+	processAllFilesForNewPatterns()
+
+fun processChangedFile(file):
+	patterns = cache.getPatternsExcept(file) // exclude patterns published by this file
+	file.setMaxBatchNo(0)
+	processFile(file, patterns)
+	processAllFilesForNewPatterns()
+		
+fun processAllFilesForNewPatterns():
+	patterns = cache.getPatterns()
+	maxBatchNo = getMaxBatchNo(patterns)
+	
+	files = project.getAllFiles()
+	for file <- files:
+		processFile(file, patterns)
+	
+	// go find fix-point
+	if cache.hasNewPatterns(maxBatchNo):
+		processAllForNewPatterns()
+	
+
+fun processFile(file, patterns):
+	
+	(contributions, thisFilePatterns) = computeContributions(file, patterns)
+	
+	cache.updateFileContributions(file, contributions)
+	
+	// remove obsolete patterns published earlier by this file
+	cache.removeFilePatternsExceptThese(file, thisFilePatterns)
+	
+
+// this is intraprocedural and independent of cache
+fun computeContributions(file, patterns):
+	for pattern <- patterns:
+		if pattern.batchNo > file.lastBatchProcessed:
+			...
+
+
+
+
+
+
+
+High-level processes
+* one process keeps cache in sync with source (this is JDT-dependent)
+* other process queries cache for strings and checks them (this is independent from JDT)
+
+
+
+
+------------------------------------------------------------------------------------------
+
+Partial checking
+----------------
+If certain IJavaElement is selected for checking, then this part is searched only for primary
+hotspots. If it contains secondary hotspots, then those are analyzed only when respective
+primary hotspots are also within search/analysis scope.
+
+Secondary hotspots are searched in the same project.
+
+Implementations of string-methods are searched from all required projects.

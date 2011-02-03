@@ -1,0 +1,26 @@
+<!-- this file is used as starting point for creating custom configuration for specific projects -->
+<alvor>
+    <hotspotPatterns>
+    	<hotspot className="java.sql.Connection" methodName="prepareStatement" argumentIndex="1" />
+    	<hotspot className="java.sql.Connection" methodName="prepareCall" argumentIndex="1" />
+    	<hotspot className="java.sql.Statement" methodName="execute" argumentIndex="1" />
+    	<hotspot className="java.sql.Statement" methodName="executeQuery" argumentIndex="1" />
+    </hotspotPatterns>
+    
+    <dataSources>
+    	<!-- 
+        <dataSource 
+            pattern="*" 
+            driverName="driver:name"
+            url="url:asdfaf"
+            userName="juuser neim"
+            password="passwöörd"/>
+        -->
+    </dataSources>
+    
+    <analyzerSettings
+    	enableLoops="true"
+    	maxDepth="5"
+    	preferTesting="true"    	
+    	/>
+</alvor>

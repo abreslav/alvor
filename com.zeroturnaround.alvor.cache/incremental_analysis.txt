@@ -1,0 +1,97 @@
+Interesting things a file can contain:
+---------------------------------------
+* calls to fixed hotspot patterns
+* calls to wrapper (deduced) hotspot patterns
+* definitions of new (deduced) hotspot patterns (ie. methods, which call to some hotspot-pattern,
+  but take part of the input from parameters)
+* overridden hotspot patterns
+
+* string methods which are used in some hotspot expression
+* overridden versions of such string methods
+
+Of these, other files depend on:
+	- definitions of new (possibly partial) hotspot patterns (need to search for calls to these)
+	- overriding implementations of used string methods (can be just added to cache and to 
+	  corresponding string-choices) 
+    	
+
+
+After editing a file (or during initial checking) => Processing unvalidated file
+-----------------------------------------------------------
+Tasks concerning hotspots:
+	* remove from cache all hotspot-patterns introduced by this file 
+	  (because those methods may be not hotspots anymore)
+		- leave corresponding strings in place, in case it's still a hotspot
+		- or maybe just mark its hotspot-definitions as questionable
+	
+	* remove all options from all choices that originate from this file
+	
+	* parse the file and search for calls to (remaining) hotspot-patterns
+	  and evaluate those (without going out from current file (leave stubs in cache) ?)
+	    - in this process its hotspot-patterns may be restored
+	     
+	* remove from cache all questionable hotspot-patterns from this file, together with the strings
+	 
+* add new hotspots to table (and search their call-sites)
+
+Alternative file processing
+---------------------------
+* Search only for fixed hotspots (others will be searched when processing another file)
+* for each found hotspot, evaluate the argument, possibly using
+
+
+?? Should I recurse to other files, when string has parts outside this file?
+   Or leave the stubs in cache and wait until those files are processed and stubs are filled in ??
+?? During recursing, should I search only for requested call-sites, or start processing that file?   
+
+
+Handling nested hotspots
+------------------------
+Eg. when there is method doStuff(String sql) that calls prepareStatement(sql). If
+both are defined as fixed hotspots, and when analyzing prepareStatement I find that it's
+inside doStuff, then I cancel this search (or when doing my own tree-walking, then I even don't
+reach there). If user wants to see errors on call-sites to wrapper, then he must define
+the wrapper as fixed hotspot -- it's not automatically deduced.
+
+
+
+Handling virtual methods
+------------------------
+Short story: all known method overrides are considered always  
+
+* when I need to get something from parameter, then I search calls not only to this particular
+  (possibly overridden) method but also calls where receiver is supertype of 'this'.
+* In cache, all (partial or full) hotspot methods are registered by the name of the class/interface
+  where the method was first introduced.
+
+* when I need result of a string method, then I look up it's uppermost declaration type and
+  then combine implementations from all overrides. (Yes, this can lose precision)   
+* In cache, string methods are registered using
+
+* Other option -- first time when a set of call-sites or implementations are required,
+  then all are registered (in a separate table), but when constructing the string-choice, static type of the 
+  receiver is taken into account
+
+
+Deleting and creating file
+---------------------------
+Deleting can be considered as edit which makes file/classdef empty
+Likewise, creating new file adds stuff to empty file/classdef. 
+
+
+Related topics
+---------------
+* How does this approach fit with:
+	- connection analysis and multiple dialects? 
+	- ResultSet analysis? 
+	- Search?
+    - Other host languages? 
+    - Bytecode analysis? 
+    - Content-assist? 
+    - Syntax highlighting?  
+
+    
+    
+    
+    
+    

@@ -1,0 +1,192 @@
+Terminals unused in grammar
+
+   VALUES
+   ESCAPE
+   INSERT
+   WHERE
+   ORDER
+   OUTER
+   GROUP
+   RIGHT
+   INNER
+   JOIN
+   LEFT
+   WHEN
+   THEN
+   ELSE
+   CASE
+   INTO
+   FULL
+   DESC
+   ASC
+   AND
+   END
+   XOR
+   NOT
+   OR
+   ON
+   BY
+   AS
+   IN
+   IS
+   NULL
+   DIGAL_ERR
+   STRING_DQ
+   STRING_DQ_ERR
+   STRING_SQ
+   STRING_SQ_ERR
+   DISTINCT
+   UNKNOWN_CHARACTER_ERR
+   NE
+   LE
+   GE
+   CONCAT
+   TABLE
+   LIKE
+   '='
+   '>'
+   '<'
+   '+'
+   '/'
+   '*'
+
+
+Grammatika
+
+    0 $accept: select $end
+
+    1 select: SELECT NUMBER '-' NUMBER FROM ID
+
+
+Terminalid, koos reeglitega kus nad ilmuvad
+
+$end (0) 0
+'*' (42)
+'+' (43)
+'-' (45) 1
+'/' (47)
+'<' (60)
+'=' (61)
+'>' (62)
+error (256)
+VALUES (258)
+ESCAPE (259)
+SELECT (260) 1
+INSERT (261)
+WHERE (262)
+ORDER (263)
+OUTER (264)
+GROUP (265)
+RIGHT (266)
+INNER (267)
+FROM (268) 1
+JOIN (269)
+LEFT (270)
+WHEN (271)
+THEN (272)
+ELSE (273)
+CASE (274)
+INTO (275)
+FULL (276)
+DESC (277)
+ASC (278)
+AND (279)
+END (280)
+XOR (281)
+NOT (282)
+OR (283)
+ON (284)
+BY (285)
+AS (286)
+IN (287)
+IS (288)
+NULL (289)
+DIGAL_ERR (290)
+STRING_DQ (291)
+STRING_DQ_ERR (292)
+STRING_SQ (293)
+STRING_SQ_ERR (294)
+NUMBER (295) 1
+ID (296) 1
+DISTINCT (297)
+UNKNOWN_CHARACTER_ERR (298)
+NE (299)
+LE (300)
+GE (301)
+CONCAT (302)
+TABLE (303)
+LIKE (304)
+
+
+Mitteterminalid, koos reeglitega kus nad ilmuvad
+
+$accept (57)
+    vasakul: 0
+select (58)
+    vasakul: 1, paremal: 0
+
+
+olek 0
+
+    0 $accept: . select $end
+    1 select: . SELECT NUMBER '-' NUMBER FROM ID
+
+    SELECT  nihuta ja liigu olekule 1
+
+    select  liigu olekule 2
+
+
+olek 1
+
+    1 select: SELECT . NUMBER '-' NUMBER FROM ID
+
+    NUMBER  nihuta ja liigu olekule 3
+
+
+olek 2
+
+    0 $accept: select . $end
+
+    $end  nihuta ja liigu olekule 4
+
+
+olek 3
+
+    1 select: SELECT NUMBER . '-' NUMBER FROM ID
+
+    '-'  nihuta ja liigu olekule 5
+
+
+olek 4
+
+    0 $accept: select $end .
+
+    $default  nõustun
+
+
+olek 5
+
+    1 select: SELECT NUMBER '-' . NUMBER FROM ID
+
+    NUMBER  nihuta ja liigu olekule 6
+
+
+olek 6
+
+    1 select: SELECT NUMBER '-' NUMBER . FROM ID
+
+    FROM  nihuta ja liigu olekule 7
+
+
+olek 7
+
+    1 select: SELECT NUMBER '-' NUMBER FROM . ID
+
+    ID  nihuta ja liigu olekule 8
+
+
+olek 8
+
+    1 select: SELECT NUMBER '-' NUMBER FROM ID .
+
+    $default  redutseerin kasutades reeglit 1 (select)

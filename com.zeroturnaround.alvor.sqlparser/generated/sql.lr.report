@@ -1,0 +1,4896 @@
+Terminals unused in grammar
+
+   DIGAL_ERR
+   STRING_SQ_ERR
+   UNKNOWN_CHARACTER_ERR
+
+
+Grammar
+
+    0 $accept: query $end
+
+    1 query: bracketedSelect
+    2      | delete
+    3      | insert
+    4      | update
+    5      | COMMIT
+
+    6 update: UPDATE alias SET assignList where
+
+    7 assignList: assign
+    8           | assignList ',' assign
+
+    9 assign: ident '=' simpleExpr
+   10       | '(' idList ')' '=' simpleExpr
+
+   11 delete: DELETE optFrom alias where
+
+   12 optFrom: FROM
+   13        | /* empty */
+
+   14 insert: INSERT INTO alias optIdList insertRest
+
+   15 insertRest: VALUES identRest
+   16           | select
+
+   17 optIdList: /* empty */
+   18          | '(' idList ')'
+
+   19 idList: ID
+   20       | idList ',' ID
+
+   21 bracketedSelect: select
+   22                | '(' select ')'
+
+   23 select: basicSelect where byClauses forUpdate
+   24       | select UNION select
+
+   25 basicSelect: SELECT optDist whatToSelect FROM tableList
+
+   26 where: WHERE whereCond
+   27      | /* empty */
+
+   28 forUpdate: FOR UPDATE
+   29          | /* empty */
+
+   30 groupBy: GROUP BY simExList having
+
+   31 optGroupBy: groupBy
+   32           | /* empty */
+
+   33 having: HAVING condition
+   34       | /* empty */
+
+   35 orderBy: ORDER BY directionList
+
+   36 optOrderBy: orderBy
+   37           | /* empty */
+
+   38 byClauses: orderBy optGroupBy
+   39          | groupBy optOrderBy
+   40          | /* empty */
+
+   41 directionList: direction
+   42              | directionList ',' direction
+
+   43 direction: simpleExpr orderDirection
+
+   44 orderDirection: ASC
+   45               | DESC
+   46               | /* empty */
+
+   47 optDist: DISTINCT
+   48        | /* empty */
+
+   49 whatToSelect: selectExpressionList
+
+   50 selectExpression: expression
+   51                 | selectExpression AS id
+   52                 | selectExpression id
+
+   53 id: ID
+
+   54 expression: condition
+   55           | simpleExpr
+
+   56 selectExpressionList: selectExpression
+   57                     | selectExpressionList ',' selectExpression
+
+   58 tableList: table
+   59          | tableList ',' table
+
+   60 table: alias
+   61      | table join alias ON condition
+
+   62 join: JOIN
+   63     | LEFT JOIN
+   64     | outerType OUTER JOIN
+   65     | INNER JOIN
+
+   66 outerType: LEFT
+   67          | RIGHT
+   68          | FULL
+
+   69 alias: tableExpr
+   70      | tableExpr ID
+
+   71 tableExpr: ident
+   72          | TABLE '(' simpleExpr ')'
+   73          | '(' select ')'
+
+   74 ident: ID
+   75      | ID '.' ID
+   76      | ID '.' ID '.' ID
+
+   77 whereCond: condition
+
+   78 condition: condition AND condition
+   79          | condition OR condition
+   80          | condition XOR condition
+   81          | NOT condition
+   82          | '(' condition ')'
+   83          | comparison
+   84          | simpleExpr inExpr '(' simExList ')'
+   85          | simpleExpr inExpr '(' select ')'
+   86          | '(' idList2 ')' inExpr '(' simExList ')'
+   87          | '(' idList2 ')' inExpr '(' select ')'
+   88          | simpleExpr IS optNot NULL
+   89          | simpleExpr optNot LIKE simpleExpr escape
+   90          | EXISTS '(' select ')'
+   91          | simpleExpr optNot BETWEEN simpleExpr AND simpleExpr
+
+   92 idList2: ID ',' ID
+   93        | idList2 ',' ID
+
+   94 comparison: simpleExpr '=' simpleExpr
+   95           | simpleExpr '>' simpleExpr
+   96           | simpleExpr '<' simpleExpr
+   97           | simpleExpr LE simpleExpr
+   98           | simpleExpr NE simpleExpr
+   99           | simpleExpr GE simpleExpr
+
+  100 escape: ESCAPE STRING_SQ
+  101       | /* empty */
+
+  102 inExpr: optNot IN
+
+  103 optNot: NOT
+  104       | /* empty */
+
+  105 simpleExpr: NUMBER
+  106           | simpleExpr OUTERJ
+  107           | '-' simpleExpr
+  108           | CASE whenList else END
+  109           | STRING_SQ
+  110           | ident identRest
+  111           | '(' simpleExpr ')'
+  112           | simpleExpr '-' simpleExpr
+  113           | simpleExpr '+' simpleExpr
+  114           | simpleExpr '*' simpleExpr
+  115           | simpleExpr '/' simpleExpr
+  116           | simpleExpr CONCAT simpleExpr
+  117           | simpleExpr OVER partition
+  118           | CAST '(' simpleExpr AS ID optSize ')'
+  119           | '(' select ')'
+  120           | ID '.' '*'
+  121           | '*'
+  122           | '?'
+  123           | NULL
+
+  124 optSize: /* empty */
+  125        | '(' NUMBER ')'
+
+  126 identRest: '(' simExList ')'
+  127          | /* empty */
+
+  128 whenList: when
+  129         | when whenList
+
+  130 when: WHEN condition THEN simpleExpr
+
+  131 else: ELSE simpleExpr
+  132     | /* empty */
+
+  133 simExList: /* empty */
+  134          | simpleExpr
+  135          | simExList ',' simpleExpr
+
+  136 partition: '(' PARTITION BY ident orderBy ')'
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+'(' (40) 10 18 22 72 73 82 84 85 86 87 90 111 118 119 125 126 136
+')' (41) 10 18 22 72 73 82 84 85 86 87 90 111 118 119 125 126 136
+'*' (42) 114 120 121
+'+' (43) 113
+',' (44) 8 20 42 57 59 92 93 135
+'-' (45) 107 112
+'.' (46) 75 76 120
+'/' (47) 115
+'<' (60) 96
+'=' (61) 9 10 94
+'>' (62) 95
+'?' (63) 122
+error (256)
+PARTITION (258) 136
+DISTINCT (259) 47
+BETWEEN (260) 91
+VALUES (261) 15
+SELECT (262) 25
+DELETE (263) 11
+INSERT (264) 14
+ESCAPE (265) 100
+OVER (266) 117
+UPDATE (267) 6 28
+EXISTS (268) 90
+HAVING (269) 33
+COMMIT (270) 5
+WHERE (271) 26
+TABLE (272) 72
+ORDER (273) 35
+OR (274) 79
+GROUP (275) 30
+RIGHT (276) 67
+INNER (277) 65
+OUTER (278) 64
+UNION (279) 24
+FROM (280) 12 25
+WHEN (281) 130
+THEN (282) 130
+CASE (283) 108
+CAST (284) 118
+ELSE (285) 131
+DESC (286) 45
+LIKE (287) 89
+JOIN (288) 62 63 64 65
+LEFT (289) 63 66
+NULL (290) 88 123
+FULL (291) 68
+INTO (292) 14
+AND (293) 78 91
+SET (294) 6
+END (295) 108
+ASC (296) 44
+XOR (297) 80
+FOR (298) 28
+NOT (299) 81 103
+ON (300) 61
+BY (301) 30 35 136
+AS (302) 51 118
+IN (303) 102
+IS (304) 88
+OUTERJ (305) 106
+NE (306) 98
+LE (307) 97
+GE (308) 99
+CONCAT (309) 116
+DIGAL_ERR (310)
+STRING_SQ (311) 100 109
+STRING_SQ_ERR (312)
+NUMBER (313) 105 125
+ID (314) 19 20 53 70 74 75 76 92 93 118 120
+UNKNOWN_CHARACTER_ERR (315)
+
+
+Nonterminals, with rules where they appear
+
+$accept (73)
+    on left: 0
+query (74)
+    on left: 1 2 3 4 5, on right: 0
+update (75)
+    on left: 6, on right: 4
+assignList (76)
+    on left: 7 8, on right: 6 8
+assign (77)
+    on left: 9 10, on right: 7 8
+delete (78)
+    on left: 11, on right: 2
+optFrom (79)
+    on left: 12 13, on right: 11
+insert (80)
+    on left: 14, on right: 3
+insertRest (81)
+    on left: 15 16, on right: 14
+optIdList (82)
+    on left: 17 18, on right: 14
+idList (83)
+    on left: 19 20, on right: 10 18 20
+bracketedSelect (84)
+    on left: 21 22, on right: 1
+select (85)
+    on left: 23 24, on right: 16 21 22 24 73 85 87 90 119
+basicSelect (86)
+    on left: 25, on right: 23
+where (87)
+    on left: 26 27, on right: 6 11 23
+forUpdate (88)
+    on left: 28 29, on right: 23
+groupBy (89)
+    on left: 30, on right: 31 39
+optGroupBy (90)
+    on left: 31 32, on right: 38
+having (91)
+    on left: 33 34, on right: 30
+orderBy (92)
+    on left: 35, on right: 36 38 136
+optOrderBy (93)
+    on left: 36 37, on right: 39
+byClauses (94)
+    on left: 38 39 40, on right: 23
+directionList (95)
+    on left: 41 42, on right: 35 42
+direction (96)
+    on left: 43, on right: 41 42
+orderDirection (97)
+    on left: 44 45 46, on right: 43
+optDist (98)
+    on left: 47 48, on right: 25
+whatToSelect (99)
+    on left: 49, on right: 25
+selectExpression (100)
+    on left: 50 51 52, on right: 51 52 56 57
+id (101)
+    on left: 53, on right: 51 52
+expression (102)
+    on left: 54 55, on right: 50
+selectExpressionList (103)
+    on left: 56 57, on right: 49 57
+tableList (104)
+    on left: 58 59, on right: 25 59
+table (105)
+    on left: 60 61, on right: 58 59 61
+join (106)
+    on left: 62 63 64 65, on right: 61
+outerType (107)
+    on left: 66 67 68, on right: 64
+alias (108)
+    on left: 69 70, on right: 6 11 14 60 61
+tableExpr (109)
+    on left: 71 72 73, on right: 69 70
+ident (110)
+    on left: 74 75 76, on right: 9 71 110 136
+whereCond (111)
+    on left: 77, on right: 26
+condition (112)
+    on left: 78 79 80 81 82 83 84 85 86 87 88 89 90 91, on right: 33
+    54 61 77 78 79 80 81 82 130
+idList2 (113)
+    on left: 92 93, on right: 86 87 93
+comparison (114)
+    on left: 94 95 96 97 98 99, on right: 83
+escape (115)
+    on left: 100 101, on right: 89
+inExpr (116)
+    on left: 102, on right: 84 85 86 87
+optNot (117)
+    on left: 103 104, on right: 88 89 91 102
+simpleExpr (118)
+    on left: 105 106 107 108 109 110 111 112 113 114 115 116 117 118
+    119 120 121 122 123, on right: 9 10 43 55 72 84 85 88 89 91 94
+    95 96 97 98 99 106 107 111 112 113 114 115 116 117 118 130 131
+    134 135
+optSize (119)
+    on left: 124 125, on right: 118
+identRest (120)
+    on left: 126 127, on right: 15 110
+whenList (121)
+    on left: 128 129, on right: 108 129
+when (122)
+    on left: 130, on right: 128 129
+else (123)
+    on left: 131 132, on right: 108
+simExList (124)
+    on left: 133 134 135, on right: 30 84 86 126 135
+partition (125)
+    on left: 136, on right: 117
+
+
+state 0
+
+    0 $accept: . query $end
+    1 query: . bracketedSelect
+    2      | . delete
+    3      | . insert
+    4      | . update
+    5      | . COMMIT
+    6 update: . UPDATE alias SET assignList where
+   11 delete: . DELETE optFrom alias where
+   14 insert: . INSERT INTO alias optIdList insertRest
+   21 bracketedSelect: . select
+   22                | . '(' select ')'
+   23 select: . basicSelect where byClauses forUpdate
+   24       | . select UNION select
+   25 basicSelect: . SELECT optDist whatToSelect FROM tableList
+
+    SELECT  shift, and go to state 1
+    DELETE  shift, and go to state 2
+    INSERT  shift, and go to state 3
+    UPDATE  shift, and go to state 4
+    COMMIT  shift, and go to state 5
+    '('     shift, and go to state 6
+
+    query            go to state 7
+    update           go to state 8
+    delete           go to state 9
+    insert           go to state 10
+    bracketedSelect  go to state 11
+    select           go to state 12
+    basicSelect      go to state 13
+
+
+state 1
+
+   25 basicSelect: SELECT . optDist whatToSelect FROM tableList
+   47 optDist: . DISTINCT
+   48        | .  [EXISTS, CASE, CAST, NULL, NOT, STRING_SQ, NUMBER, ID, '-', '*', '(', '?']
+
+    DISTINCT  shift, and go to state 14
+
+    $default  reduce using rule 48 (optDist)
+
+    optDist  go to state 15
+
+
+state 2
+
+   11 delete: DELETE . optFrom alias where
+   12 optFrom: . FROM
+   13        | .  [TABLE, ID, '(']
+
+    FROM  shift, and go to state 16
+
+    $default  reduce using rule 13 (optFrom)
+
+    optFrom  go to state 17
+
+
+state 3
+
+   14 insert: INSERT . INTO alias optIdList insertRest
+
+    INTO  shift, and go to state 18
+
+
+state 4
+
+    6 update: UPDATE . alias SET assignList where
+   69 alias: . tableExpr
+   70      | . tableExpr ID
+   71 tableExpr: . ident
+   72          | . TABLE '(' simpleExpr ')'
+   73          | . '(' select ')'
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+
+    TABLE  shift, and go to state 19
+    ID     shift, and go to state 20
+    '('    shift, and go to state 21
+
+    alias      go to state 22
+    tableExpr  go to state 23
+    ident      go to state 24
+
+
+state 5
+
+    5 query: COMMIT .
+
+    $default  reduce using rule 5 (query)
+
+
+state 6
+
+   22 bracketedSelect: '(' . select ')'
+   23 select: . basicSelect where byClauses forUpdate
+   24       | . select UNION select
+   25 basicSelect: . SELECT optDist whatToSelect FROM tableList
+
+    SELECT  shift, and go to state 1
+
+    select       go to state 25
+    basicSelect  go to state 13
+
+
+state 7
+
+    0 $accept: query . $end
+
+    $end  shift, and go to state 26
+
+
+state 8
+
+    4 query: update .
+
+    $default  reduce using rule 4 (query)
+
+
+state 9
+
+    2 query: delete .
+
+    $default  reduce using rule 2 (query)
+
+
+state 10
+
+    3 query: insert .
+
+    $default  reduce using rule 3 (query)
+
+
+state 11
+
+    1 query: bracketedSelect .
+
+    $default  reduce using rule 1 (query)
+
+
+state 12
+
+   21 bracketedSelect: select .  [$end]
+   24 select: select . UNION select
+
+    UNION  shift, and go to state 27
+
+    $default  reduce using rule 21 (bracketedSelect)
+
+
+state 13
+
+   23 select: basicSelect . where byClauses forUpdate
+   26 where: . WHERE whereCond
+   27      | .  [$end, ORDER, GROUP, UNION, FOR, ')']
+
+    WHERE  shift, and go to state 28
+
+    $default  reduce using rule 27 (where)
+
+    where  go to state 29
+
+
+state 14
+
+   47 optDist: DISTINCT .
+
+    $default  reduce using rule 47 (optDist)
+
+
+state 15
+
+   25 basicSelect: SELECT optDist . whatToSelect FROM tableList
+   49 whatToSelect: . selectExpressionList
+   50 selectExpression: . expression
+   51                 | . selectExpression AS id
+   52                 | . selectExpression id
+   54 expression: . condition
+   55           | . simpleExpr
+   56 selectExpressionList: . selectExpression
+   57                     | . selectExpressionList ',' selectExpression
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   78 condition: . condition AND condition
+   79          | . condition OR condition
+   80          | . condition XOR condition
+   81          | . NOT condition
+   82          | . '(' condition ')'
+   83          | . comparison
+   84          | . simpleExpr inExpr '(' simExList ')'
+   85          | . simpleExpr inExpr '(' select ')'
+   86          | . '(' idList2 ')' inExpr '(' simExList ')'
+   87          | . '(' idList2 ')' inExpr '(' select ')'
+   88          | . simpleExpr IS optNot NULL
+   89          | . simpleExpr optNot LIKE simpleExpr escape
+   90          | . EXISTS '(' select ')'
+   91          | . simpleExpr optNot BETWEEN simpleExpr AND simpleExpr
+   94 comparison: . simpleExpr '=' simpleExpr
+   95           | . simpleExpr '>' simpleExpr
+   96           | . simpleExpr '<' simpleExpr
+   97           | . simpleExpr LE simpleExpr
+   98           | . simpleExpr NE simpleExpr
+   99           | . simpleExpr GE simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    EXISTS     shift, and go to state 30
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    NOT        shift, and go to state 34
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 40
+    '?'        shift, and go to state 41
+
+    whatToSelect          go to state 42
+    selectExpression      go to state 43
+    expression            go to state 44
+    selectExpressionList  go to state 45
+    ident                 go to state 46
+    condition             go to state 47
+    comparison            go to state 48
+    simpleExpr            go to state 49
+
+
+state 16
+
+   12 optFrom: FROM .
+
+    $default  reduce using rule 12 (optFrom)
+
+
+state 17
+
+   11 delete: DELETE optFrom . alias where
+   69 alias: . tableExpr
+   70      | . tableExpr ID
+   71 tableExpr: . ident
+   72          | . TABLE '(' simpleExpr ')'
+   73          | . '(' select ')'
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+
+    TABLE  shift, and go to state 19
+    ID     shift, and go to state 20
+    '('    shift, and go to state 21
+
+    alias      go to state 50
+    tableExpr  go to state 23
+    ident      go to state 24
+
+
+state 18
+
+   14 insert: INSERT INTO . alias optIdList insertRest
+   69 alias: . tableExpr
+   70      | . tableExpr ID
+   71 tableExpr: . ident
+   72          | . TABLE '(' simpleExpr ')'
+   73          | . '(' select ')'
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+
+    TABLE  shift, and go to state 19
+    ID     shift, and go to state 20
+    '('    shift, and go to state 21
+
+    alias      go to state 51
+    tableExpr  go to state 23
+    ident      go to state 24
+
+
+state 19
+
+   72 tableExpr: TABLE . '(' simpleExpr ')'
+
+    '('  shift, and go to state 52
+
+
+state 20
+
+   74 ident: ID .  [$end, VALUES, SELECT, WHERE, ORDER, GROUP, RIGHT, INNER, UNION, JOIN, LEFT, FULL, SET, FOR, ON, ID, '=', ',', '(', ')']
+   75      | ID . '.' ID
+   76      | ID . '.' ID '.' ID
+
+    '.'  shift, and go to state 53
+
+    $default  reduce using rule 74 (ident)
+
+
+state 21
+
+   23 select: . basicSelect where byClauses forUpdate
+   24       | . select UNION select
+   25 basicSelect: . SELECT optDist whatToSelect FROM tableList
+   73 tableExpr: '(' . select ')'
+
+    SELECT  shift, and go to state 1
+
+    select       go to state 54
+    basicSelect  go to state 13
+
+
+state 22
+
+    6 update: UPDATE alias . SET assignList where
+
+    SET  shift, and go to state 55
+
+
+state 23
+
+   69 alias: tableExpr .  [$end, VALUES, SELECT, WHERE, ORDER, GROUP, RIGHT, INNER, UNION, JOIN, LEFT, FULL, SET, FOR, ON, ',', '(', ')']
+   70      | tableExpr . ID
+
+    ID  shift, and go to state 56
+
+    $default  reduce using rule 69 (alias)
+
+
+state 24
+
+   71 tableExpr: ident .
+
+    $default  reduce using rule 71 (tableExpr)
+
+
+state 25
+
+   22 bracketedSelect: '(' select . ')'
+   24 select: select . UNION select
+
+    UNION  shift, and go to state 27
+    ')'    shift, and go to state 57
+
+
+state 26
+
+    0 $accept: query $end .
+
+    $default  accept
+
+
+state 27
+
+   23 select: . basicSelect where byClauses forUpdate
+   24       | . select UNION select
+   24       | select UNION . select
+   25 basicSelect: . SELECT optDist whatToSelect FROM tableList
+
+    SELECT  shift, and go to state 1
+
+    select       go to state 58
+    basicSelect  go to state 13
+
+
+state 28
+
+   26 where: WHERE . whereCond
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   77 whereCond: . condition
+   78 condition: . condition AND condition
+   79          | . condition OR condition
+   80          | . condition XOR condition
+   81          | . NOT condition
+   82          | . '(' condition ')'
+   83          | . comparison
+   84          | . simpleExpr inExpr '(' simExList ')'
+   85          | . simpleExpr inExpr '(' select ')'
+   86          | . '(' idList2 ')' inExpr '(' simExList ')'
+   87          | . '(' idList2 ')' inExpr '(' select ')'
+   88          | . simpleExpr IS optNot NULL
+   89          | . simpleExpr optNot LIKE simpleExpr escape
+   90          | . EXISTS '(' select ')'
+   91          | . simpleExpr optNot BETWEEN simpleExpr AND simpleExpr
+   94 comparison: . simpleExpr '=' simpleExpr
+   95           | . simpleExpr '>' simpleExpr
+   96           | . simpleExpr '<' simpleExpr
+   97           | . simpleExpr LE simpleExpr
+   98           | . simpleExpr NE simpleExpr
+   99           | . simpleExpr GE simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    EXISTS     shift, and go to state 30
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    NOT        shift, and go to state 34
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 40
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    whereCond   go to state 59
+    condition   go to state 60
+    comparison  go to state 48
+    simpleExpr  go to state 61
+
+
+state 29
+
+   23 select: basicSelect where . byClauses forUpdate
+   30 groupBy: . GROUP BY simExList having
+   35 orderBy: . ORDER BY directionList
+   38 byClauses: . orderBy optGroupBy
+   39          | . groupBy optOrderBy
+   40          | .  [$end, UNION, FOR, ')']
+
+    ORDER  shift, and go to state 62
+    GROUP  shift, and go to state 63
+
+    $default  reduce using rule 40 (byClauses)
+
+    groupBy    go to state 64
+    orderBy    go to state 65
+    byClauses  go to state 66
+
+
+state 30
+
+   90 condition: EXISTS . '(' select ')'
+
+    '('  shift, and go to state 67
+
+
+state 31
+
+  108 simpleExpr: CASE . whenList else END
+  128 whenList: . when
+  129         | . when whenList
+  130 when: . WHEN condition THEN simpleExpr
+
+    WHEN  shift, and go to state 68
+
+    whenList  go to state 69
+    when      go to state 70
+
+
+state 32
+
+  118 simpleExpr: CAST . '(' simpleExpr AS ID optSize ')'
+
+    '('  shift, and go to state 71
+
+
+state 33
+
+  123 simpleExpr: NULL .
+
+    $default  reduce using rule 123 (simpleExpr)
+
+
+state 34
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   78 condition: . condition AND condition
+   79          | . condition OR condition
+   80          | . condition XOR condition
+   81          | . NOT condition
+   81          | NOT . condition
+   82          | . '(' condition ')'
+   83          | . comparison
+   84          | . simpleExpr inExpr '(' simExList ')'
+   85          | . simpleExpr inExpr '(' select ')'
+   86          | . '(' idList2 ')' inExpr '(' simExList ')'
+   87          | . '(' idList2 ')' inExpr '(' select ')'
+   88          | . simpleExpr IS optNot NULL
+   89          | . simpleExpr optNot LIKE simpleExpr escape
+   90          | . EXISTS '(' select ')'
+   91          | . simpleExpr optNot BETWEEN simpleExpr AND simpleExpr
+   94 comparison: . simpleExpr '=' simpleExpr
+   95           | . simpleExpr '>' simpleExpr
+   96           | . simpleExpr '<' simpleExpr
+   97           | . simpleExpr LE simpleExpr
+   98           | . simpleExpr NE simpleExpr
+   99           | . simpleExpr GE simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    EXISTS     shift, and go to state 30
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    NOT        shift, and go to state 34
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 40
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    condition   go to state 72
+    comparison  go to state 48
+    simpleExpr  go to state 61
+
+
+state 35
+
+  109 simpleExpr: STRING_SQ .
+
+    $default  reduce using rule 109 (simpleExpr)
+
+
+state 36
+
+  105 simpleExpr: NUMBER .
+
+    $default  reduce using rule 105 (simpleExpr)
+
+
+state 37
+
+   74 ident: ID .  [$end, BETWEEN, ESCAPE, OVER, HAVING, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, WHEN, THEN, ELSE, DESC, LIKE, JOIN, LEFT, FULL, AND, END, ASC, XOR, FOR, NOT, AS, IN, IS, OUTERJ, NE, LE, GE, CONCAT, ID, '=', '>', '<', '-', '+', '/', '*', ',', '(', ')']
+   75      | ID . '.' ID
+   76      | ID . '.' ID '.' ID
+  120 simpleExpr: ID . '.' '*'
+
+    '.'  shift, and go to state 73
+
+    $default  reduce using rule 74 (ident)
+
+
+state 38
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  107           | '-' . simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 74
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    simpleExpr  go to state 75
+
+
+state 39
+
+  121 simpleExpr: '*' .
+
+    $default  reduce using rule 121 (simpleExpr)
+
+
+state 40
+
+   23 select: . basicSelect where byClauses forUpdate
+   24       | . select UNION select
+   25 basicSelect: . SELECT optDist whatToSelect FROM tableList
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   78 condition: . condition AND condition
+   79          | . condition OR condition
+   80          | . condition XOR condition
+   81          | . NOT condition
+   82          | . '(' condition ')'
+   82          | '(' . condition ')'
+   83          | . comparison
+   84          | . simpleExpr inExpr '(' simExList ')'
+   85          | . simpleExpr inExpr '(' select ')'
+   86          | . '(' idList2 ')' inExpr '(' simExList ')'
+   86          | '(' . idList2 ')' inExpr '(' simExList ')'
+   87          | . '(' idList2 ')' inExpr '(' select ')'
+   87          | '(' . idList2 ')' inExpr '(' select ')'
+   88          | . simpleExpr IS optNot NULL
+   89          | . simpleExpr optNot LIKE simpleExpr escape
+   90          | . EXISTS '(' select ')'
+   91          | . simpleExpr optNot BETWEEN simpleExpr AND simpleExpr
+   92 idList2: . ID ',' ID
+   93        | . idList2 ',' ID
+   94 comparison: . simpleExpr '=' simpleExpr
+   95           | . simpleExpr '>' simpleExpr
+   96           | . simpleExpr '<' simpleExpr
+   97           | . simpleExpr LE simpleExpr
+   98           | . simpleExpr NE simpleExpr
+   99           | . simpleExpr GE simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  111           | '(' . simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  119           | '(' . select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    SELECT     shift, and go to state 1
+    EXISTS     shift, and go to state 30
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    NOT        shift, and go to state 34
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 76
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 40
+    '?'        shift, and go to state 41
+
+    select       go to state 77
+    basicSelect  go to state 13
+    ident        go to state 46
+    condition    go to state 78
+    idList2      go to state 79
+    comparison   go to state 48
+    simpleExpr   go to state 80
+
+
+state 41
+
+  122 simpleExpr: '?' .
+
+    $default  reduce using rule 122 (simpleExpr)
+
+
+state 42
+
+   25 basicSelect: SELECT optDist whatToSelect . FROM tableList
+
+    FROM  shift, and go to state 81
+
+
+state 43
+
+   51 selectExpression: selectExpression . AS id
+   52                 | selectExpression . id
+   53 id: . ID
+   56 selectExpressionList: selectExpression .  [FROM, ',']
+
+    AS  shift, and go to state 82
+    ID  shift, and go to state 83
+
+    $default  reduce using rule 56 (selectExpressionList)
+
+    id  go to state 84
+
+
+state 44
+
+   50 selectExpression: expression .
+
+    $default  reduce using rule 50 (selectExpression)
+
+
+state 45
+
+   49 whatToSelect: selectExpressionList .  [FROM]
+   57 selectExpressionList: selectExpressionList . ',' selectExpression
+
+    ','  shift, and go to state 85
+
+    $default  reduce using rule 49 (whatToSelect)
+
+
+state 46
+
+  110 simpleExpr: ident . identRest
+  126 identRest: . '(' simExList ')'
+  127          | .  [$end, BETWEEN, ESCAPE, OVER, HAVING, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, WHEN, THEN, ELSE, DESC, LIKE, JOIN, LEFT, FULL, AND, END, ASC, XOR, FOR, NOT, AS, IN, IS, OUTERJ, NE, LE, GE, CONCAT, ID, '=', '>', '<', '-', '+', '/', '*', ',', ')']
+
+    '('  shift, and go to state 86
+
+    $default  reduce using rule 127 (identRest)
+
+    identRest  go to state 87
+
+
+state 47
+
+   54 expression: condition .  [FROM, AS, ID, ',']
+   78 condition: condition . AND condition
+   79          | condition . OR condition
+   80          | condition . XOR condition
+
+    OR   shift, and go to state 88
+    AND  shift, and go to state 89
+    XOR  shift, and go to state 90
+
+    $default  reduce using rule 54 (expression)
+
+
+state 48
+
+   83 condition: comparison .
+
+    $default  reduce using rule 83 (condition)
+
+
+state 49
+
+   55 expression: simpleExpr .  [FROM, AS, ID, ',']
+   84 condition: simpleExpr . inExpr '(' simExList ')'
+   85          | simpleExpr . inExpr '(' select ')'
+   88          | simpleExpr . IS optNot NULL
+   89          | simpleExpr . optNot LIKE simpleExpr escape
+   91          | simpleExpr . optNot BETWEEN simpleExpr AND simpleExpr
+   94 comparison: simpleExpr . '=' simpleExpr
+   95           | simpleExpr . '>' simpleExpr
+   96           | simpleExpr . '<' simpleExpr
+   97           | simpleExpr . LE simpleExpr
+   98           | simpleExpr . NE simpleExpr
+   99           | simpleExpr . GE simpleExpr
+  102 inExpr: . optNot IN
+  103 optNot: . NOT
+  104       | .  [BETWEEN, LIKE, IN]
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    shift, and go to state 91
+    NOT     shift, and go to state 92
+    IS      shift, and go to state 93
+    OUTERJ  shift, and go to state 94
+    NE      shift, and go to state 95
+    LE      shift, and go to state 96
+    GE      shift, and go to state 97
+    CONCAT  shift, and go to state 98
+    '='     shift, and go to state 99
+    '>'     shift, and go to state 100
+    '<'     shift, and go to state 101
+    '-'     shift, and go to state 102
+    '+'     shift, and go to state 103
+    '/'     shift, and go to state 104
+    '*'     shift, and go to state 105
+
+    BETWEEN   reduce using rule 104 (optNot)
+    LIKE      reduce using rule 104 (optNot)
+    IN        reduce using rule 104 (optNot)
+    $default  reduce using rule 55 (expression)
+
+    inExpr  go to state 106
+    optNot  go to state 107
+
+
+state 50
+
+   11 delete: DELETE optFrom alias . where
+   26 where: . WHERE whereCond
+   27      | .  [$end]
+
+    WHERE  shift, and go to state 28
+
+    $default  reduce using rule 27 (where)
+
+    where  go to state 108
+
+
+state 51
+
+   14 insert: INSERT INTO alias . optIdList insertRest
+   17 optIdList: .  [VALUES, SELECT]
+   18          | . '(' idList ')'
+
+    '('  shift, and go to state 109
+
+    $default  reduce using rule 17 (optIdList)
+
+    optIdList  go to state 110
+
+
+state 52
+
+   72 tableExpr: TABLE '(' . simpleExpr ')'
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 74
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    simpleExpr  go to state 111
+
+
+state 53
+
+   75 ident: ID '.' . ID
+   76      | ID '.' . ID '.' ID
+
+    ID  shift, and go to state 112
+
+
+state 54
+
+   24 select: select . UNION select
+   73 tableExpr: '(' select . ')'
+
+    UNION  shift, and go to state 27
+    ')'    shift, and go to state 113
+
+
+state 55
+
+    6 update: UPDATE alias SET . assignList where
+    7 assignList: . assign
+    8           | . assignList ',' assign
+    9 assign: . ident '=' simpleExpr
+   10       | . '(' idList ')' '=' simpleExpr
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+
+    ID   shift, and go to state 20
+    '('  shift, and go to state 114
+
+    assignList  go to state 115
+    assign      go to state 116
+    ident       go to state 117
+
+
+state 56
+
+   70 alias: tableExpr ID .
+
+    $default  reduce using rule 70 (alias)
+
+
+state 57
+
+   22 bracketedSelect: '(' select ')' .
+
+    $default  reduce using rule 22 (bracketedSelect)
+
+
+state 58
+
+   24 select: select . UNION select
+   24       | select UNION select .  [$end, UNION, ')']
+
+    $default  reduce using rule 24 (select)
+
+
+state 59
+
+   26 where: WHERE whereCond .
+
+    $default  reduce using rule 26 (where)
+
+
+state 60
+
+   77 whereCond: condition .  [$end, ORDER, GROUP, UNION, FOR, ')']
+   78 condition: condition . AND condition
+   79          | condition . OR condition
+   80          | condition . XOR condition
+
+    OR   shift, and go to state 88
+    AND  shift, and go to state 89
+    XOR  shift, and go to state 90
+
+    $default  reduce using rule 77 (whereCond)
+
+
+state 61
+
+   84 condition: simpleExpr . inExpr '(' simExList ')'
+   85          | simpleExpr . inExpr '(' select ')'
+   88          | simpleExpr . IS optNot NULL
+   89          | simpleExpr . optNot LIKE simpleExpr escape
+   91          | simpleExpr . optNot BETWEEN simpleExpr AND simpleExpr
+   94 comparison: simpleExpr . '=' simpleExpr
+   95           | simpleExpr . '>' simpleExpr
+   96           | simpleExpr . '<' simpleExpr
+   97           | simpleExpr . LE simpleExpr
+   98           | simpleExpr . NE simpleExpr
+   99           | simpleExpr . GE simpleExpr
+  102 inExpr: . optNot IN
+  103 optNot: . NOT
+  104       | .  [BETWEEN, LIKE, IN]
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    shift, and go to state 91
+    NOT     shift, and go to state 92
+    IS      shift, and go to state 93
+    OUTERJ  shift, and go to state 94
+    NE      shift, and go to state 95
+    LE      shift, and go to state 96
+    GE      shift, and go to state 97
+    CONCAT  shift, and go to state 98
+    '='     shift, and go to state 99
+    '>'     shift, and go to state 100
+    '<'     shift, and go to state 101
+    '-'     shift, and go to state 102
+    '+'     shift, and go to state 103
+    '/'     shift, and go to state 104
+    '*'     shift, and go to state 105
+
+    $default  reduce using rule 104 (optNot)
+
+    inExpr  go to state 106
+    optNot  go to state 107
+
+
+state 62
+
+   35 orderBy: ORDER . BY directionList
+
+    BY  shift, and go to state 118
+
+
+state 63
+
+   30 groupBy: GROUP . BY simExList having
+
+    BY  shift, and go to state 119
+
+
+state 64
+
+   35 orderBy: . ORDER BY directionList
+   36 optOrderBy: . orderBy
+   37           | .  [$end, UNION, FOR, ')']
+   39 byClauses: groupBy . optOrderBy
+
+    ORDER  shift, and go to state 62
+
+    $default  reduce using rule 37 (optOrderBy)
+
+    orderBy     go to state 120
+    optOrderBy  go to state 121
+
+
+state 65
+
+   30 groupBy: . GROUP BY simExList having
+   31 optGroupBy: . groupBy
+   32           | .  [$end, UNION, FOR, ')']
+   38 byClauses: orderBy . optGroupBy
+
+    GROUP  shift, and go to state 63
+
+    $default  reduce using rule 32 (optGroupBy)
+
+    groupBy     go to state 122
+    optGroupBy  go to state 123
+
+
+state 66
+
+   23 select: basicSelect where byClauses . forUpdate
+   28 forUpdate: . FOR UPDATE
+   29          | .  [$end, UNION, ')']
+
+    FOR  shift, and go to state 124
+
+    $default  reduce using rule 29 (forUpdate)
+
+    forUpdate  go to state 125
+
+
+state 67
+
+   23 select: . basicSelect where byClauses forUpdate
+   24       | . select UNION select
+   25 basicSelect: . SELECT optDist whatToSelect FROM tableList
+   90 condition: EXISTS '(' . select ')'
+
+    SELECT  shift, and go to state 1
+
+    select       go to state 126
+    basicSelect  go to state 13
+
+
+state 68
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   78 condition: . condition AND condition
+   79          | . condition OR condition
+   80          | . condition XOR condition
+   81          | . NOT condition
+   82          | . '(' condition ')'
+   83          | . comparison
+   84          | . simpleExpr inExpr '(' simExList ')'
+   85          | . simpleExpr inExpr '(' select ')'
+   86          | . '(' idList2 ')' inExpr '(' simExList ')'
+   87          | . '(' idList2 ')' inExpr '(' select ')'
+   88          | . simpleExpr IS optNot NULL
+   89          | . simpleExpr optNot LIKE simpleExpr escape
+   90          | . EXISTS '(' select ')'
+   91          | . simpleExpr optNot BETWEEN simpleExpr AND simpleExpr
+   94 comparison: . simpleExpr '=' simpleExpr
+   95           | . simpleExpr '>' simpleExpr
+   96           | . simpleExpr '<' simpleExpr
+   97           | . simpleExpr LE simpleExpr
+   98           | . simpleExpr NE simpleExpr
+   99           | . simpleExpr GE simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+  130 when: WHEN . condition THEN simpleExpr
+
+    EXISTS     shift, and go to state 30
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    NOT        shift, and go to state 34
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 40
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    condition   go to state 127
+    comparison  go to state 48
+    simpleExpr  go to state 61
+
+
+state 69
+
+  108 simpleExpr: CASE whenList . else END
+  131 else: . ELSE simpleExpr
+  132     | .  [END]
+
+    ELSE  shift, and go to state 128
+
+    $default  reduce using rule 132 (else)
+
+    else  go to state 129
+
+
+state 70
+
+  128 whenList: . when
+  128         | when .  [ELSE, END]
+  129         | . when whenList
+  129         | when . whenList
+  130 when: . WHEN condition THEN simpleExpr
+
+    WHEN  shift, and go to state 68
+
+    $default  reduce using rule 128 (whenList)
+
+    whenList  go to state 130
+    when      go to state 70
+
+
+state 71
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  118           | CAST '(' . simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 74
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    simpleExpr  go to state 131
+
+
+state 72
+
+   78 condition: condition . AND condition
+   79          | condition . OR condition
+   80          | condition . XOR condition
+   81          | NOT condition .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, AND, XOR, FOR, AS, ID, ',', ')']
+
+    $default  reduce using rule 81 (condition)
+
+
+state 73
+
+   75 ident: ID '.' . ID
+   76      | ID '.' . ID '.' ID
+  120 simpleExpr: ID '.' . '*'
+
+    ID   shift, and go to state 112
+    '*'  shift, and go to state 132
+
+
+state 74
+
+   23 select: . basicSelect where byClauses forUpdate
+   24       | . select UNION select
+   25 basicSelect: . SELECT optDist whatToSelect FROM tableList
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  111           | '(' . simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  119           | '(' . select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    SELECT     shift, and go to state 1
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 74
+    '?'        shift, and go to state 41
+
+    select       go to state 77
+    basicSelect  go to state 13
+    ident        go to state 46
+    simpleExpr   go to state 133
+
+
+state 75
+
+  106 simpleExpr: simpleExpr . OUTERJ
+  107           | '-' simpleExpr .  [$end, BETWEEN, ESCAPE, OVER, HAVING, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, WHEN, THEN, ELSE, DESC, LIKE, JOIN, LEFT, FULL, AND, END, ASC, XOR, FOR, NOT, AS, IN, IS, NE, LE, GE, ID, '=', '>', '<', '-', '+', ',', ')']
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OUTERJ  shift, and go to state 94
+    CONCAT  shift, and go to state 98
+    '/'     shift, and go to state 104
+    '*'     shift, and go to state 105
+
+    $default  reduce using rule 107 (simpleExpr)
+
+
+state 76
+
+   74 ident: ID .  [BETWEEN, OVER, LIKE, NOT, IN, IS, OUTERJ, NE, LE, GE, CONCAT, '=', '>', '<', '-', '+', '/', '*', '(', ')']
+   75      | ID . '.' ID
+   76      | ID . '.' ID '.' ID
+   92 idList2: ID . ',' ID
+  120 simpleExpr: ID . '.' '*'
+
+    ','  shift, and go to state 134
+    '.'  shift, and go to state 73
+
+    $default  reduce using rule 74 (ident)
+
+
+state 77
+
+   24 select: select . UNION select
+  119 simpleExpr: '(' select . ')'
+
+    UNION  shift, and go to state 27
+    ')'    shift, and go to state 135
+
+
+state 78
+
+   78 condition: condition . AND condition
+   79          | condition . OR condition
+   80          | condition . XOR condition
+   82          | '(' condition . ')'
+
+    OR   shift, and go to state 88
+    AND  shift, and go to state 89
+    XOR  shift, and go to state 90
+    ')'  shift, and go to state 136
+
+
+state 79
+
+   86 condition: '(' idList2 . ')' inExpr '(' simExList ')'
+   87          | '(' idList2 . ')' inExpr '(' select ')'
+   93 idList2: idList2 . ',' ID
+
+    ','  shift, and go to state 137
+    ')'  shift, and go to state 138
+
+
+state 80
+
+   84 condition: simpleExpr . inExpr '(' simExList ')'
+   85          | simpleExpr . inExpr '(' select ')'
+   88          | simpleExpr . IS optNot NULL
+   89          | simpleExpr . optNot LIKE simpleExpr escape
+   91          | simpleExpr . optNot BETWEEN simpleExpr AND simpleExpr
+   94 comparison: simpleExpr . '=' simpleExpr
+   95           | simpleExpr . '>' simpleExpr
+   96           | simpleExpr . '<' simpleExpr
+   97           | simpleExpr . LE simpleExpr
+   98           | simpleExpr . NE simpleExpr
+   99           | simpleExpr . GE simpleExpr
+  102 inExpr: . optNot IN
+  103 optNot: . NOT
+  104       | .  [BETWEEN, LIKE, IN]
+  106 simpleExpr: simpleExpr . OUTERJ
+  111           | '(' simpleExpr . ')'
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    shift, and go to state 91
+    NOT     shift, and go to state 92
+    IS      shift, and go to state 93
+    OUTERJ  shift, and go to state 94
+    NE      shift, and go to state 95
+    LE      shift, and go to state 96
+    GE      shift, and go to state 97
+    CONCAT  shift, and go to state 98
+    '='     shift, and go to state 99
+    '>'     shift, and go to state 100
+    '<'     shift, and go to state 101
+    '-'     shift, and go to state 102
+    '+'     shift, and go to state 103
+    '/'     shift, and go to state 104
+    '*'     shift, and go to state 105
+    ')'     shift, and go to state 139
+
+    $default  reduce using rule 104 (optNot)
+
+    inExpr  go to state 106
+    optNot  go to state 107
+
+
+state 81
+
+   25 basicSelect: SELECT optDist whatToSelect FROM . tableList
+   58 tableList: . table
+   59          | . tableList ',' table
+   60 table: . alias
+   61      | . table join alias ON condition
+   69 alias: . tableExpr
+   70      | . tableExpr ID
+   71 tableExpr: . ident
+   72          | . TABLE '(' simpleExpr ')'
+   73          | . '(' select ')'
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+
+    TABLE  shift, and go to state 19
+    ID     shift, and go to state 20
+    '('    shift, and go to state 21
+
+    tableList  go to state 140
+    table      go to state 141
+    alias      go to state 142
+    tableExpr  go to state 23
+    ident      go to state 24
+
+
+state 82
+
+   51 selectExpression: selectExpression AS . id
+   53 id: . ID
+
+    ID  shift, and go to state 83
+
+    id  go to state 143
+
+
+state 83
+
+   53 id: ID .
+
+    $default  reduce using rule 53 (id)
+
+
+state 84
+
+   52 selectExpression: selectExpression id .
+
+    $default  reduce using rule 52 (selectExpression)
+
+
+state 85
+
+   50 selectExpression: . expression
+   51                 | . selectExpression AS id
+   52                 | . selectExpression id
+   54 expression: . condition
+   55           | . simpleExpr
+   57 selectExpressionList: selectExpressionList ',' . selectExpression
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   78 condition: . condition AND condition
+   79          | . condition OR condition
+   80          | . condition XOR condition
+   81          | . NOT condition
+   82          | . '(' condition ')'
+   83          | . comparison
+   84          | . simpleExpr inExpr '(' simExList ')'
+   85          | . simpleExpr inExpr '(' select ')'
+   86          | . '(' idList2 ')' inExpr '(' simExList ')'
+   87          | . '(' idList2 ')' inExpr '(' select ')'
+   88          | . simpleExpr IS optNot NULL
+   89          | . simpleExpr optNot LIKE simpleExpr escape
+   90          | . EXISTS '(' select ')'
+   91          | . simpleExpr optNot BETWEEN simpleExpr AND simpleExpr
+   94 comparison: . simpleExpr '=' simpleExpr
+   95           | . simpleExpr '>' simpleExpr
+   96           | . simpleExpr '<' simpleExpr
+   97           | . simpleExpr LE simpleExpr
+   98           | . simpleExpr NE simpleExpr
+   99           | . simpleExpr GE simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    EXISTS     shift, and go to state 30
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    NOT        shift, and go to state 34
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 40
+    '?'        shift, and go to state 41
+
+    selectExpression  go to state 144
+    expression        go to state 44
+    ident             go to state 46
+    condition         go to state 47
+    comparison        go to state 48
+    simpleExpr        go to state 49
+
+
+state 86
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+  126 identRest: '(' . simExList ')'
+  133 simExList: .  [',', ')']
+  134          | . simpleExpr
+  135          | . simExList ',' simpleExpr
+
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 74
+    '?'        shift, and go to state 41
+
+    $default  reduce using rule 133 (simExList)
+
+    ident       go to state 46
+    simpleExpr  go to state 145
+    simExList   go to state 146
+
+
+state 87
+
+  110 simpleExpr: ident identRest .
+
+    $default  reduce using rule 110 (simpleExpr)
+
+
+state 88
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   78 condition: . condition AND condition
+   79          | . condition OR condition
+   79          | condition OR . condition
+   80          | . condition XOR condition
+   81          | . NOT condition
+   82          | . '(' condition ')'
+   83          | . comparison
+   84          | . simpleExpr inExpr '(' simExList ')'
+   85          | . simpleExpr inExpr '(' select ')'
+   86          | . '(' idList2 ')' inExpr '(' simExList ')'
+   87          | . '(' idList2 ')' inExpr '(' select ')'
+   88          | . simpleExpr IS optNot NULL
+   89          | . simpleExpr optNot LIKE simpleExpr escape
+   90          | . EXISTS '(' select ')'
+   91          | . simpleExpr optNot BETWEEN simpleExpr AND simpleExpr
+   94 comparison: . simpleExpr '=' simpleExpr
+   95           | . simpleExpr '>' simpleExpr
+   96           | . simpleExpr '<' simpleExpr
+   97           | . simpleExpr LE simpleExpr
+   98           | . simpleExpr NE simpleExpr
+   99           | . simpleExpr GE simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    EXISTS     shift, and go to state 30
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    NOT        shift, and go to state 34
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 40
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    condition   go to state 147
+    comparison  go to state 48
+    simpleExpr  go to state 61
+
+
+state 89
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   78 condition: . condition AND condition
+   78          | condition AND . condition
+   79          | . condition OR condition
+   80          | . condition XOR condition
+   81          | . NOT condition
+   82          | . '(' condition ')'
+   83          | . comparison
+   84          | . simpleExpr inExpr '(' simExList ')'
+   85          | . simpleExpr inExpr '(' select ')'
+   86          | . '(' idList2 ')' inExpr '(' simExList ')'
+   87          | . '(' idList2 ')' inExpr '(' select ')'
+   88          | . simpleExpr IS optNot NULL
+   89          | . simpleExpr optNot LIKE simpleExpr escape
+   90          | . EXISTS '(' select ')'
+   91          | . simpleExpr optNot BETWEEN simpleExpr AND simpleExpr
+   94 comparison: . simpleExpr '=' simpleExpr
+   95           | . simpleExpr '>' simpleExpr
+   96           | . simpleExpr '<' simpleExpr
+   97           | . simpleExpr LE simpleExpr
+   98           | . simpleExpr NE simpleExpr
+   99           | . simpleExpr GE simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    EXISTS     shift, and go to state 30
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    NOT        shift, and go to state 34
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 40
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    condition   go to state 148
+    comparison  go to state 48
+    simpleExpr  go to state 61
+
+
+state 90
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   78 condition: . condition AND condition
+   79          | . condition OR condition
+   80          | . condition XOR condition
+   80          | condition XOR . condition
+   81          | . NOT condition
+   82          | . '(' condition ')'
+   83          | . comparison
+   84          | . simpleExpr inExpr '(' simExList ')'
+   85          | . simpleExpr inExpr '(' select ')'
+   86          | . '(' idList2 ')' inExpr '(' simExList ')'
+   87          | . '(' idList2 ')' inExpr '(' select ')'
+   88          | . simpleExpr IS optNot NULL
+   89          | . simpleExpr optNot LIKE simpleExpr escape
+   90          | . EXISTS '(' select ')'
+   91          | . simpleExpr optNot BETWEEN simpleExpr AND simpleExpr
+   94 comparison: . simpleExpr '=' simpleExpr
+   95           | . simpleExpr '>' simpleExpr
+   96           | . simpleExpr '<' simpleExpr
+   97           | . simpleExpr LE simpleExpr
+   98           | . simpleExpr NE simpleExpr
+   99           | . simpleExpr GE simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    EXISTS     shift, and go to state 30
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    NOT        shift, and go to state 34
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 40
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    condition   go to state 149
+    comparison  go to state 48
+    simpleExpr  go to state 61
+
+
+state 91
+
+  117 simpleExpr: simpleExpr OVER . partition
+  136 partition: . '(' PARTITION BY ident orderBy ')'
+
+    '('  shift, and go to state 150
+
+    partition  go to state 151
+
+
+state 92
+
+  103 optNot: NOT .
+
+    $default  reduce using rule 103 (optNot)
+
+
+state 93
+
+   88 condition: simpleExpr IS . optNot NULL
+  103 optNot: . NOT
+  104       | .  [NULL]
+
+    NOT  shift, and go to state 92
+
+    $default  reduce using rule 104 (optNot)
+
+    optNot  go to state 152
+
+
+state 94
+
+  106 simpleExpr: simpleExpr OUTERJ .
+
+    $default  reduce using rule 106 (simpleExpr)
+
+
+state 95
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   98 comparison: simpleExpr NE . simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 74
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    simpleExpr  go to state 153
+
+
+state 96
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   97 comparison: simpleExpr LE . simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 74
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    simpleExpr  go to state 154
+
+
+state 97
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   99 comparison: simpleExpr GE . simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 74
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    simpleExpr  go to state 155
+
+
+state 98
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  116           | simpleExpr CONCAT . simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 74
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    simpleExpr  go to state 156
+
+
+state 99
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   94 comparison: simpleExpr '=' . simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 74
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    simpleExpr  go to state 157
+
+
+state 100
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   95 comparison: simpleExpr '>' . simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 74
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    simpleExpr  go to state 158
+
+
+state 101
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   96 comparison: simpleExpr '<' . simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 74
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    simpleExpr  go to state 159
+
+
+state 102
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  112           | simpleExpr '-' . simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 74
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    simpleExpr  go to state 160
+
+
+state 103
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  113           | simpleExpr '+' . simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 74
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    simpleExpr  go to state 161
+
+
+state 104
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  115           | simpleExpr '/' . simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 74
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    simpleExpr  go to state 162
+
+
+state 105
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  114           | simpleExpr '*' . simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 74
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    simpleExpr  go to state 163
+
+
+state 106
+
+   84 condition: simpleExpr inExpr . '(' simExList ')'
+   85          | simpleExpr inExpr . '(' select ')'
+
+    '('  shift, and go to state 164
+
+
+state 107
+
+   89 condition: simpleExpr optNot . LIKE simpleExpr escape
+   91          | simpleExpr optNot . BETWEEN simpleExpr AND simpleExpr
+  102 inExpr: optNot . IN
+
+    BETWEEN  shift, and go to state 165
+    LIKE     shift, and go to state 166
+    IN       shift, and go to state 167
+
+
+state 108
+
+   11 delete: DELETE optFrom alias where .
+
+    $default  reduce using rule 11 (delete)
+
+
+state 109
+
+   18 optIdList: '(' . idList ')'
+   19 idList: . ID
+   20       | . idList ',' ID
+
+    ID  shift, and go to state 168
+
+    idList  go to state 169
+
+
+state 110
+
+   14 insert: INSERT INTO alias optIdList . insertRest
+   15 insertRest: . VALUES identRest
+   16           | . select
+   23 select: . basicSelect where byClauses forUpdate
+   24       | . select UNION select
+   25 basicSelect: . SELECT optDist whatToSelect FROM tableList
+
+    VALUES  shift, and go to state 170
+    SELECT  shift, and go to state 1
+
+    insertRest   go to state 171
+    select       go to state 172
+    basicSelect  go to state 13
+
+
+state 111
+
+   72 tableExpr: TABLE '(' simpleExpr . ')'
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    shift, and go to state 91
+    OUTERJ  shift, and go to state 94
+    CONCAT  shift, and go to state 98
+    '-'     shift, and go to state 102
+    '+'     shift, and go to state 103
+    '/'     shift, and go to state 104
+    '*'     shift, and go to state 105
+    ')'     shift, and go to state 173
+
+
+state 112
+
+   75 ident: ID '.' ID .  [$end, BETWEEN, VALUES, SELECT, ESCAPE, OVER, HAVING, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, WHEN, THEN, ELSE, DESC, LIKE, JOIN, LEFT, FULL, AND, SET, END, ASC, XOR, FOR, NOT, ON, AS, IN, IS, OUTERJ, NE, LE, GE, CONCAT, ID, '=', '>', '<', '-', '+', '/', '*', ',', '(', ')']
+   76      | ID '.' ID . '.' ID
+
+    '.'  shift, and go to state 174
+
+    $default  reduce using rule 75 (ident)
+
+
+state 113
+
+   73 tableExpr: '(' select ')' .
+
+    $default  reduce using rule 73 (tableExpr)
+
+
+state 114
+
+   10 assign: '(' . idList ')' '=' simpleExpr
+   19 idList: . ID
+   20       | . idList ',' ID
+
+    ID  shift, and go to state 168
+
+    idList  go to state 175
+
+
+state 115
+
+    6 update: UPDATE alias SET assignList . where
+    8 assignList: assignList . ',' assign
+   26 where: . WHERE whereCond
+   27      | .  [$end]
+
+    WHERE  shift, and go to state 28
+    ','    shift, and go to state 176
+
+    $default  reduce using rule 27 (where)
+
+    where  go to state 177
+
+
+state 116
+
+    7 assignList: assign .
+
+    $default  reduce using rule 7 (assignList)
+
+
+state 117
+
+    9 assign: ident . '=' simpleExpr
+
+    '='  shift, and go to state 178
+
+
+state 118
+
+   35 orderBy: ORDER BY . directionList
+   41 directionList: . direction
+   42              | . directionList ',' direction
+   43 direction: . simpleExpr orderDirection
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 74
+    '?'        shift, and go to state 41
+
+    directionList  go to state 179
+    direction      go to state 180
+    ident          go to state 46
+    simpleExpr     go to state 181
+
+
+state 119
+
+   30 groupBy: GROUP BY . simExList having
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+  133 simExList: .  [$end, HAVING, ORDER, UNION, FOR, ',', ')']
+  134          | . simpleExpr
+  135          | . simExList ',' simpleExpr
+
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 74
+    '?'        shift, and go to state 41
+
+    $default  reduce using rule 133 (simExList)
+
+    ident       go to state 46
+    simpleExpr  go to state 145
+    simExList   go to state 182
+
+
+state 120
+
+   36 optOrderBy: orderBy .
+
+    $default  reduce using rule 36 (optOrderBy)
+
+
+state 121
+
+   39 byClauses: groupBy optOrderBy .
+
+    $default  reduce using rule 39 (byClauses)
+
+
+state 122
+
+   31 optGroupBy: groupBy .
+
+    $default  reduce using rule 31 (optGroupBy)
+
+
+state 123
+
+   38 byClauses: orderBy optGroupBy .
+
+    $default  reduce using rule 38 (byClauses)
+
+
+state 124
+
+   28 forUpdate: FOR . UPDATE
+
+    UPDATE  shift, and go to state 183
+
+
+state 125
+
+   23 select: basicSelect where byClauses forUpdate .
+
+    $default  reduce using rule 23 (select)
+
+
+state 126
+
+   24 select: select . UNION select
+   90 condition: EXISTS '(' select . ')'
+
+    UNION  shift, and go to state 27
+    ')'    shift, and go to state 184
+
+
+state 127
+
+   78 condition: condition . AND condition
+   79          | condition . OR condition
+   80          | condition . XOR condition
+  130 when: WHEN condition . THEN simpleExpr
+
+    OR    shift, and go to state 88
+    THEN  shift, and go to state 185
+    AND   shift, and go to state 89
+    XOR   shift, and go to state 90
+
+
+state 128
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+  131 else: ELSE . simpleExpr
+
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 74
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    simpleExpr  go to state 186
+
+
+state 129
+
+  108 simpleExpr: CASE whenList else . END
+
+    END  shift, and go to state 187
+
+
+state 130
+
+  129 whenList: when whenList .
+
+    $default  reduce using rule 129 (whenList)
+
+
+state 131
+
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+  118           | CAST '(' simpleExpr . AS ID optSize ')'
+
+    OVER    shift, and go to state 91
+    AS      shift, and go to state 188
+    OUTERJ  shift, and go to state 94
+    CONCAT  shift, and go to state 98
+    '-'     shift, and go to state 102
+    '+'     shift, and go to state 103
+    '/'     shift, and go to state 104
+    '*'     shift, and go to state 105
+
+
+state 132
+
+  120 simpleExpr: ID '.' '*' .
+
+    $default  reduce using rule 120 (simpleExpr)
+
+
+state 133
+
+  106 simpleExpr: simpleExpr . OUTERJ
+  111           | '(' simpleExpr . ')'
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    shift, and go to state 91
+    OUTERJ  shift, and go to state 94
+    CONCAT  shift, and go to state 98
+    '-'     shift, and go to state 102
+    '+'     shift, and go to state 103
+    '/'     shift, and go to state 104
+    '*'     shift, and go to state 105
+    ')'     shift, and go to state 139
+
+
+state 134
+
+   92 idList2: ID ',' . ID
+
+    ID  shift, and go to state 189
+
+
+state 135
+
+  119 simpleExpr: '(' select ')' .
+
+    $default  reduce using rule 119 (simpleExpr)
+
+
+state 136
+
+   82 condition: '(' condition ')' .
+
+    $default  reduce using rule 82 (condition)
+
+
+state 137
+
+   93 idList2: idList2 ',' . ID
+
+    ID  shift, and go to state 190
+
+
+state 138
+
+   86 condition: '(' idList2 ')' . inExpr '(' simExList ')'
+   87          | '(' idList2 ')' . inExpr '(' select ')'
+  102 inExpr: . optNot IN
+  103 optNot: . NOT
+  104       | .  [IN]
+
+    NOT  shift, and go to state 92
+
+    $default  reduce using rule 104 (optNot)
+
+    inExpr  go to state 191
+    optNot  go to state 192
+
+
+state 139
+
+  111 simpleExpr: '(' simpleExpr ')' .
+
+    $default  reduce using rule 111 (simpleExpr)
+
+
+state 140
+
+   25 basicSelect: SELECT optDist whatToSelect FROM tableList .  [$end, WHERE, ORDER, GROUP, UNION, FOR, ')']
+   59 tableList: tableList . ',' table
+
+    ','  shift, and go to state 193
+
+    $default  reduce using rule 25 (basicSelect)
+
+
+state 141
+
+   58 tableList: table .  [$end, WHERE, ORDER, GROUP, UNION, FOR, ',', ')']
+   61 table: table . join alias ON condition
+   62 join: . JOIN
+   63     | . LEFT JOIN
+   64     | . outerType OUTER JOIN
+   65     | . INNER JOIN
+   66 outerType: . LEFT
+   67          | . RIGHT
+   68          | . FULL
+
+    RIGHT  shift, and go to state 194
+    INNER  shift, and go to state 195
+    JOIN   shift, and go to state 196
+    LEFT   shift, and go to state 197
+    FULL   shift, and go to state 198
+
+    $default  reduce using rule 58 (tableList)
+
+    join       go to state 199
+    outerType  go to state 200
+
+
+state 142
+
+   60 table: alias .
+
+    $default  reduce using rule 60 (table)
+
+
+state 143
+
+   51 selectExpression: selectExpression AS id .
+
+    $default  reduce using rule 51 (selectExpression)
+
+
+state 144
+
+   51 selectExpression: selectExpression . AS id
+   52                 | selectExpression . id
+   53 id: . ID
+   57 selectExpressionList: selectExpressionList ',' selectExpression .  [FROM, ',']
+
+    AS  shift, and go to state 82
+    ID  shift, and go to state 83
+
+    $default  reduce using rule 57 (selectExpressionList)
+
+    id  go to state 84
+
+
+state 145
+
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+  134 simExList: simpleExpr .  [$end, HAVING, ORDER, UNION, FOR, ',', ')']
+
+    OVER    shift, and go to state 91
+    OUTERJ  shift, and go to state 94
+    CONCAT  shift, and go to state 98
+    '-'     shift, and go to state 102
+    '+'     shift, and go to state 103
+    '/'     shift, and go to state 104
+    '*'     shift, and go to state 105
+
+    $default  reduce using rule 134 (simExList)
+
+
+state 146
+
+  126 identRest: '(' simExList . ')'
+  135 simExList: simExList . ',' simpleExpr
+
+    ','  shift, and go to state 201
+    ')'  shift, and go to state 202
+
+
+state 147
+
+   78 condition: condition . AND condition
+   79          | condition . OR condition
+   79          | condition OR condition .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, XOR, FOR, AS, ID, ',', ')']
+   80          | condition . XOR condition
+
+    AND  shift, and go to state 89
+
+    $default  reduce using rule 79 (condition)
+
+
+state 148
+
+   78 condition: condition . AND condition
+   78          | condition AND condition .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, AND, XOR, FOR, AS, ID, ',', ')']
+   79          | condition . OR condition
+   80          | condition . XOR condition
+
+    $default  reduce using rule 78 (condition)
+
+
+state 149
+
+   78 condition: condition . AND condition
+   79          | condition . OR condition
+   80          | condition . XOR condition
+   80          | condition XOR condition .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, XOR, FOR, AS, ID, ',', ')']
+
+    AND  shift, and go to state 89
+
+    $default  reduce using rule 80 (condition)
+
+
+state 150
+
+  136 partition: '(' . PARTITION BY ident orderBy ')'
+
+    PARTITION  shift, and go to state 203
+
+
+state 151
+
+  117 simpleExpr: simpleExpr OVER partition .
+
+    $default  reduce using rule 117 (simpleExpr)
+
+
+state 152
+
+   88 condition: simpleExpr IS optNot . NULL
+
+    NULL  shift, and go to state 204
+
+
+state 153
+
+   98 comparison: simpleExpr NE simpleExpr .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, AND, XOR, FOR, AS, ID, ',', ')']
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    shift, and go to state 91
+    OUTERJ  shift, and go to state 94
+    CONCAT  shift, and go to state 98
+    '-'     shift, and go to state 102
+    '+'     shift, and go to state 103
+    '/'     shift, and go to state 104
+    '*'     shift, and go to state 105
+
+    $default  reduce using rule 98 (comparison)
+
+
+state 154
+
+   97 comparison: simpleExpr LE simpleExpr .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, AND, XOR, FOR, AS, ID, ',', ')']
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    shift, and go to state 91
+    OUTERJ  shift, and go to state 94
+    CONCAT  shift, and go to state 98
+    '-'     shift, and go to state 102
+    '+'     shift, and go to state 103
+    '/'     shift, and go to state 104
+    '*'     shift, and go to state 105
+
+    $default  reduce using rule 97 (comparison)
+
+
+state 155
+
+   99 comparison: simpleExpr GE simpleExpr .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, AND, XOR, FOR, AS, ID, ',', ')']
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    shift, and go to state 91
+    OUTERJ  shift, and go to state 94
+    CONCAT  shift, and go to state 98
+    '-'     shift, and go to state 102
+    '+'     shift, and go to state 103
+    '/'     shift, and go to state 104
+    '*'     shift, and go to state 105
+
+    $default  reduce using rule 99 (comparison)
+
+
+state 156
+
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  116           | simpleExpr CONCAT simpleExpr .  [$end, BETWEEN, ESCAPE, OVER, HAVING, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, WHEN, THEN, ELSE, DESC, LIKE, JOIN, LEFT, FULL, AND, END, ASC, XOR, FOR, NOT, AS, IN, IS, OUTERJ, NE, LE, GE, CONCAT, ID, '=', '>', '<', '-', '+', '/', '*', ',', ')']
+  117           | simpleExpr . OVER partition
+
+    $default  reduce using rule 116 (simpleExpr)
+
+
+state 157
+
+   94 comparison: simpleExpr '=' simpleExpr .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, AND, XOR, FOR, AS, ID, ',', ')']
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    shift, and go to state 91
+    OUTERJ  shift, and go to state 94
+    CONCAT  shift, and go to state 98
+    '-'     shift, and go to state 102
+    '+'     shift, and go to state 103
+    '/'     shift, and go to state 104
+    '*'     shift, and go to state 105
+
+    $default  reduce using rule 94 (comparison)
+
+
+state 158
+
+   95 comparison: simpleExpr '>' simpleExpr .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, AND, XOR, FOR, AS, ID, ',', ')']
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    shift, and go to state 91
+    OUTERJ  shift, and go to state 94
+    CONCAT  shift, and go to state 98
+    '-'     shift, and go to state 102
+    '+'     shift, and go to state 103
+    '/'     shift, and go to state 104
+    '*'     shift, and go to state 105
+
+    $default  reduce using rule 95 (comparison)
+
+
+state 159
+
+   96 comparison: simpleExpr '<' simpleExpr .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, AND, XOR, FOR, AS, ID, ',', ')']
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    shift, and go to state 91
+    OUTERJ  shift, and go to state 94
+    CONCAT  shift, and go to state 98
+    '-'     shift, and go to state 102
+    '+'     shift, and go to state 103
+    '/'     shift, and go to state 104
+    '*'     shift, and go to state 105
+
+    $default  reduce using rule 96 (comparison)
+
+
+state 160
+
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  112           | simpleExpr '-' simpleExpr .  [$end, BETWEEN, ESCAPE, OVER, HAVING, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, WHEN, THEN, ELSE, DESC, LIKE, JOIN, LEFT, FULL, AND, END, ASC, XOR, FOR, NOT, AS, IN, IS, NE, LE, GE, ID, '=', '>', '<', '-', '+', ',', ')']
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OUTERJ  shift, and go to state 94
+    CONCAT  shift, and go to state 98
+    '/'     shift, and go to state 104
+    '*'     shift, and go to state 105
+
+    $default  reduce using rule 112 (simpleExpr)
+
+
+state 161
+
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  113           | simpleExpr '+' simpleExpr .  [$end, BETWEEN, ESCAPE, OVER, HAVING, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, WHEN, THEN, ELSE, DESC, LIKE, JOIN, LEFT, FULL, AND, END, ASC, XOR, FOR, NOT, AS, IN, IS, NE, LE, GE, ID, '=', '>', '<', '-', '+', ',', ')']
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OUTERJ  shift, and go to state 94
+    CONCAT  shift, and go to state 98
+    '/'     shift, and go to state 104
+    '*'     shift, and go to state 105
+
+    $default  reduce using rule 113 (simpleExpr)
+
+
+state 162
+
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  115           | simpleExpr '/' simpleExpr .  [$end, BETWEEN, ESCAPE, OVER, HAVING, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, WHEN, THEN, ELSE, DESC, LIKE, JOIN, LEFT, FULL, AND, END, ASC, XOR, FOR, NOT, AS, IN, IS, OUTERJ, NE, LE, GE, CONCAT, ID, '=', '>', '<', '-', '+', '/', '*', ',', ')']
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    $default  reduce using rule 115 (simpleExpr)
+
+
+state 163
+
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  114           | simpleExpr '*' simpleExpr .  [$end, BETWEEN, ESCAPE, OVER, HAVING, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, WHEN, THEN, ELSE, DESC, LIKE, JOIN, LEFT, FULL, AND, END, ASC, XOR, FOR, NOT, AS, IN, IS, OUTERJ, NE, LE, GE, CONCAT, ID, '=', '>', '<', '-', '+', '/', '*', ',', ')']
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    $default  reduce using rule 114 (simpleExpr)
+
+
+state 164
+
+   23 select: . basicSelect where byClauses forUpdate
+   24       | . select UNION select
+   25 basicSelect: . SELECT optDist whatToSelect FROM tableList
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   84 condition: simpleExpr inExpr '(' . simExList ')'
+   85          | simpleExpr inExpr '(' . select ')'
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+  133 simExList: .  [',', ')']
+  134          | . simpleExpr
+  135          | . simExList ',' simpleExpr
+
+    SELECT     shift, and go to state 1
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 74
+    '?'        shift, and go to state 41
+
+    $default  reduce using rule 133 (simExList)
+
+    select       go to state 205
+    basicSelect  go to state 13
+    ident        go to state 46
+    simpleExpr   go to state 145
+    simExList    go to state 206
+
+
+state 165
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   91 condition: simpleExpr optNot BETWEEN . simpleExpr AND simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 74
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    simpleExpr  go to state 207
+
+
+state 166
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   89 condition: simpleExpr optNot LIKE . simpleExpr escape
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 74
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    simpleExpr  go to state 208
+
+
+state 167
+
+  102 inExpr: optNot IN .
+
+    $default  reduce using rule 102 (inExpr)
+
+
+state 168
+
+   19 idList: ID .
+
+    $default  reduce using rule 19 (idList)
+
+
+state 169
+
+   18 optIdList: '(' idList . ')'
+   20 idList: idList . ',' ID
+
+    ','  shift, and go to state 209
+    ')'  shift, and go to state 210
+
+
+state 170
+
+   15 insertRest: VALUES . identRest
+  126 identRest: . '(' simExList ')'
+  127          | .  [$end]
+
+    '('  shift, and go to state 86
+
+    $default  reduce using rule 127 (identRest)
+
+    identRest  go to state 211
+
+
+state 171
+
+   14 insert: INSERT INTO alias optIdList insertRest .
+
+    $default  reduce using rule 14 (insert)
+
+
+state 172
+
+   16 insertRest: select .  [$end]
+   24 select: select . UNION select
+
+    UNION  shift, and go to state 27
+
+    $default  reduce using rule 16 (insertRest)
+
+
+state 173
+
+   72 tableExpr: TABLE '(' simpleExpr ')' .
+
+    $default  reduce using rule 72 (tableExpr)
+
+
+state 174
+
+   76 ident: ID '.' ID '.' . ID
+
+    ID  shift, and go to state 212
+
+
+state 175
+
+   10 assign: '(' idList . ')' '=' simpleExpr
+   20 idList: idList . ',' ID
+
+    ','  shift, and go to state 209
+    ')'  shift, and go to state 213
+
+
+state 176
+
+    8 assignList: assignList ',' . assign
+    9 assign: . ident '=' simpleExpr
+   10       | . '(' idList ')' '=' simpleExpr
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+
+    ID   shift, and go to state 20
+    '('  shift, and go to state 114
+
+    assign  go to state 214
+    ident   go to state 117
+
+
+state 177
+
+    6 update: UPDATE alias SET assignList where .
+
+    $default  reduce using rule 6 (update)
+
+
+state 178
+
+    9 assign: ident '=' . simpleExpr
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 74
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    simpleExpr  go to state 215
+
+
+state 179
+
+   35 orderBy: ORDER BY directionList .  [$end, GROUP, UNION, FOR, ')']
+   42 directionList: directionList . ',' direction
+
+    ','  shift, and go to state 216
+
+    $default  reduce using rule 35 (orderBy)
+
+
+state 180
+
+   41 directionList: direction .
+
+    $default  reduce using rule 41 (directionList)
+
+
+state 181
+
+   43 direction: simpleExpr . orderDirection
+   44 orderDirection: . ASC
+   45               | . DESC
+   46               | .  [$end, GROUP, UNION, FOR, ',', ')']
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    shift, and go to state 91
+    DESC    shift, and go to state 217
+    ASC     shift, and go to state 218
+    OUTERJ  shift, and go to state 94
+    CONCAT  shift, and go to state 98
+    '-'     shift, and go to state 102
+    '+'     shift, and go to state 103
+    '/'     shift, and go to state 104
+    '*'     shift, and go to state 105
+
+    $default  reduce using rule 46 (orderDirection)
+
+    orderDirection  go to state 219
+
+
+state 182
+
+   30 groupBy: GROUP BY simExList . having
+   33 having: . HAVING condition
+   34       | .  [$end, ORDER, UNION, FOR, ')']
+  135 simExList: simExList . ',' simpleExpr
+
+    HAVING  shift, and go to state 220
+    ','     shift, and go to state 201
+
+    $default  reduce using rule 34 (having)
+
+    having  go to state 221
+
+
+state 183
+
+   28 forUpdate: FOR UPDATE .
+
+    $default  reduce using rule 28 (forUpdate)
+
+
+state 184
+
+   90 condition: EXISTS '(' select ')' .
+
+    $default  reduce using rule 90 (condition)
+
+
+state 185
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+  130 when: WHEN condition THEN . simpleExpr
+
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 74
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    simpleExpr  go to state 222
+
+
+state 186
+
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+  131 else: ELSE simpleExpr .  [END]
+
+    OVER    shift, and go to state 91
+    OUTERJ  shift, and go to state 94
+    CONCAT  shift, and go to state 98
+    '-'     shift, and go to state 102
+    '+'     shift, and go to state 103
+    '/'     shift, and go to state 104
+    '*'     shift, and go to state 105
+
+    $default  reduce using rule 131 (else)
+
+
+state 187
+
+  108 simpleExpr: CASE whenList else END .
+
+    $default  reduce using rule 108 (simpleExpr)
+
+
+state 188
+
+  118 simpleExpr: CAST '(' simpleExpr AS . ID optSize ')'
+
+    ID  shift, and go to state 223
+
+
+state 189
+
+   92 idList2: ID ',' ID .
+
+    $default  reduce using rule 92 (idList2)
+
+
+state 190
+
+   93 idList2: idList2 ',' ID .
+
+    $default  reduce using rule 93 (idList2)
+
+
+state 191
+
+   86 condition: '(' idList2 ')' inExpr . '(' simExList ')'
+   87          | '(' idList2 ')' inExpr . '(' select ')'
+
+    '('  shift, and go to state 224
+
+
+state 192
+
+  102 inExpr: optNot . IN
+
+    IN  shift, and go to state 167
+
+
+state 193
+
+   59 tableList: tableList ',' . table
+   60 table: . alias
+   61      | . table join alias ON condition
+   69 alias: . tableExpr
+   70      | . tableExpr ID
+   71 tableExpr: . ident
+   72          | . TABLE '(' simpleExpr ')'
+   73          | . '(' select ')'
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+
+    TABLE  shift, and go to state 19
+    ID     shift, and go to state 20
+    '('    shift, and go to state 21
+
+    table      go to state 225
+    alias      go to state 142
+    tableExpr  go to state 23
+    ident      go to state 24
+
+
+state 194
+
+   67 outerType: RIGHT .
+
+    $default  reduce using rule 67 (outerType)
+
+
+state 195
+
+   65 join: INNER . JOIN
+
+    JOIN  shift, and go to state 226
+
+
+state 196
+
+   62 join: JOIN .
+
+    $default  reduce using rule 62 (join)
+
+
+state 197
+
+   63 join: LEFT . JOIN
+   66 outerType: LEFT .  [OUTER]
+
+    JOIN  shift, and go to state 227
+
+    $default  reduce using rule 66 (outerType)
+
+
+state 198
+
+   68 outerType: FULL .
+
+    $default  reduce using rule 68 (outerType)
+
+
+state 199
+
+   61 table: table join . alias ON condition
+   69 alias: . tableExpr
+   70      | . tableExpr ID
+   71 tableExpr: . ident
+   72          | . TABLE '(' simpleExpr ')'
+   73          | . '(' select ')'
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+
+    TABLE  shift, and go to state 19
+    ID     shift, and go to state 20
+    '('    shift, and go to state 21
+
+    alias      go to state 228
+    tableExpr  go to state 23
+    ident      go to state 24
+
+
+state 200
+
+   64 join: outerType . OUTER JOIN
+
+    OUTER  shift, and go to state 229
+
+
+state 201
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+  135 simExList: simExList ',' . simpleExpr
+
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 74
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    simpleExpr  go to state 230
+
+
+state 202
+
+  126 identRest: '(' simExList ')' .
+
+    $default  reduce using rule 126 (identRest)
+
+
+state 203
+
+  136 partition: '(' PARTITION . BY ident orderBy ')'
+
+    BY  shift, and go to state 231
+
+
+state 204
+
+   88 condition: simpleExpr IS optNot NULL .
+
+    $default  reduce using rule 88 (condition)
+
+
+state 205
+
+   24 select: select . UNION select
+   85 condition: simpleExpr inExpr '(' select . ')'
+
+    UNION  shift, and go to state 27
+    ')'    shift, and go to state 232
+
+
+state 206
+
+   84 condition: simpleExpr inExpr '(' simExList . ')'
+  135 simExList: simExList . ',' simpleExpr
+
+    ','  shift, and go to state 201
+    ')'  shift, and go to state 233
+
+
+state 207
+
+   91 condition: simpleExpr optNot BETWEEN simpleExpr . AND simpleExpr
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    shift, and go to state 91
+    AND     shift, and go to state 234
+    OUTERJ  shift, and go to state 94
+    CONCAT  shift, and go to state 98
+    '-'     shift, and go to state 102
+    '+'     shift, and go to state 103
+    '/'     shift, and go to state 104
+    '*'     shift, and go to state 105
+
+
+state 208
+
+   89 condition: simpleExpr optNot LIKE simpleExpr . escape
+  100 escape: . ESCAPE STRING_SQ
+  101       | .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, AND, XOR, FOR, AS, ID, ',', ')']
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    ESCAPE  shift, and go to state 235
+    OVER    shift, and go to state 91
+    OUTERJ  shift, and go to state 94
+    CONCAT  shift, and go to state 98
+    '-'     shift, and go to state 102
+    '+'     shift, and go to state 103
+    '/'     shift, and go to state 104
+    '*'     shift, and go to state 105
+
+    $default  reduce using rule 101 (escape)
+
+    escape  go to state 236
+
+
+state 209
+
+   20 idList: idList ',' . ID
+
+    ID  shift, and go to state 237
+
+
+state 210
+
+   18 optIdList: '(' idList ')' .
+
+    $default  reduce using rule 18 (optIdList)
+
+
+state 211
+
+   15 insertRest: VALUES identRest .
+
+    $default  reduce using rule 15 (insertRest)
+
+
+state 212
+
+   76 ident: ID '.' ID '.' ID .
+
+    $default  reduce using rule 76 (ident)
+
+
+state 213
+
+   10 assign: '(' idList ')' . '=' simpleExpr
+
+    '='  shift, and go to state 238
+
+
+state 214
+
+    8 assignList: assignList ',' assign .
+
+    $default  reduce using rule 8 (assignList)
+
+
+state 215
+
+    9 assign: ident '=' simpleExpr .  [$end, WHERE, ',']
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    shift, and go to state 91
+    OUTERJ  shift, and go to state 94
+    CONCAT  shift, and go to state 98
+    '-'     shift, and go to state 102
+    '+'     shift, and go to state 103
+    '/'     shift, and go to state 104
+    '*'     shift, and go to state 105
+
+    $default  reduce using rule 9 (assign)
+
+
+state 216
+
+   42 directionList: directionList ',' . direction
+   43 direction: . simpleExpr orderDirection
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 74
+    '?'        shift, and go to state 41
+
+    direction   go to state 239
+    ident       go to state 46
+    simpleExpr  go to state 181
+
+
+state 217
+
+   45 orderDirection: DESC .
+
+    $default  reduce using rule 45 (orderDirection)
+
+
+state 218
+
+   44 orderDirection: ASC .
+
+    $default  reduce using rule 44 (orderDirection)
+
+
+state 219
+
+   43 direction: simpleExpr orderDirection .
+
+    $default  reduce using rule 43 (direction)
+
+
+state 220
+
+   33 having: HAVING . condition
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   78 condition: . condition AND condition
+   79          | . condition OR condition
+   80          | . condition XOR condition
+   81          | . NOT condition
+   82          | . '(' condition ')'
+   83          | . comparison
+   84          | . simpleExpr inExpr '(' simExList ')'
+   85          | . simpleExpr inExpr '(' select ')'
+   86          | . '(' idList2 ')' inExpr '(' simExList ')'
+   87          | . '(' idList2 ')' inExpr '(' select ')'
+   88          | . simpleExpr IS optNot NULL
+   89          | . simpleExpr optNot LIKE simpleExpr escape
+   90          | . EXISTS '(' select ')'
+   91          | . simpleExpr optNot BETWEEN simpleExpr AND simpleExpr
+   94 comparison: . simpleExpr '=' simpleExpr
+   95           | . simpleExpr '>' simpleExpr
+   96           | . simpleExpr '<' simpleExpr
+   97           | . simpleExpr LE simpleExpr
+   98           | . simpleExpr NE simpleExpr
+   99           | . simpleExpr GE simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    EXISTS     shift, and go to state 30
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    NOT        shift, and go to state 34
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 40
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    condition   go to state 240
+    comparison  go to state 48
+    simpleExpr  go to state 61
+
+
+state 221
+
+   30 groupBy: GROUP BY simExList having .
+
+    $default  reduce using rule 30 (groupBy)
+
+
+state 222
+
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+  130 when: WHEN condition THEN simpleExpr .  [WHEN, ELSE, END]
+
+    OVER    shift, and go to state 91
+    OUTERJ  shift, and go to state 94
+    CONCAT  shift, and go to state 98
+    '-'     shift, and go to state 102
+    '+'     shift, and go to state 103
+    '/'     shift, and go to state 104
+    '*'     shift, and go to state 105
+
+    $default  reduce using rule 130 (when)
+
+
+state 223
+
+  118 simpleExpr: CAST '(' simpleExpr AS ID . optSize ')'
+  124 optSize: .  [')']
+  125        | . '(' NUMBER ')'
+
+    '('  shift, and go to state 241
+
+    $default  reduce using rule 124 (optSize)
+
+    optSize  go to state 242
+
+
+state 224
+
+   23 select: . basicSelect where byClauses forUpdate
+   24       | . select UNION select
+   25 basicSelect: . SELECT optDist whatToSelect FROM tableList
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   86 condition: '(' idList2 ')' inExpr '(' . simExList ')'
+   87          | '(' idList2 ')' inExpr '(' . select ')'
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+  133 simExList: .  [',', ')']
+  134          | . simpleExpr
+  135          | . simExList ',' simpleExpr
+
+    SELECT     shift, and go to state 1
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 74
+    '?'        shift, and go to state 41
+
+    $default  reduce using rule 133 (simExList)
+
+    select       go to state 243
+    basicSelect  go to state 13
+    ident        go to state 46
+    simpleExpr   go to state 145
+    simExList    go to state 244
+
+
+state 225
+
+   59 tableList: tableList ',' table .  [$end, WHERE, ORDER, GROUP, UNION, FOR, ',', ')']
+   61 table: table . join alias ON condition
+   62 join: . JOIN
+   63     | . LEFT JOIN
+   64     | . outerType OUTER JOIN
+   65     | . INNER JOIN
+   66 outerType: . LEFT
+   67          | . RIGHT
+   68          | . FULL
+
+    RIGHT  shift, and go to state 194
+    INNER  shift, and go to state 195
+    JOIN   shift, and go to state 196
+    LEFT   shift, and go to state 197
+    FULL   shift, and go to state 198
+
+    $default  reduce using rule 59 (tableList)
+
+    join       go to state 199
+    outerType  go to state 200
+
+
+state 226
+
+   65 join: INNER JOIN .
+
+    $default  reduce using rule 65 (join)
+
+
+state 227
+
+   63 join: LEFT JOIN .
+
+    $default  reduce using rule 63 (join)
+
+
+state 228
+
+   61 table: table join alias . ON condition
+
+    ON  shift, and go to state 245
+
+
+state 229
+
+   64 join: outerType OUTER . JOIN
+
+    JOIN  shift, and go to state 246
+
+
+state 230
+
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+  135 simExList: simExList ',' simpleExpr .  [$end, HAVING, ORDER, UNION, FOR, ',', ')']
+
+    OVER    shift, and go to state 91
+    OUTERJ  shift, and go to state 94
+    CONCAT  shift, and go to state 98
+    '-'     shift, and go to state 102
+    '+'     shift, and go to state 103
+    '/'     shift, and go to state 104
+    '*'     shift, and go to state 105
+
+    $default  reduce using rule 135 (simExList)
+
+
+state 231
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  136 partition: '(' PARTITION BY . ident orderBy ')'
+
+    ID  shift, and go to state 20
+
+    ident  go to state 247
+
+
+state 232
+
+   85 condition: simpleExpr inExpr '(' select ')' .
+
+    $default  reduce using rule 85 (condition)
+
+
+state 233
+
+   84 condition: simpleExpr inExpr '(' simExList ')' .
+
+    $default  reduce using rule 84 (condition)
+
+
+state 234
+
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   91 condition: simpleExpr optNot BETWEEN simpleExpr AND . simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 74
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    simpleExpr  go to state 248
+
+
+state 235
+
+  100 escape: ESCAPE . STRING_SQ
+
+    STRING_SQ  shift, and go to state 249
+
+
+state 236
+
+   89 condition: simpleExpr optNot LIKE simpleExpr escape .
+
+    $default  reduce using rule 89 (condition)
+
+
+state 237
+
+   20 idList: idList ',' ID .
+
+    $default  reduce using rule 20 (idList)
+
+
+state 238
+
+   10 assign: '(' idList ')' '=' . simpleExpr
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 74
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    simpleExpr  go to state 250
+
+
+state 239
+
+   42 directionList: directionList ',' direction .
+
+    $default  reduce using rule 42 (directionList)
+
+
+state 240
+
+   33 having: HAVING condition .  [$end, ORDER, UNION, FOR, ')']
+   78 condition: condition . AND condition
+   79          | condition . OR condition
+   80          | condition . XOR condition
+
+    OR   shift, and go to state 88
+    AND  shift, and go to state 89
+    XOR  shift, and go to state 90
+
+    $default  reduce using rule 33 (having)
+
+
+state 241
+
+  125 optSize: '(' . NUMBER ')'
+
+    NUMBER  shift, and go to state 251
+
+
+state 242
+
+  118 simpleExpr: CAST '(' simpleExpr AS ID optSize . ')'
+
+    ')'  shift, and go to state 252
+
+
+state 243
+
+   24 select: select . UNION select
+   87 condition: '(' idList2 ')' inExpr '(' select . ')'
+
+    UNION  shift, and go to state 27
+    ')'    shift, and go to state 253
+
+
+state 244
+
+   86 condition: '(' idList2 ')' inExpr '(' simExList . ')'
+  135 simExList: simExList . ',' simpleExpr
+
+    ','  shift, and go to state 201
+    ')'  shift, and go to state 254
+
+
+state 245
+
+   61 table: table join alias ON . condition
+   74 ident: . ID
+   75      | . ID '.' ID
+   76      | . ID '.' ID '.' ID
+   78 condition: . condition AND condition
+   79          | . condition OR condition
+   80          | . condition XOR condition
+   81          | . NOT condition
+   82          | . '(' condition ')'
+   83          | . comparison
+   84          | . simpleExpr inExpr '(' simExList ')'
+   85          | . simpleExpr inExpr '(' select ')'
+   86          | . '(' idList2 ')' inExpr '(' simExList ')'
+   87          | . '(' idList2 ')' inExpr '(' select ')'
+   88          | . simpleExpr IS optNot NULL
+   89          | . simpleExpr optNot LIKE simpleExpr escape
+   90          | . EXISTS '(' select ')'
+   91          | . simpleExpr optNot BETWEEN simpleExpr AND simpleExpr
+   94 comparison: . simpleExpr '=' simpleExpr
+   95           | . simpleExpr '>' simpleExpr
+   96           | . simpleExpr '<' simpleExpr
+   97           | . simpleExpr LE simpleExpr
+   98           | . simpleExpr NE simpleExpr
+   99           | . simpleExpr GE simpleExpr
+  105 simpleExpr: . NUMBER
+  106           | . simpleExpr OUTERJ
+  107           | . '-' simpleExpr
+  108           | . CASE whenList else END
+  109           | . STRING_SQ
+  110           | . ident identRest
+  111           | . '(' simpleExpr ')'
+  112           | . simpleExpr '-' simpleExpr
+  113           | . simpleExpr '+' simpleExpr
+  114           | . simpleExpr '*' simpleExpr
+  115           | . simpleExpr '/' simpleExpr
+  116           | . simpleExpr CONCAT simpleExpr
+  117           | . simpleExpr OVER partition
+  118           | . CAST '(' simpleExpr AS ID optSize ')'
+  119           | . '(' select ')'
+  120           | . ID '.' '*'
+  121           | . '*'
+  122           | . '?'
+  123           | . NULL
+
+    EXISTS     shift, and go to state 30
+    CASE       shift, and go to state 31
+    CAST       shift, and go to state 32
+    NULL       shift, and go to state 33
+    NOT        shift, and go to state 34
+    STRING_SQ  shift, and go to state 35
+    NUMBER     shift, and go to state 36
+    ID         shift, and go to state 37
+    '-'        shift, and go to state 38
+    '*'        shift, and go to state 39
+    '('        shift, and go to state 40
+    '?'        shift, and go to state 41
+
+    ident       go to state 46
+    condition   go to state 255
+    comparison  go to state 48
+    simpleExpr  go to state 61
+
+
+state 246
+
+   64 join: outerType OUTER JOIN .
+
+    $default  reduce using rule 64 (join)
+
+
+state 247
+
+   35 orderBy: . ORDER BY directionList
+  136 partition: '(' PARTITION BY ident . orderBy ')'
+
+    ORDER  shift, and go to state 62
+
+    orderBy  go to state 256
+
+
+state 248
+
+   91 condition: simpleExpr optNot BETWEEN simpleExpr AND simpleExpr .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, AND, XOR, FOR, AS, ID, ',', ')']
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    shift, and go to state 91
+    OUTERJ  shift, and go to state 94
+    CONCAT  shift, and go to state 98
+    '-'     shift, and go to state 102
+    '+'     shift, and go to state 103
+    '/'     shift, and go to state 104
+    '*'     shift, and go to state 105
+
+    $default  reduce using rule 91 (condition)
+
+
+state 249
+
+  100 escape: ESCAPE STRING_SQ .
+
+    $default  reduce using rule 100 (escape)
+
+
+state 250
+
+   10 assign: '(' idList ')' '=' simpleExpr .  [$end, WHERE, ',']
+  106 simpleExpr: simpleExpr . OUTERJ
+  112           | simpleExpr . '-' simpleExpr
+  113           | simpleExpr . '+' simpleExpr
+  114           | simpleExpr . '*' simpleExpr
+  115           | simpleExpr . '/' simpleExpr
+  116           | simpleExpr . CONCAT simpleExpr
+  117           | simpleExpr . OVER partition
+
+    OVER    shift, and go to state 91
+    OUTERJ  shift, and go to state 94
+    CONCAT  shift, and go to state 98
+    '-'     shift, and go to state 102
+    '+'     shift, and go to state 103
+    '/'     shift, and go to state 104
+    '*'     shift, and go to state 105
+
+    $default  reduce using rule 10 (assign)
+
+
+state 251
+
+  125 optSize: '(' NUMBER . ')'
+
+    ')'  shift, and go to state 257
+
+
+state 252
+
+  118 simpleExpr: CAST '(' simpleExpr AS ID optSize ')' .
+
+    $default  reduce using rule 118 (simpleExpr)
+
+
+state 253
+
+   87 condition: '(' idList2 ')' inExpr '(' select ')' .
+
+    $default  reduce using rule 87 (condition)
+
+
+state 254
+
+   86 condition: '(' idList2 ')' inExpr '(' simExList ')' .
+
+    $default  reduce using rule 86 (condition)
+
+
+state 255
+
+   61 table: table join alias ON condition .  [$end, WHERE, ORDER, GROUP, RIGHT, INNER, UNION, JOIN, LEFT, FULL, FOR, ',', ')']
+   78 condition: condition . AND condition
+   79          | condition . OR condition
+   80          | condition . XOR condition
+
+    OR   shift, and go to state 88
+    AND  shift, and go to state 89
+    XOR  shift, and go to state 90
+
+    $default  reduce using rule 61 (table)
+
+
+state 256
+
+  136 partition: '(' PARTITION BY ident orderBy . ')'
+
+    ')'  shift, and go to state 258
+
+
+state 257
+
+  125 optSize: '(' NUMBER ')' .
+
+    $default  reduce using rule 125 (optSize)
+
+
+state 258
+
+  136 partition: '(' PARTITION BY ident orderBy ')' .
+
+    $default  reduce using rule 136 (partition)
