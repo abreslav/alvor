@@ -514,10 +514,10 @@ public class ASTUtil {
 	}
 
 	
-	public static ASTNode parseCompilationUnit(ICompilationUnit cUnit) {
+	public static ASTNode parseCompilationUnit(ICompilationUnit cUnit, boolean requireBindings) {
 		ASTParser parser = ASTParser.newParser(AST.JLS3);
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
-		parser.setResolveBindings(true);
+		parser.setResolveBindings(requireBindings);
 		parser.setSource(cUnit);
 		ASTNode ast = parser.createAST(null);
 		return ast;

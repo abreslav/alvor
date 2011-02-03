@@ -53,55 +53,128 @@ Pseudocode
 
 fun fullCheckProject(project, conf) = 
 	files = project.getFiles()
-	hotspots = conf.fixedHotspots
-	strings = findStringsFromManyFilesForManyHotspots(files, hotspots, project)
+	patterns = conf.primaryHotspotPatterns
+	strings = findStringsFromManyFilesForManyPatterns(files, patterns, project)
 	check(strings)
 
 
 fun checkFileAfterEdit(file, project, conf) = 
 	cache.removeFileEntries(file)  // marks dependent strings as unchecked
-	hotspots = conf.fixedHotspots ++ cache.getSecondaryHotspots
-	strings1 = findStringsFromOneFileForManyHotspots(file, hotspots)
+	patterns = conf.primaryHotspotPatterns ++ cache.getSecondaryHotspotPatterns
+	strings1 = findStringsFromOneFileForManyPatterns(file, patterns)
 	check(strings1)
 	
 	// some base Hotspot entries from other files now got modified and need to be rechecked 
 	strings2 = cache.getUncheckedStrings()
 	check(strings2) 
 
-fun findStringsFromManyFilesForManyHotspots(files, hotspots) =
+fun findStringsFromManyFilesForManyPatterns(files, patterns) =
 	result = [] 
 	for file <- files:
-		result.addAll(findStringsFromOneFileForManyHotspots(file, hotspots))
+		result.addAll(findStringsFromOneFileForManyPatterns(file, patterns))
 		
 	return result
 	
-fun findStringsFromOneFileForManyHotspots(file, hotspots) =
+fun findStringsFromOneFileForManyPatterns(file, patterns) =
 	result = []
-	hotspotsToBeSearched = []
+	patternsToBeSearched = []
 	 
-	for hotspot <- hotspots:
-	    if cache.hasEntryFor(file, hotspot):
-	        result.addAll(getFromCache(file, hotspot))
+	for hotspotPattern <- patterns:
+	    if cache.hasEntryFor(file, hotspotPattern):
+	        result.addAll(getFromCache(file, hotspotPattern))
 	    else:
-	    	hotspotsToBeSearched.add(hotspot)
+	    	patternsToBeSearched(hotspotPattern)
 	
 	
-	for node <- findCorrespondingNodes(file, hotspotsToBeSearched):
-		str = evaluate(node)
-	    result.add(str)
-	    cache.addEntryFor(str, file, hotspot) // marks dependent strings as unchecked
+	for pattern <- patternsToBeSearched:
+		for node <- findCorrespondingNodes(file, pattern):
+			str = evaluate(node)
+	    	result.add(str)
+	    	cache.addEntryFor(str, file, pattern) // marks dependent strings as unchecked
 	
 	return result
 
 fun evaluate(node, project) =
-	// this doesn't use cache (directly)
+	// this doesn't use cache directly
     ...
     if node is Parameter:
     	files = project.getAllFiles()
-    	return findStringsFromManyFilesForManyHotspots(files, [node as hotspot])
+    	return findStringsFromManyFilesForManyPatterns(files, [node as pattern])
     
     ...
     
+------------------------------------------------------------------------------------------
+ALTERNATIVE PSEUDOCODE
+(focuses on building the cache, file by file, in several iterations)
+
+files = getUncheckedFiles()
+
+for file <- files:
+	review secondary patterns published by this file, remove obsolete ones
+	(but for this you need to consider other patterns)
+
+	for pattern <- activePatterns: // both primary and secondary
+		nodes = findNodes(file, pattern)
+		compute local parts of the nodes; if necessary publish new patterns
+
+
+
+Repeat until there are no new patterns
+------------------------------------------------------------------------------------------
+ALTERNATIVE 2
+
+fun initialProcessing(conf):
+	cache.addPrimaryPatternsAsBatch1(conf.getPrimaryPatterns)
+	processAllFilesForNewPatterns()
+
+fun processChangedFile(file):
+	patterns = cache.getPatternsExcept(file) // exclude patterns published by this file
+	file.setMaxBatchNo(0)
+	processFile(file, patterns)
+	processAllFilesForNewPatterns()
+		
+fun processAllFilesForNewPatterns():
+	patterns = cache.getPatterns()
+	maxBatchNo = getMaxBatchNo(patterns)
+	
+	files = project.getAllFiles()
+	for file <- files:
+		processFile(file, patterns)
+	
+	// go find fix-point
+	if cache.hasNewPatterns(maxBatchNo):
+		processAllForNewPatterns()
+	
+
+fun processFile(file, patterns):
+	
+	(contributions, thisFilePatterns) = computeContributions(file, patterns)
+	
+	cache.updateFileContributions(file, contributions)
+	
+	// remove obsolete patterns published earlier by this file
+	cache.removeFilePatternsExceptThese(file, thisFilePatterns)
+	
+
+// this is intraprocedural and independent of cache
+fun computeContributions(file, patterns):
+	for pattern <- patterns:
+		if pattern.batchNo > file.lastBatchProcessed:
+			...
+
+
+
+
+
+
+
+High-level processes
+* one process keeps cache in sync with source (this is JDT-dependent)
+* other process queries cache for strings and checks them (this is independent from JDT)
+
+
+
+
 ------------------------------------------------------------------------------------------
 
 Partial checking

@@ -42,7 +42,7 @@ public class ConnectionSourceFinder implements IEditorActionDelegate {
 		
 		IResource resource = (IResource) targetEditor.getEditorInput().getAdapter(IResource.class);
 		ICompilationUnit icu = (ICompilationUnit) JavaCore.create(resource);
-		ASTNode ast = ASTUtil.parseCompilationUnit(icu);
+		ASTNode ast = ASTUtil.parseCompilationUnit(icu, true);
 		
 		ASTNode node = NodeFinder.perform(ast, textSel.getOffset(), textSel.getLength());
 		if (node == null) {

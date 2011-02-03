@@ -10,11 +10,15 @@ import org.eclipse.core.runtime.Path;
 
 public class WorkspaceUtil {
 
-	public static IProject getProject(String projectName) throws CoreException {
+	public static IProject getProject(String projectName) {
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		IProject project = root.getProject(projectName);
 		if (!project.isOpen()) {
-			project.open(null);
+			try {
+				project.open(null);
+			} catch (CoreException e) {
+				throw new RuntimeException(e);
+			}
 		}
 		return project;
 	}
