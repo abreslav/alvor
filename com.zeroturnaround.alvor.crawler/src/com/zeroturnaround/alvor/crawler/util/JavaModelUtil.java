@@ -21,6 +21,8 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 
+import com.zeroturnaround.alvor.common.WorkspaceUtil;
+
 public class JavaModelUtil {
 	public static Set<IJavaProject> getAllRequiredProjects(IJavaProject project) {
 		Set<IJavaProject> reqs = new HashSet<IJavaProject>();
@@ -37,6 +39,12 @@ public class JavaModelUtil {
 		
 		return reqs;
 	}
+	
+	public static ICompilationUnit getCompilationUnitByName(String name) {
+		IFile file = WorkspaceUtil.getFile(name);
+		return JavaCore.createCompilationUnitFrom(file);
+	}
+	
 	
 	public static IJavaProject getJavaProjectByName(String name) {
 		IWorkspaceRoot wr = ResourcesPlugin.getWorkspace().getRoot();

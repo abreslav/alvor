@@ -1,32 +1,28 @@
-First read the tool-paper.
+= Overview =
+NB! First read the tool-paper.
 
-Simple explanation
-------------------
-Alvor searches for all primary hotspots in all project files
+=== Simple explanation ===
+Alvor searches for all primary ''hotspots'' in all project files
 For each matching string expression, it constructs the set of it's possible values. For this, 
 it may be necessary to analyze relevant parts in other files.
 
-Interesting things a file can contain:
----------------------------------------
-* primary hotspots
-* secondary hotspots
-* primary hotspot targets, ie. target methods for primary hotspots
-* secondary hotspot targets (or "hotspot wrappers") -- ie. methods containing 
-  hotspots whose value is (partly) taken from a parameter
-  
-* overridden hotspot targets (primary or secondary)
+=== Interesting things a file can contain ===
 
-* relevant string methods (string methods which are used for constructing value of a hotspot)
-* overridden versions of such string methods
+ * primary hotspots
+ * secondary hotspots
+ * primary hotspot targets, ie. target methods for primary hotspots
+ * secondary hotspot targets (or "hotspot wrappers") - ie. methods containing hotspots whose value is (partly) taken from a parameter
+ * overridden hotspot targets (primary or secondary)
+ * relevant string methods (string methods which are used for constructing value of a hotspot)
+ * overridden versions of such string methods
 
-Checking one file
------------------
+
+=== Checking one file ===
 From given file we want abstract values of primary hotspots. For this it might be
 necessary to analyze other files if hotspot value depends on method argument (need to find
 and analyze secondary hotspots).
 
-Incremental checking
---------------------
+=== Incremental checking ===
 In order to enable incremental checking, Alvor stores certain information about each file
 in a database. When one file is changed, then cache for that file is discarded and the
 file is analyzed (almost) from scratch. When some parts are required from other files,
@@ -48,8 +44,8 @@ analysis must take into account registered secondary patterns (and string method
 dependent projects. Pattern registration is organized per-project basis.
 
 
-Pseudocode
-----------
+=== Pseudocode ===
+{{{
 
 fun fullCheckProject(project, conf) = 
 	files = project.getFiles()
@@ -102,11 +98,14 @@ fun evaluate(node, project) =
     	return findStringsFromManyFilesForManyPatterns(files, [node as pattern])
     
     ...
+}}}
     
-------------------------------------------------------------------------------------------
-ALTERNATIVE PSEUDOCODE
+
+=== ALTERNATIVE PSEUDOCODE ===
+
 (focuses on building the cache, file by file, in several iterations)
 
+{{{
 files = getUncheckedFiles()
 
 for file <- files:
@@ -120,9 +119,12 @@ for file <- files:
 
 
 Repeat until there are no new patterns
-------------------------------------------------------------------------------------------
-ALTERNATIVE 2
+}}}
 
+
+=== ALTERNATIVE 2 ===
+
+{{{
 fun initialProcessing(conf):
 	cache.addPrimaryPatternsAsBatch1(conf.getPrimaryPatterns)
 	processAllFilesForNewPatterns()
@@ -150,10 +152,11 @@ fun processFile(file, patterns):
 	
 	(contributions, thisFilePatterns) = computeContributions(file, patterns)
 	
+	cache.removeFileStrings(file) // except published patterns	
 	cache.updateFileContributions(file, contributions)
 	
 	// remove obsolete patterns published earlier by this file
-	cache.removeFilePatternsExceptThese(file, thisFilePatterns)
+	cache.removeObsoletePatterns(file) // ie. those patterns who don't have parent anymore
 	
 
 // this is intraprocedural and independent of cache
@@ -162,23 +165,49 @@ fun computeContributions(file, patterns):
 		if pattern.batchNo > file.lastBatchProcessed:
 			...
 
+}}}
 
 
 
+=== ALT 3 ===
 
-
-
+When a file is changed:
+ 	# its data is removed from cache (but "stubs", connecting it to other files, remain)
+	# the cache for the whole workspace is updated (preferably starting with the changed file)
+		- updating workspace means updating each project
+		- if a project doesn't have primary hotspots registered and it's dependent project
+		  doesn't need anything from it, then its cache is up to date without any work.
+	
 High-level processes
-* one process keeps cache in sync with source (this is JDT-dependent)
-* other process queries cache for strings and checks them (this is independent from JDT)
+ * one process keeps cache in sync with source (this is JDT-dependent)
+ * other process queries cache for strings and checks them (this is independent from JDT)
 
 
 
 
-------------------------------------------------------------------------------------------
 
-Partial checking
-----------------
+=== Optimizing by acknowledging the dynamics of the code ===
+
+ * if a new hotspot pattern appears as a new method, then it's not necessary to search old code for call-sites (unless it's an implementation of a virtual method)
+ * if you're calling a string method, then you can search implementation only in fixed places (even easier with non-virtual methods)
+ * I can postpone cache consistency (allow some files to be checked later). I start with checking most relevant files (don't know yet how to identify these). It's possible then, that some markers appear after some time
+  
+  
+
+=== Dependencies between projects ===
+
+ * options for hotspot patterns should be searched also in dependent projects (?)
+	- if new hotspot pattern appears in a project, then dependent projects should be also updated (?)
+	- for this, dependent project processes hotspot patterns defined by itself and it's required projects (?) 
+
+ * implementations for string-methods should be searched also in required projects
+	- if new string-usage appears in a project, then implementations should be searched also in required projects
+	- for this, required project also considers method-patterns from its dependent projects
+
+
+
+=== Partial checking ===
+
 If certain IJavaElement is selected for checking, then this part is searched only for primary
 hotspots. If it contains secondary hotspots, then those are analyzed only when respective
 primary hotspots are also within search/analysis scope.

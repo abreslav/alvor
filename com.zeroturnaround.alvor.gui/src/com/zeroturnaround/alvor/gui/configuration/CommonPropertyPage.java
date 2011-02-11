@@ -65,8 +65,9 @@ public abstract class CommonPropertyPage extends PropertyPage implements IWorkbe
 		}
 	}
 	
-	@Override
-	protected void performApply() {
-		this.saveState();
-	}
+	// Apply Restore buttons are hidden currently, and UI is cleaner like that
+//	@Override
+//	protected void performApply() {
+//		this.saveState();
+//	}
 }

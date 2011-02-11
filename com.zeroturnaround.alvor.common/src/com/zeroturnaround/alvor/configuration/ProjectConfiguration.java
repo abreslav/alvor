@@ -62,12 +62,20 @@ public class ProjectConfiguration {
 	}
 	
 	public DataSourceProperties getDefaultDataSource() {
-		for (DataSourceProperties props : this.getDataSources()) {
-			if (props.getPattern().equals("*")) {
-				return props;
-			}
+//		for (DataSourceProperties props : this.getDataSources()) {
+//			if (props.getPattern().equals("*")) {
+//				return props;
+//			}
+//		}
+//		return null;
+		
+		// temporary: give first one
+		if (dataSources.size() > 0) {
+			return dataSources.get(0);
 		}
-		return null;
+		else {
+			return null;
+		}
 	}
 	
 	@Override

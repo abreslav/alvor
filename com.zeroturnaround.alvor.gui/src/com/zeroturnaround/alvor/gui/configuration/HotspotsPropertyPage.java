@@ -19,28 +19,32 @@ import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
 
 public class HotspotsPropertyPage extends CommonPropertyPage {
 	private Text memo;
+	private ModifyListener modifyListener;
 
 	@Override
 	protected Control createContents(Composite parent) {
+		noDefaultAndApplyButton();
 		
 		memo = new Text(parent, SWT.MULTI | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		memo.setFont(JFaceResources.getTextFont());
 		memo.setText(unparseHotspots(readConfiguration().getHotspots()));
 		
-		memo.addModifyListener(new ModifyListener() {
+		this.modifyListener = new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent e) {
 				// TODO validate lines after entering a newline
 				hasChanges = true;
 			}
-		});
+		};
+		
+		memo.addModifyListener(this.modifyListener);
 		return memo;
 	}
 	
 	@Override
 	protected Label createDescriptionLabel(Composite parent) {
 		Label desc = new Label(parent, SWT.NONE);
-		desc.setText("Describe which arguments to which method calls should Alvor analyze.\n\n" +
+		desc.setText("Describe which arguments to which method-calls should Alvor analyze.\n\n" +
 				"On each line give class name, method name and argument index (1-based), eg:\n" +
 				"java.sql.Connection, prepareStatement, 1");
 		return desc;
@@ -61,19 +65,19 @@ public class HotspotsPropertyPage extends CommonPropertyPage {
 		int i = 1;
 		while (sc.hasNextLine()) {
 			String line = sc.nextLine();
-			String[] parts = line.split(",");
 			if (!line.trim().isEmpty()) {
+				String[] parts = line.split(",");
 				if (parts.length != 3) {
 					throw new IllegalArgumentException("Invalid hotspot on line " + i 
 							+ ", should have 3 parts");
 				}
 				// TODO validate individual parts
+				list.add(new HotspotPattern(parts[0].trim(), parts[1].trim(), 
+						Integer.parseInt(parts[2].trim())));
 			}
 			i++;
 			
 			
-			list.add(new HotspotPattern(parts[0].trim(), parts[1].trim(), 
-					Integer.parseInt(parts[2].trim())));
 		}
 		
 		return list;
