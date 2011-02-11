@@ -20,6 +20,8 @@ public class MainPropertyPage extends CommonPropertyPage {
 	private Button natureCheckbox; 
 	@Override
 	protected Control createContents(Composite parent) {
+		noDefaultAndApplyButton();
+		
 		Composite composite = new Composite(parent, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		composite.setLayout(layout);
@@ -43,7 +45,8 @@ public class MainPropertyPage extends CommonPropertyPage {
 		natureLabel.setText("This gives automatic incremental checking on each save, " +
 				"and full checking on 'Clean'.\n" +
 				"NB! First checking can take several minutes for big projects.\n\n\n" +
-				"Altenatively, you can always use 'Project' -> 'Check SQL' menu item.");
+				"Altenatively, you can always right-click your project in Package Explorer\n" +
+				"and select 'Check SQL' menu item.");
 		
 		return composite;
 	}

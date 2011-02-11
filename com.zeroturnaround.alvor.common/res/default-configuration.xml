@@ -19,7 +19,7 @@
     </dataSources>
     
     <analyzerSettings
-    	enableLoops="true"
+    	enableLoops="false"
     	maxDepth="5"
     	preferTesting="true"    	
     	/>

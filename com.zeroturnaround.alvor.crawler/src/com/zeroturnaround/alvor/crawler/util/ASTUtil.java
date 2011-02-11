@@ -45,6 +45,7 @@ import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
+import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.common.PositionUtil;
 import com.zeroturnaround.alvor.string.IPosition;
 import com.zeroturnaround.alvor.string.Position;
@@ -545,5 +546,11 @@ public class ASTUtil {
 	public static String getFileString(ASTNode node) {
 		IResource file = getFile(node);
 		return PositionUtil.getFileString(file);
+	}
+
+	public static boolean invocationCorrespondsToPattern(MethodInvocation node,
+			HotspotPattern pattern) {
+		// TODO
+		return false;
 	}
 }

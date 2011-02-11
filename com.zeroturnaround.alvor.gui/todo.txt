@@ -10,7 +10,7 @@ TODO
 * Add change tests?
 * Find and fix cache problems
 * Test and Fix new bugs
-* Fix the terms/meanings of hotspot vs hotspot-method
++ Fix the terms/meanings of hotspot vs hotspot-method
 
 * What's the ratio of right/wrong search matches ?
 
