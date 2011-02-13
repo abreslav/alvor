@@ -182,7 +182,14 @@ High-level processes
  * one process keeps cache in sync with source (this is JDT-dependent)
  * other process queries cache for strings and checks them (this is independent from JDT)
 
-
+{{{
+def updateWorkspace():
+	
+	for project <- workspace.allProjects: // try to get recently changed projects first
+		if project.doesntHaveJavaErrors:
+			files = project.getFiles       // try to get recently changed files first
+			for file <- files:
+				
 
 
 

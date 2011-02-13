@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -65,6 +66,20 @@ public class JavaModelUtil {
 		}
 		
 		return javaProject;		
+	}
+	
+	public static IJavaProject getJavaProjectFromProject(IProject project) {
+		try {
+			IJavaProject jp = (IJavaProject)project.getNature(JavaCore.NATURE_ID);
+			if (jp == null) {
+				throw new IllegalArgumentException("Project " + project + " is not Java project");
+			}
+			else {
+				return jp;
+			}
+		} catch (CoreException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	public static IJavaElement[] scopeToProjectAndRequiredProjectsScope(IJavaElement[] scope) {
@@ -137,5 +152,23 @@ public class JavaModelUtil {
 		else {
 			throw new IllegalArgumentException("Can't find compilation units from " + element.getClass().getName());
 		}
+	}
+	
+	public static boolean isSourceFile(IResource res) {
+		return JavaCore.create(res) instanceof ICompilationUnit;
+	}
+	
+	public static boolean isSourceFolderOrPackage(IResource resource) {
+		IJavaElement element = JavaCore.create(resource); 
+		return element != null && (element instanceof IPackageFragment || element instanceof IPackageFragmentRoot);
+	}
+	
+	public static List<String> getCompilationUnitNames(Collection<ICompilationUnit> units) {
+		List<String> names = new ArrayList<String>();
+		for (ICompilationUnit unit: units) {
+			names.add(unit.getElementName());
+		}
+		
+		return names;
 	}
 }
