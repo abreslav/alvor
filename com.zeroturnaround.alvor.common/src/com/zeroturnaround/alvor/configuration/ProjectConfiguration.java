@@ -9,13 +9,13 @@ import com.zeroturnaround.alvor.common.HotspotPattern;
 public class ProjectConfiguration {
 	public enum CheckingStrategy {PREFER_STATIC, PREFER_DYNAMIC, ALL_CHECKERS}
 	
-	private List<HotspotPattern> hotspots = new ArrayList<HotspotPattern>();
+	private List<HotspotPattern> hotspotPatterns = new ArrayList<HotspotPattern>();
 	private List<DataSourceProperties> dataSources = new ArrayList<DataSourceProperties>();
 	private Map<String, String> properties;
 
 	public ProjectConfiguration(List<HotspotPattern> hotspots, List<DataSourceProperties> dataSources,
 			Map<String, String> properties) {
-		this.hotspots = hotspots;
+		this.hotspotPatterns = hotspots;
 		this.dataSources = dataSources;
 		this.properties = properties;
 	}
@@ -24,12 +24,12 @@ public class ProjectConfiguration {
 		return dataSources;
 	}
 	
-	public List<HotspotPattern> getHotspots() {
-		return hotspots;
+	public List<HotspotPattern> getHotspotPatterns() {
+		return hotspotPatterns;
 	}
 	
-	public void setHotspots(List<HotspotPattern> hotspots) {
-		this.hotspots = hotspots;
+	public void setHotspotPatterns(List<HotspotPattern> hotspots) {
+		this.hotspotPatterns = hotspots;
 	}
 
 	public void setDataSources(List<DataSourceProperties> dataSources) {
@@ -89,7 +89,7 @@ public class ProjectConfiguration {
 	public int hashCode() {
 		int result = 17;
 		result = result * 31 + dataSources.hashCode();
-		result = result * 31 + hotspots.hashCode();
+		result = result * 31 + hotspotPatterns.hashCode();
 		result = result * 31 + properties.hashCode();
 		return result;
 	}

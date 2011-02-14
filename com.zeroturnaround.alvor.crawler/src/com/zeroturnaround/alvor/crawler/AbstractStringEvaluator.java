@@ -91,7 +91,7 @@ public class AbstractStringEvaluator {
 		
 		Timer timer = new Timer();
 		timer.start("TIMER: string construction");
-		List<HotspotPattern> requests = conf.getHotspots();
+		List<HotspotPattern> requests = conf.getHotspotPatterns();
 		if (requests.isEmpty()) {
 			throw new IllegalArgumentException("No hotspot definitions found in options");
 		}
