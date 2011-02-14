@@ -1,5 +1,6 @@
 package com.zeroturnaround.alvor.crawler;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
 import com.zeroturnaround.alvor.cache.Cache;
@@ -88,7 +90,7 @@ public class MyCacheBuilder {
 			List<FileRecord> fileRecords = cache.getFilesToUpdate(projectName);
 			for (FileRecord rec : fileRecords) {
 				ICompilationUnit unit = JavaModelUtil.getCompilationUnitByName(rec.getName());
-				findAndAddHotspotsForCompilationUnit(unit, patterns, rec.getBatchNo());
+				updateCompilationUnitCache(unit, patterns, rec.getBatchNo());
 			}
 		}
 	}
@@ -106,10 +108,21 @@ public class MyCacheBuilder {
 	 * @param patterns
 	 * @param currentBatchNo indicates biggest pattern batch number this file already has been processed for
 	 */
-	private static void findAndAddHotspotsForCompilationUnit(ICompilationUnit unit, 
+	private void updateCompilationUnitCache(ICompilationUnit unit, 
 			final List<PatternRecord> patterns, int currentBatchNo) {
 		// TODO try parsing in a batch
 		ASTNode ast = ASTUtil.parseCompilationUnit(unit, true);
+		
+		
+		// separate relevant patterns
+		final List<PatternRecord> relevantHotspotPatterns = new ArrayList<PatternRecord>();
+		final List<PatternRecord> relevantMethodPatterns = new ArrayList<PatternRecord>();
+		for (PatternRecord pattern : patterns) {
+			// TODO distinguish between hotspot and method patterns
+			if (pattern.getBatchNo() > currentBatchNo) {
+				relevantHotspotPatterns.add(pattern);
+			}
+		}
 		
 		// TODO if all new patterns are new original methods, then there's no point to search it in all files
 		// because they couldn't have been called there. Ie. here's an opportunity for optimization
@@ -117,17 +130,29 @@ public class MyCacheBuilder {
 		ast.accept(new ASTVisitor() {
 			@Override
 			public boolean visit(MethodInvocation node) {
-				for (PatternRecord pattern : patterns) {
-					//if (ASTUtil.invocationCorrespondsToPattern(node, pattern)) {
+				for (PatternRecord pattern : relevantHotspotPatterns) {
+					if (ASTUtil.invocationCorrespondsToPattern(node, pattern)) {
 						Expression hotspot = (Expression)node.arguments().get(pattern.getArgumentIndex());
 						NodeDescriptor descriptor = Crawler2.INSTANCE.evaluate(hotspot);
 						cache.addHotspot(pattern, descriptor);
-					//}
+					}
 				}
 				// Don't want to visit children. 
 				// In principle there can be another hotspot in an argument, but
-				// it would be quite stupid and I think it doesn't deserve extra computation effort
+				// for now I think it doesn't deserve extra computation effort
+				// TODO test how big is the extra computation effort 
 				return false; 
+			}
+			
+			@Override
+			public boolean visit(MethodDeclaration node) {
+				for (PatternRecord pattern : relevantMethodPatterns) {
+					if (ASTUtil.declarationCorrespondsToPattern(node, pattern)) {
+						// TODO
+						// cache.addMethodSummary(pattern, descriptor);
+					}
+				}
+				return false;
 			}
 		});
 	}
