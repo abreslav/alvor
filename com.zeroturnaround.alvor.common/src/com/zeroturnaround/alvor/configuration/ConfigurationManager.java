@@ -102,7 +102,7 @@ public class ConfigurationManager {
 		SAXException, IOException {
 		
 		List<DataSourceProperties> dataSources = new ArrayList<DataSourceProperties>();
-		List<HotspotPattern> hotspots = new ArrayList<HotspotPattern>();
+		List<HotspotPattern> hotspotPatterns = new ArrayList<HotspotPattern>();
 		
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		DocumentBuilder db = dbf.newDocumentBuilder(); 
@@ -112,7 +112,7 @@ public class ConfigurationManager {
 		NodeList hotspotNodes = doc.getElementsByTagName("hotspot");
 		for (int i = 0; i < hotspotNodes.getLength(); i++) {
 			Element node = (Element)hotspotNodes.item(i);
-			hotspots.add (new HotspotPattern(
+			hotspotPatterns.add (new HotspotPattern(
 					node.getAttribute("className"),
 					node.getAttribute("methodName"), 
 					Integer.valueOf(node.getAttribute("argumentIndex"))));
@@ -136,7 +136,7 @@ public class ConfigurationManager {
 			attributes.put(nnm.item(i).getNodeName(), nnm.item(i).getNodeValue());
 		}
 
-		return new ProjectConfiguration(hotspots, dataSources, attributes);
+		return new ProjectConfiguration(hotspotPatterns, dataSources, attributes);
 	}
 
 	public static void saveProjectConfiguration(ProjectConfiguration conf, IProject project) {
@@ -158,7 +158,7 @@ public class ConfigurationManager {
 
 		Element hotspotNodes = doc.createElement("hotspots"); 
 		docElement.appendChild(hotspotNodes);
-		for (HotspotPattern hotspot : conf.getHotspots()) {
+		for (HotspotPattern hotspot : conf.getHotspotPatterns()) {
 			Element node = doc.createElement("hotspot");
 			node.setAttribute("className", hotspot.getClassName());
 			node.setAttribute("methodName", hotspot.getMethodName());

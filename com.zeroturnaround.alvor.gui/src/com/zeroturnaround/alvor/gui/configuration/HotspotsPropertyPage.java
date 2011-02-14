@@ -27,7 +27,7 @@ public class HotspotsPropertyPage extends CommonPropertyPage {
 		
 		memo = new Text(parent, SWT.MULTI | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 		memo.setFont(JFaceResources.getTextFont());
-		memo.setText(unparseHotspots(readConfiguration().getHotspots()));
+		memo.setText(unparseHotspots(readConfiguration().getHotspotPatterns()));
 		
 		this.modifyListener = new ModifyListener() {
 			@Override
@@ -85,7 +85,7 @@ public class HotspotsPropertyPage extends CommonPropertyPage {
 
 	@Override
 	protected void mergeChanges(ProjectConfiguration base) {
-		base.setHotspots(parseHotspots(memo.getText()));
+		base.setHotspotPatterns(parseHotspots(memo.getText()));
 	}
 	
 	@Override

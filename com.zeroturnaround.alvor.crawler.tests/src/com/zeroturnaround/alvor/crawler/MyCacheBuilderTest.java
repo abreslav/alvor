@@ -17,15 +17,19 @@ import com.zeroturnaround.alvor.configuration.ConfigurationManager;
 import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
 import com.zeroturnaround.alvor.crawler.util.JavaModelUtil;
 
-public class CacheBuilderTest {
+public class MyCacheBuilderTest {
 	
-//	@Test
-//	public void cleanBuildProjectCache() {
-//		IJavaProject javaProject = JavaModelUtil.getJavaProjectByName("earved");
-//		ProjectConfiguration conf = ConfigurationManager
-//			.readProjectConfiguration(javaProject.getProject(), true);
-//		CacheBuilder.cleanBuildProjectCache(javaProject, conf);
-//		
+	@Test
+	public void cleanBuildProjectCache() {
+		IJavaProject javaProject = JavaModelUtil.getJavaProjectByName("earved");
+		ProjectConfiguration conf = ConfigurationManager
+			.readProjectConfiguration(javaProject.getProject(), true);
+		
+		Cache.getInstance().setProjectPrimaryPatterns(javaProject.getProject().getName(), conf.getHotspotPatterns());
+		
+		MyCacheBuilder cb = new MyCacheBuilder();
+		cb.fullBuildProject(javaProject.getProject(), null);
+		
 //		// check that cache contains correct strings
 //		Cache cache = null;
 //		Collection<NodeDescriptor> strings = cache.getPrimaryHotspotDescriptors
@@ -34,8 +38,8 @@ public class CacheBuilderTest {
 //		List<String> serializedStrings = new ArrayList<String>();
 //		// TODO serialize strings
 //		assertTrue(CrawlerTestUtil.stringsAreExpected(serializedStrings, "earved_strings_cache"));
-//	}
-//	
+	}
+	
 //	public void updateCacheAfterOneFileChange() {
 //		ICompilationUnit unit = JavaModelUtil.getCompilationUnitByName("/earved/src/.../blaa.java");
 //		CacheBuilder.updateCacheAfterChange(unit.getJavaProject(), Collections.singletonList(unit));
