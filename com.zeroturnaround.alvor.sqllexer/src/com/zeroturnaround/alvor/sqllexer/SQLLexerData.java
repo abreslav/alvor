@@ -326,7 +326,6 @@ public static final int[] ACTIONS = {
         "BIT_LENGTH",
         "INDICATOR",
         "FALSE",
-        "VALUE",
         "FOREIGN",
         "YEAR",
         "OVERLAPS",
