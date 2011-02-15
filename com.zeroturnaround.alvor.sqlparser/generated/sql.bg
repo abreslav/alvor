@@ -169,7 +169,6 @@ import java.io.IOException;
 %token BIT_LENGTH
 %token INDICATOR
 %token FALSE
-%token VALUE
 %token FOREIGN
 %token YEAR
 %token OVERLAPS
@@ -267,7 +266,6 @@ id
 	| CONVERT
 	| SUBSTRING
 	| DESC
-	| VALUE
 	;
 update
 	: UPDATE alias SET assignList where
@@ -1087,7 +1085,7 @@ unsignedLiteral
     : unsignedNumericLiteral | generalLiteral
     ;
 generalValueSpecification
-    : parameterSpecification | dynamicParameterSpecification | variableSpecification | USER | CURRENT_USER | SESSION_USER | SYSTEM_USER | VALUE
+    : parameterSpecification | dynamicParameterSpecification | variableSpecification | USER | CURRENT_USER | SESSION_USER | SYSTEM_USER /* | VALUE */
     ;
 parameterSpecification
     : parameterName parameterSpecification1
