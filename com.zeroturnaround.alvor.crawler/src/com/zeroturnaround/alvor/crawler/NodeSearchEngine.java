@@ -13,6 +13,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
@@ -78,7 +80,7 @@ public class NodeSearchEngine {
 		astCache.remove(JavaCore.createCompilationUnitFrom(file));
 	}
 	
-	public static List<IPosition> findArgumentNodes(IJavaElement[] scope, final Collection<HotspotPattern> requests) {
+	public static List<IPosition> findArgumentNodes(IJavaElement[] scope, final Collection<HotspotPattern> requests, IProgressMonitor monitor) {
 		// No requests -- no results
 		if (requests.isEmpty()) {
 			return Collections.emptyList();
@@ -97,6 +99,15 @@ public class NodeSearchEngine {
 					allFilesInScope, 
 					cacheService.getHotspotCache(), 
 					hotspotPattern, result);
+			
+			if (monitor != null) {
+				if (monitor.isCanceled()) {
+					throw new OperationCanceledException();
+				}
+				else {
+					monitor.worked(1);
+				}
+			}
 		}
 		return result;
 	}

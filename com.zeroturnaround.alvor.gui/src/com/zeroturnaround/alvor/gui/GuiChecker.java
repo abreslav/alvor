@@ -9,6 +9,8 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
@@ -48,32 +50,45 @@ public class GuiChecker {
 	private ComplexChecker complexChecker = new ComplexChecker();
 	
 	
-	public void performCleanCheck(IProject optionsFrom, IJavaElement[] scope) {
+	public void performCleanCheck(IProject optionsFrom, IJavaElement[] scope,
+			IProgressMonitor monitor) {
 		NodeSearchEngine.clearASTCache();
 		CacheService.getCacheService().clearAll();
-		performIncrementalCheck(optionsFrom, scope);
+		performIncrementalCheck(optionsFrom, scope, monitor);
 	}
 	
 	/**
 	 * NB! Before calling this you should take care that NodeSearchEngine's ASTCache doesn't
 	 * contain old stuff (either clear it completely or remove expired AST-s)
 	 */
-	public void performIncrementalCheck(IProject currentProject, IJavaElement[] scope) {
+	public void performIncrementalCheck(IProject currentProject, IJavaElement[] scope, 
+			IProgressMonitor monitor) {
 		if (scope.length == 0) {
 			return;
 		}
 		
-		cleanMarkers(scope);
-		cleanConfigurationMarkers(currentProject);
+		if (monitor != null) {
+			monitor.beginTask("Checking SQL", 10000);
+		}
 		
-		ProjectConfiguration conf = ConfigurationManager.readProjectConfiguration(currentProject, true);
-		List<NodeDescriptor> hotspots = AbstractStringEvaluator.findAndEvaluateHotspots(scope, conf);
-		markHotspots(hotspots);
-		
-		Collection<HotspotCheckingResult> checkingResults = 
-			complexChecker.checkNodeDescriptors(hotspots, conf);
-		
-		createCheckingMarkers(checkingResults, currentProject);
+		try {
+			cleanMarkers(scope);
+			cleanConfigurationMarkers(currentProject);
+			
+			ProjectConfiguration conf = ConfigurationManager.readProjectConfiguration(currentProject, true);
+			List<NodeDescriptor> hotspots = AbstractStringEvaluator.findAndEvaluateHotspots(scope, conf, monitor);
+			markHotspots(hotspots);
+			
+			Collection<HotspotCheckingResult> checkingResults = 
+				complexChecker.checkNodeDescriptors(hotspots, conf, monitor);
+			
+			createCheckingMarkers(checkingResults, currentProject);
+		}
+		finally {
+			if (monitor != null) {
+				monitor.done();
+			}
+		}
 	}
 
 	

@@ -16,6 +16,7 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaCore;
@@ -86,21 +87,26 @@ public class AlvorBuilder extends IncrementalProjectBuilder {
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected IProject[] build(int kind, Map args, IProgressMonitor monitor) throws CoreException {
-		switch (kind) {
-		case FULL_BUILD:
-			cleanBuild(monitor);
-			break;
-		case CLEAN_BUILD:
-			cleanBuild(monitor);
-			break;
-		default:
-//			cleanBuild(monitor);
-			IResourceDelta delta = getDelta(getProject());
-			if (delta == null) {
-				fullBuild(monitor);
-			} else {
-				incrementalBuild(delta, monitor);
+		try {
+			switch (kind) {
+			case FULL_BUILD:
+				cleanBuild(monitor);
+				break;
+			case CLEAN_BUILD:
+				cleanBuild(monitor);
+				break;
+			default:
+	//			cleanBuild(monitor);
+				IResourceDelta delta = getDelta(getProject());
+				if (delta == null) {
+					fullBuild(monitor);
+				} else {
+					incrementalBuild(delta, monitor);
+				}
 			}
+		} catch (OperationCanceledException e) {
+			this.forgetLastBuiltState();
+			throw e;
 		}
 		return null;
 	}
@@ -110,13 +116,13 @@ public class AlvorBuilder extends IncrementalProjectBuilder {
 		assert LOG.message("Clean build on " + getProject());
 		clearCache();
 		NodeSearchEngine.clearASTCache();
-		checkResources(new IJavaElement[] {JavaCore.create(getProject())});
+		checkResources(new IJavaElement[] {JavaCore.create(getProject())}, monitor);
 	}
 
 	protected void fullBuild(final IProgressMonitor monitor) {
 		assert LOG.message("==============================");
 		assert LOG.message("Full build (no files changed?) on " + getProject());
-		checkResources(new IJavaElement[] {JavaCore.create(getProject())});
+		checkResources(new IJavaElement[] {JavaCore.create(getProject())}, monitor);
 	}
 	
 	protected void incrementalBuild(IResourceDelta delta,
@@ -179,18 +185,18 @@ public class AlvorBuilder extends IncrementalProjectBuilder {
 			assert LOG.message(e);
 		}
 		t.start("Search and check");
-		checkResources(elements.toArray(new IJavaElement[elements.size()]));
+		checkResources(elements.toArray(new IJavaElement[elements.size()]), monitor);
 		t.printTime();
 		
 		overall.printTime();		
 	}
 
-	private void checkResources(IJavaElement[] elements) {
+	private void checkResources(IJavaElement[] elements, IProgressMonitor monitor) {
 		try {
 			if (checker == null) {
 				checker = new GuiChecker();
 			}
-			checker.performIncrementalCheck(getProject(), elements);
+			checker.performIncrementalCheck(getProject(), elements, monitor);
 		} catch (Throwable e) {
 			LOG.error("AlvorBuilder.checkResources", e);
 		} 

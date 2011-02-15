@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -80,13 +82,16 @@ public class AbstractStringEvaluator {
 	
 	private static final String RESULT_FOR_SQL_CHECKER = "@ResultForSQLChecker";
 	private static final ILog LOG = Logs.getLog(AbstractStringEvaluator.class);
+	
+	private IProgressMonitor monitor = null;
 
 	/*
 	 * Actually returns abstract strings corresponding to hotspots
 	 * (or markers for unsupported cases)  
 	 * TODO rename?
 	 */
-	public static List<NodeDescriptor> findAndEvaluateHotspots(IJavaElement[] scope, ProjectConfiguration conf) {
+	public static List<NodeDescriptor> findAndEvaluateHotspots(IJavaElement[] scope, ProjectConfiguration conf,
+			IProgressMonitor monitor) {
 		Measurements.resetAll();
 		
 		Timer timer = new Timer();
@@ -95,7 +100,7 @@ public class AbstractStringEvaluator {
 		if (requests.isEmpty()) {
 			throw new IllegalArgumentException("No hotspot definitions found in options");
 		}
-		List<NodeDescriptor> result = AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(requests, scope, 0, null);
+		List<NodeDescriptor> result = AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(requests, scope, 0, null, monitor);
 		timer.printTime(); // String construction
 		
 		LOG.message(Measurements.parseTimer);
@@ -105,36 +110,40 @@ public class AbstractStringEvaluator {
 		return result;
 	}
 	
-	private AbstractStringEvaluator(int level, IJavaElement[] scope, boolean templateConstructionMode) {
+	private AbstractStringEvaluator(int level, IJavaElement[] scope, boolean templateConstructionMode, IProgressMonitor monitor) {
 		if (level > maxLevel) {
 			throw new UnsupportedStringOpEx("Analysis level (" + level + ") too deep", (IPosition)null);
 		}
 		this.ipLevel = level;
 		this.scope = scope;
 		this.templateConstructionMode = templateConstructionMode;
+		this.monitor = monitor;
 	}
 	
 	/*
 	 * Used for debugging
 	 */
 	public static IAbstractString evaluateExpression(Expression node) {
-		AbstractStringEvaluator evaluator = new AbstractStringEvaluator(0, new IJavaElement[] {ASTUtil.getNodeProject(node)}, false);
+		AbstractStringEvaluator evaluator = new AbstractStringEvaluator(0, 
+				new IJavaElement[] {ASTUtil.getNodeProject(node)}, false, null);
 		return evaluator.eval(node, null);
 	}
 	
 	public static List<NodeDescriptor> evaluateMethodArgumentAtCallSites
-		(Collection<HotspotPattern> requests, IJavaElement[] scope, int level, ContextLink context) {
+		(Collection<HotspotPattern> requests, IJavaElement[] scope, int level, ContextLink context,
+				IProgressMonitor monitor) {
 		logMessage("SEARCHING", level, null);
 		for (HotspotPattern hotspotPattern : requests) {
 			logMessage(hotspotPattern, level, null);
 		}
 		
-		Collection<IPosition> argumentPositions = NodeSearchEngine.findArgumentNodes(scope, requests);
-		AbstractStringEvaluator evaluator = new AbstractStringEvaluator(level, scope, false);
+		Collection<IPosition> argumentPositions = NodeSearchEngine.findArgumentNodes(scope, requests, monitor);
+		AbstractStringEvaluator evaluator = new AbstractStringEvaluator(level, scope, false, monitor);
 		List<NodeDescriptor> result = new ArrayList<NodeDescriptor>();
 		for (IPosition pos: argumentPositions) {
 			try {
 				result.add(new StringNodeDescriptor(pos, evaluator.eval(pos, context)));
+				evaluator.checkMonitor(true);
 			} 
 			catch (UnsupportedStringOpEx e) {
 				result.add(new UnsupportedNodeDescriptor(pos, e.getMessage(), e.getPosition()));
@@ -388,7 +397,8 @@ public class AbstractStringEvaluator {
 			throw new UnsupportedStringOpExAtNode("No declarations found for: " + inv.toString(), inv);
 		}
 		
-		AbstractStringEvaluator argEvaluator = new AbstractStringEvaluator(this.ipLevel+1, this.scope, this.templateConstructionMode);
+		AbstractStringEvaluator argEvaluator = new AbstractStringEvaluator(this.ipLevel+1, this.scope, 
+				this.templateConstructionMode, this.monitor);
 		
 		// evaluate argumets
 		List<IAbstractString> arguments = new ArrayList<IAbstractString>();
@@ -449,7 +459,8 @@ public class AbstractStringEvaluator {
 		
 		// get choice out of different return expressions
 		// Need new evaluator because mode changes to template construction
-		AbstractStringEvaluator evaluator = new AbstractStringEvaluator(ipLevel+1, scope, true);
+		AbstractStringEvaluator evaluator = new AbstractStringEvaluator(ipLevel+1, scope, 
+				true, this.monitor);
 		
 		List<IAbstractString> options = new ArrayList<IAbstractString>();
 		for (ReturnStatement ret: returnStmts) {
@@ -473,7 +484,8 @@ public class AbstractStringEvaluator {
 				(IVariableBinding)paramName.resolveBinding(), decl);
 
 		// need new evaluator because mode changes to template construction
-		AbstractStringEvaluator evaluator = new AbstractStringEvaluator(ipLevel+1, scope, true);
+		AbstractStringEvaluator evaluator = new AbstractStringEvaluator(ipLevel+1, scope, true,
+				this.monitor);
 		return evaluator.evalNameAfter(paramName, lastMod, null);
 	}
 
@@ -755,7 +767,8 @@ public class AbstractStringEvaluator {
 									usage.getIndex()+1)), 
 					scope, // FIXME should be widened to all required projects 
 					ipLevel+1,
-					new ContextLink(usage.getNode(), context));
+					new ContextLink(usage.getNode(), context),
+					this.monitor);
 			
 			List<IAbstractString> choices = new ArrayList<IAbstractString>();
 			
@@ -796,5 +809,16 @@ public class AbstractStringEvaluator {
 					+ ", line: " + ASTUtil.getLineNumber(node); 
 		}
 		assert LOG.message(finalMsg);
+	}
+	
+	private void checkMonitor(boolean makeStep) {
+		if (this.monitor != null) {
+			if (this.monitor.isCanceled()) {
+				throw new OperationCanceledException(); 
+			}
+			else {
+				this.monitor.worked(1);
+			}
+		}
 	}
 }

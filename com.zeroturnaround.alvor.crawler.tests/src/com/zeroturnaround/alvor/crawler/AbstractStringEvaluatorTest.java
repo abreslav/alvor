@@ -42,7 +42,7 @@ public abstract class AbstractStringEvaluatorTest {
 		IJavaElement[] scope = {(IJavaProject)project.getNature(JavaCore.NATURE_ID)}; 
 		ProjectConfiguration conf = ConfigurationManager.readProjectConfiguration(project, true);
 		return AbstractStringEvaluator.evaluateMethodArgumentAtCallSites
-			(conf.getHotspotPatterns(), scope, 0, null);
+			(conf.getHotspotPatterns(), scope, 0, null, null);
 	}
 	
 	private void validateNodeDescriptors(List<NodeDescriptor> descriptors, IProject project) {
