@@ -49,7 +49,8 @@ public class ProjectConfiguration {
 	}
 	
 	public boolean getSupportLoops() {
-		if (properties.get("supportLoops").equals("false")) {
+		String result = properties.get("supportLoops"); 
+		if (result != null && result.equals("false")) {
 			return false;
 		}
 		else {
@@ -61,6 +62,25 @@ public class ProjectConfiguration {
 		return properties;
 	}
 	
+	public boolean getMarkHotspots() {
+		String result = properties.get("markHotspots"); 
+		if (result != null && result.equals("false")) {
+			return false;
+		}
+		else {
+			return true;
+		}
+	}
+	
+//	public String getProperty(String key) {
+//		String value = this.properties.get(key);
+//		if (value != null) {
+//			return value;
+//		} else {
+//			return "";
+//		}
+//	}
+//	
 	public DataSourceProperties getDefaultDataSource() {
 //		for (DataSourceProperties props : this.getDataSources()) {
 //			if (props.getPattern().equals("*")) {

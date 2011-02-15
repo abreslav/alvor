@@ -77,7 +77,10 @@ public class GuiChecker {
 			
 			ProjectConfiguration conf = ConfigurationManager.readProjectConfiguration(currentProject, true);
 			List<NodeDescriptor> hotspots = AbstractStringEvaluator.findAndEvaluateHotspots(scope, conf, monitor);
-			markHotspots(hotspots);
+			
+			if (conf.getMarkHotspots()) {
+				markHotspots(hotspots);
+			}
 			
 			Collection<HotspotCheckingResult> checkingResults = 
 				complexChecker.checkNodeDescriptors(hotspots, conf, monitor);

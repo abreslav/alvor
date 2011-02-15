@@ -17,10 +17,4 @@
             password="passwöörd"/>
         -->
     </dataSources>
-    
-    <analyzerSettings
-    	enableLoops="false"
-    	maxDepth="5"
-    	preferTesting="true"    	
-    	/>
 </alvor>
