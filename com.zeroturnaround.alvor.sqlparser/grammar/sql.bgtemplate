@@ -169,7 +169,6 @@ import java.io.IOException;
 %lex-keyword BIT_LENGTH
 %lex-keyword INDICATOR
 %lex-keyword FALSE
-%lex-keyword VALUE
 %lex-keyword FOREIGN
 %lex-keyword YEAR
 %lex-keyword OVERLAPS
@@ -295,7 +294,6 @@ id
 	| CONVERT
 	| SUBSTRING
 	| DESC
-	| VALUE
 	;
 update
 	: UPDATE alias SET assignList where
@@ -1115,7 +1113,7 @@ unsignedLiteral
     : unsignedNumericLiteral | generalLiteral
     ;
 generalValueSpecification
-    : parameterSpecification | dynamicParameterSpecification | variableSpecification | USER | CURRENT_USER | SESSION_USER | SYSTEM_USER | VALUE
+    : parameterSpecification | dynamicParameterSpecification | variableSpecification | USER | CURRENT_USER | SESSION_USER | SYSTEM_USER /* | VALUE */
     ;
 parameterSpecification
     : parameterName parameterSpecification1
