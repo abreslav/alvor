@@ -63,12 +63,12 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 				@Override
 				public void unexpectedItem(IAbstractInputItem item,
 						List<? extends IAbstractInputItem> counterExampleList) {
-					String counterExample = PositionedCharacterUtil.renderCounterExample(counterExampleList);
+//					String counterExample = PositionedCharacterUtil.renderCounterExample(counterExampleList);
 					Collection<IPosition> markerPositions = PositionedCharacterUtil.getMarkerPositions(((Token) item).getText());
 					for (IPosition pos : markerPositions) {
 						result.add(new HotspotError(
 								"SQL syntax checker: Unexpected token: " + PositionedCharacterUtil.render(item) 
-								+ "\n" + "    Counter example: " + counterExample
+//								+ "\n" + "    Counter example: " + counterExample
 								, 
 								pos));
 					}

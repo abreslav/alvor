@@ -131,11 +131,11 @@ public class MyCacheBuilder {
 			@Override
 			public boolean visit(MethodInvocation node) {
 				for (PatternRecord pattern : relevantHotspotPatterns) {
-					if (ASTUtil.invocationCorrespondsToPattern(node, pattern)) {
-						Expression hotspot = (Expression)node.arguments().get(pattern.getArgumentIndex());
-						NodeDescriptor descriptor = Crawler2.INSTANCE.evaluate(hotspot);
-						cache.addHotspot(pattern, descriptor);
-					}
+//					if (ASTUtil.invocationCorrespondsToPattern(node, pattern)) {
+//						Expression hotspot = (Expression)node.arguments().get(pattern.getArgumentIndex());
+//						NodeDescriptor descriptor = Crawler2.INSTANCE.evaluate(hotspot);
+//						cache.addHotspot(pattern, descriptor);
+//					}
 				}
 				// Don't want to visit children. 
 				// In principle there can be another hotspot in an argument, but
@@ -147,10 +147,10 @@ public class MyCacheBuilder {
 			@Override
 			public boolean visit(MethodDeclaration node) {
 				for (PatternRecord pattern : relevantMethodPatterns) {
-					if (ASTUtil.declarationCorrespondsToPattern(node, pattern)) {
-						// TODO
-						// cache.addMethodSummary(pattern, descriptor);
-					}
+//					if (ASTUtil.declarationCorrespondsToPattern(node, pattern)) {
+//						// TODO
+//						// cache.addMethodSummary(pattern, descriptor);
+//					}
 				}
 				return false;
 			}
