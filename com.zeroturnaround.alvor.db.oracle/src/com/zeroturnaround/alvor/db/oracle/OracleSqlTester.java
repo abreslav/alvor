@@ -10,6 +10,7 @@ import com.zeroturnaround.alvor.db.SqlTester;
 public class OracleSqlTester extends SqlTester {
 	private int connUsageCount = 0;
 	private Connection conn = null;
+	private int connectionErrorCount = 0;
 	
 	public OracleSqlTester(String driverName, String url, String username,
 			String password) throws ClassNotFoundException {
@@ -57,13 +58,25 @@ public class OracleSqlTester extends SqlTester {
 	}
 	
 	private void prepareConnection() throws SQLException {
+		
+		// TODO: create this guard for other drivers also
+		if (this.connectionErrorCount > 1) {
+			// don't waste time for trying to connect anymore
+			throw new SQLException("Had several connection errors, not trying anymore");
+		}
+		
 		// disconnecting seems to be necessary because of "too many open cursors" error
-		if (this.conn == null || this.connUsageCount > 200) {
-			if (this.conn != null) {
-				this.conn.close();
+		try {
+			if (this.conn == null || this.connUsageCount > 200) {
+				if (this.conn != null) {
+					this.conn.close();
+				}
+				connUsageCount = 0;
+				this.conn = DriverManager.getConnection(this.url, this.username, this.password);
 			}
-			connUsageCount = 0;
-			this.conn = DriverManager.getConnection(this.url, this.username, this.password);
+		} catch (SQLException e) {
+			this.connectionErrorCount++;
+			throw e;
 		}
 	}
 
