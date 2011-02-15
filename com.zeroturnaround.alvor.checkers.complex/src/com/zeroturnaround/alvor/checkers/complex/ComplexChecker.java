@@ -5,11 +5,10 @@ import java.util.Collection;
 import java.util.List;
 
 import com.zeroturnaround.alvor.checkers.AbstractStringCheckerManager;
+import com.zeroturnaround.alvor.checkers.CheckerException;
 import com.zeroturnaround.alvor.checkers.HotspotCheckingResult;
 import com.zeroturnaround.alvor.checkers.HotspotError;
 import com.zeroturnaround.alvor.checkers.HotspotInfo;
-import com.zeroturnaround.alvor.checkers.HotspotWarning;
-import com.zeroturnaround.alvor.checkers.CheckerException;
 import com.zeroturnaround.alvor.checkers.IAbstractStringChecker;
 import com.zeroturnaround.alvor.checkers.sqldynamic.DynamicSQLChecker;
 import com.zeroturnaround.alvor.checkers.sqlstatic.SyntacticalSQLChecker;
@@ -60,7 +59,7 @@ public class ComplexChecker {
 				if (und.getErrorPosition() != null && !und.getPosition().equals(und.getErrorPosition())) {
 					msg += " at: " + PositionUtil.getLineString(und.getErrorPosition());
 				}
-				results.add(new HotspotWarning(msg, hotspot.getPosition()));
+				results.add(new HotspotInfo(msg, hotspot.getPosition()));
 			}
 			else {
 				throw new IllegalArgumentException("Unknown type of INodeTypeDescriptor: " + hotspot.getClass().getName());
@@ -142,7 +141,7 @@ public class ComplexChecker {
 		for (IAbstractStringChecker checker : checkers) {
 			if (checker instanceof DynamicSQLChecker 
 					&& !dynamicCheckerIsConfigured(configuration)) {
-				results.add(new HotspotWarning("SQL checker: testing database is not configured", null));
+				results.add(new HotspotInfo("SQL checker: testing database is not configured", null));
 				
 			} else {
 				Timer timer = new Timer();
@@ -184,7 +183,7 @@ public class ComplexChecker {
 				}
 			} catch (Exception e) {
 				LOG.exception(e);
-				nodeResults.add(new HotspotWarning("Error during checking: " + e.getMessage(), 
+				nodeResults.add(new HotspotInfo("Error during checking: " + e.getMessage(), 
 						descriptor.getPosition()));
 			}
 			results.addAll(nodeResults);
@@ -216,7 +215,7 @@ public class ComplexChecker {
 			} catch (Exception e) {
 				// should be able to proceed with next descriptors using static checker
 				LOG.exception(e);
-				nodeResults.add(new HotspotWarning("Error during checking: " + e.getMessage(), 
+				nodeResults.add(new HotspotInfo("Error during checking: " + e.getMessage(), 
 						descriptor.getPosition()));
 			}
 			results.addAll(nodeResults);
