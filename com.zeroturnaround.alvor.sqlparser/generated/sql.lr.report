@@ -5,7 +5,7 @@ Terminals unused in grammar
    UNKNOWN_CHARACTER_ERR
 
 
-Grammar
+Grammatika
 
     0 $accept: query $end
 
@@ -26,14 +26,14 @@ Grammar
    11 delete: DELETE optFrom alias where
 
    12 optFrom: FROM
-   13        | /* empty */
+   13        | /* tühi */
 
    14 insert: INSERT INTO alias optIdList insertRest
 
    15 insertRest: VALUES identRest
    16           | select
 
-   17 optIdList: /* empty */
+   17 optIdList: /* tühi */
    18          | '(' idList ')'
 
    19 idList: ID
@@ -48,27 +48,27 @@ Grammar
    25 basicSelect: SELECT optDist whatToSelect FROM tableList
 
    26 where: WHERE whereCond
-   27      | /* empty */
+   27      | /* tühi */
 
    28 forUpdate: FOR UPDATE
-   29          | /* empty */
+   29          | /* tühi */
 
    30 groupBy: GROUP BY simExList having
 
    31 optGroupBy: groupBy
-   32           | /* empty */
+   32           | /* tühi */
 
    33 having: HAVING condition
-   34       | /* empty */
+   34       | /* tühi */
 
    35 orderBy: ORDER BY directionList
 
    36 optOrderBy: orderBy
-   37           | /* empty */
+   37           | /* tühi */
 
    38 byClauses: orderBy optGroupBy
    39          | groupBy optOrderBy
-   40          | /* empty */
+   40          | /* tühi */
 
    41 directionList: direction
    42              | directionList ',' direction
@@ -77,10 +77,10 @@ Grammar
 
    44 orderDirection: ASC
    45               | DESC
-   46               | /* empty */
+   46               | /* tühi */
 
    47 optDist: DISTINCT
-   48        | /* empty */
+   48        | /* tühi */
 
    49 whatToSelect: selectExpressionList
 
@@ -150,12 +150,12 @@ Grammar
    99           | simpleExpr GE simpleExpr
 
   100 escape: ESCAPE STRING_SQ
-  101       | /* empty */
+  101       | /* tühi */
 
   102 inExpr: optNot IN
 
   103 optNot: NOT
-  104       | /* empty */
+  104       | /* tühi */
 
   105 simpleExpr: NUMBER
   106           | simpleExpr OUTERJ
@@ -177,11 +177,11 @@ Grammar
   122           | '?'
   123           | NULL
 
-  124 optSize: /* empty */
+  124 optSize: /* tühi */
   125        | '(' NUMBER ')'
 
   126 identRest: '(' simExList ')'
-  127          | /* empty */
+  127          | /* tühi */
 
   128 whenList: when
   129         | when whenList
@@ -189,16 +189,16 @@ Grammar
   130 when: WHEN condition THEN simpleExpr
 
   131 else: ELSE simpleExpr
-  132     | /* empty */
+  132     | /* tühi */
 
-  133 simExList: /* empty */
+  133 simExList: /* tühi */
   134          | simpleExpr
   135          | simExList ',' simpleExpr
 
   136 partition: '(' PARTITION BY ident orderBy ')'
 
 
-Terminals, with rules where they appear
+Terminalid, koos reeglitega kus nad ilmuvad
 
 $end (0) 0
 '(' (40) 10 18 22 72 73 82 84 85 86 87 90 111 118 119 125 126 136
@@ -274,121 +274,121 @@ ID (314) 19 20 53 70 74 75 76 92 93 118 120
 UNKNOWN_CHARACTER_ERR (315)
 
 
-Nonterminals, with rules where they appear
+Mitteterminalid, koos reeglitega kus nad ilmuvad
 
 $accept (73)
-    on left: 0
+    vasakul: 0
 query (74)
-    on left: 1 2 3 4 5, on right: 0
+    vasakul: 1 2 3 4 5, paremal: 0
 update (75)
-    on left: 6, on right: 4
+    vasakul: 6, paremal: 4
 assignList (76)
-    on left: 7 8, on right: 6 8
+    vasakul: 7 8, paremal: 6 8
 assign (77)
-    on left: 9 10, on right: 7 8
+    vasakul: 9 10, paremal: 7 8
 delete (78)
-    on left: 11, on right: 2
+    vasakul: 11, paremal: 2
 optFrom (79)
-    on left: 12 13, on right: 11
+    vasakul: 12 13, paremal: 11
 insert (80)
-    on left: 14, on right: 3
+    vasakul: 14, paremal: 3
 insertRest (81)
-    on left: 15 16, on right: 14
+    vasakul: 15 16, paremal: 14
 optIdList (82)
-    on left: 17 18, on right: 14
+    vasakul: 17 18, paremal: 14
 idList (83)
-    on left: 19 20, on right: 10 18 20
+    vasakul: 19 20, paremal: 10 18 20
 bracketedSelect (84)
-    on left: 21 22, on right: 1
+    vasakul: 21 22, paremal: 1
 select (85)
-    on left: 23 24, on right: 16 21 22 24 73 85 87 90 119
+    vasakul: 23 24, paremal: 16 21 22 24 73 85 87 90 119
 basicSelect (86)
-    on left: 25, on right: 23
+    vasakul: 25, paremal: 23
 where (87)
-    on left: 26 27, on right: 6 11 23
+    vasakul: 26 27, paremal: 6 11 23
 forUpdate (88)
-    on left: 28 29, on right: 23
+    vasakul: 28 29, paremal: 23
 groupBy (89)
-    on left: 30, on right: 31 39
+    vasakul: 30, paremal: 31 39
 optGroupBy (90)
-    on left: 31 32, on right: 38
+    vasakul: 31 32, paremal: 38
 having (91)
-    on left: 33 34, on right: 30
+    vasakul: 33 34, paremal: 30
 orderBy (92)
-    on left: 35, on right: 36 38 136
+    vasakul: 35, paremal: 36 38 136
 optOrderBy (93)
-    on left: 36 37, on right: 39
+    vasakul: 36 37, paremal: 39
 byClauses (94)
-    on left: 38 39 40, on right: 23
+    vasakul: 38 39 40, paremal: 23
 directionList (95)
-    on left: 41 42, on right: 35 42
+    vasakul: 41 42, paremal: 35 42
 direction (96)
-    on left: 43, on right: 41 42
+    vasakul: 43, paremal: 41 42
 orderDirection (97)
-    on left: 44 45 46, on right: 43
+    vasakul: 44 45 46, paremal: 43
 optDist (98)
-    on left: 47 48, on right: 25
+    vasakul: 47 48, paremal: 25
 whatToSelect (99)
-    on left: 49, on right: 25
+    vasakul: 49, paremal: 25
 selectExpression (100)
-    on left: 50 51 52, on right: 51 52 56 57
+    vasakul: 50 51 52, paremal: 51 52 56 57
 id (101)
-    on left: 53, on right: 51 52
+    vasakul: 53, paremal: 51 52
 expression (102)
-    on left: 54 55, on right: 50
+    vasakul: 54 55, paremal: 50
 selectExpressionList (103)
-    on left: 56 57, on right: 49 57
+    vasakul: 56 57, paremal: 49 57
 tableList (104)
-    on left: 58 59, on right: 25 59
+    vasakul: 58 59, paremal: 25 59
 table (105)
-    on left: 60 61, on right: 58 59 61
+    vasakul: 60 61, paremal: 58 59 61
 join (106)
-    on left: 62 63 64 65, on right: 61
+    vasakul: 62 63 64 65, paremal: 61
 outerType (107)
-    on left: 66 67 68, on right: 64
+    vasakul: 66 67 68, paremal: 64
 alias (108)
-    on left: 69 70, on right: 6 11 14 60 61
+    vasakul: 69 70, paremal: 6 11 14 60 61
 tableExpr (109)
-    on left: 71 72 73, on right: 69 70
+    vasakul: 71 72 73, paremal: 69 70
 ident (110)
-    on left: 74 75 76, on right: 9 71 110 136
+    vasakul: 74 75 76, paremal: 9 71 110 136
 whereCond (111)
-    on left: 77, on right: 26
+    vasakul: 77, paremal: 26
 condition (112)
-    on left: 78 79 80 81 82 83 84 85 86 87 88 89 90 91, on right: 33
+    vasakul: 78 79 80 81 82 83 84 85 86 87 88 89 90 91, paremal: 33
     54 61 77 78 79 80 81 82 130
 idList2 (113)
-    on left: 92 93, on right: 86 87 93
+    vasakul: 92 93, paremal: 86 87 93
 comparison (114)
-    on left: 94 95 96 97 98 99, on right: 83
+    vasakul: 94 95 96 97 98 99, paremal: 83
 escape (115)
-    on left: 100 101, on right: 89
+    vasakul: 100 101, paremal: 89
 inExpr (116)
-    on left: 102, on right: 84 85 86 87
+    vasakul: 102, paremal: 84 85 86 87
 optNot (117)
-    on left: 103 104, on right: 88 89 91 102
+    vasakul: 103 104, paremal: 88 89 91 102
 simpleExpr (118)
-    on left: 105 106 107 108 109 110 111 112 113 114 115 116 117 118
-    119 120 121 122 123, on right: 9 10 43 55 72 84 85 88 89 91 94
-    95 96 97 98 99 106 107 111 112 113 114 115 116 117 118 130 131
-    134 135
+    vasakul: 105 106 107 108 109 110 111 112 113 114 115 116 117 118
+    119 120 121 122 123, paremal: 9 10 43 55 72 84 85 88 89 91 94 95
+    96 97 98 99 106 107 111 112 113 114 115 116 117 118 130 131 134
+    135
 optSize (119)
-    on left: 124 125, on right: 118
+    vasakul: 124 125, paremal: 118
 identRest (120)
-    on left: 126 127, on right: 15 110
+    vasakul: 126 127, paremal: 15 110
 whenList (121)
-    on left: 128 129, on right: 108 129
+    vasakul: 128 129, paremal: 108 129
 when (122)
-    on left: 130, on right: 128 129
+    vasakul: 130, paremal: 128 129
 else (123)
-    on left: 131 132, on right: 108
+    vasakul: 131 132, paremal: 108
 simExList (124)
-    on left: 133 134 135, on right: 30 84 86 126 135
+    vasakul: 133 134 135, paremal: 30 84 86 126 135
 partition (125)
-    on left: 136, on right: 117
+    vasakul: 136, paremal: 117
 
 
-state 0
+olek 0
 
     0 $accept: . query $end
     1 query: . bracketedSelect
@@ -405,56 +405,56 @@ state 0
    24       | . select UNION select
    25 basicSelect: . SELECT optDist whatToSelect FROM tableList
 
-    SELECT  shift, and go to state 1
-    DELETE  shift, and go to state 2
-    INSERT  shift, and go to state 3
-    UPDATE  shift, and go to state 4
-    COMMIT  shift, and go to state 5
-    '('     shift, and go to state 6
+    SELECT  nihuta ja liigu olekule 1
+    DELETE  nihuta ja liigu olekule 2
+    INSERT  nihuta ja liigu olekule 3
+    UPDATE  nihuta ja liigu olekule 4
+    COMMIT  nihuta ja liigu olekule 5
+    '('     nihuta ja liigu olekule 6
 
-    query            go to state 7
-    update           go to state 8
-    delete           go to state 9
-    insert           go to state 10
-    bracketedSelect  go to state 11
-    select           go to state 12
-    basicSelect      go to state 13
+    query            liigu olekule 7
+    update           liigu olekule 8
+    delete           liigu olekule 9
+    insert           liigu olekule 10
+    bracketedSelect  liigu olekule 11
+    select           liigu olekule 12
+    basicSelect      liigu olekule 13
 
 
-state 1
+olek 1
 
    25 basicSelect: SELECT . optDist whatToSelect FROM tableList
    47 optDist: . DISTINCT
    48        | .  [EXISTS, CASE, CAST, NULL, NOT, STRING_SQ, NUMBER, ID, '-', '*', '(', '?']
 
-    DISTINCT  shift, and go to state 14
+    DISTINCT  nihuta ja liigu olekule 14
 
-    $default  reduce using rule 48 (optDist)
+    $default  redutseerin kasutades reeglit 48 (optDist)
 
-    optDist  go to state 15
+    optDist  liigu olekule 15
 
 
-state 2
+olek 2
 
    11 delete: DELETE . optFrom alias where
    12 optFrom: . FROM
    13        | .  [TABLE, ID, '(']
 
-    FROM  shift, and go to state 16
+    FROM  nihuta ja liigu olekule 16
 
-    $default  reduce using rule 13 (optFrom)
+    $default  redutseerin kasutades reeglit 13 (optFrom)
 
-    optFrom  go to state 17
+    optFrom  liigu olekule 17
 
 
-state 3
+olek 3
 
    14 insert: INSERT . INTO alias optIdList insertRest
 
-    INTO  shift, and go to state 18
+    INTO  nihuta ja liigu olekule 18
 
 
-state 4
+olek 4
 
     6 update: UPDATE . alias SET assignList where
    69 alias: . tableExpr
@@ -466,101 +466,101 @@ state 4
    75      | . ID '.' ID
    76      | . ID '.' ID '.' ID
 
-    TABLE  shift, and go to state 19
-    ID     shift, and go to state 20
-    '('    shift, and go to state 21
+    TABLE  nihuta ja liigu olekule 19
+    ID     nihuta ja liigu olekule 20
+    '('    nihuta ja liigu olekule 21
 
-    alias      go to state 22
-    tableExpr  go to state 23
-    ident      go to state 24
+    alias      liigu olekule 22
+    tableExpr  liigu olekule 23
+    ident      liigu olekule 24
 
 
-state 5
+olek 5
 
     5 query: COMMIT .
 
-    $default  reduce using rule 5 (query)
+    $default  redutseerin kasutades reeglit 5 (query)
 
 
-state 6
+olek 6
 
    22 bracketedSelect: '(' . select ')'
    23 select: . basicSelect where byClauses forUpdate
    24       | . select UNION select
    25 basicSelect: . SELECT optDist whatToSelect FROM tableList
 
-    SELECT  shift, and go to state 1
+    SELECT  nihuta ja liigu olekule 1
 
-    select       go to state 25
-    basicSelect  go to state 13
+    select       liigu olekule 25
+    basicSelect  liigu olekule 13
 
 
-state 7
+olek 7
 
     0 $accept: query . $end
 
-    $end  shift, and go to state 26
+    $end  nihuta ja liigu olekule 26
 
 
-state 8
+olek 8
 
     4 query: update .
 
-    $default  reduce using rule 4 (query)
+    $default  redutseerin kasutades reeglit 4 (query)
 
 
-state 9
+olek 9
 
     2 query: delete .
 
-    $default  reduce using rule 2 (query)
+    $default  redutseerin kasutades reeglit 2 (query)
 
 
-state 10
+olek 10
 
     3 query: insert .
 
-    $default  reduce using rule 3 (query)
+    $default  redutseerin kasutades reeglit 3 (query)
 
 
-state 11
+olek 11
 
     1 query: bracketedSelect .
 
-    $default  reduce using rule 1 (query)
+    $default  redutseerin kasutades reeglit 1 (query)
 
 
-state 12
+olek 12
 
    21 bracketedSelect: select .  [$end]
    24 select: select . UNION select
 
-    UNION  shift, and go to state 27
+    UNION  nihuta ja liigu olekule 27
 
-    $default  reduce using rule 21 (bracketedSelect)
+    $default  redutseerin kasutades reeglit 21 (bracketedSelect)
 
 
-state 13
+olek 13
 
    23 select: basicSelect . where byClauses forUpdate
    26 where: . WHERE whereCond
    27      | .  [$end, ORDER, GROUP, UNION, FOR, ')']
 
-    WHERE  shift, and go to state 28
+    WHERE  nihuta ja liigu olekule 28
 
-    $default  reduce using rule 27 (where)
+    $default  redutseerin kasutades reeglit 27 (where)
 
-    where  go to state 29
+    where  liigu olekule 29
 
 
-state 14
+olek 14
 
    47 optDist: DISTINCT .
 
-    $default  reduce using rule 47 (optDist)
+    $default  redutseerin kasutades reeglit 47 (optDist)
 
 
-state 15
+olek 15
 
    25 basicSelect: SELECT optDist . whatToSelect FROM tableList
    49 whatToSelect: . selectExpressionList
@@ -614,37 +614,37 @@ state 15
   122           | . '?'
   123           | . NULL
 
-    EXISTS     shift, and go to state 30
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    NOT        shift, and go to state 34
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 40
-    '?'        shift, and go to state 41
+    EXISTS     nihuta ja liigu olekule 30
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    NOT        nihuta ja liigu olekule 34
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 40
+    '?'        nihuta ja liigu olekule 41
 
-    whatToSelect          go to state 42
-    selectExpression      go to state 43
-    expression            go to state 44
-    selectExpressionList  go to state 45
-    ident                 go to state 46
-    condition             go to state 47
-    comparison            go to state 48
-    simpleExpr            go to state 49
+    whatToSelect          liigu olekule 42
+    selectExpression      liigu olekule 43
+    expression            liigu olekule 44
+    selectExpressionList  liigu olekule 45
+    ident                 liigu olekule 46
+    condition             liigu olekule 47
+    comparison            liigu olekule 48
+    simpleExpr            liigu olekule 49
 
 
-state 16
+olek 16
 
    12 optFrom: FROM .
 
-    $default  reduce using rule 12 (optFrom)
+    $default  redutseerin kasutades reeglit 12 (optFrom)
 
 
-state 17
+olek 17
 
    11 delete: DELETE optFrom . alias where
    69 alias: . tableExpr
@@ -656,16 +656,16 @@ state 17
    75      | . ID '.' ID
    76      | . ID '.' ID '.' ID
 
-    TABLE  shift, and go to state 19
-    ID     shift, and go to state 20
-    '('    shift, and go to state 21
+    TABLE  nihuta ja liigu olekule 19
+    ID     nihuta ja liigu olekule 20
+    '('    nihuta ja liigu olekule 21
 
-    alias      go to state 50
-    tableExpr  go to state 23
-    ident      go to state 24
+    alias      liigu olekule 50
+    tableExpr  liigu olekule 23
+    ident      liigu olekule 24
 
 
-state 18
+olek 18
 
    14 insert: INSERT INTO . alias optIdList insertRest
    69 alias: . tableExpr
@@ -677,100 +677,100 @@ state 18
    75      | . ID '.' ID
    76      | . ID '.' ID '.' ID
 
-    TABLE  shift, and go to state 19
-    ID     shift, and go to state 20
-    '('    shift, and go to state 21
+    TABLE  nihuta ja liigu olekule 19
+    ID     nihuta ja liigu olekule 20
+    '('    nihuta ja liigu olekule 21
 
-    alias      go to state 51
-    tableExpr  go to state 23
-    ident      go to state 24
+    alias      liigu olekule 51
+    tableExpr  liigu olekule 23
+    ident      liigu olekule 24
 
 
-state 19
+olek 19
 
    72 tableExpr: TABLE . '(' simpleExpr ')'
 
-    '('  shift, and go to state 52
+    '('  nihuta ja liigu olekule 52
 
 
-state 20
+olek 20
 
    74 ident: ID .  [$end, VALUES, SELECT, WHERE, ORDER, GROUP, RIGHT, INNER, UNION, JOIN, LEFT, FULL, SET, FOR, ON, ID, '=', ',', '(', ')']
    75      | ID . '.' ID
    76      | ID . '.' ID '.' ID
 
-    '.'  shift, and go to state 53
+    '.'  nihuta ja liigu olekule 53
 
-    $default  reduce using rule 74 (ident)
+    $default  redutseerin kasutades reeglit 74 (ident)
 
 
-state 21
+olek 21
 
    23 select: . basicSelect where byClauses forUpdate
    24       | . select UNION select
    25 basicSelect: . SELECT optDist whatToSelect FROM tableList
    73 tableExpr: '(' . select ')'
 
-    SELECT  shift, and go to state 1
+    SELECT  nihuta ja liigu olekule 1
 
-    select       go to state 54
-    basicSelect  go to state 13
+    select       liigu olekule 54
+    basicSelect  liigu olekule 13
 
 
-state 22
+olek 22
 
     6 update: UPDATE alias . SET assignList where
 
-    SET  shift, and go to state 55
+    SET  nihuta ja liigu olekule 55
 
 
-state 23
+olek 23
 
    69 alias: tableExpr .  [$end, VALUES, SELECT, WHERE, ORDER, GROUP, RIGHT, INNER, UNION, JOIN, LEFT, FULL, SET, FOR, ON, ',', '(', ')']
    70      | tableExpr . ID
 
-    ID  shift, and go to state 56
+    ID  nihuta ja liigu olekule 56
 
-    $default  reduce using rule 69 (alias)
+    $default  redutseerin kasutades reeglit 69 (alias)
 
 
-state 24
+olek 24
 
    71 tableExpr: ident .
 
-    $default  reduce using rule 71 (tableExpr)
+    $default  redutseerin kasutades reeglit 71 (tableExpr)
 
 
-state 25
+olek 25
 
    22 bracketedSelect: '(' select . ')'
    24 select: select . UNION select
 
-    UNION  shift, and go to state 27
-    ')'    shift, and go to state 57
+    UNION  nihuta ja liigu olekule 27
+    ')'    nihuta ja liigu olekule 57
 
 
-state 26
+olek 26
 
     0 $accept: query $end .
 
-    $default  accept
+    $default  nõustun
 
 
-state 27
+olek 27
 
    23 select: . basicSelect where byClauses forUpdate
    24       | . select UNION select
    24       | select UNION . select
    25 basicSelect: . SELECT optDist whatToSelect FROM tableList
 
-    SELECT  shift, and go to state 1
+    SELECT  nihuta ja liigu olekule 1
 
-    select       go to state 58
-    basicSelect  go to state 13
+    select       liigu olekule 58
+    basicSelect  liigu olekule 13
 
 
-state 28
+olek 28
 
    26 where: WHERE . whereCond
    74 ident: . ID
@@ -817,27 +817,27 @@ state 28
   122           | . '?'
   123           | . NULL
 
-    EXISTS     shift, and go to state 30
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    NOT        shift, and go to state 34
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 40
-    '?'        shift, and go to state 41
+    EXISTS     nihuta ja liigu olekule 30
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    NOT        nihuta ja liigu olekule 34
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 40
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    whereCond   go to state 59
-    condition   go to state 60
-    comparison  go to state 48
-    simpleExpr  go to state 61
+    ident       liigu olekule 46
+    whereCond   liigu olekule 59
+    condition   liigu olekule 60
+    comparison  liigu olekule 48
+    simpleExpr  liigu olekule 61
 
 
-state 29
+olek 29
 
    23 select: basicSelect where . byClauses forUpdate
    30 groupBy: . GROUP BY simExList having
@@ -846,51 +846,51 @@ state 29
    39          | . groupBy optOrderBy
    40          | .  [$end, UNION, FOR, ')']
 
-    ORDER  shift, and go to state 62
-    GROUP  shift, and go to state 63
+    ORDER  nihuta ja liigu olekule 62
+    GROUP  nihuta ja liigu olekule 63
 
-    $default  reduce using rule 40 (byClauses)
+    $default  redutseerin kasutades reeglit 40 (byClauses)
 
-    groupBy    go to state 64
-    orderBy    go to state 65
-    byClauses  go to state 66
+    groupBy    liigu olekule 64
+    orderBy    liigu olekule 65
+    byClauses  liigu olekule 66
 
 
-state 30
+olek 30
 
    90 condition: EXISTS . '(' select ')'
 
-    '('  shift, and go to state 67
+    '('  nihuta ja liigu olekule 67
 
 
-state 31
+olek 31
 
   108 simpleExpr: CASE . whenList else END
   128 whenList: . when
   129         | . when whenList
   130 when: . WHEN condition THEN simpleExpr
 
-    WHEN  shift, and go to state 68
+    WHEN  nihuta ja liigu olekule 68
 
-    whenList  go to state 69
-    when      go to state 70
+    whenList  liigu olekule 69
+    when      liigu olekule 70
 
 
-state 32
+olek 32
 
   118 simpleExpr: CAST . '(' simpleExpr AS ID optSize ')'
 
-    '('  shift, and go to state 71
+    '('  nihuta ja liigu olekule 71
 
 
-state 33
+olek 33
 
   123 simpleExpr: NULL .
 
-    $default  reduce using rule 123 (simpleExpr)
+    $default  redutseerin kasutades reeglit 123 (simpleExpr)
 
 
-state 34
+olek 34
 
    74 ident: . ID
    75      | . ID '.' ID
@@ -936,52 +936,52 @@ state 34
   122           | . '?'
   123           | . NULL
 
-    EXISTS     shift, and go to state 30
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    NOT        shift, and go to state 34
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 40
-    '?'        shift, and go to state 41
+    EXISTS     nihuta ja liigu olekule 30
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    NOT        nihuta ja liigu olekule 34
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 40
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    condition   go to state 72
-    comparison  go to state 48
-    simpleExpr  go to state 61
+    ident       liigu olekule 46
+    condition   liigu olekule 72
+    comparison  liigu olekule 48
+    simpleExpr  liigu olekule 61
 
 
-state 35
+olek 35
 
   109 simpleExpr: STRING_SQ .
 
-    $default  reduce using rule 109 (simpleExpr)
+    $default  redutseerin kasutades reeglit 109 (simpleExpr)
 
 
-state 36
+olek 36
 
   105 simpleExpr: NUMBER .
 
-    $default  reduce using rule 105 (simpleExpr)
+    $default  redutseerin kasutades reeglit 105 (simpleExpr)
 
 
-state 37
+olek 37
 
    74 ident: ID .  [$end, BETWEEN, ESCAPE, OVER, HAVING, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, WHEN, THEN, ELSE, DESC, LIKE, JOIN, LEFT, FULL, AND, END, ASC, XOR, FOR, NOT, AS, IN, IS, OUTERJ, NE, LE, GE, CONCAT, ID, '=', '>', '<', '-', '+', '/', '*', ',', '(', ')']
    75      | ID . '.' ID
    76      | ID . '.' ID '.' ID
   120 simpleExpr: ID . '.' '*'
 
-    '.'  shift, and go to state 73
+    '.'  nihuta ja liigu olekule 73
 
-    $default  reduce using rule 74 (ident)
+    $default  redutseerin kasutades reeglit 74 (ident)
 
 
-state 38
+olek 38
 
    74 ident: . ID
    75      | . ID '.' ID
@@ -1007,29 +1007,29 @@ state 38
   122           | . '?'
   123           | . NULL
 
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 74
-    '?'        shift, and go to state 41
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    simpleExpr  go to state 75
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 75
 
 
-state 39
+olek 39
 
   121 simpleExpr: '*' .
 
-    $default  reduce using rule 121 (simpleExpr)
+    $default  redutseerin kasutades reeglit 121 (simpleExpr)
 
 
-state 40
+olek 40
 
    23 select: . basicSelect where byClauses forUpdate
    24       | . select UNION select
@@ -1084,110 +1084,110 @@ state 40
   122           | . '?'
   123           | . NULL
 
-    SELECT     shift, and go to state 1
-    EXISTS     shift, and go to state 30
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    NOT        shift, and go to state 34
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 76
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 40
-    '?'        shift, and go to state 41
+    SELECT     nihuta ja liigu olekule 1
+    EXISTS     nihuta ja liigu olekule 30
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    NOT        nihuta ja liigu olekule 34
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 76
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 40
+    '?'        nihuta ja liigu olekule 41
 
-    select       go to state 77
-    basicSelect  go to state 13
-    ident        go to state 46
-    condition    go to state 78
-    idList2      go to state 79
-    comparison   go to state 48
-    simpleExpr   go to state 80
+    select       liigu olekule 77
+    basicSelect  liigu olekule 13
+    ident        liigu olekule 46
+    condition    liigu olekule 78
+    idList2      liigu olekule 79
+    comparison   liigu olekule 48
+    simpleExpr   liigu olekule 80
 
 
-state 41
+olek 41
 
   122 simpleExpr: '?' .
 
-    $default  reduce using rule 122 (simpleExpr)
+    $default  redutseerin kasutades reeglit 122 (simpleExpr)
 
 
-state 42
+olek 42
 
    25 basicSelect: SELECT optDist whatToSelect . FROM tableList
 
-    FROM  shift, and go to state 81
+    FROM  nihuta ja liigu olekule 81
 
 
-state 43
+olek 43
 
    51 selectExpression: selectExpression . AS id
    52                 | selectExpression . id
    53 id: . ID
    56 selectExpressionList: selectExpression .  [FROM, ',']
 
-    AS  shift, and go to state 82
-    ID  shift, and go to state 83
+    AS  nihuta ja liigu olekule 82
+    ID  nihuta ja liigu olekule 83
 
-    $default  reduce using rule 56 (selectExpressionList)
+    $default  redutseerin kasutades reeglit 56 (selectExpressionList)
 
-    id  go to state 84
+    id  liigu olekule 84
 
 
-state 44
+olek 44
 
    50 selectExpression: expression .
 
-    $default  reduce using rule 50 (selectExpression)
+    $default  redutseerin kasutades reeglit 50 (selectExpression)
 
 
-state 45
+olek 45
 
    49 whatToSelect: selectExpressionList .  [FROM]
    57 selectExpressionList: selectExpressionList . ',' selectExpression
 
-    ','  shift, and go to state 85
+    ','  nihuta ja liigu olekule 85
 
-    $default  reduce using rule 49 (whatToSelect)
+    $default  redutseerin kasutades reeglit 49 (whatToSelect)
 
 
-state 46
+olek 46
 
   110 simpleExpr: ident . identRest
   126 identRest: . '(' simExList ')'
   127          | .  [$end, BETWEEN, ESCAPE, OVER, HAVING, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, WHEN, THEN, ELSE, DESC, LIKE, JOIN, LEFT, FULL, AND, END, ASC, XOR, FOR, NOT, AS, IN, IS, OUTERJ, NE, LE, GE, CONCAT, ID, '=', '>', '<', '-', '+', '/', '*', ',', ')']
 
-    '('  shift, and go to state 86
+    '('  nihuta ja liigu olekule 86
 
-    $default  reduce using rule 127 (identRest)
+    $default  redutseerin kasutades reeglit 127 (identRest)
 
-    identRest  go to state 87
+    identRest  liigu olekule 87
 
 
-state 47
+olek 47
 
    54 expression: condition .  [FROM, AS, ID, ',']
    78 condition: condition . AND condition
    79          | condition . OR condition
    80          | condition . XOR condition
 
-    OR   shift, and go to state 88
-    AND  shift, and go to state 89
-    XOR  shift, and go to state 90
+    OR   nihuta ja liigu olekule 88
+    AND  nihuta ja liigu olekule 89
+    XOR  nihuta ja liigu olekule 90
 
-    $default  reduce using rule 54 (expression)
+    $default  redutseerin kasutades reeglit 54 (expression)
 
 
-state 48
+olek 48
 
    83 condition: comparison .
 
-    $default  reduce using rule 83 (condition)
+    $default  redutseerin kasutades reeglit 83 (condition)
 
 
-state 49
+olek 49
 
    55 expression: simpleExpr .  [FROM, AS, ID, ',']
    84 condition: simpleExpr . inExpr '(' simExList ')'
@@ -1212,58 +1212,58 @@ state 49
   116           | simpleExpr . CONCAT simpleExpr
   117           | simpleExpr . OVER partition
 
-    OVER    shift, and go to state 91
-    NOT     shift, and go to state 92
-    IS      shift, and go to state 93
-    OUTERJ  shift, and go to state 94
-    NE      shift, and go to state 95
-    LE      shift, and go to state 96
-    GE      shift, and go to state 97
-    CONCAT  shift, and go to state 98
-    '='     shift, and go to state 99
-    '>'     shift, and go to state 100
-    '<'     shift, and go to state 101
-    '-'     shift, and go to state 102
-    '+'     shift, and go to state 103
-    '/'     shift, and go to state 104
-    '*'     shift, and go to state 105
+    OVER    nihuta ja liigu olekule 91
+    NOT     nihuta ja liigu olekule 92
+    IS      nihuta ja liigu olekule 93
+    OUTERJ  nihuta ja liigu olekule 94
+    NE      nihuta ja liigu olekule 95
+    LE      nihuta ja liigu olekule 96
+    GE      nihuta ja liigu olekule 97
+    CONCAT  nihuta ja liigu olekule 98
+    '='     nihuta ja liigu olekule 99
+    '>'     nihuta ja liigu olekule 100
+    '<'     nihuta ja liigu olekule 101
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
 
-    BETWEEN   reduce using rule 104 (optNot)
-    LIKE      reduce using rule 104 (optNot)
-    IN        reduce using rule 104 (optNot)
-    $default  reduce using rule 55 (expression)
+    BETWEEN   redutseerin kasutades reeglit 104 (optNot)
+    LIKE      redutseerin kasutades reeglit 104 (optNot)
+    IN        redutseerin kasutades reeglit 104 (optNot)
+    $default  redutseerin kasutades reeglit 55 (expression)
 
-    inExpr  go to state 106
-    optNot  go to state 107
+    inExpr  liigu olekule 106
+    optNot  liigu olekule 107
 
 
-state 50
+olek 50
 
    11 delete: DELETE optFrom alias . where
    26 where: . WHERE whereCond
    27      | .  [$end]
 
-    WHERE  shift, and go to state 28
+    WHERE  nihuta ja liigu olekule 28
 
-    $default  reduce using rule 27 (where)
+    $default  redutseerin kasutades reeglit 27 (where)
 
-    where  go to state 108
+    where  liigu olekule 108
 
 
-state 51
+olek 51
 
    14 insert: INSERT INTO alias . optIdList insertRest
    17 optIdList: .  [VALUES, SELECT]
    18          | . '(' idList ')'
 
-    '('  shift, and go to state 109
+    '('  nihuta ja liigu olekule 109
 
-    $default  reduce using rule 17 (optIdList)
+    $default  redutseerin kasutades reeglit 17 (optIdList)
 
-    optIdList  go to state 110
+    optIdList  liigu olekule 110
 
 
-state 52
+olek 52
 
    72 tableExpr: TABLE '(' . simpleExpr ')'
    74 ident: . ID
@@ -1289,39 +1289,39 @@ state 52
   122           | . '?'
   123           | . NULL
 
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 74
-    '?'        shift, and go to state 41
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    simpleExpr  go to state 111
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 111
 
 
-state 53
+olek 53
 
    75 ident: ID '.' . ID
    76      | ID '.' . ID '.' ID
 
-    ID  shift, and go to state 112
+    ID  nihuta ja liigu olekule 112
 
 
-state 54
+olek 54
 
    24 select: select . UNION select
    73 tableExpr: '(' select . ')'
 
-    UNION  shift, and go to state 27
-    ')'    shift, and go to state 113
+    UNION  nihuta ja liigu olekule 27
+    ')'    nihuta ja liigu olekule 113
 
 
-state 55
+olek 55
 
     6 update: UPDATE alias SET . assignList where
     7 assignList: . assign
@@ -1332,58 +1332,58 @@ state 55
    75      | . ID '.' ID
    76      | . ID '.' ID '.' ID
 
-    ID   shift, and go to state 20
-    '('  shift, and go to state 114
+    ID   nihuta ja liigu olekule 20
+    '('  nihuta ja liigu olekule 114
 
-    assignList  go to state 115
-    assign      go to state 116
-    ident       go to state 117
+    assignList  liigu olekule 115
+    assign      liigu olekule 116
+    ident       liigu olekule 117
 
 
-state 56
+olek 56
 
    70 alias: tableExpr ID .
 
-    $default  reduce using rule 70 (alias)
+    $default  redutseerin kasutades reeglit 70 (alias)
 
 
-state 57
+olek 57
 
    22 bracketedSelect: '(' select ')' .
 
-    $default  reduce using rule 22 (bracketedSelect)
+    $default  redutseerin kasutades reeglit 22 (bracketedSelect)
 
 
-state 58
+olek 58
 
    24 select: select . UNION select
    24       | select UNION select .  [$end, UNION, ')']
 
-    $default  reduce using rule 24 (select)
+    $default  redutseerin kasutades reeglit 24 (select)
 
 
-state 59
+olek 59
 
    26 where: WHERE whereCond .
 
-    $default  reduce using rule 26 (where)
+    $default  redutseerin kasutades reeglit 26 (where)
 
 
-state 60
+olek 60
 
    77 whereCond: condition .  [$end, ORDER, GROUP, UNION, FOR, ')']
    78 condition: condition . AND condition
    79          | condition . OR condition
    80          | condition . XOR condition
 
-    OR   shift, and go to state 88
-    AND  shift, and go to state 89
-    XOR  shift, and go to state 90
+    OR   nihuta ja liigu olekule 88
+    AND  nihuta ja liigu olekule 89
+    XOR  nihuta ja liigu olekule 90
 
-    $default  reduce using rule 77 (whereCond)
+    $default  redutseerin kasutades reeglit 77 (whereCond)
 
 
-state 61
+olek 61
 
    84 condition: simpleExpr . inExpr '(' simExList ')'
    85          | simpleExpr . inExpr '(' select ')'
@@ -1407,99 +1407,99 @@ state 61
   116           | simpleExpr . CONCAT simpleExpr
   117           | simpleExpr . OVER partition
 
-    OVER    shift, and go to state 91
-    NOT     shift, and go to state 92
-    IS      shift, and go to state 93
-    OUTERJ  shift, and go to state 94
-    NE      shift, and go to state 95
-    LE      shift, and go to state 96
-    GE      shift, and go to state 97
-    CONCAT  shift, and go to state 98
-    '='     shift, and go to state 99
-    '>'     shift, and go to state 100
-    '<'     shift, and go to state 101
-    '-'     shift, and go to state 102
-    '+'     shift, and go to state 103
-    '/'     shift, and go to state 104
-    '*'     shift, and go to state 105
+    OVER    nihuta ja liigu olekule 91
+    NOT     nihuta ja liigu olekule 92
+    IS      nihuta ja liigu olekule 93
+    OUTERJ  nihuta ja liigu olekule 94
+    NE      nihuta ja liigu olekule 95
+    LE      nihuta ja liigu olekule 96
+    GE      nihuta ja liigu olekule 97
+    CONCAT  nihuta ja liigu olekule 98
+    '='     nihuta ja liigu olekule 99
+    '>'     nihuta ja liigu olekule 100
+    '<'     nihuta ja liigu olekule 101
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
 
-    $default  reduce using rule 104 (optNot)
+    $default  redutseerin kasutades reeglit 104 (optNot)
 
-    inExpr  go to state 106
-    optNot  go to state 107
+    inExpr  liigu olekule 106
+    optNot  liigu olekule 107
 
 
-state 62
+olek 62
 
    35 orderBy: ORDER . BY directionList
 
-    BY  shift, and go to state 118
+    BY  nihuta ja liigu olekule 118
 
 
-state 63
+olek 63
 
    30 groupBy: GROUP . BY simExList having
 
-    BY  shift, and go to state 119
+    BY  nihuta ja liigu olekule 119
 
 
-state 64
+olek 64
 
    35 orderBy: . ORDER BY directionList
    36 optOrderBy: . orderBy
    37           | .  [$end, UNION, FOR, ')']
    39 byClauses: groupBy . optOrderBy
 
-    ORDER  shift, and go to state 62
+    ORDER  nihuta ja liigu olekule 62
 
-    $default  reduce using rule 37 (optOrderBy)
+    $default  redutseerin kasutades reeglit 37 (optOrderBy)
 
-    orderBy     go to state 120
-    optOrderBy  go to state 121
+    orderBy     liigu olekule 120
+    optOrderBy  liigu olekule 121
 
 
-state 65
+olek 65
 
    30 groupBy: . GROUP BY simExList having
    31 optGroupBy: . groupBy
    32           | .  [$end, UNION, FOR, ')']
    38 byClauses: orderBy . optGroupBy
 
-    GROUP  shift, and go to state 63
+    GROUP  nihuta ja liigu olekule 63
 
-    $default  reduce using rule 32 (optGroupBy)
+    $default  redutseerin kasutades reeglit 32 (optGroupBy)
 
-    groupBy     go to state 122
-    optGroupBy  go to state 123
+    groupBy     liigu olekule 122
+    optGroupBy  liigu olekule 123
 
 
-state 66
+olek 66
 
    23 select: basicSelect where byClauses . forUpdate
    28 forUpdate: . FOR UPDATE
    29          | .  [$end, UNION, ')']
 
-    FOR  shift, and go to state 124
+    FOR  nihuta ja liigu olekule 124
 
-    $default  reduce using rule 29 (forUpdate)
+    $default  redutseerin kasutades reeglit 29 (forUpdate)
 
-    forUpdate  go to state 125
+    forUpdate  liigu olekule 125
 
 
-state 67
+olek 67
 
    23 select: . basicSelect where byClauses forUpdate
    24       | . select UNION select
    25 basicSelect: . SELECT optDist whatToSelect FROM tableList
    90 condition: EXISTS '(' . select ')'
 
-    SELECT  shift, and go to state 1
+    SELECT  nihuta ja liigu olekule 1
 
-    select       go to state 126
-    basicSelect  go to state 13
+    select       liigu olekule 126
+    basicSelect  liigu olekule 13
 
 
-state 68
+olek 68
 
    74 ident: . ID
    75      | . ID '.' ID
@@ -1545,39 +1545,39 @@ state 68
   123           | . NULL
   130 when: WHEN . condition THEN simpleExpr
 
-    EXISTS     shift, and go to state 30
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    NOT        shift, and go to state 34
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 40
-    '?'        shift, and go to state 41
+    EXISTS     nihuta ja liigu olekule 30
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    NOT        nihuta ja liigu olekule 34
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 40
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    condition   go to state 127
-    comparison  go to state 48
-    simpleExpr  go to state 61
+    ident       liigu olekule 46
+    condition   liigu olekule 127
+    comparison  liigu olekule 48
+    simpleExpr  liigu olekule 61
 
 
-state 69
+olek 69
 
   108 simpleExpr: CASE whenList . else END
   131 else: . ELSE simpleExpr
   132     | .  [END]
 
-    ELSE  shift, and go to state 128
+    ELSE  nihuta ja liigu olekule 128
 
-    $default  reduce using rule 132 (else)
+    $default  redutseerin kasutades reeglit 132 (else)
 
-    else  go to state 129
+    else  liigu olekule 129
 
 
-state 70
+olek 70
 
   128 whenList: . when
   128         | when .  [ELSE, END]
@@ -1585,15 +1585,15 @@ state 70
   129         | when . whenList
   130 when: . WHEN condition THEN simpleExpr
 
-    WHEN  shift, and go to state 68
+    WHEN  nihuta ja liigu olekule 68
 
-    $default  reduce using rule 128 (whenList)
+    $default  redutseerin kasutades reeglit 128 (whenList)
 
-    whenList  go to state 130
-    when      go to state 70
+    whenList  liigu olekule 130
+    when      liigu olekule 70
 
 
-state 71
+olek 71
 
    74 ident: . ID
    75      | . ID '.' ID
@@ -1619,42 +1619,42 @@ state 71
   122           | . '?'
   123           | . NULL
 
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 74
-    '?'        shift, and go to state 41
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    simpleExpr  go to state 131
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 131
 
 
-state 72
+olek 72
 
    78 condition: condition . AND condition
    79          | condition . OR condition
    80          | condition . XOR condition
    81          | NOT condition .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, AND, XOR, FOR, AS, ID, ',', ')']
 
-    $default  reduce using rule 81 (condition)
+    $default  redutseerin kasutades reeglit 81 (condition)
 
 
-state 73
+olek 73
 
    75 ident: ID '.' . ID
    76      | ID '.' . ID '.' ID
   120 simpleExpr: ID '.' . '*'
 
-    ID   shift, and go to state 112
-    '*'  shift, and go to state 132
+    ID   nihuta ja liigu olekule 112
+    '*'  nihuta ja liigu olekule 132
 
 
-state 74
+olek 74
 
    23 select: . basicSelect where byClauses forUpdate
    24       | . select UNION select
@@ -1684,25 +1684,25 @@ state 74
   122           | . '?'
   123           | . NULL
 
-    SELECT     shift, and go to state 1
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 74
-    '?'        shift, and go to state 41
+    SELECT     nihuta ja liigu olekule 1
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
 
-    select       go to state 77
-    basicSelect  go to state 13
-    ident        go to state 46
-    simpleExpr   go to state 133
+    select       liigu olekule 77
+    basicSelect  liigu olekule 13
+    ident        liigu olekule 46
+    simpleExpr   liigu olekule 133
 
 
-state 75
+olek 75
 
   106 simpleExpr: simpleExpr . OUTERJ
   107           | '-' simpleExpr .  [$end, BETWEEN, ESCAPE, OVER, HAVING, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, WHEN, THEN, ELSE, DESC, LIKE, JOIN, LEFT, FULL, AND, END, ASC, XOR, FOR, NOT, AS, IN, IS, NE, LE, GE, ID, '=', '>', '<', '-', '+', ',', ')']
@@ -1713,15 +1713,15 @@ state 75
   116           | simpleExpr . CONCAT simpleExpr
   117           | simpleExpr . OVER partition
 
-    OUTERJ  shift, and go to state 94
-    CONCAT  shift, and go to state 98
-    '/'     shift, and go to state 104
-    '*'     shift, and go to state 105
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
 
-    $default  reduce using rule 107 (simpleExpr)
+    $default  redutseerin kasutades reeglit 107 (simpleExpr)
 
 
-state 76
+olek 76
 
    74 ident: ID .  [BETWEEN, OVER, LIKE, NOT, IN, IS, OUTERJ, NE, LE, GE, CONCAT, '=', '>', '<', '-', '+', '/', '*', '(', ')']
    75      | ID . '.' ID
@@ -1729,45 +1729,45 @@ state 76
    92 idList2: ID . ',' ID
   120 simpleExpr: ID . '.' '*'
 
-    ','  shift, and go to state 134
-    '.'  shift, and go to state 73
+    ','  nihuta ja liigu olekule 134
+    '.'  nihuta ja liigu olekule 73
 
-    $default  reduce using rule 74 (ident)
+    $default  redutseerin kasutades reeglit 74 (ident)
 
 
-state 77
+olek 77
 
    24 select: select . UNION select
   119 simpleExpr: '(' select . ')'
 
-    UNION  shift, and go to state 27
-    ')'    shift, and go to state 135
+    UNION  nihuta ja liigu olekule 27
+    ')'    nihuta ja liigu olekule 135
 
 
-state 78
+olek 78
 
    78 condition: condition . AND condition
    79          | condition . OR condition
    80          | condition . XOR condition
    82          | '(' condition . ')'
 
-    OR   shift, and go to state 88
-    AND  shift, and go to state 89
-    XOR  shift, and go to state 90
-    ')'  shift, and go to state 136
+    OR   nihuta ja liigu olekule 88
+    AND  nihuta ja liigu olekule 89
+    XOR  nihuta ja liigu olekule 90
+    ')'  nihuta ja liigu olekule 136
 
 
-state 79
+olek 79
 
    86 condition: '(' idList2 . ')' inExpr '(' simExList ')'
    87          | '(' idList2 . ')' inExpr '(' select ')'
    93 idList2: idList2 . ',' ID
 
-    ','  shift, and go to state 137
-    ')'  shift, and go to state 138
+    ','  nihuta ja liigu olekule 137
+    ')'  nihuta ja liigu olekule 138
 
 
-state 80
+olek 80
 
    84 condition: simpleExpr . inExpr '(' simExList ')'
    85          | simpleExpr . inExpr '(' select ')'
@@ -1792,30 +1792,30 @@ state 80
   116           | simpleExpr . CONCAT simpleExpr
   117           | simpleExpr . OVER partition
 
-    OVER    shift, and go to state 91
-    NOT     shift, and go to state 92
-    IS      shift, and go to state 93
-    OUTERJ  shift, and go to state 94
-    NE      shift, and go to state 95
-    LE      shift, and go to state 96
-    GE      shift, and go to state 97
-    CONCAT  shift, and go to state 98
-    '='     shift, and go to state 99
-    '>'     shift, and go to state 100
-    '<'     shift, and go to state 101
-    '-'     shift, and go to state 102
-    '+'     shift, and go to state 103
-    '/'     shift, and go to state 104
-    '*'     shift, and go to state 105
-    ')'     shift, and go to state 139
+    OVER    nihuta ja liigu olekule 91
+    NOT     nihuta ja liigu olekule 92
+    IS      nihuta ja liigu olekule 93
+    OUTERJ  nihuta ja liigu olekule 94
+    NE      nihuta ja liigu olekule 95
+    LE      nihuta ja liigu olekule 96
+    GE      nihuta ja liigu olekule 97
+    CONCAT  nihuta ja liigu olekule 98
+    '='     nihuta ja liigu olekule 99
+    '>'     nihuta ja liigu olekule 100
+    '<'     nihuta ja liigu olekule 101
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
+    ')'     nihuta ja liigu olekule 139
 
-    $default  reduce using rule 104 (optNot)
+    $default  redutseerin kasutades reeglit 104 (optNot)
 
-    inExpr  go to state 106
-    optNot  go to state 107
+    inExpr  liigu olekule 106
+    optNot  liigu olekule 107
 
 
-state 81
+olek 81
 
    25 basicSelect: SELECT optDist whatToSelect FROM . tableList
    58 tableList: . table
@@ -1831,42 +1831,42 @@ state 81
    75      | . ID '.' ID
    76      | . ID '.' ID '.' ID
 
-    TABLE  shift, and go to state 19
-    ID     shift, and go to state 20
-    '('    shift, and go to state 21
+    TABLE  nihuta ja liigu olekule 19
+    ID     nihuta ja liigu olekule 20
+    '('    nihuta ja liigu olekule 21
 
-    tableList  go to state 140
-    table      go to state 141
-    alias      go to state 142
-    tableExpr  go to state 23
-    ident      go to state 24
+    tableList  liigu olekule 140
+    table      liigu olekule 141
+    alias      liigu olekule 142
+    tableExpr  liigu olekule 23
+    ident      liigu olekule 24
 
 
-state 82
+olek 82
 
    51 selectExpression: selectExpression AS . id
    53 id: . ID
 
-    ID  shift, and go to state 83
+    ID  nihuta ja liigu olekule 83
 
-    id  go to state 143
+    id  liigu olekule 143
 
 
-state 83
+olek 83
 
    53 id: ID .
 
-    $default  reduce using rule 53 (id)
+    $default  redutseerin kasutades reeglit 53 (id)
 
 
-state 84
+olek 84
 
    52 selectExpression: selectExpression id .
 
-    $default  reduce using rule 52 (selectExpression)
+    $default  redutseerin kasutades reeglit 52 (selectExpression)
 
 
-state 85
+olek 85
 
    50 selectExpression: . expression
    51                 | . selectExpression AS id
@@ -1917,28 +1917,28 @@ state 85
   122           | . '?'
   123           | . NULL
 
-    EXISTS     shift, and go to state 30
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    NOT        shift, and go to state 34
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 40
-    '?'        shift, and go to state 41
+    EXISTS     nihuta ja liigu olekule 30
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    NOT        nihuta ja liigu olekule 34
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 40
+    '?'        nihuta ja liigu olekule 41
 
-    selectExpression  go to state 144
-    expression        go to state 44
-    ident             go to state 46
-    condition         go to state 47
-    comparison        go to state 48
-    simpleExpr        go to state 49
+    selectExpression  liigu olekule 144
+    expression        liigu olekule 44
+    ident             liigu olekule 46
+    condition         liigu olekule 47
+    comparison        liigu olekule 48
+    simpleExpr        liigu olekule 49
 
 
-state 86
+olek 86
 
    74 ident: . ID
    75      | . ID '.' ID
@@ -1967,32 +1967,32 @@ state 86
   134          | . simpleExpr
   135          | . simExList ',' simpleExpr
 
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 74
-    '?'        shift, and go to state 41
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
 
-    $default  reduce using rule 133 (simExList)
+    $default  redutseerin kasutades reeglit 133 (simExList)
 
-    ident       go to state 46
-    simpleExpr  go to state 145
-    simExList   go to state 146
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 145
+    simExList   liigu olekule 146
 
 
-state 87
+olek 87
 
   110 simpleExpr: ident identRest .
 
-    $default  reduce using rule 110 (simpleExpr)
+    $default  redutseerin kasutades reeglit 110 (simpleExpr)
 
 
-state 88
+olek 88
 
    74 ident: . ID
    75      | . ID '.' ID
@@ -2038,26 +2038,26 @@ state 88
   122           | . '?'
   123           | . NULL
 
-    EXISTS     shift, and go to state 30
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    NOT        shift, and go to state 34
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 40
-    '?'        shift, and go to state 41
+    EXISTS     nihuta ja liigu olekule 30
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    NOT        nihuta ja liigu olekule 34
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 40
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    condition   go to state 147
-    comparison  go to state 48
-    simpleExpr  go to state 61
+    ident       liigu olekule 46
+    condition   liigu olekule 147
+    comparison  liigu olekule 48
+    simpleExpr  liigu olekule 61
 
 
-state 89
+olek 89
 
    74 ident: . ID
    75      | . ID '.' ID
@@ -2103,26 +2103,26 @@ state 89
   122           | . '?'
   123           | . NULL
 
-    EXISTS     shift, and go to state 30
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    NOT        shift, and go to state 34
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 40
-    '?'        shift, and go to state 41
+    EXISTS     nihuta ja liigu olekule 30
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    NOT        nihuta ja liigu olekule 34
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 40
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    condition   go to state 148
-    comparison  go to state 48
-    simpleExpr  go to state 61
+    ident       liigu olekule 46
+    condition   liigu olekule 148
+    comparison  liigu olekule 48
+    simpleExpr  liigu olekule 61
 
 
-state 90
+olek 90
 
    74 ident: . ID
    75      | . ID '.' ID
@@ -2168,63 +2168,63 @@ state 90
   122           | . '?'
   123           | . NULL
 
-    EXISTS     shift, and go to state 30
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    NOT        shift, and go to state 34
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 40
-    '?'        shift, and go to state 41
+    EXISTS     nihuta ja liigu olekule 30
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    NOT        nihuta ja liigu olekule 34
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 40
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    condition   go to state 149
-    comparison  go to state 48
-    simpleExpr  go to state 61
+    ident       liigu olekule 46
+    condition   liigu olekule 149
+    comparison  liigu olekule 48
+    simpleExpr  liigu olekule 61
 
 
-state 91
+olek 91
 
   117 simpleExpr: simpleExpr OVER . partition
   136 partition: . '(' PARTITION BY ident orderBy ')'
 
-    '('  shift, and go to state 150
+    '('  nihuta ja liigu olekule 150
 
-    partition  go to state 151
+    partition  liigu olekule 151
 
 
-state 92
+olek 92
 
   103 optNot: NOT .
 
-    $default  reduce using rule 103 (optNot)
+    $default  redutseerin kasutades reeglit 103 (optNot)
 
 
-state 93
+olek 93
 
    88 condition: simpleExpr IS . optNot NULL
   103 optNot: . NOT
   104       | .  [NULL]
 
-    NOT  shift, and go to state 92
+    NOT  nihuta ja liigu olekule 92
 
-    $default  reduce using rule 104 (optNot)
+    $default  redutseerin kasutades reeglit 104 (optNot)
 
-    optNot  go to state 152
+    optNot  liigu olekule 152
 
 
-state 94
+olek 94
 
   106 simpleExpr: simpleExpr OUTERJ .
 
-    $default  reduce using rule 106 (simpleExpr)
+    $default  redutseerin kasutades reeglit 106 (simpleExpr)
 
 
-state 95
+olek 95
 
    74 ident: . ID
    75      | . ID '.' ID
@@ -2250,22 +2250,22 @@ state 95
   122           | . '?'
   123           | . NULL
 
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 74
-    '?'        shift, and go to state 41
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    simpleExpr  go to state 153
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 153
 
 
-state 96
+olek 96
 
    74 ident: . ID
    75      | . ID '.' ID
@@ -2291,22 +2291,22 @@ state 96
   122           | . '?'
   123           | . NULL
 
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 74
-    '?'        shift, and go to state 41
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    simpleExpr  go to state 154
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 154
 
 
-state 97
+olek 97
 
    74 ident: . ID
    75      | . ID '.' ID
@@ -2332,22 +2332,22 @@ state 97
   122           | . '?'
   123           | . NULL
 
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 74
-    '?'        shift, and go to state 41
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    simpleExpr  go to state 155
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 155
 
 
-state 98
+olek 98
 
    74 ident: . ID
    75      | . ID '.' ID
@@ -2373,22 +2373,22 @@ state 98
   122           | . '?'
   123           | . NULL
 
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 74
-    '?'        shift, and go to state 41
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    simpleExpr  go to state 156
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 156
 
 
-state 99
+olek 99
 
    74 ident: . ID
    75      | . ID '.' ID
@@ -2414,22 +2414,22 @@ state 99
   122           | . '?'
   123           | . NULL
 
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 74
-    '?'        shift, and go to state 41
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    simpleExpr  go to state 157
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 157
 
 
-state 100
+olek 100
 
    74 ident: . ID
    75      | . ID '.' ID
@@ -2455,22 +2455,22 @@ state 100
   122           | . '?'
   123           | . NULL
 
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 74
-    '?'        shift, and go to state 41
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    simpleExpr  go to state 158
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 158
 
 
-state 101
+olek 101
 
    74 ident: . ID
    75      | . ID '.' ID
@@ -2496,22 +2496,22 @@ state 101
   122           | . '?'
   123           | . NULL
 
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 74
-    '?'        shift, and go to state 41
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    simpleExpr  go to state 159
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 159
 
 
-state 102
+olek 102
 
    74 ident: . ID
    75      | . ID '.' ID
@@ -2537,22 +2537,22 @@ state 102
   122           | . '?'
   123           | . NULL
 
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 74
-    '?'        shift, and go to state 41
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    simpleExpr  go to state 160
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 160
 
 
-state 103
+olek 103
 
    74 ident: . ID
    75      | . ID '.' ID
@@ -2578,22 +2578,22 @@ state 103
   122           | . '?'
   123           | . NULL
 
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 74
-    '?'        shift, and go to state 41
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    simpleExpr  go to state 161
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 161
 
 
-state 104
+olek 104
 
    74 ident: . ID
    75      | . ID '.' ID
@@ -2619,22 +2619,22 @@ state 104
   122           | . '?'
   123           | . NULL
 
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 74
-    '?'        shift, and go to state 41
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    simpleExpr  go to state 162
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 162
 
 
-state 105
+olek 105
 
    74 ident: . ID
    75      | . ID '.' ID
@@ -2660,59 +2660,59 @@ state 105
   122           | . '?'
   123           | . NULL
 
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 74
-    '?'        shift, and go to state 41
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    simpleExpr  go to state 163
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 163
 
 
-state 106
+olek 106
 
    84 condition: simpleExpr inExpr . '(' simExList ')'
    85          | simpleExpr inExpr . '(' select ')'
 
-    '('  shift, and go to state 164
+    '('  nihuta ja liigu olekule 164
 
 
-state 107
+olek 107
 
    89 condition: simpleExpr optNot . LIKE simpleExpr escape
    91          | simpleExpr optNot . BETWEEN simpleExpr AND simpleExpr
   102 inExpr: optNot . IN
 
-    BETWEEN  shift, and go to state 165
-    LIKE     shift, and go to state 166
-    IN       shift, and go to state 167
+    BETWEEN  nihuta ja liigu olekule 165
+    LIKE     nihuta ja liigu olekule 166
+    IN       nihuta ja liigu olekule 167
 
 
-state 108
+olek 108
 
    11 delete: DELETE optFrom alias where .
 
-    $default  reduce using rule 11 (delete)
+    $default  redutseerin kasutades reeglit 11 (delete)
 
 
-state 109
+olek 109
 
    18 optIdList: '(' . idList ')'
    19 idList: . ID
    20       | . idList ',' ID
 
-    ID  shift, and go to state 168
+    ID  nihuta ja liigu olekule 168
 
-    idList  go to state 169
+    idList  liigu olekule 169
 
 
-state 110
+olek 110
 
    14 insert: INSERT INTO alias optIdList . insertRest
    15 insertRest: . VALUES identRest
@@ -2721,15 +2721,15 @@ state 110
    24       | . select UNION select
    25 basicSelect: . SELECT optDist whatToSelect FROM tableList
 
-    VALUES  shift, and go to state 170
-    SELECT  shift, and go to state 1
+    VALUES  nihuta ja liigu olekule 170
+    SELECT  nihuta ja liigu olekule 1
 
-    insertRest   go to state 171
-    select       go to state 172
-    basicSelect  go to state 13
+    insertRest   liigu olekule 171
+    select       liigu olekule 172
+    basicSelect  liigu olekule 13
 
 
-state 111
+olek 111
 
    72 tableExpr: TABLE '(' simpleExpr . ')'
   106 simpleExpr: simpleExpr . OUTERJ
@@ -2740,74 +2740,74 @@ state 111
   116           | simpleExpr . CONCAT simpleExpr
   117           | simpleExpr . OVER partition
 
-    OVER    shift, and go to state 91
-    OUTERJ  shift, and go to state 94
-    CONCAT  shift, and go to state 98
-    '-'     shift, and go to state 102
-    '+'     shift, and go to state 103
-    '/'     shift, and go to state 104
-    '*'     shift, and go to state 105
-    ')'     shift, and go to state 173
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
+    ')'     nihuta ja liigu olekule 173
 
 
-state 112
+olek 112
 
    75 ident: ID '.' ID .  [$end, BETWEEN, VALUES, SELECT, ESCAPE, OVER, HAVING, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, WHEN, THEN, ELSE, DESC, LIKE, JOIN, LEFT, FULL, AND, SET, END, ASC, XOR, FOR, NOT, ON, AS, IN, IS, OUTERJ, NE, LE, GE, CONCAT, ID, '=', '>', '<', '-', '+', '/', '*', ',', '(', ')']
    76      | ID '.' ID . '.' ID
 
-    '.'  shift, and go to state 174
+    '.'  nihuta ja liigu olekule 174
 
-    $default  reduce using rule 75 (ident)
+    $default  redutseerin kasutades reeglit 75 (ident)
 
 
-state 113
+olek 113
 
    73 tableExpr: '(' select ')' .
 
-    $default  reduce using rule 73 (tableExpr)
+    $default  redutseerin kasutades reeglit 73 (tableExpr)
 
 
-state 114
+olek 114
 
    10 assign: '(' . idList ')' '=' simpleExpr
    19 idList: . ID
    20       | . idList ',' ID
 
-    ID  shift, and go to state 168
+    ID  nihuta ja liigu olekule 168
 
-    idList  go to state 175
+    idList  liigu olekule 175
 
 
-state 115
+olek 115
 
     6 update: UPDATE alias SET assignList . where
     8 assignList: assignList . ',' assign
    26 where: . WHERE whereCond
    27      | .  [$end]
 
-    WHERE  shift, and go to state 28
-    ','    shift, and go to state 176
+    WHERE  nihuta ja liigu olekule 28
+    ','    nihuta ja liigu olekule 176
 
-    $default  reduce using rule 27 (where)
+    $default  redutseerin kasutades reeglit 27 (where)
 
-    where  go to state 177
+    where  liigu olekule 177
 
 
-state 116
+olek 116
 
     7 assignList: assign .
 
-    $default  reduce using rule 7 (assignList)
+    $default  redutseerin kasutades reeglit 7 (assignList)
 
 
-state 117
+olek 117
 
     9 assign: ident . '=' simpleExpr
 
-    '='  shift, and go to state 178
+    '='  nihuta ja liigu olekule 178
 
 
-state 118
+olek 118
 
    35 orderBy: ORDER BY . directionList
    41 directionList: . direction
@@ -2836,24 +2836,24 @@ state 118
   122           | . '?'
   123           | . NULL
 
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 74
-    '?'        shift, and go to state 41
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
 
-    directionList  go to state 179
-    direction      go to state 180
-    ident          go to state 46
-    simpleExpr     go to state 181
+    directionList  liigu olekule 179
+    direction      liigu olekule 180
+    ident          liigu olekule 46
+    simpleExpr     liigu olekule 181
 
 
-state 119
+olek 119
 
    30 groupBy: GROUP BY . simExList having
    74 ident: . ID
@@ -2882,89 +2882,89 @@ state 119
   134          | . simpleExpr
   135          | . simExList ',' simpleExpr
 
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 74
-    '?'        shift, and go to state 41
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
 
-    $default  reduce using rule 133 (simExList)
+    $default  redutseerin kasutades reeglit 133 (simExList)
 
-    ident       go to state 46
-    simpleExpr  go to state 145
-    simExList   go to state 182
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 145
+    simExList   liigu olekule 182
 
 
-state 120
+olek 120
 
    36 optOrderBy: orderBy .
 
-    $default  reduce using rule 36 (optOrderBy)
+    $default  redutseerin kasutades reeglit 36 (optOrderBy)
 
 
-state 121
+olek 121
 
    39 byClauses: groupBy optOrderBy .
 
-    $default  reduce using rule 39 (byClauses)
+    $default  redutseerin kasutades reeglit 39 (byClauses)
 
 
-state 122
+olek 122
 
    31 optGroupBy: groupBy .
 
-    $default  reduce using rule 31 (optGroupBy)
+    $default  redutseerin kasutades reeglit 31 (optGroupBy)
 
 
-state 123
+olek 123
 
    38 byClauses: orderBy optGroupBy .
 
-    $default  reduce using rule 38 (byClauses)
+    $default  redutseerin kasutades reeglit 38 (byClauses)
 
 
-state 124
+olek 124
 
    28 forUpdate: FOR . UPDATE
 
-    UPDATE  shift, and go to state 183
+    UPDATE  nihuta ja liigu olekule 183
 
 
-state 125
+olek 125
 
    23 select: basicSelect where byClauses forUpdate .
 
-    $default  reduce using rule 23 (select)
+    $default  redutseerin kasutades reeglit 23 (select)
 
 
-state 126
+olek 126
 
    24 select: select . UNION select
    90 condition: EXISTS '(' select . ')'
 
-    UNION  shift, and go to state 27
-    ')'    shift, and go to state 184
+    UNION  nihuta ja liigu olekule 27
+    ')'    nihuta ja liigu olekule 184
 
 
-state 127
+olek 127
 
    78 condition: condition . AND condition
    79          | condition . OR condition
    80          | condition . XOR condition
   130 when: WHEN condition . THEN simpleExpr
 
-    OR    shift, and go to state 88
-    THEN  shift, and go to state 185
-    AND   shift, and go to state 89
-    XOR   shift, and go to state 90
+    OR    nihuta ja liigu olekule 88
+    THEN  nihuta ja liigu olekule 185
+    AND   nihuta ja liigu olekule 89
+    XOR   nihuta ja liigu olekule 90
 
 
-state 128
+olek 128
 
    74 ident: . ID
    75      | . ID '.' ID
@@ -2990,36 +2990,36 @@ state 128
   123           | . NULL
   131 else: ELSE . simpleExpr
 
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 74
-    '?'        shift, and go to state 41
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    simpleExpr  go to state 186
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 186
 
 
-state 129
+olek 129
 
   108 simpleExpr: CASE whenList else . END
 
-    END  shift, and go to state 187
+    END  nihuta ja liigu olekule 187
 
 
-state 130
+olek 130
 
   129 whenList: when whenList .
 
-    $default  reduce using rule 129 (whenList)
+    $default  redutseerin kasutades reeglit 129 (whenList)
 
 
-state 131
+olek 131
 
   106 simpleExpr: simpleExpr . OUTERJ
   112           | simpleExpr . '-' simpleExpr
@@ -3030,24 +3030,24 @@ state 131
   117           | simpleExpr . OVER partition
   118           | CAST '(' simpleExpr . AS ID optSize ')'
 
-    OVER    shift, and go to state 91
-    AS      shift, and go to state 188
-    OUTERJ  shift, and go to state 94
-    CONCAT  shift, and go to state 98
-    '-'     shift, and go to state 102
-    '+'     shift, and go to state 103
-    '/'     shift, and go to state 104
-    '*'     shift, and go to state 105
+    OVER    nihuta ja liigu olekule 91
+    AS      nihuta ja liigu olekule 188
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
 
 
-state 132
+olek 132
 
   120 simpleExpr: ID '.' '*' .
 
-    $default  reduce using rule 120 (simpleExpr)
+    $default  redutseerin kasutades reeglit 120 (simpleExpr)
 
 
-state 133
+olek 133
 
   106 simpleExpr: simpleExpr . OUTERJ
   111           | '(' simpleExpr . ')'
@@ -3058,45 +3058,45 @@ state 133
   116           | simpleExpr . CONCAT simpleExpr
   117           | simpleExpr . OVER partition
 
-    OVER    shift, and go to state 91
-    OUTERJ  shift, and go to state 94
-    CONCAT  shift, and go to state 98
-    '-'     shift, and go to state 102
-    '+'     shift, and go to state 103
-    '/'     shift, and go to state 104
-    '*'     shift, and go to state 105
-    ')'     shift, and go to state 139
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
+    ')'     nihuta ja liigu olekule 139
 
 
-state 134
+olek 134
 
    92 idList2: ID ',' . ID
 
-    ID  shift, and go to state 189
+    ID  nihuta ja liigu olekule 189
 
 
-state 135
+olek 135
 
   119 simpleExpr: '(' select ')' .
 
-    $default  reduce using rule 119 (simpleExpr)
+    $default  redutseerin kasutades reeglit 119 (simpleExpr)
 
 
-state 136
+olek 136
 
    82 condition: '(' condition ')' .
 
-    $default  reduce using rule 82 (condition)
+    $default  redutseerin kasutades reeglit 82 (condition)
 
 
-state 137
+olek 137
 
    93 idList2: idList2 ',' . ID
 
-    ID  shift, and go to state 190
+    ID  nihuta ja liigu olekule 190
 
 
-state 138
+olek 138
 
    86 condition: '(' idList2 ')' . inExpr '(' simExList ')'
    87          | '(' idList2 ')' . inExpr '(' select ')'
@@ -3104,32 +3104,32 @@ state 138
   103 optNot: . NOT
   104       | .  [IN]
 
-    NOT  shift, and go to state 92
+    NOT  nihuta ja liigu olekule 92
 
-    $default  reduce using rule 104 (optNot)
+    $default  redutseerin kasutades reeglit 104 (optNot)
 
-    inExpr  go to state 191
-    optNot  go to state 192
+    inExpr  liigu olekule 191
+    optNot  liigu olekule 192
 
 
-state 139
+olek 139
 
   111 simpleExpr: '(' simpleExpr ')' .
 
-    $default  reduce using rule 111 (simpleExpr)
+    $default  redutseerin kasutades reeglit 111 (simpleExpr)
 
 
-state 140
+olek 140
 
    25 basicSelect: SELECT optDist whatToSelect FROM tableList .  [$end, WHERE, ORDER, GROUP, UNION, FOR, ')']
    59 tableList: tableList . ',' table
 
-    ','  shift, and go to state 193
+    ','  nihuta ja liigu olekule 193
 
-    $default  reduce using rule 25 (basicSelect)
+    $default  redutseerin kasutades reeglit 25 (basicSelect)
 
 
-state 141
+olek 141
 
    58 tableList: table .  [$end, WHERE, ORDER, GROUP, UNION, FOR, ',', ')']
    61 table: table . join alias ON condition
@@ -3141,48 +3141,48 @@ state 141
    67          | . RIGHT
    68          | . FULL
 
-    RIGHT  shift, and go to state 194
-    INNER  shift, and go to state 195
-    JOIN   shift, and go to state 196
-    LEFT   shift, and go to state 197
-    FULL   shift, and go to state 198
+    RIGHT  nihuta ja liigu olekule 194
+    INNER  nihuta ja liigu olekule 195
+    JOIN   nihuta ja liigu olekule 196
+    LEFT   nihuta ja liigu olekule 197
+    FULL   nihuta ja liigu olekule 198
 
-    $default  reduce using rule 58 (tableList)
+    $default  redutseerin kasutades reeglit 58 (tableList)
 
-    join       go to state 199
-    outerType  go to state 200
+    join       liigu olekule 199
+    outerType  liigu olekule 200
 
 
-state 142
+olek 142
 
    60 table: alias .
 
-    $default  reduce using rule 60 (table)
+    $default  redutseerin kasutades reeglit 60 (table)
 
 
-state 143
+olek 143
 
    51 selectExpression: selectExpression AS id .
 
-    $default  reduce using rule 51 (selectExpression)
+    $default  redutseerin kasutades reeglit 51 (selectExpression)
 
 
-state 144
+olek 144
 
    51 selectExpression: selectExpression . AS id
    52                 | selectExpression . id
    53 id: . ID
    57 selectExpressionList: selectExpressionList ',' selectExpression .  [FROM, ',']
 
-    AS  shift, and go to state 82
-    ID  shift, and go to state 83
+    AS  nihuta ja liigu olekule 82
+    ID  nihuta ja liigu olekule 83
 
-    $default  reduce using rule 57 (selectExpressionList)
+    $default  redutseerin kasutades reeglit 57 (selectExpressionList)
 
-    id  go to state 84
+    id  liigu olekule 84
 
 
-state 145
+olek 145
 
   106 simpleExpr: simpleExpr . OUTERJ
   112           | simpleExpr . '-' simpleExpr
@@ -3193,82 +3193,82 @@ state 145
   117           | simpleExpr . OVER partition
   134 simExList: simpleExpr .  [$end, HAVING, ORDER, UNION, FOR, ',', ')']
 
-    OVER    shift, and go to state 91
-    OUTERJ  shift, and go to state 94
-    CONCAT  shift, and go to state 98
-    '-'     shift, and go to state 102
-    '+'     shift, and go to state 103
-    '/'     shift, and go to state 104
-    '*'     shift, and go to state 105
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
 
-    $default  reduce using rule 134 (simExList)
+    $default  redutseerin kasutades reeglit 134 (simExList)
 
 
-state 146
+olek 146
 
   126 identRest: '(' simExList . ')'
   135 simExList: simExList . ',' simpleExpr
 
-    ','  shift, and go to state 201
-    ')'  shift, and go to state 202
+    ','  nihuta ja liigu olekule 201
+    ')'  nihuta ja liigu olekule 202
 
 
-state 147
+olek 147
 
    78 condition: condition . AND condition
    79          | condition . OR condition
    79          | condition OR condition .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, XOR, FOR, AS, ID, ',', ')']
    80          | condition . XOR condition
 
-    AND  shift, and go to state 89
+    AND  nihuta ja liigu olekule 89
 
-    $default  reduce using rule 79 (condition)
+    $default  redutseerin kasutades reeglit 79 (condition)
 
 
-state 148
+olek 148
 
    78 condition: condition . AND condition
    78          | condition AND condition .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, AND, XOR, FOR, AS, ID, ',', ')']
    79          | condition . OR condition
    80          | condition . XOR condition
 
-    $default  reduce using rule 78 (condition)
+    $default  redutseerin kasutades reeglit 78 (condition)
 
 
-state 149
+olek 149
 
    78 condition: condition . AND condition
    79          | condition . OR condition
    80          | condition . XOR condition
    80          | condition XOR condition .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, XOR, FOR, AS, ID, ',', ')']
 
-    AND  shift, and go to state 89
+    AND  nihuta ja liigu olekule 89
 
-    $default  reduce using rule 80 (condition)
+    $default  redutseerin kasutades reeglit 80 (condition)
 
 
-state 150
+olek 150
 
   136 partition: '(' . PARTITION BY ident orderBy ')'
 
-    PARTITION  shift, and go to state 203
+    PARTITION  nihuta ja liigu olekule 203
 
 
-state 151
+olek 151
 
   117 simpleExpr: simpleExpr OVER partition .
 
-    $default  reduce using rule 117 (simpleExpr)
+    $default  redutseerin kasutades reeglit 117 (simpleExpr)
 
 
-state 152
+olek 152
 
    88 condition: simpleExpr IS optNot . NULL
 
-    NULL  shift, and go to state 204
+    NULL  nihuta ja liigu olekule 204
 
 
-state 153
+olek 153
 
    98 comparison: simpleExpr NE simpleExpr .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, AND, XOR, FOR, AS, ID, ',', ')']
   106 simpleExpr: simpleExpr . OUTERJ
@@ -3279,18 +3279,18 @@ state 153
   116           | simpleExpr . CONCAT simpleExpr
   117           | simpleExpr . OVER partition
 
-    OVER    shift, and go to state 91
-    OUTERJ  shift, and go to state 94
-    CONCAT  shift, and go to state 98
-    '-'     shift, and go to state 102
-    '+'     shift, and go to state 103
-    '/'     shift, and go to state 104
-    '*'     shift, and go to state 105
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
 
-    $default  reduce using rule 98 (comparison)
+    $default  redutseerin kasutades reeglit 98 (comparison)
 
 
-state 154
+olek 154
 
    97 comparison: simpleExpr LE simpleExpr .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, AND, XOR, FOR, AS, ID, ',', ')']
   106 simpleExpr: simpleExpr . OUTERJ
@@ -3301,18 +3301,18 @@ state 154
   116           | simpleExpr . CONCAT simpleExpr
   117           | simpleExpr . OVER partition
 
-    OVER    shift, and go to state 91
-    OUTERJ  shift, and go to state 94
-    CONCAT  shift, and go to state 98
-    '-'     shift, and go to state 102
-    '+'     shift, and go to state 103
-    '/'     shift, and go to state 104
-    '*'     shift, and go to state 105
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
 
-    $default  reduce using rule 97 (comparison)
+    $default  redutseerin kasutades reeglit 97 (comparison)
 
 
-state 155
+olek 155
 
    99 comparison: simpleExpr GE simpleExpr .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, AND, XOR, FOR, AS, ID, ',', ')']
   106 simpleExpr: simpleExpr . OUTERJ
@@ -3323,18 +3323,18 @@ state 155
   116           | simpleExpr . CONCAT simpleExpr
   117           | simpleExpr . OVER partition
 
-    OVER    shift, and go to state 91
-    OUTERJ  shift, and go to state 94
-    CONCAT  shift, and go to state 98
-    '-'     shift, and go to state 102
-    '+'     shift, and go to state 103
-    '/'     shift, and go to state 104
-    '*'     shift, and go to state 105
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
 
-    $default  reduce using rule 99 (comparison)
+    $default  redutseerin kasutades reeglit 99 (comparison)
 
 
-state 156
+olek 156
 
   106 simpleExpr: simpleExpr . OUTERJ
   112           | simpleExpr . '-' simpleExpr
@@ -3345,10 +3345,10 @@ state 156
   116           | simpleExpr CONCAT simpleExpr .  [$end, BETWEEN, ESCAPE, OVER, HAVING, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, WHEN, THEN, ELSE, DESC, LIKE, JOIN, LEFT, FULL, AND, END, ASC, XOR, FOR, NOT, AS, IN, IS, OUTERJ, NE, LE, GE, CONCAT, ID, '=', '>', '<', '-', '+', '/', '*', ',', ')']
   117           | simpleExpr . OVER partition
 
-    $default  reduce using rule 116 (simpleExpr)
+    $default  redutseerin kasutades reeglit 116 (simpleExpr)
 
 
-state 157
+olek 157
 
    94 comparison: simpleExpr '=' simpleExpr .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, AND, XOR, FOR, AS, ID, ',', ')']
   106 simpleExpr: simpleExpr . OUTERJ
@@ -3359,18 +3359,18 @@ state 157
   116           | simpleExpr . CONCAT simpleExpr
   117           | simpleExpr . OVER partition
 
-    OVER    shift, and go to state 91
-    OUTERJ  shift, and go to state 94
-    CONCAT  shift, and go to state 98
-    '-'     shift, and go to state 102
-    '+'     shift, and go to state 103
-    '/'     shift, and go to state 104
-    '*'     shift, and go to state 105
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
 
-    $default  reduce using rule 94 (comparison)
+    $default  redutseerin kasutades reeglit 94 (comparison)
 
 
-state 158
+olek 158
 
    95 comparison: simpleExpr '>' simpleExpr .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, AND, XOR, FOR, AS, ID, ',', ')']
   106 simpleExpr: simpleExpr . OUTERJ
@@ -3381,18 +3381,18 @@ state 158
   116           | simpleExpr . CONCAT simpleExpr
   117           | simpleExpr . OVER partition
 
-    OVER    shift, and go to state 91
-    OUTERJ  shift, and go to state 94
-    CONCAT  shift, and go to state 98
-    '-'     shift, and go to state 102
-    '+'     shift, and go to state 103
-    '/'     shift, and go to state 104
-    '*'     shift, and go to state 105
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
 
-    $default  reduce using rule 95 (comparison)
+    $default  redutseerin kasutades reeglit 95 (comparison)
 
 
-state 159
+olek 159
 
    96 comparison: simpleExpr '<' simpleExpr .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, AND, XOR, FOR, AS, ID, ',', ')']
   106 simpleExpr: simpleExpr . OUTERJ
@@ -3403,18 +3403,18 @@ state 159
   116           | simpleExpr . CONCAT simpleExpr
   117           | simpleExpr . OVER partition
 
-    OVER    shift, and go to state 91
-    OUTERJ  shift, and go to state 94
-    CONCAT  shift, and go to state 98
-    '-'     shift, and go to state 102
-    '+'     shift, and go to state 103
-    '/'     shift, and go to state 104
-    '*'     shift, and go to state 105
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
 
-    $default  reduce using rule 96 (comparison)
+    $default  redutseerin kasutades reeglit 96 (comparison)
 
 
-state 160
+olek 160
 
   106 simpleExpr: simpleExpr . OUTERJ
   112           | simpleExpr . '-' simpleExpr
@@ -3425,15 +3425,15 @@ state 160
   116           | simpleExpr . CONCAT simpleExpr
   117           | simpleExpr . OVER partition
 
-    OUTERJ  shift, and go to state 94
-    CONCAT  shift, and go to state 98
-    '/'     shift, and go to state 104
-    '*'     shift, and go to state 105
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
 
-    $default  reduce using rule 112 (simpleExpr)
+    $default  redutseerin kasutades reeglit 112 (simpleExpr)
 
 
-state 161
+olek 161
 
   106 simpleExpr: simpleExpr . OUTERJ
   112           | simpleExpr . '-' simpleExpr
@@ -3444,15 +3444,15 @@ state 161
   116           | simpleExpr . CONCAT simpleExpr
   117           | simpleExpr . OVER partition
 
-    OUTERJ  shift, and go to state 94
-    CONCAT  shift, and go to state 98
-    '/'     shift, and go to state 104
-    '*'     shift, and go to state 105
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
 
-    $default  reduce using rule 113 (simpleExpr)
+    $default  redutseerin kasutades reeglit 113 (simpleExpr)
 
 
-state 162
+olek 162
 
   106 simpleExpr: simpleExpr . OUTERJ
   112           | simpleExpr . '-' simpleExpr
@@ -3463,10 +3463,10 @@ state 162
   116           | simpleExpr . CONCAT simpleExpr
   117           | simpleExpr . OVER partition
 
-    $default  reduce using rule 115 (simpleExpr)
+    $default  redutseerin kasutades reeglit 115 (simpleExpr)
 
 
-state 163
+olek 163
 
   106 simpleExpr: simpleExpr . OUTERJ
   112           | simpleExpr . '-' simpleExpr
@@ -3477,10 +3477,10 @@ state 163
   116           | simpleExpr . CONCAT simpleExpr
   117           | simpleExpr . OVER partition
 
-    $default  reduce using rule 114 (simpleExpr)
+    $default  redutseerin kasutades reeglit 114 (simpleExpr)
 
 
-state 164
+olek 164
 
    23 select: . basicSelect where byClauses forUpdate
    24       | . select UNION select
@@ -3513,28 +3513,28 @@ state 164
   134          | . simpleExpr
   135          | . simExList ',' simpleExpr
 
-    SELECT     shift, and go to state 1
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 74
-    '?'        shift, and go to state 41
+    SELECT     nihuta ja liigu olekule 1
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
 
-    $default  reduce using rule 133 (simExList)
+    $default  redutseerin kasutades reeglit 133 (simExList)
 
-    select       go to state 205
-    basicSelect  go to state 13
-    ident        go to state 46
-    simpleExpr   go to state 145
-    simExList    go to state 206
+    select       liigu olekule 205
+    basicSelect  liigu olekule 13
+    ident        liigu olekule 46
+    simpleExpr   liigu olekule 145
+    simExList    liigu olekule 206
 
 
-state 165
+olek 165
 
    74 ident: . ID
    75      | . ID '.' ID
@@ -3560,22 +3560,22 @@ state 165
   122           | . '?'
   123           | . NULL
 
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 74
-    '?'        shift, and go to state 41
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    simpleExpr  go to state 207
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 207
 
 
-state 166
+olek 166
 
    74 ident: . ID
    75      | . ID '.' ID
@@ -3601,98 +3601,98 @@ state 166
   122           | . '?'
   123           | . NULL
 
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 74
-    '?'        shift, and go to state 41
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    simpleExpr  go to state 208
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 208
 
 
-state 167
+olek 167
 
   102 inExpr: optNot IN .
 
-    $default  reduce using rule 102 (inExpr)
+    $default  redutseerin kasutades reeglit 102 (inExpr)
 
 
-state 168
+olek 168
 
    19 idList: ID .
 
-    $default  reduce using rule 19 (idList)
+    $default  redutseerin kasutades reeglit 19 (idList)
 
 
-state 169
+olek 169
 
    18 optIdList: '(' idList . ')'
    20 idList: idList . ',' ID
 
-    ','  shift, and go to state 209
-    ')'  shift, and go to state 210
+    ','  nihuta ja liigu olekule 209
+    ')'  nihuta ja liigu olekule 210
 
 
-state 170
+olek 170
 
    15 insertRest: VALUES . identRest
   126 identRest: . '(' simExList ')'
   127          | .  [$end]
 
-    '('  shift, and go to state 86
+    '('  nihuta ja liigu olekule 86
 
-    $default  reduce using rule 127 (identRest)
+    $default  redutseerin kasutades reeglit 127 (identRest)
 
-    identRest  go to state 211
+    identRest  liigu olekule 211
 
 
-state 171
+olek 171
 
    14 insert: INSERT INTO alias optIdList insertRest .
 
-    $default  reduce using rule 14 (insert)
+    $default  redutseerin kasutades reeglit 14 (insert)
 
 
-state 172
+olek 172
 
    16 insertRest: select .  [$end]
    24 select: select . UNION select
 
-    UNION  shift, and go to state 27
+    UNION  nihuta ja liigu olekule 27
 
-    $default  reduce using rule 16 (insertRest)
+    $default  redutseerin kasutades reeglit 16 (insertRest)
 
 
-state 173
+olek 173
 
    72 tableExpr: TABLE '(' simpleExpr ')' .
 
-    $default  reduce using rule 72 (tableExpr)
+    $default  redutseerin kasutades reeglit 72 (tableExpr)
 
 
-state 174
+olek 174
 
    76 ident: ID '.' ID '.' . ID
 
-    ID  shift, and go to state 212
+    ID  nihuta ja liigu olekule 212
 
 
-state 175
+olek 175
 
    10 assign: '(' idList . ')' '=' simpleExpr
    20 idList: idList . ',' ID
 
-    ','  shift, and go to state 209
-    ')'  shift, and go to state 213
+    ','  nihuta ja liigu olekule 209
+    ')'  nihuta ja liigu olekule 213
 
 
-state 176
+olek 176
 
     8 assignList: assignList ',' . assign
     9 assign: . ident '=' simpleExpr
@@ -3701,21 +3701,21 @@ state 176
    75      | . ID '.' ID
    76      | . ID '.' ID '.' ID
 
-    ID   shift, and go to state 20
-    '('  shift, and go to state 114
+    ID   nihuta ja liigu olekule 20
+    '('  nihuta ja liigu olekule 114
 
-    assign  go to state 214
-    ident   go to state 117
+    assign  liigu olekule 214
+    ident   liigu olekule 117
 
 
-state 177
+olek 177
 
     6 update: UPDATE alias SET assignList where .
 
-    $default  reduce using rule 6 (update)
+    $default  redutseerin kasutades reeglit 6 (update)
 
 
-state 178
+olek 178
 
     9 assign: ident '=' . simpleExpr
    74 ident: . ID
@@ -3741,39 +3741,39 @@ state 178
   122           | . '?'
   123           | . NULL
 
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 74
-    '?'        shift, and go to state 41
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    simpleExpr  go to state 215
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 215
 
 
-state 179
+olek 179
 
    35 orderBy: ORDER BY directionList .  [$end, GROUP, UNION, FOR, ')']
    42 directionList: directionList . ',' direction
 
-    ','  shift, and go to state 216
+    ','  nihuta ja liigu olekule 216
 
-    $default  reduce using rule 35 (orderBy)
+    $default  redutseerin kasutades reeglit 35 (orderBy)
 
 
-state 180
+olek 180
 
    41 directionList: direction .
 
-    $default  reduce using rule 41 (directionList)
+    $default  redutseerin kasutades reeglit 41 (directionList)
 
 
-state 181
+olek 181
 
    43 direction: simpleExpr . orderDirection
    44 orderDirection: . ASC
@@ -3787,51 +3787,51 @@ state 181
   116           | simpleExpr . CONCAT simpleExpr
   117           | simpleExpr . OVER partition
 
-    OVER    shift, and go to state 91
-    DESC    shift, and go to state 217
-    ASC     shift, and go to state 218
-    OUTERJ  shift, and go to state 94
-    CONCAT  shift, and go to state 98
-    '-'     shift, and go to state 102
-    '+'     shift, and go to state 103
-    '/'     shift, and go to state 104
-    '*'     shift, and go to state 105
+    OVER    nihuta ja liigu olekule 91
+    DESC    nihuta ja liigu olekule 217
+    ASC     nihuta ja liigu olekule 218
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
 
-    $default  reduce using rule 46 (orderDirection)
+    $default  redutseerin kasutades reeglit 46 (orderDirection)
 
-    orderDirection  go to state 219
+    orderDirection  liigu olekule 219
 
 
-state 182
+olek 182
 
    30 groupBy: GROUP BY simExList . having
    33 having: . HAVING condition
    34       | .  [$end, ORDER, UNION, FOR, ')']
   135 simExList: simExList . ',' simpleExpr
 
-    HAVING  shift, and go to state 220
-    ','     shift, and go to state 201
+    HAVING  nihuta ja liigu olekule 220
+    ','     nihuta ja liigu olekule 201
 
-    $default  reduce using rule 34 (having)
+    $default  redutseerin kasutades reeglit 34 (having)
 
-    having  go to state 221
+    having  liigu olekule 221
 
 
-state 183
+olek 183
 
    28 forUpdate: FOR UPDATE .
 
-    $default  reduce using rule 28 (forUpdate)
+    $default  redutseerin kasutades reeglit 28 (forUpdate)
 
 
-state 184
+olek 184
 
    90 condition: EXISTS '(' select ')' .
 
-    $default  reduce using rule 90 (condition)
+    $default  redutseerin kasutades reeglit 90 (condition)
 
 
-state 185
+olek 185
 
    74 ident: . ID
    75      | . ID '.' ID
@@ -3857,22 +3857,22 @@ state 185
   123           | . NULL
   130 when: WHEN condition THEN . simpleExpr
 
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 74
-    '?'        shift, and go to state 41
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    simpleExpr  go to state 222
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 222
 
 
-state 186
+olek 186
 
   106 simpleExpr: simpleExpr . OUTERJ
   112           | simpleExpr . '-' simpleExpr
@@ -3883,61 +3883,61 @@ state 186
   117           | simpleExpr . OVER partition
   131 else: ELSE simpleExpr .  [END]
 
-    OVER    shift, and go to state 91
-    OUTERJ  shift, and go to state 94
-    CONCAT  shift, and go to state 98
-    '-'     shift, and go to state 102
-    '+'     shift, and go to state 103
-    '/'     shift, and go to state 104
-    '*'     shift, and go to state 105
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
 
-    $default  reduce using rule 131 (else)
+    $default  redutseerin kasutades reeglit 131 (else)
 
 
-state 187
+olek 187
 
   108 simpleExpr: CASE whenList else END .
 
-    $default  reduce using rule 108 (simpleExpr)
+    $default  redutseerin kasutades reeglit 108 (simpleExpr)
 
 
-state 188
+olek 188
 
   118 simpleExpr: CAST '(' simpleExpr AS . ID optSize ')'
 
-    ID  shift, and go to state 223
+    ID  nihuta ja liigu olekule 223
 
 
-state 189
+olek 189
 
    92 idList2: ID ',' ID .
 
-    $default  reduce using rule 92 (idList2)
+    $default  redutseerin kasutades reeglit 92 (idList2)
 
 
-state 190
+olek 190
 
    93 idList2: idList2 ',' ID .
 
-    $default  reduce using rule 93 (idList2)
+    $default  redutseerin kasutades reeglit 93 (idList2)
 
 
-state 191
+olek 191
 
    86 condition: '(' idList2 ')' inExpr . '(' simExList ')'
    87          | '(' idList2 ')' inExpr . '(' select ')'
 
-    '('  shift, and go to state 224
+    '('  nihuta ja liigu olekule 224
 
 
-state 192
+olek 192
 
   102 inExpr: optNot . IN
 
-    IN  shift, and go to state 167
+    IN  nihuta ja liigu olekule 167
 
 
-state 193
+olek 193
 
    59 tableList: tableList ',' . table
    60 table: . alias
@@ -3951,55 +3951,55 @@ state 193
    75      | . ID '.' ID
    76      | . ID '.' ID '.' ID
 
-    TABLE  shift, and go to state 19
-    ID     shift, and go to state 20
-    '('    shift, and go to state 21
+    TABLE  nihuta ja liigu olekule 19
+    ID     nihuta ja liigu olekule 20
+    '('    nihuta ja liigu olekule 21
 
-    table      go to state 225
-    alias      go to state 142
-    tableExpr  go to state 23
-    ident      go to state 24
+    table      liigu olekule 225
+    alias      liigu olekule 142
+    tableExpr  liigu olekule 23
+    ident      liigu olekule 24
 
 
-state 194
+olek 194
 
    67 outerType: RIGHT .
 
-    $default  reduce using rule 67 (outerType)
+    $default  redutseerin kasutades reeglit 67 (outerType)
 
 
-state 195
+olek 195
 
    65 join: INNER . JOIN
 
-    JOIN  shift, and go to state 226
+    JOIN  nihuta ja liigu olekule 226
 
 
-state 196
+olek 196
 
    62 join: JOIN .
 
-    $default  reduce using rule 62 (join)
+    $default  redutseerin kasutades reeglit 62 (join)
 
 
-state 197
+olek 197
 
    63 join: LEFT . JOIN
    66 outerType: LEFT .  [OUTER]
 
-    JOIN  shift, and go to state 227
+    JOIN  nihuta ja liigu olekule 227
 
-    $default  reduce using rule 66 (outerType)
+    $default  redutseerin kasutades reeglit 66 (outerType)
 
 
-state 198
+olek 198
 
    68 outerType: FULL .
 
-    $default  reduce using rule 68 (outerType)
+    $default  redutseerin kasutades reeglit 68 (outerType)
 
 
-state 199
+olek 199
 
    61 table: table join . alias ON condition
    69 alias: . tableExpr
@@ -4011,23 +4011,23 @@ state 199
    75      | . ID '.' ID
    76      | . ID '.' ID '.' ID
 
-    TABLE  shift, and go to state 19
-    ID     shift, and go to state 20
-    '('    shift, and go to state 21
+    TABLE  nihuta ja liigu olekule 19
+    ID     nihuta ja liigu olekule 20
+    '('    nihuta ja liigu olekule 21
 
-    alias      go to state 228
-    tableExpr  go to state 23
-    ident      go to state 24
+    alias      liigu olekule 228
+    tableExpr  liigu olekule 23
+    ident      liigu olekule 24
 
 
-state 200
+olek 200
 
    64 join: outerType . OUTER JOIN
 
-    OUTER  shift, and go to state 229
+    OUTER  nihuta ja liigu olekule 229
 
 
-state 201
+olek 201
 
    74 ident: . ID
    75      | . ID '.' ID
@@ -4053,61 +4053,61 @@ state 201
   123           | . NULL
   135 simExList: simExList ',' . simpleExpr
 
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 74
-    '?'        shift, and go to state 41
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    simpleExpr  go to state 230
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 230
 
 
-state 202
+olek 202
 
   126 identRest: '(' simExList ')' .
 
-    $default  reduce using rule 126 (identRest)
+    $default  redutseerin kasutades reeglit 126 (identRest)
 
 
-state 203
+olek 203
 
   136 partition: '(' PARTITION . BY ident orderBy ')'
 
-    BY  shift, and go to state 231
+    BY  nihuta ja liigu olekule 231
 
 
-state 204
+olek 204
 
    88 condition: simpleExpr IS optNot NULL .
 
-    $default  reduce using rule 88 (condition)
+    $default  redutseerin kasutades reeglit 88 (condition)
 
 
-state 205
+olek 205
 
    24 select: select . UNION select
    85 condition: simpleExpr inExpr '(' select . ')'
 
-    UNION  shift, and go to state 27
-    ')'    shift, and go to state 232
+    UNION  nihuta ja liigu olekule 27
+    ')'    nihuta ja liigu olekule 232
 
 
-state 206
+olek 206
 
    84 condition: simpleExpr inExpr '(' simExList . ')'
   135 simExList: simExList . ',' simpleExpr
 
-    ','  shift, and go to state 201
-    ')'  shift, and go to state 233
+    ','  nihuta ja liigu olekule 201
+    ')'  nihuta ja liigu olekule 233
 
 
-state 207
+olek 207
 
    91 condition: simpleExpr optNot BETWEEN simpleExpr . AND simpleExpr
   106 simpleExpr: simpleExpr . OUTERJ
@@ -4118,17 +4118,17 @@ state 207
   116           | simpleExpr . CONCAT simpleExpr
   117           | simpleExpr . OVER partition
 
-    OVER    shift, and go to state 91
-    AND     shift, and go to state 234
-    OUTERJ  shift, and go to state 94
-    CONCAT  shift, and go to state 98
-    '-'     shift, and go to state 102
-    '+'     shift, and go to state 103
-    '/'     shift, and go to state 104
-    '*'     shift, and go to state 105
+    OVER    nihuta ja liigu olekule 91
+    AND     nihuta ja liigu olekule 234
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
 
 
-state 208
+olek 208
 
    89 condition: simpleExpr optNot LIKE simpleExpr . escape
   100 escape: . ESCAPE STRING_SQ
@@ -4141,63 +4141,63 @@ state 208
   116           | simpleExpr . CONCAT simpleExpr
   117           | simpleExpr . OVER partition
 
-    ESCAPE  shift, and go to state 235
-    OVER    shift, and go to state 91
-    OUTERJ  shift, and go to state 94
-    CONCAT  shift, and go to state 98
-    '-'     shift, and go to state 102
-    '+'     shift, and go to state 103
-    '/'     shift, and go to state 104
-    '*'     shift, and go to state 105
+    ESCAPE  nihuta ja liigu olekule 235
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
 
-    $default  reduce using rule 101 (escape)
+    $default  redutseerin kasutades reeglit 101 (escape)
 
-    escape  go to state 236
+    escape  liigu olekule 236
 
 
-state 209
+olek 209
 
    20 idList: idList ',' . ID
 
-    ID  shift, and go to state 237
+    ID  nihuta ja liigu olekule 237
 
 
-state 210
+olek 210
 
    18 optIdList: '(' idList ')' .
 
-    $default  reduce using rule 18 (optIdList)
+    $default  redutseerin kasutades reeglit 18 (optIdList)
 
 
-state 211
+olek 211
 
    15 insertRest: VALUES identRest .
 
-    $default  reduce using rule 15 (insertRest)
+    $default  redutseerin kasutades reeglit 15 (insertRest)
 
 
-state 212
+olek 212
 
    76 ident: ID '.' ID '.' ID .
 
-    $default  reduce using rule 76 (ident)
+    $default  redutseerin kasutades reeglit 76 (ident)
 
 
-state 213
+olek 213
 
    10 assign: '(' idList ')' . '=' simpleExpr
 
-    '='  shift, and go to state 238
+    '='  nihuta ja liigu olekule 238
 
 
-state 214
+olek 214
 
     8 assignList: assignList ',' assign .
 
-    $default  reduce using rule 8 (assignList)
+    $default  redutseerin kasutades reeglit 8 (assignList)
 
 
-state 215
+olek 215
 
     9 assign: ident '=' simpleExpr .  [$end, WHERE, ',']
   106 simpleExpr: simpleExpr . OUTERJ
@@ -4208,18 +4208,18 @@ state 215
   116           | simpleExpr . CONCAT simpleExpr
   117           | simpleExpr . OVER partition
 
-    OVER    shift, and go to state 91
-    OUTERJ  shift, and go to state 94
-    CONCAT  shift, and go to state 98
-    '-'     shift, and go to state 102
-    '+'     shift, and go to state 103
-    '/'     shift, and go to state 104
-    '*'     shift, and go to state 105
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
 
-    $default  reduce using rule 9 (assign)
+    $default  redutseerin kasutades reeglit 9 (assign)
 
 
-state 216
+olek 216
 
    42 directionList: directionList ',' . direction
    43 direction: . simpleExpr orderDirection
@@ -4246,44 +4246,44 @@ state 216
   122           | . '?'
   123           | . NULL
 
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 74
-    '?'        shift, and go to state 41
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
 
-    direction   go to state 239
-    ident       go to state 46
-    simpleExpr  go to state 181
+    direction   liigu olekule 239
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 181
 
 
-state 217
+olek 217
 
    45 orderDirection: DESC .
 
-    $default  reduce using rule 45 (orderDirection)
+    $default  redutseerin kasutades reeglit 45 (orderDirection)
 
 
-state 218
+olek 218
 
    44 orderDirection: ASC .
 
-    $default  reduce using rule 44 (orderDirection)
+    $default  redutseerin kasutades reeglit 44 (orderDirection)
 
 
-state 219
+olek 219
 
    43 direction: simpleExpr orderDirection .
 
-    $default  reduce using rule 43 (direction)
+    $default  redutseerin kasutades reeglit 43 (direction)
 
 
-state 220
+olek 220
 
    33 having: HAVING . condition
    74 ident: . ID
@@ -4329,33 +4329,33 @@ state 220
   122           | . '?'
   123           | . NULL
 
-    EXISTS     shift, and go to state 30
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    NOT        shift, and go to state 34
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 40
-    '?'        shift, and go to state 41
+    EXISTS     nihuta ja liigu olekule 30
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    NOT        nihuta ja liigu olekule 34
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 40
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    condition   go to state 240
-    comparison  go to state 48
-    simpleExpr  go to state 61
+    ident       liigu olekule 46
+    condition   liigu olekule 240
+    comparison  liigu olekule 48
+    simpleExpr  liigu olekule 61
 
 
-state 221
+olek 221
 
    30 groupBy: GROUP BY simExList having .
 
-    $default  reduce using rule 30 (groupBy)
+    $default  redutseerin kasutades reeglit 30 (groupBy)
 
 
-state 222
+olek 222
 
   106 simpleExpr: simpleExpr . OUTERJ
   112           | simpleExpr . '-' simpleExpr
@@ -4366,31 +4366,31 @@ state 222
   117           | simpleExpr . OVER partition
   130 when: WHEN condition THEN simpleExpr .  [WHEN, ELSE, END]
 
-    OVER    shift, and go to state 91
-    OUTERJ  shift, and go to state 94
-    CONCAT  shift, and go to state 98
-    '-'     shift, and go to state 102
-    '+'     shift, and go to state 103
-    '/'     shift, and go to state 104
-    '*'     shift, and go to state 105
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
 
-    $default  reduce using rule 130 (when)
+    $default  redutseerin kasutades reeglit 130 (when)
 
 
-state 223
+olek 223
 
   118 simpleExpr: CAST '(' simpleExpr AS ID . optSize ')'
   124 optSize: .  [')']
   125        | . '(' NUMBER ')'
 
-    '('  shift, and go to state 241
+    '('  nihuta ja liigu olekule 241
 
-    $default  reduce using rule 124 (optSize)
+    $default  redutseerin kasutades reeglit 124 (optSize)
 
-    optSize  go to state 242
+    optSize  liigu olekule 242
 
 
-state 224
+olek 224
 
    23 select: . basicSelect where byClauses forUpdate
    24       | . select UNION select
@@ -4423,28 +4423,28 @@ state 224
   134          | . simpleExpr
   135          | . simExList ',' simpleExpr
 
-    SELECT     shift, and go to state 1
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 74
-    '?'        shift, and go to state 41
+    SELECT     nihuta ja liigu olekule 1
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
 
-    $default  reduce using rule 133 (simExList)
+    $default  redutseerin kasutades reeglit 133 (simExList)
 
-    select       go to state 243
-    basicSelect  go to state 13
-    ident        go to state 46
-    simpleExpr   go to state 145
-    simExList    go to state 244
+    select       liigu olekule 243
+    basicSelect  liigu olekule 13
+    ident        liigu olekule 46
+    simpleExpr   liigu olekule 145
+    simExList    liigu olekule 244
 
 
-state 225
+olek 225
 
    59 tableList: tableList ',' table .  [$end, WHERE, ORDER, GROUP, UNION, FOR, ',', ')']
    61 table: table . join alias ON condition
@@ -4456,47 +4456,47 @@ state 225
    67          | . RIGHT
    68          | . FULL
 
-    RIGHT  shift, and go to state 194
-    INNER  shift, and go to state 195
-    JOIN   shift, and go to state 196
-    LEFT   shift, and go to state 197
-    FULL   shift, and go to state 198
+    RIGHT  nihuta ja liigu olekule 194
+    INNER  nihuta ja liigu olekule 195
+    JOIN   nihuta ja liigu olekule 196
+    LEFT   nihuta ja liigu olekule 197
+    FULL   nihuta ja liigu olekule 198
 
-    $default  reduce using rule 59 (tableList)
+    $default  redutseerin kasutades reeglit 59 (tableList)
 
-    join       go to state 199
-    outerType  go to state 200
+    join       liigu olekule 199
+    outerType  liigu olekule 200
 
 
-state 226
+olek 226
 
    65 join: INNER JOIN .
 
-    $default  reduce using rule 65 (join)
+    $default  redutseerin kasutades reeglit 65 (join)
 
 
-state 227
+olek 227
 
    63 join: LEFT JOIN .
 
-    $default  reduce using rule 63 (join)
+    $default  redutseerin kasutades reeglit 63 (join)
 
 
-state 228
+olek 228
 
    61 table: table join alias . ON condition
 
-    ON  shift, and go to state 245
+    ON  nihuta ja liigu olekule 245
 
 
-state 229
+olek 229
 
    64 join: outerType OUTER . JOIN
 
-    JOIN  shift, and go to state 246
+    JOIN  nihuta ja liigu olekule 246
 
 
-state 230
+olek 230
 
   106 simpleExpr: simpleExpr . OUTERJ
   112           | simpleExpr . '-' simpleExpr
@@ -4507,44 +4507,44 @@ state 230
   117           | simpleExpr . OVER partition
   135 simExList: simExList ',' simpleExpr .  [$end, HAVING, ORDER, UNION, FOR, ',', ')']
 
-    OVER    shift, and go to state 91
-    OUTERJ  shift, and go to state 94
-    CONCAT  shift, and go to state 98
-    '-'     shift, and go to state 102
-    '+'     shift, and go to state 103
-    '/'     shift, and go to state 104
-    '*'     shift, and go to state 105
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
 
-    $default  reduce using rule 135 (simExList)
+    $default  redutseerin kasutades reeglit 135 (simExList)
 
 
-state 231
+olek 231
 
    74 ident: . ID
    75      | . ID '.' ID
    76      | . ID '.' ID '.' ID
   136 partition: '(' PARTITION BY . ident orderBy ')'
 
-    ID  shift, and go to state 20
+    ID  nihuta ja liigu olekule 20
 
-    ident  go to state 247
+    ident  liigu olekule 247
 
 
-state 232
+olek 232
 
    85 condition: simpleExpr inExpr '(' select ')' .
 
-    $default  reduce using rule 85 (condition)
+    $default  redutseerin kasutades reeglit 85 (condition)
 
 
-state 233
+olek 233
 
    84 condition: simpleExpr inExpr '(' simExList ')' .
 
-    $default  reduce using rule 84 (condition)
+    $default  redutseerin kasutades reeglit 84 (condition)
 
 
-state 234
+olek 234
 
    74 ident: . ID
    75      | . ID '.' ID
@@ -4570,43 +4570,43 @@ state 234
   122           | . '?'
   123           | . NULL
 
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 74
-    '?'        shift, and go to state 41
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    simpleExpr  go to state 248
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 248
 
 
-state 235
+olek 235
 
   100 escape: ESCAPE . STRING_SQ
 
-    STRING_SQ  shift, and go to state 249
+    STRING_SQ  nihuta ja liigu olekule 249
 
 
-state 236
+olek 236
 
    89 condition: simpleExpr optNot LIKE simpleExpr escape .
 
-    $default  reduce using rule 89 (condition)
+    $default  redutseerin kasutades reeglit 89 (condition)
 
 
-state 237
+olek 237
 
    20 idList: idList ',' ID .
 
-    $default  reduce using rule 20 (idList)
+    $default  redutseerin kasutades reeglit 20 (idList)
 
 
-state 238
+olek 238
 
    10 assign: '(' idList ')' '=' . simpleExpr
    74 ident: . ID
@@ -4632,75 +4632,75 @@ state 238
   122           | . '?'
   123           | . NULL
 
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 74
-    '?'        shift, and go to state 41
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 74
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    simpleExpr  go to state 250
+    ident       liigu olekule 46
+    simpleExpr  liigu olekule 250
 
 
-state 239
+olek 239
 
    42 directionList: directionList ',' direction .
 
-    $default  reduce using rule 42 (directionList)
+    $default  redutseerin kasutades reeglit 42 (directionList)
 
 
-state 240
+olek 240
 
    33 having: HAVING condition .  [$end, ORDER, UNION, FOR, ')']
    78 condition: condition . AND condition
    79          | condition . OR condition
    80          | condition . XOR condition
 
-    OR   shift, and go to state 88
-    AND  shift, and go to state 89
-    XOR  shift, and go to state 90
+    OR   nihuta ja liigu olekule 88
+    AND  nihuta ja liigu olekule 89
+    XOR  nihuta ja liigu olekule 90
 
-    $default  reduce using rule 33 (having)
+    $default  redutseerin kasutades reeglit 33 (having)
 
 
-state 241
+olek 241
 
   125 optSize: '(' . NUMBER ')'
 
-    NUMBER  shift, and go to state 251
+    NUMBER  nihuta ja liigu olekule 251
 
 
-state 242
+olek 242
 
   118 simpleExpr: CAST '(' simpleExpr AS ID optSize . ')'
 
-    ')'  shift, and go to state 252
+    ')'  nihuta ja liigu olekule 252
 
 
-state 243
+olek 243
 
    24 select: select . UNION select
    87 condition: '(' idList2 ')' inExpr '(' select . ')'
 
-    UNION  shift, and go to state 27
-    ')'    shift, and go to state 253
+    UNION  nihuta ja liigu olekule 27
+    ')'    nihuta ja liigu olekule 253
 
 
-state 244
+olek 244
 
    86 condition: '(' idList2 ')' inExpr '(' simExList . ')'
   135 simExList: simExList . ',' simpleExpr
 
-    ','  shift, and go to state 201
-    ')'  shift, and go to state 254
+    ','  nihuta ja liigu olekule 201
+    ')'  nihuta ja liigu olekule 254
 
 
-state 245
+olek 245
 
    61 table: table join alias ON . condition
    74 ident: . ID
@@ -4746,43 +4746,43 @@ state 245
   122           | . '?'
   123           | . NULL
 
-    EXISTS     shift, and go to state 30
-    CASE       shift, and go to state 31
-    CAST       shift, and go to state 32
-    NULL       shift, and go to state 33
-    NOT        shift, and go to state 34
-    STRING_SQ  shift, and go to state 35
-    NUMBER     shift, and go to state 36
-    ID         shift, and go to state 37
-    '-'        shift, and go to state 38
-    '*'        shift, and go to state 39
-    '('        shift, and go to state 40
-    '?'        shift, and go to state 41
+    EXISTS     nihuta ja liigu olekule 30
+    CASE       nihuta ja liigu olekule 31
+    CAST       nihuta ja liigu olekule 32
+    NULL       nihuta ja liigu olekule 33
+    NOT        nihuta ja liigu olekule 34
+    STRING_SQ  nihuta ja liigu olekule 35
+    NUMBER     nihuta ja liigu olekule 36
+    ID         nihuta ja liigu olekule 37
+    '-'        nihuta ja liigu olekule 38
+    '*'        nihuta ja liigu olekule 39
+    '('        nihuta ja liigu olekule 40
+    '?'        nihuta ja liigu olekule 41
 
-    ident       go to state 46
-    condition   go to state 255
-    comparison  go to state 48
-    simpleExpr  go to state 61
+    ident       liigu olekule 46
+    condition   liigu olekule 255
+    comparison  liigu olekule 48
+    simpleExpr  liigu olekule 61
 
 
-state 246
+olek 246
 
    64 join: outerType OUTER JOIN .
 
-    $default  reduce using rule 64 (join)
+    $default  redutseerin kasutades reeglit 64 (join)
 
 
-state 247
+olek 247
 
    35 orderBy: . ORDER BY directionList
   136 partition: '(' PARTITION BY ident . orderBy ')'
 
-    ORDER  shift, and go to state 62
+    ORDER  nihuta ja liigu olekule 62
 
-    orderBy  go to state 256
+    orderBy  liigu olekule 256
 
 
-state 248
+olek 248
 
    91 condition: simpleExpr optNot BETWEEN simpleExpr AND simpleExpr .  [$end, WHERE, ORDER, OR, GROUP, RIGHT, INNER, UNION, FROM, THEN, JOIN, LEFT, FULL, AND, XOR, FOR, AS, ID, ',', ')']
   106 simpleExpr: simpleExpr . OUTERJ
@@ -4793,25 +4793,25 @@ state 248
   116           | simpleExpr . CONCAT simpleExpr
   117           | simpleExpr . OVER partition
 
-    OVER    shift, and go to state 91
-    OUTERJ  shift, and go to state 94
-    CONCAT  shift, and go to state 98
-    '-'     shift, and go to state 102
-    '+'     shift, and go to state 103
-    '/'     shift, and go to state 104
-    '*'     shift, and go to state 105
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
 
-    $default  reduce using rule 91 (condition)
+    $default  redutseerin kasutades reeglit 91 (condition)
 
 
-state 249
+olek 249
 
   100 escape: ESCAPE STRING_SQ .
 
-    $default  reduce using rule 100 (escape)
+    $default  redutseerin kasutades reeglit 100 (escape)
 
 
-state 250
+olek 250
 
    10 assign: '(' idList ')' '=' simpleExpr .  [$end, WHERE, ',']
   106 simpleExpr: simpleExpr . OUTERJ
@@ -4822,75 +4822,75 @@ state 250
   116           | simpleExpr . CONCAT simpleExpr
   117           | simpleExpr . OVER partition
 
-    OVER    shift, and go to state 91
-    OUTERJ  shift, and go to state 94
-    CONCAT  shift, and go to state 98
-    '-'     shift, and go to state 102
-    '+'     shift, and go to state 103
-    '/'     shift, and go to state 104
-    '*'     shift, and go to state 105
+    OVER    nihuta ja liigu olekule 91
+    OUTERJ  nihuta ja liigu olekule 94
+    CONCAT  nihuta ja liigu olekule 98
+    '-'     nihuta ja liigu olekule 102
+    '+'     nihuta ja liigu olekule 103
+    '/'     nihuta ja liigu olekule 104
+    '*'     nihuta ja liigu olekule 105
 
-    $default  reduce using rule 10 (assign)
+    $default  redutseerin kasutades reeglit 10 (assign)
 
 
-state 251
+olek 251
 
   125 optSize: '(' NUMBER . ')'
 
-    ')'  shift, and go to state 257
+    ')'  nihuta ja liigu olekule 257
 
 
-state 252
+olek 252
 
   118 simpleExpr: CAST '(' simpleExpr AS ID optSize ')' .
 
-    $default  reduce using rule 118 (simpleExpr)
+    $default  redutseerin kasutades reeglit 118 (simpleExpr)
 
 
-state 253
+olek 253
 
    87 condition: '(' idList2 ')' inExpr '(' select ')' .
 
-    $default  reduce using rule 87 (condition)
+    $default  redutseerin kasutades reeglit 87 (condition)
 
 
-state 254
+olek 254
 
    86 condition: '(' idList2 ')' inExpr '(' simExList ')' .
 
-    $default  reduce using rule 86 (condition)
+    $default  redutseerin kasutades reeglit 86 (condition)
 
 
-state 255
+olek 255
 
    61 table: table join alias ON condition .  [$end, WHERE, ORDER, GROUP, RIGHT, INNER, UNION, JOIN, LEFT, FULL, FOR, ',', ')']
    78 condition: condition . AND condition
    79          | condition . OR condition
    80          | condition . XOR condition
 
-    OR   shift, and go to state 88
-    AND  shift, and go to state 89
-    XOR  shift, and go to state 90
+    OR   nihuta ja liigu olekule 88
+    AND  nihuta ja liigu olekule 89
+    XOR  nihuta ja liigu olekule 90
 
-    $default  reduce using rule 61 (table)
+    $default  redutseerin kasutades reeglit 61 (table)
 
 
-state 256
+olek 256
 
   136 partition: '(' PARTITION BY ident orderBy . ')'
 
-    ')'  shift, and go to state 258
+    ')'  nihuta ja liigu olekule 258
 
 
-state 257
+olek 257
 
   125 optSize: '(' NUMBER ')' .
 
-    $default  reduce using rule 125 (optSize)
+    $default  redutseerin kasutades reeglit 125 (optSize)
 
 
-state 258
+olek 258
 
   136 partition: '(' PARTITION BY ident orderBy ')' .
 
-    $default  reduce using rule 136 (partition)
+    $default  redutseerin kasutades reeglit 136 (partition)
