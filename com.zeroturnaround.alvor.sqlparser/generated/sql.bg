@@ -267,6 +267,7 @@ id
 	| CONVERT
 	| SUBSTRING
 	| DESC
+	| VALUE
 	;
 update
 	: UPDATE alias SET assignList where
