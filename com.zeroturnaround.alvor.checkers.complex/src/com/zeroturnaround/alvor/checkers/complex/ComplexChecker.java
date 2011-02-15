@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
+
 import com.zeroturnaround.alvor.checkers.AbstractStringCheckerManager;
 import com.zeroturnaround.alvor.checkers.CheckerException;
 import com.zeroturnaround.alvor.checkers.HotspotCheckingResult;
@@ -33,7 +36,7 @@ public class ComplexChecker {
 	
 
 	public Collection<HotspotCheckingResult> checkNodeDescriptors(List<NodeDescriptor> hotspots, 
-		ProjectConfiguration configuration) {
+		ProjectConfiguration configuration, IProgressMonitor monitor) {
 		
 		int unsupportedCount = 0;
 		
@@ -65,7 +68,7 @@ public class ComplexChecker {
 				throw new IllegalArgumentException("Unknown type of INodeTypeDescriptor: " + hotspot.getClass().getName());
 			}
 		}
-		results.addAll(checkStringNodeDescriptors(validHotspots, checkers, configuration));
+		results.addAll(checkStringNodeDescriptors(validHotspots, checkers, configuration, monitor));
 		
 		LOG.message("Processed " + hotspots.size() + " node descriptors, "
 				+ validHotspots.size() + " of them with valid abstract strings, "
@@ -77,7 +80,7 @@ public class ComplexChecker {
 	private Collection<HotspotCheckingResult> checkStringNodeDescriptors(
 			List<StringNodeDescriptor> hotspots, 
 			List<IAbstractStringChecker> checkers, 
-			ProjectConfiguration configuration) {
+			ProjectConfiguration configuration, IProgressMonitor monitor) {
 		
 		Timer timer = new Timer();
 		timer.start("TIMER checking");
@@ -92,7 +95,7 @@ public class ComplexChecker {
 		try {
 			if (configuration.getCheckingStrategy() == ProjectConfiguration.CheckingStrategy.ALL_CHECKERS) {
 				assert LOG.message("Checking with all checkers");
-				results.addAll(checkStringNodeDescriptorsWithAllCheckers(hotspots,checkers, configuration));
+				results.addAll(checkStringNodeDescriptorsWithAllCheckers(hotspots,checkers, configuration, monitor));
 			}
 			
 			else {
@@ -113,11 +116,11 @@ public class ComplexChecker {
 				assert (dynamicChecker != null && staticChecker != null);
 				if (configuration.getCheckingStrategy() == ProjectConfiguration.CheckingStrategy.PREFER_DYNAMIC) {
 					assert LOG.message("Prefering dynamic checker");
-					results.addAll(checkStringNodeDescriptorsPreferDynamic(hotspots, dynamicChecker, staticChecker, configuration));
+					results.addAll(checkStringNodeDescriptorsPreferDynamic(hotspots, dynamicChecker, staticChecker, configuration, monitor));
 				}
 				else if (configuration.getCheckingStrategy() == ProjectConfiguration.CheckingStrategy.PREFER_STATIC) { 
 					assert LOG.message("Prefering static checker");
-					results.addAll(checkStringNodeDescriptorsPreferStatic(hotspots, dynamicChecker, staticChecker, configuration));
+					results.addAll(checkStringNodeDescriptorsPreferStatic(hotspots, dynamicChecker, staticChecker, configuration, monitor));
 				}
 				else {
 					throw new CheckerException("Unknown checking strategy", null);
@@ -135,7 +138,7 @@ public class ComplexChecker {
 	private Collection<HotspotCheckingResult> checkStringNodeDescriptorsWithAllCheckers(
 			List<StringNodeDescriptor> hotspots, 
 			List<IAbstractStringChecker> checkers, 
-			ProjectConfiguration configuration) throws CheckerException {
+			ProjectConfiguration configuration, IProgressMonitor monitor) throws CheckerException {
 		
 		Collection<HotspotCheckingResult> results = new ArrayList<HotspotCheckingResult>();
 		for (IAbstractStringChecker checker : checkers) {
@@ -149,6 +152,8 @@ public class ComplexChecker {
 				results.addAll(checker.checkAbstractStrings(hotspots, configuration));
 				timer.printTime();
 			}
+			
+			checkMonitor(monitor);
 		}
 		return results;
 	}
@@ -163,7 +168,7 @@ public class ComplexChecker {
 			List<StringNodeDescriptor> descriptors, 
 			IAbstractStringChecker dynamicChecker, 
 			IAbstractStringChecker staticChecker, 
-			ProjectConfiguration configuration) {
+			ProjectConfiguration configuration, IProgressMonitor monitor) {
 		
 		Collection<HotspotCheckingResult> results = new ArrayList<HotspotCheckingResult>();
 		for (StringNodeDescriptor descriptor : descriptors) {
@@ -187,6 +192,7 @@ public class ComplexChecker {
 						descriptor.getPosition()));
 			}
 			results.addAll(nodeResults);
+			checkMonitor(monitor);
 		}
 		return results;
 	}
@@ -196,7 +202,7 @@ public class ComplexChecker {
 			List<StringNodeDescriptor> descriptors, 
 			IAbstractStringChecker dynamicChecker, 
 			IAbstractStringChecker staticChecker, 
-			ProjectConfiguration configuration) {
+			ProjectConfiguration configuration, IProgressMonitor monitor) {
 		
 		Collection<HotspotCheckingResult> results = new ArrayList<HotspotCheckingResult>();
 		for (StringNodeDescriptor descriptor : descriptors) {
@@ -219,8 +225,20 @@ public class ComplexChecker {
 						descriptor.getPosition()));
 			}
 			results.addAll(nodeResults);
+			checkMonitor(monitor);
 		}
 		return results;
+	}
+	
+	private void checkMonitor(IProgressMonitor monitor) {
+		if (monitor != null) {
+			if (monitor.isCanceled()) {
+				throw new OperationCanceledException();
+			}
+			else {
+				monitor.worked(1);
+			}
+		}
 	}
 	
 }

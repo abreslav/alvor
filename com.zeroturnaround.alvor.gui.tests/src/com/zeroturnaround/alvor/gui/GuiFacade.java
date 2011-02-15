@@ -34,7 +34,7 @@ public class GuiFacade {
 		IJavaProject javaProject = (IJavaProject)project.getNature(JavaCore.NATURE_ID);
 		IJavaElement[] scope = {javaProject};
 		
-		checker.performCleanCheck(project, scope);
+		checker.performCleanCheck(project, scope, null);
 	}
 	
 	public static void startIncrementalBuild(IProject project) {

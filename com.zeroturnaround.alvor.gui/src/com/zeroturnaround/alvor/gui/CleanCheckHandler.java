@@ -3,6 +3,10 @@ package com.zeroturnaround.alvor.gui;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IJavaElement;
 
 import com.zeroturnaround.alvor.common.logging.ILog;
@@ -30,8 +34,23 @@ public class CleanCheckHandler extends AbstractHandler {
 			if (element == null) {
 				element = GuiUtil.getCurrentJavaProject();
 			}
+			
+			final IJavaElement finalElement = element;
+			
 			LOG.message("Checking project: " + element.getElementName());
-			checker.performCleanCheck(element.getJavaProject().getProject(), new IJavaElement[] {element});
+			// TODO add dialog
+			
+			Job job = new Job("Full SQL checking") {
+				
+				@Override
+				protected IStatus run(IProgressMonitor monitor) {
+					checker.performCleanCheck(finalElement.getJavaProject().getProject(), new IJavaElement[] {finalElement}, monitor);
+					return Status.OK_STATUS;
+				}
+			};
+			job.setPriority(Job.INTERACTIVE);
+			job.setUser(true);
+			job.schedule();
 			
 //			timer.printTime();
 		} 
