@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.zeroturnaround.alvor.checkers.CheckerException;
 import com.zeroturnaround.alvor.checkers.HotspotCheckingResult;
 import com.zeroturnaround.alvor.checkers.HotspotError;
+import com.zeroturnaround.alvor.checkers.HotspotInfo;
 import com.zeroturnaround.alvor.checkers.HotspotWarning;
-import com.zeroturnaround.alvor.checkers.CheckerException;
 import com.zeroturnaround.alvor.checkers.IAbstractStringChecker;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
@@ -118,7 +119,7 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 			ProjectConfiguration configuration)
 			throws CheckerException {
 		
-		List<HotspotCheckingResult> errors = new ArrayList<HotspotCheckingResult>();
+		List<HotspotCheckingResult> results = new ArrayList<HotspotCheckingResult>();
 		
 		IAbstractString abstractString = descriptor.getAbstractValue();
 		if (!hasAcceptableSize(abstractString)) {
@@ -131,7 +132,7 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 						hasBigSubstrings = true;
 					} else {
 						try {
-							errors.addAll(checkStringOfAppropriateSize(descriptor, option));
+							results.addAll(checkStringOfAppropriateSize(descriptor, option));
 							hasSmallSubstrings = true;
 						} catch (StackOverflowError e) { 
 							// TODO: This hack is no good. May be it can be fixed in the FixpointParser   
@@ -140,11 +141,11 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 					}
 				}
 				if (hasBigSubstrings) {
-					errors.add(new HotspotWarning("SQL syntax checker: SQL string has too many possible variations" 
+					results.add(new HotspotWarning("SQL syntax checker: SQL string has too many possible variations" 
 							+ (hasSmallSubstrings ? ". Only some are checked" : ""), descriptor.getPosition()));
 				}
 			} else {
-				errors.add(new HotspotWarning("SQL syntax checker: SQL string has too many possible variations", 
+				results.add(new HotspotWarning("SQL syntax checker: SQL string has too many possible variations", 
 						descriptor.getPosition()));
 			}
 		} else {
@@ -153,9 +154,15 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 			} catch (StackOverflowError e) {
 				// The analyzer has caused a stack overflow in the dfs-based evaluation procedure.
 				// See FixpointParser class
-				errors.add(new HotspotWarning("SQL syntax checker: SQL string has too many possible variations", descriptor.getPosition()));
+				results.add(new HotspotWarning("SQL syntax checker: SQL string has too many possible variations", descriptor.getPosition()));
 			}
 		}
-		return errors;
+		
+		if (results.isEmpty()) {
+			results.add(new HotspotInfo("SQL syntax check passed", descriptor.getPosition()));
+		}
+		
+
+		return results;
 	}
 }

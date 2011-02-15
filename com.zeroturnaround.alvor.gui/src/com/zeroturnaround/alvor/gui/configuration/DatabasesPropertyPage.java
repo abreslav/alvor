@@ -222,7 +222,7 @@ public class DatabasesPropertyPage extends CommonPropertyPage {
 
 	private void updateForm() {
 		int i = table.getSelectionIndex();
-		if (i > -1) {
+		if (i > -1 && this.dataSources.size() > i) {
 			DataSourceProperties prop = this.dataSources.get(i);
 	//		updateText(patternText, prop.getPattern());
 			updateText(driverText, prop.getDriverName());

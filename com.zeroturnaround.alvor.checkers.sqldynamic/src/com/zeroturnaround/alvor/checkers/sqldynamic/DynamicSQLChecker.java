@@ -8,9 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.zeroturnaround.alvor.checkers.CheckerException;
 import com.zeroturnaround.alvor.checkers.HotspotCheckingResult;
 import com.zeroturnaround.alvor.checkers.HotspotError;
-import com.zeroturnaround.alvor.checkers.CheckerException;
+import com.zeroturnaround.alvor.checkers.HotspotInfo;
 import com.zeroturnaround.alvor.checkers.IAbstractStringChecker;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
@@ -53,7 +54,7 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 	private Collection<HotspotCheckingResult> checkAbstractString(StringNodeDescriptor descriptor,
 			SqlTester tester) {
 
-		List<HotspotCheckingResult> errors = new ArrayList<HotspotCheckingResult>();
+		List<HotspotCheckingResult> results = new ArrayList<HotspotCheckingResult>();
 		Map<String, Integer> concretes = new HashMap<String, Integer>();
 
 		assert LOG.message("DYN CHECK ABS: " + descriptor.getAbstractValue());
@@ -62,7 +63,7 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 
 		Map<String, String> errorMap = new HashMap<String, String>();
 		if (AbstractStringSizeCounter.size(descriptor.getAbstractValue()) > SIZE_LIMIT) {
-			errors.add(new HotspotError("Dynamic SQL checker: SQL string has too many possible variations", 
+			results.add(new HotspotError("Dynamic SQL checker: SQL string has too many possible variations", 
 					descriptor.getPosition()));
 		} 
 		else { 
@@ -70,7 +71,7 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 			try {
 				concreteStrings = SampleGenerator.getConcreteStrings(descriptor.getAbstractValue());
 			} catch (Exception e) {
-				errors.add(new HotspotError("Sample generation failed: " + e.getMessage()
+				results.add(new HotspotError("Sample generation failed: " + e.getMessage()
 						+ ", str=" + descriptor.getAbstractValue(), descriptor.getPosition()));
 			}
 
@@ -105,13 +106,18 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 
 			for (Entry<String, String> entry : errorMap.entrySet()) {
 				String message = entry.getKey().trim() + "\nSQL: \n" + entry.getValue();
-				errors.add(new HotspotError("SQL test failed  - " + message, descriptor.getPosition()));
+				results.add(new HotspotError("SQL test failed  - " + message, descriptor.getPosition()));
 			}
 
 			assert LOG.message("DUPLICATES: " + duplicates);
 			assert LOG.message("____________________________________________");
 		}
-		return errors;
+		
+		if (results.isEmpty()) {
+			results.add(new HotspotInfo("SQL testing passed", descriptor.getPosition()));
+		}
+		
+		return results;
 	}
 
 	private SqlTester getAnalyzer(ProjectConfiguration configuration) throws CheckerException {
