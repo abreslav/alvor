@@ -56,35 +56,55 @@
    <extension
          point="org.eclipse.ui.commands">
       <command
-            categoryId="org.eclipse.jdt.ui.category.source"
+            categoryId="com.zeroturnaround.alvor.gui.AlvorCategory"
             defaultHandler="com.zeroturnaround.alvor.gui.ClearCacheHandler"
             id="com.zeroturnaround.alvor.gui.clearCache"
-            name="Clear SQL checker cache">
+            name="Clear SQL checker results">
       </command>
       <command
-            categoryId="org.eclipse.jdt.ui.category.source"
+            categoryId="com.zeroturnaround.alvor.gui.AlvorCategory"
             defaultHandler="com.zeroturnaround.alvor.gui.CleanCheckHandler"
             id="com.zeroturnaround.alvor.plugin.CleanCheck"
             name="Check SQL">
       </command>
+      <category
+            id="com.zeroturnaround.alvor.gui.AlvorCategory"
+            name="Alvor SQL checker">
+      </category>
    </extension>
    
    <extension
          point="org.eclipse.ui.menus">
       <menuContribution
             locationURI="popup:org.eclipse.jdt.ui.PackageExplorer?after=additions">
-		 <command
-               commandId="com.zeroturnaround.alvor.plugin.CleanCheck"
-               style="push">
-      <visibleWhen
-            checkEnabled="false">
-         <iterate>
-            <adapt
-                  type="org.eclipse.jdt.core.IJavaProject">
-            </adapt>
-         </iterate>
-      </visibleWhen>
-         </command>
+   <menu
+         label="Alvor SQL checker">
+      <command
+            commandId="com.zeroturnaround.alvor.plugin.CleanCheck"
+            style="push">
+         <visibleWhen
+               checkEnabled="false">
+            <iterate>
+               <adapt
+                     type="org.eclipse.jdt.core.IJavaProject">
+               </adapt>
+            </iterate>
+         </visibleWhen>
+      </command>
+      <command
+            commandId="com.zeroturnaround.alvor.gui.clearCache"
+            label="Clear results"
+            style="push">
+         <visibleWhen
+               checkEnabled="false">
+            <iterate>
+               <adapt
+                     type="org.eclipse.jdt.core.IJavaProject">
+               </adapt>
+            </iterate>
+         </visibleWhen>
+      </command>
+   </menu>
       </menuContribution>
    </extension>
    

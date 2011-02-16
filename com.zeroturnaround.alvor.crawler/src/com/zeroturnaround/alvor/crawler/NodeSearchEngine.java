@@ -105,7 +105,7 @@ public class NodeSearchEngine {
 					throw new OperationCanceledException();
 				}
 				else {
-					monitor.worked(1);
+					monitor.worked(50);
 				}
 			}
 		}
