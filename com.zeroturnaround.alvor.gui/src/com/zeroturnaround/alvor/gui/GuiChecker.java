@@ -68,7 +68,7 @@ public class GuiChecker {
 		}
 		
 		if (monitor != null) {
-			monitor.beginTask("Checking SQL", 10000);
+			monitor.beginTask("Checking SQL", 2000);
 		}
 		
 		try {
