@@ -21,14 +21,20 @@ public class MyCacheBuilderTest {
 	
 	@Test
 	public void cleanBuildProjectCache() {
-		IJavaProject javaProject = JavaModelUtil.getJavaProjectByName("earved");
-		ProjectConfiguration conf = ConfigurationManager
-			.readProjectConfiguration(javaProject.getProject(), true);
-		
-		Cache.getInstance().setProjectPrimaryPatterns(javaProject.getProject().getName(), conf.getHotspotPatterns());
-		
-		MyCacheBuilder cb = new MyCacheBuilder();
-		cb.fullBuildProject(javaProject.getProject(), null);
+		try {
+			IJavaProject javaProject = JavaModelUtil.getJavaProjectByName("earved");
+			JavaModelUtil.openProject(javaProject);
+			ProjectConfiguration conf = ConfigurationManager
+				.readProjectConfiguration(javaProject.getProject(), true);
+			Cache.getInstance().setProjectPrimaryPatterns(javaProject.getProject().getName(), conf.getHotspotPatterns());
+			
+			
+			FullParseCacheBuilder cb = new FullParseCacheBuilder();
+			cb.fullBuildProject(javaProject.getProject(), null);
+		}
+		finally {
+			Cache.shutdownIfAlive();
+		}
 		
 //		// check that cache contains correct strings
 //		Cache cache = null;

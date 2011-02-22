@@ -10,7 +10,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 public class CacheBuilder extends IncrementalProjectBuilder {
 	
 	// FIXME think about error handling
-	MyCacheBuilder helper = new MyCacheBuilder();
+	FullParseCacheBuilder helper = new FullParseCacheBuilder();
 	
 	@SuppressWarnings("rawtypes")
 	@Override

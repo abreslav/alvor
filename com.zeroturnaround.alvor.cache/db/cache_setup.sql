@@ -11,7 +11,7 @@ SET DATABASE DEFAULT TABLE TYPE CACHED;;;
 CREATE TABLE files
 ( 
 	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-	name VARCHAR(4096) not null UNIQUE,
+	name VARCHAR(300) not null UNIQUE,
 	batch_no integer not null
 );;;
 
@@ -31,18 +31,18 @@ CREATE TABLE abstract_strings
 	int_value INTEGER DEFAULT NULL,
 	str_value LONGVARCHAR DEFAULT NULL,
 	str_value2 LONGVARCHAR DEFAULT NULL,
-	file_id INTEGER REFERENCES Files(id) ON DELETE CASCADE,
-	start INTEGER,
-	length INTEGER
+	file_id INTEGER not null REFERENCES Files(id) ON DELETE CASCADE,
+	start INTEGER not null,
+	length INTEGER not null
 );;;
 
 CREATE TABLE collection_contents
 (
-	collection_id INTEGER REFERENCES abstract_strings(id) ON DELETE CASCADE,
-	item_index INTEGER,
-	item_id INTEGER REFERENCES abstract_strings(id) ON DELETE CASCADE,
+	collection_id INTEGER not null REFERENCES abstract_strings(id) ON DELETE CASCADE,
+	item_index INTEGER not null,
+	item_id INTEGER not null REFERENCES abstract_strings(id) ON DELETE CASCADE,
 	
-	UNIQUE(collection_id, item_index)
+	primary key (collection_id, item_index)
 );;;
 
 CREATE TABLE patterns
@@ -60,7 +60,9 @@ CREATE TABLE project_patterns
 (
 	project_name varchar(100) not null,
 	pattern_id INTEGER not null REFERENCES patterns(id) ON DELETE CASCADE,
-	batch_no integer not null	
+	batch_no integer not null,
+	source_id integer references files(id) on delete cascade,
+	primary key (project_name, pattern_id)
 );;;
 
 

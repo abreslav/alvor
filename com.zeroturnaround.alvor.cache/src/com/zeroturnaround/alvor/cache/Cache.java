@@ -22,6 +22,10 @@ public class Cache {
 	
 	private final static ILog LOG = Logs.getLog(ICacheService.class);
 	private static Cache INSTANCE = null;
+	
+	private static int PATTERN_KIND_HOTSPOT = 1;
+	private static int PATTERN_KIND_STRING_METHOD = 1;
+	
 	private DatabaseHelper db;
 	
 	private Cache() {
@@ -44,9 +48,8 @@ public class Cache {
 	}
 	
 	public void addFile(String projectName, String fileName) {
-		db.execute("insert into files (name, project_id, batch_no) " +
-				" values (?, (select id from projects where name = ?), 0)", 
-				fileName, projectName);
+		db.execute("insert into files (name, batch_no) values (?, 0)", 
+				fileName);
 	}
 	
 	public void invalidateFile(String fileName) {
@@ -58,7 +61,7 @@ public class Cache {
 		ResultSet rs = db.query (
 				" select f.name, f.batch_no" +
 				" from files f" +
-				" where f.name like ? || '/%'" +
+				" where f.name like '/' || ? || '/%'" +
 				" and f.batch_no < (select max(batch_no) from project_patterns where project_name = ?)",
 				projectName, projectName);
 		
@@ -90,9 +93,9 @@ public class Cache {
 			int patternId = getOrCreatePatternId(pattern);
 			db.execute (
 					" insert into project_patterns " +
-					" (project_name, pattern_id, batch_no, source)" +
-					" values (?, ?, ?, ?)", 
-					projectName, patternId, 0, "configuration"); 
+					" (project_name, pattern_id, batch_no, source_id)" +
+					" values (?, ?, 1, null)", 
+					projectName, patternId); 
 		}
 	}
 	
@@ -103,8 +106,8 @@ public class Cache {
 	private int getOrCreatePatternId(HotspotPattern pattern) {
 
 		Integer id = db.queryMaybeInteger (
-				" select id from hotspot_patterns where" +
-				" class_name = ? and method_name = ? and arg_index = ?", 
+				" select id from patterns where" +
+				" class_name = ? and method_name = ? and argument_index = ?", 
 				pattern.getClassName(), pattern.getMethodName(), pattern.getArgumentIndex());
 
 		if (id != null) {
@@ -112,8 +115,10 @@ public class Cache {
 		}
 		else {
 			return db.insertAndGetId(
-					" insert into hotspot_patterns " +
-					" (class_name, method_name, arg_index) values (?, ?, ?)",
+					" insert into patterns " +
+					" (class_name, method_name, argument_index, kind) values (?, ?, ?, " +
+					PATTERN_KIND_HOTSPOT + 
+					")",
 					pattern.getClassName(), pattern.getMethodName(), pattern.getArgumentIndex());
 		}
 	}
@@ -125,12 +130,12 @@ public class Cache {
 	public List<PatternRecord> getNewProjectPatterns(String projectName) {
 		int minFileBatchNo = db.queryInt(
 				" select coalesce(min(batch_no),0)" +
-				" from files where name like ? || '/%'", projectName);
+				" from files where name like '/' || ? || '/%'", projectName);
 		
 		ResultSet rs = db.query(
 				" select p.class_name," +
 				" 		 p.method_name," +
-				"        p.arg_index," +
+				"        p.argument_index," +
 				"        pp.batch_no" +
 				" from project_patterns pp" +
 				" join patterns p on p.id = pp.pattern_id" +
@@ -194,9 +199,9 @@ public class Cache {
 	public void clearProject(String projectName) {
 		//int projectId = getProjectId(projectName);
 		db.execute("delete from abstract_strings where file_id in " +
-				" (select id from files where name like (? || '/%'))", projectName); 
+				" (select id from files where name like ('/' || ? || '/%'))", projectName); 
 		// ... or delete abstract strings using triggers??
-		db.execute("delete from files where name like (? || '/%')", projectName); 
+		db.execute("delete from files where name like ('/' || ? || '/%')", projectName); 
 		db.execute("delete from project_patterns where project_name = ?", projectName); 
 	}
 
