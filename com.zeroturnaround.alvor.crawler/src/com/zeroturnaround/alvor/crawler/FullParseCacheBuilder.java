@@ -22,12 +22,14 @@ import com.zeroturnaround.alvor.cache.FileRecord;
 import com.zeroturnaround.alvor.cache.PatternRecord;
 import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.common.NodeDescriptor;
+import com.zeroturnaround.alvor.common.logging.Timer;
 import com.zeroturnaround.alvor.configuration.ConfigurationManager;
 import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
 import com.zeroturnaround.alvor.crawler.util.ASTUtil;
 import com.zeroturnaround.alvor.crawler.util.JavaModelUtil;
 
-public class MyCacheBuilder {
+public class FullParseCacheBuilder {
+	private static final int MAX_ITERATIONS_UNTIL_FIXPOINT = 1;
 	private static Cache cache = Cache.getInstance();
 	
 	public void fullBuildProject(IProject project, IProgressMonitor monitor) {
@@ -35,7 +37,6 @@ public class MyCacheBuilder {
 		updateProjectPrimaryPatterns(project);
 		populateCacheWithFilesInfo(project);
 		updateProjectCache(project, monitor);
-		// TODO setup primary patterns
 	}
 	
 	private void registerFileChanges(IResourceDelta delta) throws CoreException {
@@ -81,7 +82,8 @@ public class MyCacheBuilder {
 		//IJavaProject javaProject = JavaModelUtil.getJavaProjectFromProject(this.getProject()); 
 		String projectName = project.getName();
 		
-		while (true) {
+		Timer timer = new Timer("loop");
+		for (int i = 0; i < MAX_ITERATIONS_UNTIL_FIXPOINT; i++) {
 			List<PatternRecord> patterns = cache.getNewProjectPatterns(projectName);
 			if (patterns.isEmpty()) { // found fixpoint
 				break; 
@@ -93,6 +95,7 @@ public class MyCacheBuilder {
 				updateCompilationUnitCache(unit, patterns, rec.getBatchNo());
 			}
 		}
+		timer.printTime();
 	}
 	
 	/** 
@@ -106,20 +109,21 @@ public class MyCacheBuilder {
 	 * 
 	 * @param unit
 	 * @param patterns
-	 * @param currentBatchNo indicates biggest pattern batch number this file already has been processed for
+	 * @param fileCurrentBatchNo indicates biggest pattern batch number this file already has been processed for
 	 */
 	private void updateCompilationUnitCache(ICompilationUnit unit, 
-			final List<PatternRecord> patterns, int currentBatchNo) {
+			final List<PatternRecord> patterns, int fileCurrentBatchNo) {
 		// TODO try parsing in a batch
 		ASTNode ast = ASTUtil.parseCompilationUnit(unit, true);
 		
+		//System.out.println("== " + unit.getElementName() + " ==================================");
 		
 		// separate relevant patterns
 		final List<PatternRecord> relevantHotspotPatterns = new ArrayList<PatternRecord>();
 		final List<PatternRecord> relevantMethodPatterns = new ArrayList<PatternRecord>();
 		for (PatternRecord pattern : patterns) {
 			// TODO distinguish between hotspot and method patterns
-			if (pattern.getBatchNo() > currentBatchNo) {
+			if (pattern.getBatchNo() > fileCurrentBatchNo) {
 				relevantHotspotPatterns.add(pattern);
 			}
 		}
@@ -135,7 +139,9 @@ public class MyCacheBuilder {
 //						Expression hotspot = (Expression)node.arguments().get(pattern.getArgumentIndex());
 //						NodeDescriptor descriptor = Crawler2.INSTANCE.evaluate(hotspot);
 //						cache.addHotspot(pattern, descriptor);
+					
 //					}
+					//System.out.println(pattern + " * " + node);
 				}
 				// Don't want to visit children. 
 				// In principle there can be another hotspot in an argument, but
@@ -144,16 +150,16 @@ public class MyCacheBuilder {
 				return false; 
 			}
 			
-			@Override
-			public boolean visit(MethodDeclaration node) {
-				for (PatternRecord pattern : relevantMethodPatterns) {
-//					if (ASTUtil.declarationCorrespondsToPattern(node, pattern)) {
-//						// TODO
-//						// cache.addMethodSummary(pattern, descriptor);
-//					}
-				}
-				return false;
-			}
+//			@Override
+//			public boolean visit(MethodDeclaration node) {
+//				for (PatternRecord pattern : relevantMethodPatterns) {
+////					if (ASTUtil.declarationCorrespondsToPattern(node, pattern)) {
+////						// TODO
+////						// cache.addMethodSummary(pattern, descriptor);
+////					}
+//				}
+//				return false;
+//			}
 		});
 	}
 

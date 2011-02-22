@@ -54,6 +54,16 @@ public class JavaModelUtil {
 			throw new IllegalArgumentException("Project " + name + " not found");
 		}
 		
+		
+		// seems i can't get nature without opening the project
+		if (!project.isOpen()) {
+			try {
+				project.open(null);
+			} catch (CoreException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		
 		IJavaProject javaProject = null;
 		try {
 			javaProject = (IJavaProject)project.getNature(JavaCore.NATURE_ID);
@@ -166,9 +176,19 @@ public class JavaModelUtil {
 	public static List<String> getCompilationUnitNames(Collection<ICompilationUnit> units) {
 		List<String> names = new ArrayList<String>();
 		for (ICompilationUnit unit: units) {
-			names.add(unit.getElementName());
+			names.add(unit.getResource().getFullPath().toPortableString());
 		}
 		
 		return names;
+	}
+
+	public static void openProject(IJavaProject javaProject) {
+		if (!javaProject.isOpen()) {
+			try {
+				javaProject.open(null);
+			} catch (JavaModelException e) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 }

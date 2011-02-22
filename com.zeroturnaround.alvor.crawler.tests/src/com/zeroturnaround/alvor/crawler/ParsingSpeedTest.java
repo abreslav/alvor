@@ -1,5 +1,6 @@
 package com.zeroturnaround.alvor.crawler;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -17,6 +18,7 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.junit.Test;
 
+import com.zeroturnaround.alvor.common.logging.Timer;
 import com.zeroturnaround.alvor.crawler.util.ASTUtil;
 import com.zeroturnaround.alvor.crawler.util.JavaModelUtil;
 
@@ -48,17 +50,17 @@ public class ParsingSpeedTest {
 		final ASTVisitor visitor = new ASTVisitor() {
 			@Override
 			public boolean visit(MethodInvocation node) {
-				if (node.getName().getIdentifier().equals("prepareStatement")) {
-					//assert node.resolveMethodBinding() != null;
-					System.out.println("NODE:" + node);
-					System.out.println("--M :" + node.resolveMethodBinding());
-//					System.out.println("--T :" + node.resolveTypeBinding());
-//					System.out.println("--ET:" + node.getExpression().resolveTypeBinding());
-				}
-				else {
-					//System.out.println("--------" + node);
-					
-				}
+//				if (node.getName().getIdentifier().equals("prepareStatement")) {
+//					//assert node.resolveMethodBinding() != null;
+//					System.out.println("NODE:" + node);
+//					System.out.println("--M :" + node.resolveMethodBinding());
+////					System.out.println("--T :" + node.resolveTypeBinding());
+////					System.out.println("--ET:" + node.getExpression().resolveTypeBinding());
+//				}
+//				else {
+//					//System.out.println("--------" + node);
+//					
+//				}
 				return false;
 			}
 		};
@@ -68,8 +70,11 @@ public class ParsingSpeedTest {
 		ASTParser parser = ASTParser.newParser(AST.JLS3);
 		
 		int processed = 0;
-		int maxFiles = 1;
+		int maxFiles = 100;
 		int parseCount = 0;
+		
+		Timer timer = new Timer("parsing");
+		
 		while (processed < units.size()) {
 			int currentBatchSize = Math.min(maxFiles, units.size() - processed);
 			ICompilationUnit[] cUnitArray = new ICompilationUnit[currentBatchSize];
@@ -88,7 +93,7 @@ public class ParsingSpeedTest {
 			}
 		}
 		
-		
+		timer.printTime();
 		
 		
 		System.out.println("valma, parse count=" + parseCount);
