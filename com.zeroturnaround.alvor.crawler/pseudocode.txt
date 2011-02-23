@@ -190,7 +190,7 @@ def updateWorkspace():
 			files = project.getFiles       // try to get recently changed files first
 			for file <- files:
 				
-
+}}}
 
 
 === Optimizing by acknowledging the dynamics of the code ===
@@ -222,3 +222,8 @@ primary hotspots are also within search/analysis scope.
 Secondary hotspots are searched in the same project.
 
 Implementations of string-methods are searched from all required projects.
+
+
+=== Cache ===
+
+Each "stub" at method boundary creates a pattern, which is represented in cache as choice.

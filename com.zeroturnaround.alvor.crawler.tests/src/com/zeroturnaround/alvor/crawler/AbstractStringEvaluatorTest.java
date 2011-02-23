@@ -48,13 +48,16 @@ public abstract class AbstractStringEvaluatorTest {
 	private void validateNodeDescriptors(List<NodeDescriptor> descriptors, IProject project) {
 		List<String> descriptorLines = new ArrayList<String>();
 		List<String> concreteLines = new ArrayList<String>();
+		List<String> positionLines = new ArrayList<String>(); 
 		
 		for (NodeDescriptor desc : descriptors) {
-			String start = PositionUtil.getLineString(desc.getPosition()) + ", ";
+			
+			String positionString = PositionUtil.getLineString(desc.getPosition());
+			positionLines.add(positionString);
 			
 			if (desc instanceof StringNodeDescriptor) {
 				IAbstractString aStr = ((StringNodeDescriptor)desc).getAbstractValue(); 
-				descriptorLines.add(start + aStr.toString());
+				descriptorLines.add(positionString + ", " + aStr.toString());
 				try {
 					concreteLines.addAll(SampleGenerator.getConcreteStrings(aStr));
 				} catch (Exception e) {
@@ -63,7 +66,7 @@ public abstract class AbstractStringEvaluatorTest {
 				}
 			}
 			else if (desc instanceof UnsupportedNodeDescriptor) {
-				descriptorLines.add(start + "unsupported: " 
+				descriptorLines.add(positionString + ", unsupported: " 
 						+ ((UnsupportedNodeDescriptor)desc).getProblemMessage());
 			}
 			else {
@@ -72,6 +75,7 @@ public abstract class AbstractStringEvaluatorTest {
 		}
 		
 		Collections.sort(concreteLines);
+		Collections.sort(positionLines);
 		
 		File folder = CrawlerTestUtil.getAndPrepareTestResultsFolder(project);
 		
@@ -79,14 +83,20 @@ public abstract class AbstractStringEvaluatorTest {
 				folder.getAbsolutePath() + "/concrete_strings");
 		boolean abstractResult = CrawlerTestUtil.stringsAreExpected(descriptorLines, 
 				folder.getAbsolutePath() + "/node_descriptors");
+		boolean positionResult = CrawlerTestUtil.stringsAreExpected(positionLines, 
+				folder.getAbsolutePath() + "/node_positions");
 		
-		if (!abstractResult) {
-			if (concreteResult) {
-				throw new AssertionError("Node descriptors differ from expected, but concretes are same");
-			}
-			else {
-				throw new AssertionError("Node descriptors differ from expected");
-			}
+		if (!positionResult) {
+			throw new AssertionError("Positions are different");
+		}
+		else if (!concreteResult) {
+			throw new AssertionError("Node descriptors differ from expected");
+		}
+		else if (!abstractResult) {
+			throw new AssertionError("Node descriptors differ from expected, but concretes are same");
+		}
+		else {
+			// all OK
 		}
 	}
 	

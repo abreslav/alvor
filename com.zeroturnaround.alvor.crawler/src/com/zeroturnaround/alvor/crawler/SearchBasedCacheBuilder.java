@@ -2,7 +2,13 @@ package com.zeroturnaround.alvor.crawler;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -11,13 +17,34 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IMember;
+import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.NodeFinder;
+import org.eclipse.jdt.core.search.IJavaSearchConstants;
+import org.eclipse.jdt.core.search.IJavaSearchScope;
+import org.eclipse.jdt.core.search.SearchEngine;
+import org.eclipse.jdt.core.search.SearchMatch;
+import org.eclipse.jdt.core.search.SearchParticipant;
+import org.eclipse.jdt.core.search.SearchPattern;
+import org.eclipse.jdt.core.search.SearchRequestor;
 
 import com.zeroturnaround.alvor.cache.Cache;
+import com.zeroturnaround.alvor.cache.CacheProvider;
 import com.zeroturnaround.alvor.cache.FileRecord;
 import com.zeroturnaround.alvor.cache.PatternRecord;
+import com.zeroturnaround.alvor.common.HotspotPattern;
+import com.zeroturnaround.alvor.common.NodeDescriptor;
+import com.zeroturnaround.alvor.common.StringNodeDescriptor;
+import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
+import com.zeroturnaround.alvor.common.logging.ILog;
+import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.common.logging.Timer;
 import com.zeroturnaround.alvor.configuration.ConfigurationManager;
 import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
@@ -33,8 +60,18 @@ import com.zeroturnaround.alvor.crawler.util.JavaModelUtil;
  */
 
 public class SearchBasedCacheBuilder {
-	private static final int MAX_ITERATIONS_UNTIL_FIXPOINT = 1;
-	private static Cache cache = Cache.getInstance();
+	private static final ILog LOG = Logs.getLog(SearchBasedCacheBuilder.class);
+	private static final int MAX_ITERATIONS_FOR_FINDING_FIXPOINT = 1;
+	private Map<HotspotPattern, SearchPattern> searchPatterns = new HashMap<HotspotPattern, SearchPattern>();
+	private SearchEngine searchEngine = new SearchEngine();
+	private Map<ICompilationUnit, ASTNode> astCache = new WeakHashMap<ICompilationUnit, ASTNode>();
+	private Cache cache; 
+	
+	public SearchBasedCacheBuilder() {
+		this.cache = CacheProvider.getCache();
+	}
+	
+	
 	
 	public void fullBuildProject(IProject project, IProgressMonitor monitor) {
 		cleanProject(project, monitor);
@@ -81,92 +118,146 @@ public class SearchBasedCacheBuilder {
 	}
 	
 	private void updateProjectCache(IProject project, IProgressMonitor monitor) {
+		
+		
 		// 0) TODO update inter-project stuff (import patterns)
 		
-		//IJavaProject javaProject = JavaModelUtil.getJavaProjectFromProject(this.getProject()); 
-		String projectName = project.getName();
-		
 		Timer timer = new Timer("loop");
-		for (int i = 0; i < MAX_ITERATIONS_UNTIL_FIXPOINT; i++) {
-			List<PatternRecord> patterns = cache.getNewProjectPatterns(projectName);
-			if (patterns.isEmpty()) { // found fixpoint
+		for (int i = 0; i < MAX_ITERATIONS_FOR_FINDING_FIXPOINT; i++) {
+			List<PatternRecord> patternRecords = cache.getNewProjectPatterns(project.getName());
+			if (patternRecords.isEmpty()) { // found fixpoint
 				break; 
 			}
-			
-			List<FileRecord> fileRecords = cache.getFilesToUpdate(projectName);
-			for (FileRecord rec : fileRecords) {
-				ICompilationUnit unit = JavaModelUtil.getCompilationUnitByName(rec.getName());
-				updateCompilationUnitCache(unit, patterns, rec.getBatchNo());
+			else {
+				updateProjectCacheForNewPatterns(JavaModelUtil.getJavaProjectFromProject(project),
+						patternRecords, monitor);
 			}
 		}
 		timer.printTime();
 	}
 	
-	/** 
-	 * This method assumes that there is no stale information about this file in cache,
-	 * but there is missing information about some patterns (ie patterns with batchNo bigger than currentBatchNo)
-	 * 
-	 * Visits all method invocations and collects intraprocedural parts of respective abstract values
-	 * (including properly defined stubs in method boundaries).
-	 * 
-	 * Uses resulting abstract values to update cache for this file 
-	 * 
-	 * @param unit
-	 * @param patterns
-	 * @param fileCurrentBatchNo indicates biggest pattern batch number this file already has been processed for
-	 */
-	private void updateCompilationUnitCache(ICompilationUnit unit, 
-			final List<PatternRecord> patterns, int fileCurrentBatchNo) {
-		// TODO try parsing in a batch
-		ASTNode ast = ASTUtil.parseCompilationUnit(unit, true);
+	private void updateProjectCacheForNewPatterns(IJavaProject javaProject, 
+			final Collection<PatternRecord> patternRecords, IProgressMonitor monitor) {
 		
-		//System.out.println("== " + unit.getElementName() + " ==================================");
+		List<FileRecord> fileRecords = cache.getFilesToUpdate(javaProject.getProject().getName());
 		
-		// separate relevant patterns
-		final List<PatternRecord> relevantHotspotPatterns = new ArrayList<PatternRecord>();
-		final List<PatternRecord> relevantMethodPatterns = new ArrayList<PatternRecord>();
-		for (PatternRecord pattern : patterns) {
-			// TODO distinguish between hotspot and method patterns
-			if (pattern.getBatchNo() > fileCurrentBatchNo) {
-				relevantHotspotPatterns.add(pattern);
+		// group files into batches and search each batch separately according to their needed patterns
+		Map<Integer, Set<ICompilationUnit>> fileGroups = groupFiles(fileRecords);
+		
+		for (Map.Entry<Integer, Set<ICompilationUnit>> group : fileGroups.entrySet()) {
+			SearchPattern searchPattern = createCombinedSearchPattern(javaProject, patternRecords, group.getKey());
+			Timer searchTimer = new Timer("Search");
+			final Collection<IResource> files = new HashSet<IResource>();
+			final AtomicInteger count = new AtomicInteger(0);
+			performSearch(group.getValue(), searchPattern, new SearchRequestor() {
+				@Override
+				public void acceptSearchMatch(SearchMatch match) throws CoreException {
+					//System.out.println(match.getElement().getClass().getCanonicalName());
+					files.add(match.getResource());
+					
+					// TODO parse everything together
+					
+					//ASTNode node = getASTNode(match);
+					//System.out.println(node.getClass());
+					count.incrementAndGet();
+					//processNodeForPatterns(node, patternRecords);
+				}
+			});
+			searchTimer.printTime();
+			System.out.println("Count=" + count);
+			System.out.println(files);
+			System.out.println("FileCount=" + files.size());
+		}
+	}
+	
+	private void processNodeForPatterns(ASTNode node, Collection<PatternRecord> patterns) {
+		// detect which of the patterns this node is found for
+		
+		assert !patterns.isEmpty();
+		
+		boolean foundMatch = false;
+		for (PatternRecord rec : patterns) {
+			
+			if (node instanceof MethodInvocation /* && pattern is hotspot pattern */
+					&& ((MethodInvocation) node).getName().getIdentifier().equals(rec.getPattern().getMethodName())
+					) {
+				foundMatch = true;
+				processHotspot((MethodInvocation)node, rec);
 			}
 		}
 		
-		// TODO if all new patterns are new original methods, then there's no point to search it in all files
-		// because they couldn't have been called there. Ie. here's an opportunity for optimization
+		if (!foundMatch) {
+			LOG.error("Couldn't match node with patterns, node class=" + node.getClass());
+			//throw new UnsupportedStringOpExAtNode("Couldn't match node with patterns", node);
+		}
+	}
+	
+	private void processHotspot(MethodInvocation node, PatternRecord patternRecord) {
+		int argOffset = patternRecord.getPattern().getArgumentNo()-1;
+		NodeDescriptor desc = Crawler2.INSTANCE.evaluate((Expression)node.arguments().get(argOffset));
 		
-		ast.accept(new ASTVisitor() {
-			@Override
-			public boolean visit(MethodInvocation node) {
-				for (PatternRecord pattern : relevantHotspotPatterns) {
-//					if (ASTUtil.invocationCorrespondsToPattern(node, pattern)) {
-//						Expression hotspot = (Expression)node.arguments().get(pattern.getArgumentIndex());
-//						NodeDescriptor descriptor = Crawler2.INSTANCE.evaluate(hotspot);
-//						cache.addHotspot(pattern, descriptor);
-					
-//					}
-					//System.out.println(pattern + " * " + node);
-				}
-				// Don't want to visit children. 
-				// In principle there can be another hotspot in an argument, but
-				// for now I think it doesn't deserve extra computation effort
-				// TODO test how big is the extra computation effort 
-				return false; 
-			}
-			
-//			@Override
-//			public boolean visit(MethodDeclaration node) {
-//				for (PatternRecord pattern : relevantMethodPatterns) {
-////					if (ASTUtil.declarationCorrespondsToPattern(node, pattern)) {
-////						// TODO
-////						// cache.addMethodSummary(pattern, descriptor);
-////					}
-//				}
-//				return false;
-//			}
-		});
+		if (desc instanceof StringNodeDescriptor) {
+			System.out.println(((StringNodeDescriptor)desc).getAbstractValue());
+		}
+		else if (desc instanceof UnsupportedNodeDescriptor) {
+			System.out.println(((UnsupportedNodeDescriptor)desc).getProblemMessage());
+		}
+		else {
+			System.out.println("WHAAAT?");
+		}
 	}
 
+	private void performSearch(Collection<ICompilationUnit> units, SearchPattern pattern, 
+			SearchRequestor requestor) {
+		
+		try {
+			IJavaElement[] elements = units.toArray(new ICompilationUnit[units.size()]);
+			IJavaSearchScope scope = SearchEngine.createJavaSearchScope(elements, IJavaSearchScope.SOURCES);
+			SearchParticipant[] participants = { SearchEngine.getDefaultSearchParticipant()};
+			
+			// TODO do I want to use monitor?
+			searchEngine.search(pattern, participants, scope, requestor, null);
+		}
+		catch (CoreException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	private SearchPattern createCombinedSearchPattern(IJavaProject javaProject,
+			Collection<PatternRecord> patternRecords, int baseBatchNo) {
+		SearchPattern resultPattern = null; 
+		for (PatternRecord rec : patternRecords) {
+			if (rec.getBatchNo() > baseBatchNo) {
+				SearchPattern subPattern = getSearchPattern(javaProject, rec.getPattern());
+				if (subPattern == null) {
+					LOG.error("Hotspot pattern (" + rec.getPattern() + ") is not valid");
+				}
+				else if (resultPattern == null) {
+					resultPattern = subPattern;
+				}
+				else {
+					resultPattern = SearchPattern.createOrPattern(subPattern, resultPattern);
+				}
+			}
+		}
+		return resultPattern;
+	}
+	
+	private Map<Integer, Set<ICompilationUnit>> groupFiles(List<FileRecord> fileRecords) {
+		Map<Integer, Set<ICompilationUnit>> groups = new HashMap<Integer, Set<ICompilationUnit>>();
+		for (FileRecord rec: fileRecords) {
+			Set<ICompilationUnit> set = groups.get(rec.getBatchNo());
+			if (set == null) {
+				set = new HashSet<ICompilationUnit>();
+				groups.put(rec.getBatchNo(), set);
+			}
+			set.add(JavaModelUtil.getCompilationUnitByName(rec.getName()));
+		}
+		
+		return groups;
+	}
+	
+	
 	public void cleanProject(IProject project, IProgressMonitor monitor) {
 		cache.clearProject(project.getName());
 	}
@@ -184,6 +275,80 @@ public class SearchBasedCacheBuilder {
 		} catch (CoreException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	
+	private SearchPattern getSearchPattern(IJavaProject javaProject, HotspotPattern hotspotPattern) {
+		
+		SearchPattern searchPattern = searchPatterns.get(hotspotPattern);
+		if (searchPattern == null) {
+			Collection<IMethod> methods = findHotspotMethods(javaProject,
+					hotspotPattern.getClassName(),
+					hotspotPattern.getMethodName(),
+					hotspotPattern.getArgumentNo());
+			searchPattern = createCombinedMethodReferencePattern(methods);
+			searchPatterns.put(hotspotPattern, searchPattern);
+		}
+		
+		return searchPattern;		
+	}
+	
+	private List<IMethod> findHotspotMethods(IJavaProject javaProject, String className, String methodName, 
+			int stringArgumentNo) {
+		int stringArgIndex = stringArgumentNo-1;
+		try {
+			IType type = javaProject.findType(className);
+			List<IMethod> result = new ArrayList<IMethod>();
+			for (IMethod method: type.getMethods()) {
+				if (method.getElementName().equals(methodName)) {
+					String[] paramTypes = method.getParameterTypes();
+					if (paramTypes.length > stringArgIndex && (
+							paramTypes[stringArgIndex].equals("Ljava.lang.String;")
+							|| paramTypes[stringArgIndex].equals("Qjava.lang.String;")
+							|| paramTypes[stringArgIndex].equals("QString;")
+							)) {
+						result.add(method);
+					}
+				}
+			}
+			return result;
+		} 
+		catch (JavaModelException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	private SearchPattern createCombinedMethodReferencePattern(Collection<IMethod> methods) {
+		SearchPattern combinedPattern = null;
+		for (IMethod method : methods) {
+			SearchPattern pattern = SearchPattern.createPattern(method, IJavaSearchConstants.REFERENCES);
+			if (combinedPattern == null) {
+				combinedPattern = pattern;
+			}
+			else {
+				combinedPattern = SearchPattern.createOrPattern(pattern, combinedPattern);
+			}
+		}
+		
+		return combinedPattern;
+	}
+	
+	
+	private ASTNode getASTNode(SearchMatch match) {
+		
+		assert match.getElement() instanceof IMember;
+		ICompilationUnit unit = ((IMember)match.getElement()).getCompilationUnit();
+		
+		ASTNode ast = astCache.get(unit); 
+		if (ast == null) {
+			ast = ASTUtil.parseCompilationUnit(unit, true);
+			if (astCache.size() > 100) {
+				astCache.clear();
+			}
+			astCache.put(unit, ast);
+		}
+		
+		return NodeFinder.perform(ast, match.getOffset(), match.getLength());
 	}
 
 }

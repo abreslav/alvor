@@ -21,7 +21,6 @@ import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.StringLiteral;
 
 import com.zeroturnaround.alvor.common.NodeDescriptor;
-import com.zeroturnaround.alvor.common.PositionUtil;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
@@ -143,7 +142,8 @@ public class Crawler2 {
 			return evalInfix((InfixExpression)node, context);
 		}
 		else if (node instanceof MethodInvocation) {
-			throw new RuntimeException();
+			return new StringChoice(ASTUtil.getPosition(node));
+//			throw new RuntimeException();
 			// FIXME
 //			return evalInvocationResult((MethodInvocation)node, context);
 		}
@@ -159,7 +159,8 @@ public class Crawler2 {
 		IVariableBinding var = (IVariableBinding)name.resolveBinding();
 		
 		if (var.isField()) {
-			throw new RuntimeException();
+			return new StringChoice(ASTUtil.getPosition(name));
+			//throw new RuntimeException();
 			// FIXME
 //			return evalField(var, context);
 		}
@@ -197,7 +198,8 @@ public class Crawler2 {
 					nip.getIndex());
 		}
 		else if (usage instanceof NameInArgument) {
-			throw new RuntimeException();
+			return new StringChoice(ASTUtil.getPosition(usage.getNode()));
+			//throw new RuntimeException();
 			// FIXME
 //			return evalNameAfterBeingArgument(name, (NameInArgument)usage, context);
 		}

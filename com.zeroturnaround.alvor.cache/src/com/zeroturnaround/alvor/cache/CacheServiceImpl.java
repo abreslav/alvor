@@ -833,7 +833,7 @@ public final class CacheServiceImpl implements ICacheService {
 						"INSERT INTO Hotspots(method, argumentIndex, sourceRange) VALUES (?, ?, ?)"
 				);
 				insert.setInt(1, methodId);
-				insert.setInt(2, pattern.getArgumentIndex());
+				insert.setInt(2, pattern.getArgumentNo());
 				insert.setInt(3, rangeId);
 				
 				insert.executeUpdate();
@@ -869,7 +869,7 @@ public final class CacheServiceImpl implements ICacheService {
 				);
 				query.setString(1, pattern.getClassName());
 				query.setString(2, pattern.getMethodName());
-				query.setInt(3, pattern.getArgumentIndex());
+				query.setInt(3, pattern.getArgumentNo());
 				
 				ResultSet res = query.executeQuery();
 				

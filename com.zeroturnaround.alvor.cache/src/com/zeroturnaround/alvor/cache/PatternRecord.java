@@ -1,32 +1,22 @@
 package com.zeroturnaround.alvor.cache;
 
+import com.zeroturnaround.alvor.common.HotspotPattern;
+
 public class PatternRecord {
-	private final String className;
-	private final String methodName;
-	private final int argumentIndex;
+	private final HotspotPattern pattern;
 	private final int batchNo;
 
-	public PatternRecord(String className, String methodName, int argIndex, 
-			int batchNo) {
-				this.className = className;
-				this.methodName = methodName;
-				this.argumentIndex = argIndex;
+	public PatternRecord(HotspotPattern pattern, int batchNo) {
+				this.pattern = pattern;
 				this.batchNo = batchNo;
-	}
-	
-	public int getArgumentIndex() {
-		return argumentIndex;
 	}
 	
 	public int getBatchNo() {
 		return batchNo;
 	}
 	
-	public String getClassName() {
-		return className;
+	public HotspotPattern getPattern() {
+		return pattern;
 	}
 	
-	public String getMethodName() {
-		return methodName;
-	}
 }

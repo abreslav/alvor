@@ -13,15 +13,12 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
 import com.zeroturnaround.alvor.cache.Cache;
+import com.zeroturnaround.alvor.cache.CacheProvider;
 import com.zeroturnaround.alvor.cache.FileRecord;
 import com.zeroturnaround.alvor.cache.PatternRecord;
-import com.zeroturnaround.alvor.common.HotspotPattern;
-import com.zeroturnaround.alvor.common.NodeDescriptor;
 import com.zeroturnaround.alvor.common.logging.Timer;
 import com.zeroturnaround.alvor.configuration.ConfigurationManager;
 import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
@@ -30,7 +27,11 @@ import com.zeroturnaround.alvor.crawler.util.JavaModelUtil;
 
 public class FullParseCacheBuilder {
 	private static final int MAX_ITERATIONS_UNTIL_FIXPOINT = 1;
-	private static Cache cache = Cache.getInstance();
+	private Cache cache; 
+	
+	public FullParseCacheBuilder() {
+		this.cache = CacheProvider.getCache();
+	}
 	
 	public void fullBuildProject(IProject project, IProgressMonitor monitor) {
 		cleanProject(project, monitor);
