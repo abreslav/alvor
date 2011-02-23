@@ -13,7 +13,7 @@ public class HotspotPattern {
 		this.argumentIndex = argumentIndex;
 	}
 	
-	public int getArgumentIndex() {
+	public int getArgumentNo() {
 		return argumentIndex;
 	}
 	
@@ -39,7 +39,7 @@ public class HotspotPattern {
 	
 	@Override
 	public String toString() {
-		return "Argument " + getArgumentIndex() + " of " + getClassName() + "." +  getMethodName();
+		return "Argument " + getArgumentNo() + " of " + getClassName() + "." +  getMethodName();
 	}
 	
 	@Override

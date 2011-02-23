@@ -1,18 +1,10 @@
 package com.zeroturnaround.alvor.crawler;
 
-import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.junit.Test;
 
 import com.zeroturnaround.alvor.cache.Cache;
-import com.zeroturnaround.alvor.common.NodeDescriptor;
+import com.zeroturnaround.alvor.cache.CacheProvider;
 import com.zeroturnaround.alvor.configuration.ConfigurationManager;
 import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
 import com.zeroturnaround.alvor.crawler.util.JavaModelUtil;
@@ -26,14 +18,15 @@ public class MyCacheBuilderTest {
 			JavaModelUtil.openProject(javaProject);
 			ProjectConfiguration conf = ConfigurationManager
 				.readProjectConfiguration(javaProject.getProject(), true);
-			Cache.getInstance().setProjectPrimaryPatterns(javaProject.getProject().getName(), conf.getHotspotPatterns());
+			CacheProvider.getCache().setProjectPrimaryPatterns(javaProject.getProject().getName(), conf.getHotspotPatterns());
 			
 			
-			FullParseCacheBuilder cb = new FullParseCacheBuilder();
+//			FullParseCacheBuilder cb = new FullParseCacheBuilder();
+			SearchBasedCacheBuilder cb = new SearchBasedCacheBuilder();
 			cb.fullBuildProject(javaProject.getProject(), null);
 		}
 		finally {
-			Cache.shutdownIfAlive();
+			CacheProvider.shutdownCache();
 		}
 		
 //		// check that cache contains correct strings

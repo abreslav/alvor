@@ -8,7 +8,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.common.NodeDescriptor;
@@ -17,29 +19,30 @@ import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.string.AbstractStringCollection;
 import com.zeroturnaround.alvor.string.IAbstractString;
+import com.zeroturnaround.alvor.string.IPosition;
 
 public class Cache {
 	
 	private final static ILog LOG = Logs.getLog(ICacheService.class);
-	private static Cache INSTANCE = null;
 	
-	private static int PATTERN_KIND_HOTSPOT = 1;
-	private static int PATTERN_KIND_STRING_METHOD = 1;
+	private final static int PATTERN_KIND_HOTSPOT = 1;
+	private final static int PATTERN_KIND_STRING_METHOD = 2;
+	
+	private final static int KIND_CONSTANT    = 1;
+	private final static int KIND_CHARSET	    = 2;
+	private final static int KIND_SEQUENCE    = 3;
+	private final static int KIND_CHOICE      = 4;
+	private final static int KIND_APPLICATION = 5;
+	private final static int KIND_REPETITION  = 6;
+	private final static int KIND_UNSUPPORTED = 7;
+	private final static int KIND_PARAMETER   = 8;
 	
 	private DatabaseHelper db;
 	
-	private Cache() {
-		try {
-			Connection conn = this.connect();
-			this.db = new DatabaseHelper(conn);
-			this.checkCreateTables();
-		} catch (SQLException e) {
-			LOG.exception(e);
-			throw new RuntimeException(e);
-		} catch (ClassNotFoundException e) {
-			LOG.exception(e);
-			throw new RuntimeException(e);
-		}
+	private Map<String, Integer> fileIDs = new HashMap<String, Integer>();
+	
+	/*package*/ Cache(DatabaseHelper db) {
+		this.db = db;
 	}
 	
 	public void removeFile(String fileName) {
@@ -99,27 +102,40 @@ public class Cache {
 		}
 	}
 	
-//	private int getProjectId(String projectName) {
-//		return db.queryInt("select id from projects where name = ?", projectName);
-//	}
-
 	private int getOrCreatePatternId(HotspotPattern pattern) {
 
 		Integer id = db.queryMaybeInteger (
 				" select id from patterns where" +
 				" class_name = ? and method_name = ? and argument_index = ?", 
-				pattern.getClassName(), pattern.getMethodName(), pattern.getArgumentIndex());
+				pattern.getClassName(), pattern.getMethodName(), pattern.getArgumentNo());
 
 		if (id != null) {
 			return id;
 		}
 		else {
-			return db.insertAndGetId(
+			// first create pattern record in abstract_strings, this gives pattern_id
+			id = createEmptyChoice(null);
+			
+			// then add actual pattern description into patterns table
+			db.execute (
 					" insert into patterns " +
-					" (class_name, method_name, argument_index, kind) values (?, ?, ?, " +
-					PATTERN_KIND_HOTSPOT + 
-					")",
-					pattern.getClassName(), pattern.getMethodName(), pattern.getArgumentIndex());
+					" (id, class_name, method_name, argument_index, kind) values (?, ?, ?, ?, " +
+					PATTERN_KIND_HOTSPOT + ")",
+					id, pattern.getClassName(), pattern.getMethodName(), pattern.getArgumentNo());
+			
+			return id;
+		}
+	}
+	
+	private int createEmptyChoice(IPosition pos) {
+		if (pos == null) {
+			return db.insertAndGetId("insert into abstract_strings (kind) " +
+					" values (" + KIND_CHOICE + ")");
+		}
+		else {
+			return db.insertAndGetId("insert into abstract_strings (kind, file_id, start, length) " +
+					" values (" + KIND_CHOICE + ", ?, ?, ?)",
+					getFileId(pos.getPath()), pos.getStart(), pos.getLength());
 		}
 	}
 
@@ -146,7 +162,8 @@ public class Cache {
 		List<PatternRecord> result = new ArrayList<PatternRecord>();
 		try {
 			while (rs.next()) {
-				result.add(new PatternRecord(rs.getString(1), rs.getString(2), rs.getInt(3), rs.getInt(4)));
+				HotspotPattern pattern = new HotspotPattern(rs.getString(1), rs.getString(2), rs.getInt(3));
+				result.add(new PatternRecord(pattern, rs.getInt(4)));
 			}
 			return result;
 		}
@@ -167,6 +184,12 @@ public class Cache {
 		// TODO most complex thing
 		// desc should be a choice (???)
 		// creates a choice with information about pattern
+		
+		
+	}
+	
+	private int createAbstractString(IAbstractString str) {
+		return -1;
 	}
 	
 	/**
@@ -180,10 +203,6 @@ public class Cache {
 		
 	}
 	
-	private void addString(IAbstractString str) {
-		
-	}
-
 	private void addCollection(AbstractStringCollection str) {
 		
 	}
@@ -212,57 +231,23 @@ public class Cache {
 		}
 	}
 	
-	private Connection connect() throws SQLException, ClassNotFoundException {
-		Class.forName("org.hsqldb.jdbc.JDBCDriver");
-		String path = AlvorCachePlugin.getDefault().getStateLocation().append("/cache2").toPortableString();
-		String fileUrl = "jdbc:hsqldb:file:" + path + ";shutdown=true";
-		String serverUrl = "jdbc:hsqldb:hsql://localhost/xdb";
-		
-		// if db is locked, then assume that server is running and connect in server mode (this is debugging mode)
-		if (new File(path + ".lck").exists()) {
-			try {
-				return DriverManager.getConnection(serverUrl, "SA", "");
-			} catch (SQLException e) {
-				// Seems that server is not running after all, probably the lock is leftover from a crash
-				// HSQL is now supposed to do some repair on connect
-				return DriverManager.getConnection(fileUrl, "SA", "");
-			}
+	private int getFileId(String name) {
+		// first try faster cache
+		Integer id = fileIDs.get(name);
+		if (id == null) {
+			id = db.queryInt("select from files where name = ?", name);
+			assert id != null; // TODO maybe should just create if doesn't exist ??
+			fileIDs.put(name, id);
 		}
-		else {
-			return DriverManager.getConnection(fileUrl, "SA", "");
-		}
-	}
-	
-	private void checkCreateTables() throws SQLException {
-		assert this.db != null;
-		ResultSet res = db.getConnection().getMetaData().getTables(null, null, "FILES", null);
-		if (!res.next()) {
-			InputStream script = CreateDBHSQL.class.getClassLoader().getResourceAsStream("db/cache_setup.sql");
-			db.runScript(script);
-		}
-	}
-	
-	public static Cache getInstance() {
-		if (Cache.INSTANCE == null) {
-			Cache.INSTANCE = new Cache(); 
-		}
-		return Cache.INSTANCE;
-		
-	}
-	
-	private void shutdown() {
-		try {
-			this.db.getConnection().close(); // TODO
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		} 
-	}
-	
-	public static void shutdownIfAlive() {
-		if (INSTANCE != null) {
-			INSTANCE.shutdown();
-		}
+		return id;
 	}
 
+	/* package */ void shutdown() {
+		try {
+			db.getConnection().close();
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }
 

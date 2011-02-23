@@ -201,7 +201,7 @@ public class NodeSearchEngine {
 				}					
 				
 				// TODO overloading may complicate things 
-				int requestedArgumentIndex = hotspotPattern.getArgumentIndex();
+				int requestedArgumentIndex = hotspotPattern.getArgumentNo();
 				if (arguments.size() < requestedArgumentIndex) {
 					LOG.error("can't find required argument (" + requestedArgumentIndex + "), method="
 							+ methodBinding.getDeclaringClass().getQualifiedName()

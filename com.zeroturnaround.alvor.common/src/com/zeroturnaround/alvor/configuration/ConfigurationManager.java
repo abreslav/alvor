@@ -162,7 +162,7 @@ public class ConfigurationManager {
 			Element node = doc.createElement("hotspot");
 			node.setAttribute("className", hotspot.getClassName());
 			node.setAttribute("methodName", hotspot.getMethodName());
-			node.setAttribute("argumentIndex", String.valueOf(hotspot.getArgumentIndex()));
+			node.setAttribute("argumentIndex", String.valueOf(hotspot.getArgumentNo()));
 			hotspotNodes.appendChild(node);
 		}
 
