@@ -9,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,6 +20,24 @@ public class DatabaseHelper {
 	private final static ILog LOG = Logs.getLog(DatabaseHelper.class);
 	private final Connection conn;
 	private final Map<String, PreparedStatement> preparedStatments = new HashMap<String, PreparedStatement>();
+	
+	public static Integer encodeNull(Integer value) {
+		if (value == null) {
+			return Integer.MAX_VALUE;
+		}
+		else {
+			return value;
+		}
+	}
+
+	public static String encodeNull(String value) {
+		if (value == null) {
+			return "";
+		}
+		else {
+			return value;
+		}
+	}
 
 
 	public DatabaseHelper(Connection conn) {
@@ -41,10 +60,20 @@ public class DatabaseHelper {
 			int i = 1;
 			for (Object o : arguments) {
 				if (o instanceof String) {
-					stmt.setString(i, (String) o);
+					if (o.equals("")) {
+						stmt.setNull(i, Types.VARCHAR);
+					}
+					else {
+						stmt.setString(i, (String) o);
+					}
 				}
 				else if (o instanceof Integer) {
-					stmt.setInt(i, (Integer)o);
+					if (o.equals(Integer.MAX_VALUE)) {
+						stmt.setNull(i, Types.INTEGER);
+					}
+					else {
+						stmt.setInt(i, (Integer)o);
+					}
 				}
 				else {
 					throw new IllegalArgumentException("Unkown argument type: " + o.getClass().getName());

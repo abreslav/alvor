@@ -1,61 +1,18 @@
 package com.zeroturnaround.alvor.common;
 
 
-
-public class HotspotPattern {
-	private int argumentIndex;
-	private String methodName;
-	private String className;
+// could be called also ArgumentPattern
+public class HotspotPattern extends StringPattern {
 
 	public HotspotPattern(String className, String methodName, int argumentIndex) {
-		this.className = className;
-		this.methodName = methodName;
-		this.argumentIndex = argumentIndex;
+		super(className, methodName, argumentIndex);
 	}
 	
-	public int getArgumentNo() {
-		return argumentIndex;
+	public boolean equals(Object obj) {
+		return super.equals(obj) && obj instanceof HotspotPattern;
 	}
-	
-	public String getClassName() {
-		return className;
-	}
-	
-	public String getMethodName() {
-		return methodName;
-	}
-	
-	public void setClassName(String className) {
-		this.className = className;
-	}
-	
-	public void setMethodName(String methodName) {
-		this.methodName = methodName;
-	}
-	
-	public void setArgumentIndex(int argumentIndex) {
-		this.argumentIndex = argumentIndex;
-	}
-	
-	@Override
-	public String toString() {
-		return "Argument " + getArgumentNo() + " of " + getClassName() + "." +  getMethodName();
-	}
-	
 	@Override
 	public int hashCode() {
-		int result = 22;
-		result = result * 31 + className.hashCode();
-		result = result * 31 + methodName.hashCode();
-		result = result * 31 + argumentIndex;
-		return result;
-	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		return this == obj 
-		|| obj != null 
-		   && obj instanceof HotspotPattern 
-		   && this.hashCode() == obj.hashCode();
+		return super.hashCode() + HotspotPattern.class.hashCode();
 	}
 }

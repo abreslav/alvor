@@ -46,6 +46,14 @@ public class StringCharacterSet extends PositionedString {
 	public Set<Character> getContents() {
 		return Collections.unmodifiableSet(set);
 	}
+	
+	public String getContentsAsString() {
+		StringBuilder b = new StringBuilder();
+		for (Character character : getContents()) {
+			b.append(character);
+		}
+		return b.toString();
+	}
 
 	public String toString() {
 		StringBuilder stringBuilder = new StringBuilder("[");
