@@ -22,17 +22,16 @@ CREATE TABLE abstract_strings
 	2 - char set(str_value = contents)
 	3 - sequence
 	4 - choice (can be hotspot pattern or function)
-	5 - application (child is argument, int_value is function_id) 
+	5 - application (children are arguments, int_value is function_id) 
 	6 - repetition (child is repetition body) 
 	7 - unsupported(str_value = message)
-	8 - parameter (used inside functions)
+	8 - parameter (used inside functions, item_index shows which parameter)
 	*/
 	kind TINYINT NOT NULL, 
 	parent_id integer default null references abstract_strings(id) on delete cascade,
 	item_index TINYINT default null, /* used in children of sequence (or choice?) */
 	int_value INTEGER DEFAULT NULL,
 	str_value LONGVARCHAR DEFAULT NULL,
-	str_value2 LONGVARCHAR DEFAULT NULL,
 	file_id INTEGER default null REFERENCES files(id) ON DELETE CASCADE,
 	start INTEGER default null,
 	length INTEGER default null

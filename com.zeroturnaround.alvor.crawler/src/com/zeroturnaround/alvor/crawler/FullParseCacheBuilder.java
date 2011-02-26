@@ -74,7 +74,7 @@ public class FullParseCacheBuilder {
 	
 	public void updateProjectPrimaryPatterns(IProject project) {
 		ProjectConfiguration conf = ConfigurationManager.readProjectConfiguration(project, true);
-		cache.setProjectPrimaryPatterns(project.getName(), conf.getHotspotPatterns());
+		//cache.setProjectPrimaryPatterns(project.getName(), conf.getHotspotPatterns());
 	}
 	
 	private void updateProjectCache(IProject project, IProgressMonitor monitor) {

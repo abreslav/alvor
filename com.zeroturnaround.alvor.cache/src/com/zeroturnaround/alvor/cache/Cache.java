@@ -1,9 +1,5 @@
 package com.zeroturnaround.alvor.cache;
 
-import java.io.File;
-import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -13,13 +9,22 @@ import java.util.List;
 import java.util.Map;
 
 import com.zeroturnaround.alvor.common.HotspotPattern;
+import com.zeroturnaround.alvor.common.FunctionPattern;
 import com.zeroturnaround.alvor.common.NodeDescriptor;
+import com.zeroturnaround.alvor.common.StringNodeDescriptor;
+import com.zeroturnaround.alvor.common.StringPattern;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.string.AbstractStringCollection;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.IPosition;
+import com.zeroturnaround.alvor.string.StringCharacterSet;
+import com.zeroturnaround.alvor.string.StringChoice;
+import com.zeroturnaround.alvor.string.StringConstant;
+import com.zeroturnaround.alvor.string.StringParameter;
+import com.zeroturnaround.alvor.string.StringRepetition;
+import com.zeroturnaround.alvor.string.StringSequence;
 
 public class Cache {
 	
@@ -28,15 +33,16 @@ public class Cache {
 	private final static int PATTERN_KIND_HOTSPOT = 1;
 	private final static int PATTERN_KIND_STRING_METHOD = 2;
 	
-	private final static int KIND_CONSTANT    = 1;
-	private final static int KIND_CHARSET	    = 2;
-	private final static int KIND_SEQUENCE    = 3;
-	private final static int KIND_CHOICE      = 4;
-	private final static int KIND_APPLICATION = 5;
-	private final static int KIND_REPETITION  = 6;
-	private final static int KIND_UNSUPPORTED = 7;
-	private final static int KIND_PARAMETER   = 8;
-	
+	private interface StringKind {
+		public final static int CONSTANT    = 1;
+		public final static int CHARSET	    = 2;
+		public final static int SEQUENCE    = 3;
+		public final static int CHOICE      = 4;
+		public final static int APPLICATION = 5;
+		public final static int REPETITION  = 6;
+		public final static int UNSUPPORTED = 7;
+		public final static int PARAMETER   = 8;
+	}	
 	private DatabaseHelper db;
 	
 	private Map<String, Integer> fileIDs = new HashMap<String, Integer>();
@@ -92,7 +98,7 @@ public class Cache {
 		// FIXME delete only primary patterns. Or clean everything???
 		db.execute("delete from project_patterns where project_name = ?", projectName);
 		
-		for (HotspotPattern pattern : patterns) {
+		for (StringPattern pattern : patterns) {
 			int patternId = getOrCreatePatternId(pattern);
 			db.execute (
 					" insert into project_patterns " +
@@ -102,7 +108,7 @@ public class Cache {
 		}
 	}
 	
-	private int getOrCreatePatternId(HotspotPattern pattern) {
+	private int getOrCreatePatternId(StringPattern pattern) {
 
 		Integer id = db.queryMaybeInteger (
 				" select id from patterns where" +
@@ -130,11 +136,11 @@ public class Cache {
 	private int createEmptyChoice(IPosition pos) {
 		if (pos == null) {
 			return db.insertAndGetId("insert into abstract_strings (kind) " +
-					" values (" + KIND_CHOICE + ")");
+					" values (" + StringKind.CHOICE + ")");
 		}
 		else {
 			return db.insertAndGetId("insert into abstract_strings (kind, file_id, start, length) " +
-					" values (" + KIND_CHOICE + ", ?, ?, ?)",
+					" values (" + StringKind.CHOICE + ", ?, ?, ?)",
 					getFileId(pos.getPath()), pos.getStart(), pos.getLength());
 		}
 	}
@@ -149,7 +155,9 @@ public class Cache {
 				" from files where name like '/' || ? || '/%'", projectName);
 		
 		ResultSet rs = db.query(
-				" select p.class_name," +
+				" select p.id," +
+				"        p.kind," +
+				"        p.class_name," +
 				" 		 p.method_name," +
 				"        p.argument_index," +
 				"        pp.batch_no" +
@@ -162,8 +170,19 @@ public class Cache {
 		List<PatternRecord> result = new ArrayList<PatternRecord>();
 		try {
 			while (rs.next()) {
-				HotspotPattern pattern = new HotspotPattern(rs.getString(1), rs.getString(2), rs.getInt(3));
-				result.add(new PatternRecord(pattern, rs.getInt(4)));
+				StringPattern pattern;
+				if (rs.getInt("kind") == PATTERN_KIND_HOTSPOT) {
+					pattern = new HotspotPattern(rs.getString("class_name"), 
+						rs.getString("method_name"), rs.getInt("argument_index"));
+				} 
+				else if (rs.getInt("kind") == PATTERN_KIND_STRING_METHOD) {
+					pattern = new FunctionPattern(rs.getString("class_name"), 
+							rs.getString("method_name"), rs.getInt("argument_index"));
+				}
+				else {
+					throw new IllegalArgumentException();
+				}
+				result.add(new PatternRecord(pattern, rs.getInt("batch_no"), rs.getInt("id")));
 			}
 			return result;
 		}
@@ -181,15 +200,97 @@ public class Cache {
 	}
 	
 	public void addHotspot(PatternRecord pattern, NodeDescriptor desc) {
-		// TODO most complex thing
-		// desc should be a choice (???)
-		// creates a choice with information about pattern
-		
-		
+		if (desc instanceof StringNodeDescriptor) {
+			addAbstractString(((StringNodeDescriptor) desc).getAbstractValue(), pattern.getId(), null);
+		}
+		else if (desc instanceof UnsupportedNodeDescriptor) {
+			addUnsupported(((UnsupportedNodeDescriptor) desc).getProblemMessage(),
+					desc.getPosition(),
+					pattern.getId());
+		}
+		else {
+			throw new IllegalArgumentException();
+		}
 	}
 	
-	private int createAbstractString(IAbstractString str) {
-		return -1;
+	private int addAbstractString(IAbstractString str, Integer parentId, Integer itemIndex) {
+		if (str instanceof StringConstant) {
+			return addAbstractStringRecord(StringKind.CONSTANT, parentId, itemIndex, null, 
+					((StringConstant) str).getEscapedValue(), str.getPosition());
+		}
+		else if (str instanceof StringCharacterSet) {
+			return addAbstractStringRecord(StringKind.CHARSET, parentId, itemIndex, null, 
+					((StringCharacterSet) str).getContentsAsString(), str.getPosition());
+		}
+		else if (str instanceof StringParameter) {
+			return addAbstractStringRecord(StringKind.PARAMETER, parentId, itemIndex, null, 
+					null, str.getPosition());
+		}
+		else if (str instanceof StringRepetition) {
+			int id = addAbstractStringRecord(StringKind.REPETITION, parentId, itemIndex, null, 
+					null, str.getPosition());
+			addAbstractString(((StringRepetition) str).getBody(), id, null); 
+			return id;
+		}
+//		else if (TODO pattern) {
+//			
+//		}
+		else if (str instanceof AbstractStringCollection) {
+			return addStringCollection((AbstractStringCollection)str, parentId, itemIndex); 
+		}
+		else {
+			throw new IllegalArgumentException("Unexpected IAbstractString: " + str.getClass());
+		}
+	}
+	
+	private int addStringCollection(AbstractStringCollection str,
+			Integer parentId, Integer itemIndex) {
+		
+		int kind = (str instanceof StringSequence) ? StringKind.SEQUENCE : StringKind.CHOICE; 
+		int id = addAbstractStringRecord(kind, parentId, itemIndex, null, null, str.getPosition());
+		
+		int childIndex = 1;
+		for (IAbstractString child: str.getItems()) {
+			addAbstractString(child, id, childIndex);
+			childIndex++;
+		}
+		
+		return id;
+	}
+
+	private int addUnsupported(String msg, IPosition pos, Integer parentId) {
+		assert parentId != null;
+		return addAbstractStringRecord(StringKind.UNSUPPORTED, parentId,
+				null, null, msg, pos);
+	}
+	
+	private int addAbstractStringRecord(int kind, Integer parentId, 
+			Integer itemIndex, Integer intValue,
+			String strValue, IPosition pos) {
+		
+		
+		Integer fileId = null;
+		Integer start = null;
+		Integer length = null;
+		if (pos != null) {
+			fileId = getFileId(pos.getPath());
+			start = pos.getStart();
+			length = pos.getLength();
+		}
+		
+		return db.insertAndGetId(
+				"insert into abstracts_strings (kind, parent_id, " +
+				" item_index, int_value, str_value, " +
+				" file_id, start, length) " +
+				" values (?, ?, ?, ?, ?, ?, ?, ?)", 
+				kind,
+				DatabaseHelper.encodeNull(parentId),
+				DatabaseHelper.encodeNull(itemIndex),
+				DatabaseHelper.encodeNull(intValue),
+				DatabaseHelper.encodeNull(strValue),
+				DatabaseHelper.encodeNull(fileId),
+				DatabaseHelper.encodeNull(start),
+				DatabaseHelper.encodeNull(length));
 	}
 	
 	/**

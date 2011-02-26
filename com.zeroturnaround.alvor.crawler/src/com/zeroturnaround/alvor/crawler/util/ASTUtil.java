@@ -548,9 +548,9 @@ public class ASTUtil {
 		return PositionUtil.getFileString(file);
 	}
 
-	public static boolean invocationCorrespondsToPattern(MethodInvocation node,
-			HotspotPattern pattern) {
-		// TODO
-		return false;
-	}
+//	public static boolean invocationCorrespondsToPattern(MethodInvocation node,
+//			HotspotPattern pattern) {
+//		// TODO
+//		return false;
+//	}
 }

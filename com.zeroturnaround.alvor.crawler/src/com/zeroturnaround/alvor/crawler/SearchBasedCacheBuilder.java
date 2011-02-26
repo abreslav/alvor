@@ -40,8 +40,10 @@ import com.zeroturnaround.alvor.cache.CacheProvider;
 import com.zeroturnaround.alvor.cache.FileRecord;
 import com.zeroturnaround.alvor.cache.PatternRecord;
 import com.zeroturnaround.alvor.common.HotspotPattern;
+import com.zeroturnaround.alvor.common.FunctionPattern;
 import com.zeroturnaround.alvor.common.NodeDescriptor;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
+import com.zeroturnaround.alvor.common.StringPattern;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
@@ -62,7 +64,7 @@ import com.zeroturnaround.alvor.crawler.util.JavaModelUtil;
 public class SearchBasedCacheBuilder {
 	private static final ILog LOG = Logs.getLog(SearchBasedCacheBuilder.class);
 	private static final int MAX_ITERATIONS_FOR_FINDING_FIXPOINT = 1;
-	private Map<HotspotPattern, SearchPattern> searchPatterns = new HashMap<HotspotPattern, SearchPattern>();
+	private Map<StringPattern, SearchPattern> searchPatterns = new HashMap<StringPattern, SearchPattern>();
 	private SearchEngine searchEngine = new SearchEngine();
 	private Map<ICompilationUnit, ASTNode> astCache = new WeakHashMap<ICompilationUnit, ASTNode>();
 	private Cache cache; 
@@ -196,6 +198,8 @@ public class SearchBasedCacheBuilder {
 		int argOffset = patternRecord.getPattern().getArgumentNo()-1;
 		NodeDescriptor desc = Crawler2.INSTANCE.evaluate((Expression)node.arguments().get(argOffset));
 		
+		cache.addHotspot(patternRecord, desc);
+		
 		if (desc instanceof StringNodeDescriptor) {
 			System.out.println(((StringNodeDescriptor)desc).getAbstractValue());
 		}
@@ -278,16 +282,22 @@ public class SearchBasedCacheBuilder {
 	}
 	
 	
-	private SearchPattern getSearchPattern(IJavaProject javaProject, HotspotPattern hotspotPattern) {
+	private SearchPattern getSearchPattern(IJavaProject javaProject, StringPattern stringPattern) {
 		
-		SearchPattern searchPattern = searchPatterns.get(hotspotPattern);
+		SearchPattern searchPattern = searchPatterns.get(stringPattern);
 		if (searchPattern == null) {
-			Collection<IMethod> methods = findHotspotMethods(javaProject,
-					hotspotPattern.getClassName(),
-					hotspotPattern.getMethodName(),
-					hotspotPattern.getArgumentNo());
-			searchPattern = createCombinedMethodReferencePattern(methods);
-			searchPatterns.put(hotspotPattern, searchPattern);
+			
+			if (stringPattern instanceof HotspotPattern) {
+				Collection<IMethod> methods = findHotspotMethods(javaProject,
+						stringPattern.getClassName(),
+						stringPattern.getMethodName(),
+						stringPattern.getArgumentNo());
+				searchPattern = createCombinedMethodReferencePattern(methods);
+			}
+			else if (stringPattern instanceof FunctionPattern) {
+				throw new IllegalStateException("What now?"); // TODO
+			}
+			searchPatterns.put(stringPattern, searchPattern);
 		}
 		
 		return searchPattern;		
