@@ -1,7 +1,10 @@
 package com.zeroturnaround.alvor.crawler;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -19,7 +22,9 @@ import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.NullLiteral;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.StringLiteral;
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
+import com.zeroturnaround.alvor.common.FunctionPatternReference;
 import com.zeroturnaround.alvor.common.NodeDescriptor;
 import com.zeroturnaround.alvor.common.HotspotPatternReference;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
@@ -28,6 +33,7 @@ import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.crawler.util.ASTUtil;
+import com.zeroturnaround.alvor.crawler.util.JavaModelUtil;
 import com.zeroturnaround.alvor.crawler.util.UnsupportedStringOpExAtNode;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.IPosition;
@@ -36,6 +42,7 @@ import com.zeroturnaround.alvor.string.StringConstant;
 import com.zeroturnaround.alvor.string.StringRandomInteger;
 import com.zeroturnaround.alvor.string.StringRecursion;
 import com.zeroturnaround.alvor.string.StringSequence;
+import com.zeroturnaround.alvor.string.util.ArgumentApplier;
 import com.zeroturnaround.alvor.tracker.NameAssignment;
 import com.zeroturnaround.alvor.tracker.NameInArgument;
 import com.zeroturnaround.alvor.tracker.NameInMethodCallExpression;
@@ -46,8 +53,9 @@ import com.zeroturnaround.alvor.tracker.VariableTracker;
 
 public class Crawler2 {
 	private static final ILog LOG = Logs.getLog(Crawler2.class);
-	private static boolean optimizeChoice = true;
-	public static Crawler2 INSTANCE = new Crawler2();
+	private static boolean optimizeChoice = false;
+	
+	public final static Crawler2 INSTANCE = new Crawler2();
 	
 	public NodeDescriptor evaluate(Expression node) {
 		try {
@@ -143,10 +151,7 @@ public class Crawler2 {
 			return evalInfix((InfixExpression)node, context);
 		}
 		else if (node instanceof MethodInvocation) {
-			return new StringChoice(ASTUtil.getPosition(node));
-//			throw new RuntimeException();
-			// FIXME
-//			return evalInvocationResult((MethodInvocation)node, context);
+			return evalInvocationResult((MethodInvocation)node, context);
 		}
 		else if (node instanceof ClassInstanceCreation) {
 			return evalClassInstanceCreation((ClassInstanceCreation)node, context);
@@ -156,6 +161,65 @@ public class Crawler2 {
 		}
 	}
 	
+
+	private IAbstractString evalInvocationResult(MethodInvocation inv, ContextLink context) {
+		
+		// First handle special methods
+		if (inv.getExpression() != null
+				&& ASTUtil.isStringOrStringBuilderOrBuffer(inv.getExpression().resolveTypeBinding())) {
+			if (inv.getName().getIdentifier().equals("toString")) {
+				return eval(inv.getExpression(), new ContextLink(inv, context));
+			}
+			else if (inv.getName().getIdentifier().equals("append")) {
+				return new StringSequence(
+						ASTUtil.getPosition(inv), 
+						eval(inv.getExpression(), new ContextLink(inv, context)),
+						eval((Expression)inv.arguments().get(0), new ContextLink(inv, context)));
+			}
+			else if (inv.getName().getIdentifier().equals("valueOf")) {
+				assert (ASTUtil.isString(inv.getExpression().resolveTypeBinding()));
+				return eval((Expression)inv.arguments().get(0), new ContextLink(inv, context));
+			}
+			else {
+				throw new UnsupportedStringOpExAtNode("String/Builder/Buffer, method=" 
+						+ inv.getName().getIdentifier(), inv); 
+			}
+		}
+		if (inv.getExpression() != null
+				&& ASTUtil.isIntegral(inv.getExpression().resolveTypeBinding())
+				&& inv.getName().getIdentifier().equals("toString")) {
+			return new StringRandomInteger(ASTUtil.getPosition(inv));
+		}
+		
+		// handle as general method
+		else  {
+			return evalInvocationResultOrArgOut(inv, -1, context);
+		}			
+	}
+	
+	private IAbstractString evalInvocationResultOrArgOut(MethodInvocation inv,
+			int resultArgumentIndex, ContextLink context) {
+		
+		// TODO need to handle overloading
+		String className = inv.resolveMethodBinding().getDeclaringClass().getQualifiedName();
+		String methodName = inv.getName().getIdentifier();
+		
+		// evaluate arguments
+		Map<Integer, IAbstractString> inputArguments = new HashMap<Integer, IAbstractString>();
+		
+		for (int i = 0; i < inv.arguments().size(); i++) {
+			Expression arg = (Expression)inv.arguments().get(i);
+			ITypeBinding typ = arg.resolveTypeBinding();
+			if (ASTUtil.isStringOrStringBuilderOrBuffer(typ)) {
+				// using 1-based indexing
+				inputArguments.put(i+1, this.eval(arg, new ContextLink(inv, context)));
+			}
+		}
+		
+		return new FunctionPatternReference(ASTUtil.getPosition(inv), 
+				className, methodName, resultArgumentIndex, inputArguments);
+	}
+
 	private IAbstractString evalName(Name name, ContextLink context) {
 		IVariableBinding var = (IVariableBinding)name.resolveBinding();
 		
@@ -357,5 +421,8 @@ public class Crawler2 {
 			}
 		}
 	}
-
+	
+	
 }
+
+

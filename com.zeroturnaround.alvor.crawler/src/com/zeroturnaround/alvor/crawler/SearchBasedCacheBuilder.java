@@ -63,7 +63,7 @@ import com.zeroturnaround.alvor.crawler.util.JavaModelUtil;
 
 public class SearchBasedCacheBuilder {
 	private static final ILog LOG = Logs.getLog(SearchBasedCacheBuilder.class);
-	private static final int MAX_ITERATIONS_FOR_FINDING_FIXPOINT = 3;
+	private static final int MAX_ITERATIONS_FOR_FINDING_FIXPOINT = 5;
 	private Map<StringPattern, SearchPattern> searchPatterns = new HashMap<StringPattern, SearchPattern>();
 	private SearchEngine searchEngine = new SearchEngine();
 	private Map<ICompilationUnit, ASTNode> astCache = new WeakHashMap<ICompilationUnit, ASTNode>();

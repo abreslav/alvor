@@ -18,7 +18,7 @@ CREATE TABLE abstract_strings
 (
 	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 	/* Kind:
-	1 - constant(str_value = escaped value)
+	1 - constant(str_value = value, str_value2 = escaped value)
 	2 - char set(str_value = contents)
 	3 - sequence
 	4 - choice (can represent branches, hotspot options or function implementation options)
@@ -38,6 +38,7 @@ CREATE TABLE abstract_strings
 	item_index TINYINT default null, /* used in children of sequence, choice and application */
 	int_value INTEGER DEFAULT NULL,
 	str_value LONGVARCHAR DEFAULT NULL,
+	str_value2 LONGVARCHAR DEFAULT NULL,
 	file_id INTEGER default null REFERENCES files(id) ON DELETE CASCADE,
 	start INTEGER default null,
 	length INTEGER default null
