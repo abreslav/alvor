@@ -41,7 +41,7 @@ public class PatternReference extends PositionedString {
 
 	@Override
 	public boolean containsRecursion() {
-		throw new IllegalStateException();
+		return false;
 	}
 	
 }

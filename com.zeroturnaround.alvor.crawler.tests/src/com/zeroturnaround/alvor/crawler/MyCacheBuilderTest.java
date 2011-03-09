@@ -1,9 +1,13 @@
 package com.zeroturnaround.alvor.crawler;
 
+import java.util.List;
+
 import org.eclipse.jdt.core.IJavaProject;
 import org.junit.Test;
 
 import com.zeroturnaround.alvor.cache.CacheProvider;
+import com.zeroturnaround.alvor.common.NodeDescriptor;
+import com.zeroturnaround.alvor.common.logging.Timer;
 import com.zeroturnaround.alvor.configuration.ConfigurationManager;
 import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
 import com.zeroturnaround.alvor.crawler.util.JavaModelUtil;
@@ -13,7 +17,9 @@ public class MyCacheBuilderTest {
 	@Test
 	public void cleanBuildProjectCache() {
 		try {
-			IJavaProject javaProject = JavaModelUtil.getJavaProjectByName("earved");
+			String projectName = "earved";
+			
+			IJavaProject javaProject = JavaModelUtil.getJavaProjectByName(projectName);
 			JavaModelUtil.openProject(javaProject);
 			ProjectConfiguration conf = ConfigurationManager
 				.readProjectConfiguration(javaProject.getProject(), true);
@@ -23,6 +29,16 @@ public class MyCacheBuilderTest {
 //			FullParseCacheBuilder cb = new FullParseCacheBuilder();
 			SearchBasedCacheBuilder cb = new SearchBasedCacheBuilder();
 			cb.fullBuildProject(javaProject.getProject(), null);
+			
+			
+			Timer backTimer = new Timer("Back");
+			CacheProvider.getCache().printQueryCount();
+			List<NodeDescriptor> result = CacheProvider.getCache().getProjectHotspots(projectName);
+			for (NodeDescriptor desc : result) {
+				System.out.println("RES: " + desc);
+			}
+			backTimer.printTime();
+			CacheProvider.getCache().printQueryCount();
 		}
 		finally {
 			CacheProvider.shutdownCache();

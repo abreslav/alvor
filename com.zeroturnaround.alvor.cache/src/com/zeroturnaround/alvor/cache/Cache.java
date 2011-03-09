@@ -18,12 +18,16 @@ import com.zeroturnaround.alvor.common.PositionUtil;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.StringPattern;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
+import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.string.AbstractStringCollection;
+import com.zeroturnaround.alvor.string.DummyPosition;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.IPosition;
+import com.zeroturnaround.alvor.string.Position;
 import com.zeroturnaround.alvor.string.StringCharacterSet;
+import com.zeroturnaround.alvor.string.StringChoice;
 import com.zeroturnaround.alvor.string.StringConstant;
 import com.zeroturnaround.alvor.string.StringParameter;
 import com.zeroturnaround.alvor.string.StringRepetition;
@@ -78,6 +82,40 @@ public class Cache {
 				" (select id from files where name = ?)", fileName);
 	}
 	
+	public List<NodeDescriptor> getProjectHotspots(String projectName) {
+		try {
+			List<NodeDescriptor> result = new ArrayList<NodeDescriptor>();
+			
+			// query all strings from this project that are children 
+			// of this project's primary patterns
+			ResultSet rs = db.query(
+					" select s.*, f.name as name" +
+					" from files f" +
+					" join abstract_strings s on s.file_id = f.id" +
+					" join project_patterns pp on pp.project_name = ? and pp.pattern_id = s.parent_id " +
+					" where f.name like '/' || ? || '/%'" +
+					" and pp.pattern_role = " + PATTERN_ROLE_PRIMARY, 
+					projectName, projectName);
+			
+			
+			while (rs.next()) {
+				try {
+					IAbstractString str = createAbstractString(rs);
+					result.add(new StringNodeDescriptor(str.getPosition(), str));
+				} catch (UnsupportedStringOpEx e) {
+					result.add(new UnsupportedNodeDescriptor(createPosition(rs), 
+							e.getMessage(), e.getPosition()));
+				}
+			}
+			
+			return result;
+			
+		} 
+		catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 	public List<FileRecord> getFilesToUpdate(String projectName) {
 		ResultSet rs = db.query (
 				" select f.id, f.name, f.batch_no" +
@@ -110,7 +148,7 @@ public class Cache {
 		
 		for (StringPattern pattern : patterns) {
 			int kind = getPatternKind(pattern);
-			int patternId = getOrCreatePatternId(kind, pattern.getClassName(), 
+			int patternId = getPatternId(kind, pattern.getClassName(), 
 					pattern.getMethodName(), pattern.getArgumentNo());
 			registerPatternForProject(patternId, projectName, PATTERN_ROLE_PRIMARY);
 		}
@@ -186,20 +224,124 @@ public class Cache {
 		}
 	}
 	
+	private IAbstractString createAbstractString(ResultSet rs) {
+		try {
+			int kind = rs.getInt("kind");
+			
+			switch (kind) {
+			case StringKind.CONSTANT: 
+				return new StringConstant(createPosition(rs), rs.getString("str_value"), rs.getString("str_value2"));
+			case StringKind.CHARSET: 
+				return new StringCharacterSet(createPosition(rs), rs.getString("str_value"));
+			case StringKind.SEQUENCE: return createStringCollection(rs, kind);
+			case StringKind.CHOICE: return createStringCollection(rs, kind);
+			case StringKind.FUNCTION_REF: return createStringFromFunctionRef(rs);
+			case StringKind.HOTSPOT_REF: return createStringFromHotspotRef(rs);
+			case StringKind.REPETITION: return createStringRepetition(rs);
+			case StringKind.PARAMETER: return new StringParameter(rs.getInt("int_value"));
+			case StringKind.UNSUPPORTED: throw new UnsupportedStringOpEx(rs.getString("str_value"), createPosition(rs));
+			default: throw new IllegalArgumentException();
+			}
+		}
+		catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	private IAbstractString createStringFromFunctionRef(ResultSet rs) {
+		 // TODO
+		throw new UnsupportedStringOpEx("TODO", createPosition(rs));
+	}
+
+	private IAbstractString createStringFromHotspotRef(ResultSet rs) {
+		 // TODO
+		throw new UnsupportedStringOpEx("TODO", createPosition(rs));
+	}
+
+	private IAbstractString createStringRepetition(ResultSet rs) {
+		try {
+			ResultSet bodyRs = db.query(
+					" select s.*, f.name " +
+					" from abstract_strings s" +
+					" join files f on f.id = s.file_id" +
+					" where s.parent_id = ?" , rs.getInt("id"));
+			
+			boolean found = bodyRs.next();
+			assert found;
+			
+			IAbstractString body = createAbstractString(bodyRs);
+			
+			// check that only one row was found
+			found = bodyRs.next();
+			assert !found;
+			
+			return new StringRepetition(createPosition(rs), body);
+		} 
+		catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private IAbstractString createStringCollection(ResultSet rs, int kind) {
+		try {
+			ResultSet childrenRs = db.query(
+					" select s.*, f.name " +
+					" from abstract_strings s" +
+					" join files f on f.id = s.file_id" +
+					" where s.parent_id = ?" +
+					" order by s.item_index asc", rs.getInt("id"));
+			
+			List<IAbstractString> children = new ArrayList<IAbstractString>();
+			while (childrenRs.next()) {
+				children.add(createAbstractString(childrenRs));
+			}
+			
+			if (kind == StringKind.SEQUENCE) {
+				return new StringSequence(createPosition(rs), children);
+			}
+			else if (kind == StringKind.CHOICE) {
+				return new StringChoice(createPosition(rs), children);
+			}
+			else {
+				throw new IllegalArgumentException();
+			}
+		} 
+		catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private IPosition createPosition(ResultSet rs) {
+		try {
+			String fileName = rs.getString("name");
+			if (rs.wasNull()) {
+				return null;
+			}
+			else {
+				return new Position(fileName, rs.getInt("start"), rs.getInt("length"));
+			}
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 	private int addAbstractString(IAbstractString str, Integer parentId, Integer itemIndex,
 			String projectName) {
 		if (str instanceof StringConstant) {
+			StringConstant cnst = (StringConstant)str;
+			assert cnst.getEscapedValue() != null;
+			assert cnst.getConstant() != null;
 			return addAbstractStringRecord(StringKind.CONSTANT, parentId, itemIndex, null, 
-					((StringConstant) str).getEscapedValue(), str.getPosition());
+					cnst.getConstant(), cnst.getEscapedValue(), str.getPosition());
 		}
 		else if (str instanceof StringCharacterSet) {
 			return addAbstractStringRecord(StringKind.CHARSET, parentId, itemIndex, null, 
-					((StringCharacterSet) str).getContentsAsString(), str.getPosition());
+					((StringCharacterSet) str).getContentsAsString(), null, str.getPosition());
 		}
 		else if (str instanceof StringParameter) {
 			return addAbstractStringRecord(StringKind.PARAMETER, parentId, itemIndex,
 					((StringParameter)str).getIndex(), 
-					null, str.getPosition());
+					null, null, str.getPosition());
 		}
 		else if (str instanceof StringRepetition) {
 			return addRepetition((StringRepetition)str, parentId, itemIndex, projectName);
@@ -218,7 +360,7 @@ public class Cache {
 	private int addRepetition(StringRepetition str, Integer parentId, Integer itemIndex, String projectName) {
 		
 		int id = addAbstractStringRecord(StringKind.REPETITION, parentId, itemIndex, 
-				null, null, str.getPosition());
+				null, null, null, str.getPosition());
 		addAbstractString(str.getBody(), id, null, projectName); 
 		return id;
 	}
@@ -227,7 +369,7 @@ public class Cache {
 		
 		// prepare pattern and project_pattern (if they don't exist yet)
 		int patternKind = getPatternKind(str);
-		int patternId = getOrCreatePatternId(patternKind, str.getClassName(), 
+		int patternId = getPatternId(patternKind, str.getClassName(), 
 				str.getMethodName(), str.getArgumentIndex());
 		registerPatternForProject(patternId, projectName, PATTERN_ROLE_SECONDARY);
 		
@@ -235,14 +377,24 @@ public class Cache {
 		int recKind = (patternKind == PATTERN_KIND_FUNCTION) 
 			? StringKind.FUNCTION_REF : StringKind.HOTSPOT_REF;
 		
-		return addAbstractStringRecord(recKind, parentId, itemIndex, patternId, null, str.getPosition());
+		int id = addAbstractStringRecord(recKind, parentId, itemIndex, patternId, null, null, str.getPosition());
+		
+		// more work for FunctionReference: add each argument
+		if (str instanceof FunctionPatternReference) {
+			FunctionPatternReference fpr = (FunctionPatternReference)str;
+			for (Map.Entry<Integer, IAbstractString> entry : fpr.getInputArguments().entrySet()) {
+				addAbstractString(entry.getValue(), id, entry.getKey(), projectName);
+			}
+		}
+		
+		return id;
 	}
 
 	private int addStringCollection(AbstractStringCollection str,
 			Integer parentId, Integer itemIndex, String projectName) {
 		
 		int kind = (str instanceof StringSequence) ? StringKind.SEQUENCE : StringKind.CHOICE; 
-		int id = addAbstractStringRecord(kind, parentId, itemIndex, null, null, str.getPosition());
+		int id = addAbstractStringRecord(kind, parentId, itemIndex, null, null, null, str.getPosition());
 		
 		int childIndex = 1;
 		for (IAbstractString child: str.getItems()) {
@@ -268,7 +420,7 @@ public class Cache {
 		}
 	}
 	
-	private int getOrCreatePatternId(int kind, String className, String methodName, int argumentIndex) {
+	private int getPatternId(int kind, String className, String methodName, int argumentIndex) {
 		Integer id = db.queryMaybeInteger(
 				" select id from patterns " +
 				" where kind = ?" +
@@ -295,18 +447,18 @@ public class Cache {
 	private int addUnsupported(String msg, IPosition pos, Integer parentId) {
 		assert parentId != null;
 		return addAbstractStringRecord(StringKind.UNSUPPORTED, parentId,
-				null, null, msg, pos);
+				null, null, null, msg, pos);
 	}
 	
 	private int addAbstractStringRecord(int kind, Integer parentId, 
 			Integer itemIndex, Integer intValue,
-			String strValue, IPosition pos) {
+			String strValue, String strValue2, IPosition pos) {
 		
 		
 		Integer fileId = null;
 		Integer start = null;
 		Integer length = null;
-		if (pos != null) {
+		if (pos != null && !DummyPosition.isDummyPosition(pos)) {
 			fileId = getFileId(pos.getPath());
 			start = pos.getStart();
 			length = pos.getLength();
@@ -314,14 +466,15 @@ public class Cache {
 		
 		return db.insertAndGetId(
 				"insert into abstract_strings (kind, parent_id, " +
-				" item_index, int_value, str_value, " +
+				" item_index, int_value, str_value, str_value2, " +
 				" file_id, start, length) " +
-				" values (?, ?, ?, ?, ?, ?, ?, ?)", 
+				" values (?, ?, ?, ?, ?, ?, ?, ?, ?)", 
 				kind,
 				DatabaseHelper.encodeNull(parentId),
 				DatabaseHelper.encodeNull(itemIndex),
 				DatabaseHelper.encodeNull(intValue),
 				DatabaseHelper.encodeNull(strValue),
+				DatabaseHelper.encodeNull(strValue2),
 				DatabaseHelper.encodeNull(fileId),
 				DatabaseHelper.encodeNull(start),
 				DatabaseHelper.encodeNull(length));
@@ -354,9 +507,13 @@ public class Cache {
 		// first try faster cache
 		Integer id = fileIDs.get(name);
 		if (id == null) {
-			id = db.queryInt("select id from files where name = ?", name);
-			assert id != null; // TODO maybe should just create if doesn't exist ??
-			fileIDs.put(name, id);
+			try {
+				id = db.queryInt("select id from files where name = ?", name);
+				assert id != null; // TODO maybe should just create if doesn't exist ??
+				fileIDs.put(name, id);
+			} catch (Exception e) {
+				throw new IllegalArgumentException("Can't find file: " + name);
+			}
 		}
 		return id;
 	}
@@ -402,6 +559,10 @@ public class Cache {
 			db.execute("update files set batch_no = ? where id = ?", 
 					this.currentBatchNo, rec.getId());
 		}
+	}
+	
+	public void printQueryCount() {
+		System.out.println(db.queryCount);
 	}
 }
 

@@ -9,12 +9,14 @@ public class StringConstant extends PositionedString {
 
 	public StringConstant(String constant) {
 		this(null, constant, constant);
+		assert constant != null;
 	}
 
 	public StringConstant(IPosition pos, String constant, String escaped) {
 		super(pos);
 		this.constant = constant;
 		this.escaped = escaped;
+		assert constant != null;
 	}
 	
 	public String toString() {

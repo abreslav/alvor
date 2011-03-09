@@ -25,6 +25,6 @@ public class StringNodeDescriptor extends NodeDescriptor {
 	
 	@Override
 	public String toString() {
-		return getPosition().toString();
+		return getPosition().toString() + abstractValue.toString();
 	}
 }
