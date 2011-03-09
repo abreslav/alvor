@@ -3,7 +3,6 @@ package com.zeroturnaround.alvor.crawler;
 import org.eclipse.jdt.core.IJavaProject;
 import org.junit.Test;
 
-import com.zeroturnaround.alvor.cache.Cache;
 import com.zeroturnaround.alvor.cache.CacheProvider;
 import com.zeroturnaround.alvor.configuration.ConfigurationManager;
 import com.zeroturnaround.alvor.configuration.ProjectConfiguration;

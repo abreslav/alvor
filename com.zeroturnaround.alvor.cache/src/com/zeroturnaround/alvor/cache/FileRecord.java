@@ -3,8 +3,10 @@ package com.zeroturnaround.alvor.cache;
 public class FileRecord {
 	private final String name;
 	private final int batchNo;
+	private final int id;
 
-	public FileRecord(String name, int batchNo) {
+	public FileRecord(int id, String name, int batchNo) {
+		this.id = id;
 		this.name = name;
 		this.batchNo = batchNo;
 		
@@ -16,5 +18,9 @@ public class FileRecord {
 	
 	public int getBatchNo() {
 		return batchNo;
+	}
+	
+	public int getId() {
+		return id;
 	}
 }

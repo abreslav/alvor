@@ -8,9 +8,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.common.FunctionPattern;
+import com.zeroturnaround.alvor.common.FunctionPatternReference;
+import com.zeroturnaround.alvor.common.HotspotPattern;
+import com.zeroturnaround.alvor.common.HotspotPatternReference;
 import com.zeroturnaround.alvor.common.NodeDescriptor;
+import com.zeroturnaround.alvor.common.PatternReference;
+import com.zeroturnaround.alvor.common.PositionUtil;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.StringPattern;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
@@ -20,7 +24,6 @@ import com.zeroturnaround.alvor.string.AbstractStringCollection;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.IPosition;
 import com.zeroturnaround.alvor.string.StringCharacterSet;
-import com.zeroturnaround.alvor.string.StringChoice;
 import com.zeroturnaround.alvor.string.StringConstant;
 import com.zeroturnaround.alvor.string.StringParameter;
 import com.zeroturnaround.alvor.string.StringRepetition;
@@ -31,24 +34,33 @@ public class Cache {
 	private final static ILog LOG = Logs.getLog(ICacheService.class);
 	
 	private final static int PATTERN_KIND_HOTSPOT = 1;
-	private final static int PATTERN_KIND_STRING_METHOD = 2;
+	private final static int PATTERN_KIND_FUNCTION = 2;
+	
+	private final static int PATTERN_ROLE_PRIMARY = 1;
+	private final static int PATTERN_ROLE_SECONDARY = 2;
+//	private final static int PATTERN_ROLE_FOREIGN = 3;
 	
 	private interface StringKind {
-		public final static int CONSTANT    = 1;
-		public final static int CHARSET	    = 2;
-		public final static int SEQUENCE    = 3;
-		public final static int CHOICE      = 4;
-		public final static int APPLICATION = 5;
-		public final static int REPETITION  = 6;
-		public final static int UNSUPPORTED = 7;
-		public final static int PARAMETER   = 8;
+		public final static int CONSTANT     = 1;
+		public final static int CHARSET	     = 2;
+		public final static int SEQUENCE     = 3;
+		public final static int CHOICE       = 4;
+		public final static int FUNCTION_REF = 5;
+		public final static int HOTSPOT_REF  = 6;
+		public final static int REPETITION   = 7;
+		public final static int PARAMETER    = 8;
+		public final static int UNSUPPORTED  = 9;
 	}	
-	private DatabaseHelper db;
 	
+	
+	private DatabaseHelper db;
 	private Map<String, Integer> fileIDs = new HashMap<String, Integer>();
+	private int currentBatchNo;
+	
 	
 	/*package*/ Cache(DatabaseHelper db) {
 		this.db = db;
+		this.currentBatchNo = db.queryInt("select coalesce(max(batch_no), 1) from project_patterns");
 	}
 	
 	public void removeFile(String fileName) {
@@ -68,7 +80,7 @@ public class Cache {
 	
 	public List<FileRecord> getFilesToUpdate(String projectName) {
 		ResultSet rs = db.query (
-				" select f.name, f.batch_no" +
+				" select f.id, f.name, f.batch_no" +
 				" from files f" +
 				" where f.name like '/' || ? || '/%'" +
 				" and f.batch_no < (select max(batch_no) from project_patterns where project_name = ?)",
@@ -77,7 +89,7 @@ public class Cache {
 		List<FileRecord> records = new ArrayList<FileRecord>();
 		try {
 			while (rs.next()) {
-				records.add(new FileRecord(rs.getString("name"), rs.getInt("batch_no")));
+				records.add(new FileRecord(rs.getInt("id"), rs.getString("name"), rs.getInt("batch_no")));
 			}
 			return records;
 		}
@@ -93,58 +105,17 @@ public class Cache {
 	public void setProjectPrimaryPatterns(String projectName,
 			Collection<HotspotPattern> patterns) {
 		
-//		int projectId = getProjectId(projectName);
-		
 		// FIXME delete only primary patterns. Or clean everything???
 		db.execute("delete from project_patterns where project_name = ?", projectName);
 		
 		for (StringPattern pattern : patterns) {
-			int patternId = getOrCreatePatternId(pattern);
-			db.execute (
-					" insert into project_patterns " +
-					" (project_name, pattern_id, batch_no, source_id)" +
-					" values (?, ?, 1, null)", 
-					projectName, patternId); 
+			int kind = getPatternKind(pattern);
+			int patternId = getOrCreatePatternId(kind, pattern.getClassName(), 
+					pattern.getMethodName(), pattern.getArgumentNo());
+			registerPatternForProject(patternId, projectName, PATTERN_ROLE_PRIMARY);
 		}
 	}
 	
-	private int getOrCreatePatternId(StringPattern pattern) {
-
-		Integer id = db.queryMaybeInteger (
-				" select id from patterns where" +
-				" class_name = ? and method_name = ? and argument_index = ?", 
-				pattern.getClassName(), pattern.getMethodName(), pattern.getArgumentNo());
-
-		if (id != null) {
-			return id;
-		}
-		else {
-			// first create pattern record in abstract_strings, this gives pattern_id
-			id = createEmptyChoice(null);
-			
-			// then add actual pattern description into patterns table
-			db.execute (
-					" insert into patterns " +
-					" (id, class_name, method_name, argument_index, kind) values (?, ?, ?, ?, " +
-					PATTERN_KIND_HOTSPOT + ")",
-					id, pattern.getClassName(), pattern.getMethodName(), pattern.getArgumentNo());
-			
-			return id;
-		}
-	}
-	
-	private int createEmptyChoice(IPosition pos) {
-		if (pos == null) {
-			return db.insertAndGetId("insert into abstract_strings (kind) " +
-					" values (" + StringKind.CHOICE + ")");
-		}
-		else {
-			return db.insertAndGetId("insert into abstract_strings (kind, file_id, start, length) " +
-					" values (" + StringKind.CHOICE + ", ?, ?, ?)",
-					getFileId(pos.getPath()), pos.getStart(), pos.getLength());
-		}
-	}
-
 //	public List<PatternRecord> getProjectPatterns(String projectName) {
 //		return null;
 //	}
@@ -175,7 +146,7 @@ public class Cache {
 					pattern = new HotspotPattern(rs.getString("class_name"), 
 						rs.getString("method_name"), rs.getInt("argument_index"));
 				} 
-				else if (rs.getInt("kind") == PATTERN_KIND_STRING_METHOD) {
+				else if (rs.getInt("kind") == PATTERN_KIND_FUNCTION) {
 					pattern = new FunctionPattern(rs.getString("class_name"), 
 							rs.getString("method_name"), rs.getInt("argument_index"));
 				}
@@ -201,7 +172,9 @@ public class Cache {
 	
 	public void addHotspot(PatternRecord pattern, NodeDescriptor desc) {
 		if (desc instanceof StringNodeDescriptor) {
-			addAbstractString(((StringNodeDescriptor) desc).getAbstractValue(), pattern.getId(), null);
+			String projectName = PositionUtil.getProjectName(desc.getPosition()); 
+			addAbstractString(((StringNodeDescriptor) desc).getAbstractValue(), pattern.getId(), 
+					null, projectName);
 		}
 		else if (desc instanceof UnsupportedNodeDescriptor) {
 			addUnsupported(((UnsupportedNodeDescriptor) desc).getProblemMessage(),
@@ -213,7 +186,8 @@ public class Cache {
 		}
 	}
 	
-	private int addAbstractString(IAbstractString str, Integer parentId, Integer itemIndex) {
+	private int addAbstractString(IAbstractString str, Integer parentId, Integer itemIndex,
+			String projectName) {
 		if (str instanceof StringConstant) {
 			return addAbstractStringRecord(StringKind.CONSTANT, parentId, itemIndex, null, 
 					((StringConstant) str).getEscapedValue(), str.getPosition());
@@ -223,39 +197,99 @@ public class Cache {
 					((StringCharacterSet) str).getContentsAsString(), str.getPosition());
 		}
 		else if (str instanceof StringParameter) {
-			return addAbstractStringRecord(StringKind.PARAMETER, parentId, itemIndex, null, 
+			return addAbstractStringRecord(StringKind.PARAMETER, parentId, itemIndex,
+					((StringParameter)str).getIndex(), 
 					null, str.getPosition());
 		}
 		else if (str instanceof StringRepetition) {
-			int id = addAbstractStringRecord(StringKind.REPETITION, parentId, itemIndex, null, 
-					null, str.getPosition());
-			addAbstractString(((StringRepetition) str).getBody(), id, null); 
-			return id;
+			return addRepetition((StringRepetition)str, parentId, itemIndex, projectName);
 		}
-//		else if (TODO pattern) {
-//			
-//		}
 		else if (str instanceof AbstractStringCollection) {
-			return addStringCollection((AbstractStringCollection)str, parentId, itemIndex); 
+			return addStringCollection((AbstractStringCollection)str, parentId, itemIndex, projectName); 
+		}
+		else if (str instanceof PatternReference) {
+			return addPatternReference((PatternReference)str, parentId, itemIndex, projectName);
 		}
 		else {
 			throw new IllegalArgumentException("Unexpected IAbstractString: " + str.getClass());
 		}
 	}
+
+	private int addRepetition(StringRepetition str, Integer parentId, Integer itemIndex, String projectName) {
+		
+		int id = addAbstractStringRecord(StringKind.REPETITION, parentId, itemIndex, 
+				null, null, str.getPosition());
+		addAbstractString(str.getBody(), id, null, projectName); 
+		return id;
+	}
 	
+	private int addPatternReference(PatternReference str, Integer parentId, Integer itemIndex, String projectName) {
+		
+		// prepare pattern and project_pattern (if they don't exist yet)
+		int patternKind = getPatternKind(str);
+		int patternId = getOrCreatePatternId(patternKind, str.getClassName(), 
+				str.getMethodName(), str.getArgumentIndex());
+		registerPatternForProject(patternId, projectName, PATTERN_ROLE_SECONDARY);
+		
+		// add reference to this pattern
+		int recKind = (patternKind == PATTERN_KIND_FUNCTION) 
+			? StringKind.FUNCTION_REF : StringKind.HOTSPOT_REF;
+		
+		return addAbstractStringRecord(recKind, parentId, itemIndex, patternId, null, str.getPosition());
+	}
+
 	private int addStringCollection(AbstractStringCollection str,
-			Integer parentId, Integer itemIndex) {
+			Integer parentId, Integer itemIndex, String projectName) {
 		
 		int kind = (str instanceof StringSequence) ? StringKind.SEQUENCE : StringKind.CHOICE; 
 		int id = addAbstractStringRecord(kind, parentId, itemIndex, null, null, str.getPosition());
 		
 		int childIndex = 1;
 		for (IAbstractString child: str.getItems()) {
-			addAbstractString(child, id, childIndex);
+			addAbstractString(child, id, childIndex, projectName);
 			childIndex++;
 		}
 		
 		return id;
+	}
+
+	private void registerPatternForProject(int patternId, String projectName, int patternRole) {
+		int existing = db.queryInt(
+				" select count(*) from project_patterns " +
+				" where project_name = ?" +
+				" and pattern_id = ?", projectName, patternId);
+		
+		if (existing == 0) {
+			db.execute (
+					" insert into project_patterns " +
+					" (project_name, pattern_id, pattern_role, batch_no)" +
+					" values (?, ?, ?, ?)", 
+					projectName, patternId, patternRole, this.currentBatchNo);
+		}
+	}
+	
+	private int getOrCreatePatternId(int kind, String className, String methodName, int argumentIndex) {
+		Integer id = db.queryMaybeInteger(
+				" select id from patterns " +
+				" where kind = ?" +
+				" and class_name = ?" +
+				" and method_name = ?" +
+				" and argument_index = ?",
+				kind, className, methodName, argumentIndex);
+
+		if (id == null) {
+			// create empty choice for pattern options
+			id = db.insertAndGetId("insert into abstract_strings (kind) " +
+					" values (" + StringKind.CHOICE + ")");
+			
+			// pattern uses same id
+			db.execute (
+					" insert into patterns (id, kind, class_name, method_name, argument_index)" +
+					" values (?, ?, ?, ?, ?)", 
+					id, kind, className, methodName, argumentIndex);
+		}
+
+		return id;		
 	}
 
 	private int addUnsupported(String msg, IPosition pos, Integer parentId) {
@@ -279,7 +313,7 @@ public class Cache {
 		}
 		
 		return db.insertAndGetId(
-				"insert into abstracts_strings (kind, parent_id, " +
+				"insert into abstract_strings (kind, parent_id, " +
 				" item_index, int_value, str_value, " +
 				" file_id, start, length) " +
 				" values (?, ?, ?, ?, ?, ?, ?, ?)", 
@@ -292,22 +326,6 @@ public class Cache {
 				DatabaseHelper.encodeNull(start),
 				DatabaseHelper.encodeNull(length));
 	}
-	
-	/**
-	 * Marks this primary branch as unchecked  
-	 */
-	private void invalidateRespectivePrimaryHotspot() {
-		
-	}
-	
-	private void addUnsupported(UnsupportedNodeDescriptor desc) {
-		
-	}
-	
-	private void addCollection(AbstractStringCollection str) {
-		
-	}
-
 	
 	public void cleanup() {
 		removeOrphanedSecondaryPatterns();
@@ -336,7 +354,7 @@ public class Cache {
 		// first try faster cache
 		Integer id = fileIDs.get(name);
 		if (id == null) {
-			id = db.queryInt("select from files where name = ?", name);
+			id = db.queryInt("select id from files where name = ?", name);
 			assert id != null; // TODO maybe should just create if doesn't exist ??
 			fileIDs.put(name, id);
 		}
@@ -348,6 +366,41 @@ public class Cache {
 			db.getConnection().close();
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
+		}
+	}
+	
+	private static int getPatternKind(StringPattern pattern) {
+		if (pattern instanceof HotspotPattern) {
+			return PATTERN_KIND_HOTSPOT;
+		}
+		else if (pattern instanceof FunctionPattern) {
+			return PATTERN_KIND_FUNCTION;
+		}
+		else {
+			throw new IllegalArgumentException();
+		}
+	}
+	
+	private static int getPatternKind(PatternReference patternReference) {
+		if (patternReference instanceof HotspotPatternReference) {
+			return PATTERN_KIND_HOTSPOT;
+		}
+		else if (patternReference instanceof FunctionPatternReference) {
+			return PATTERN_KIND_FUNCTION;
+		}
+		else {
+			throw new IllegalArgumentException();
+		}
+	}
+	
+	public void startNewBatch() {
+		this.currentBatchNo++;
+	}
+
+	public void markFilesAsCurrent(List<FileRecord> fileRecords) {
+		for (FileRecord rec : fileRecords) {
+			db.execute("update files set batch_no = ? where id = ?", 
+					this.currentBatchNo, rec.getId());
 		}
 	}
 }

@@ -95,4 +95,15 @@ public class PositionUtil {
 		IPath path = Path.fromPortableString(pos.getPath());
 		return ResourcesPlugin.getWorkspace().getRoot().findMember(path);
 	}
+	
+	public static String getProjectName(IPosition pos) {
+		IPath path = Path.fromPortableString(pos.getPath());
+		String str = path.toString();
+		if (str.startsWith("/")) {
+			return str.substring(1, str.indexOf('/', 1));
+		}
+		else {
+			return str.substring(0, str.indexOf('/'));
+		}
+	}
 }

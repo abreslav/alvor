@@ -21,6 +21,7 @@ import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.StringLiteral;
 
 import com.zeroturnaround.alvor.common.NodeDescriptor;
+import com.zeroturnaround.alvor.common.HotspotPatternReference;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
@@ -192,7 +193,7 @@ public class Crawler2 {
 		else if (usage instanceof NameInParameter) {
 			IPosition pos = ASTUtil.getPosition(usage.getNode());
 			NameInParameter nip = (NameInParameter) usage; 
-			return new ParameterChoiceStub(pos, 
+			return new HotspotPatternReference(pos, 
 					nip.getMethodDecl().resolveBinding().getDeclaringClass().getQualifiedName(),
 					nip.getMethodDecl().getName().getIdentifier(),
 					nip.getIndex());

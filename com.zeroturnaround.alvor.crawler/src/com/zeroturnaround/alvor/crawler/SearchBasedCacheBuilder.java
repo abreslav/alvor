@@ -63,7 +63,7 @@ import com.zeroturnaround.alvor.crawler.util.JavaModelUtil;
 
 public class SearchBasedCacheBuilder {
 	private static final ILog LOG = Logs.getLog(SearchBasedCacheBuilder.class);
-	private static final int MAX_ITERATIONS_FOR_FINDING_FIXPOINT = 1;
+	private static final int MAX_ITERATIONS_FOR_FINDING_FIXPOINT = 3;
 	private Map<StringPattern, SearchPattern> searchPatterns = new HashMap<StringPattern, SearchPattern>();
 	private SearchEngine searchEngine = new SearchEngine();
 	private Map<ICompilationUnit, ASTNode> astCache = new WeakHashMap<ICompilationUnit, ASTNode>();
@@ -126,6 +126,7 @@ public class SearchBasedCacheBuilder {
 		
 		Timer timer = new Timer("loop");
 		for (int i = 0; i < MAX_ITERATIONS_FOR_FINDING_FIXPOINT; i++) {
+			cache.startNewBatch();
 			List<PatternRecord> patternRecords = cache.getNewProjectPatterns(project.getName());
 			if (patternRecords.isEmpty()) { // found fixpoint
 				break; 
@@ -159,17 +160,21 @@ public class SearchBasedCacheBuilder {
 					
 					// TODO parse everything together
 					
-					//ASTNode node = getASTNode(match);
+					ASTNode node = getASTNode(match);
 					//System.out.println(node.getClass());
 					count.incrementAndGet();
-					//processNodeForPatterns(node, patternRecords);
+					processNodeForPatterns(node, patternRecords);
 				}
 			});
+			
 			searchTimer.printTime();
 			System.out.println("Count=" + count);
 			System.out.println(files);
 			System.out.println("FileCount=" + files.size());
 		}
+		
+		// TODO should be more granular
+		cache.markFilesAsCurrent(fileRecords);
 	}
 	
 	private void processNodeForPatterns(ASTNode node, Collection<PatternRecord> patterns) {
@@ -180,11 +185,15 @@ public class SearchBasedCacheBuilder {
 		boolean foundMatch = false;
 		for (PatternRecord rec : patterns) {
 			
-			if (node instanceof MethodInvocation /* && pattern is hotspot pattern */
+			if (node instanceof MethodInvocation 
+					&& rec.getPattern() instanceof HotspotPattern
 					&& ((MethodInvocation) node).getName().getIdentifier().equals(rec.getPattern().getMethodName())
 					) {
 				foundMatch = true;
 				processHotspot((MethodInvocation)node, rec);
+			}
+			else {
+				System.out.println("processNode: " + node.getClass());
 			}
 		}
 		
@@ -198,8 +207,6 @@ public class SearchBasedCacheBuilder {
 		int argOffset = patternRecord.getPattern().getArgumentNo()-1;
 		NodeDescriptor desc = Crawler2.INSTANCE.evaluate((Expression)node.arguments().get(argOffset));
 		
-		cache.addHotspot(patternRecord, desc);
-		
 		if (desc instanceof StringNodeDescriptor) {
 			System.out.println(((StringNodeDescriptor)desc).getAbstractValue());
 		}
@@ -209,6 +216,8 @@ public class SearchBasedCacheBuilder {
 		else {
 			System.out.println("WHAAAT?");
 		}
+		cache.addHotspot(patternRecord, desc);
+		
 	}
 
 	private void performSearch(Collection<ICompilationUnit> units, SearchPattern pattern, 
