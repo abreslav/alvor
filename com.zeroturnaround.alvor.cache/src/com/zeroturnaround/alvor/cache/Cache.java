@@ -1,6 +1,7 @@
 package com.zeroturnaround.alvor.cache;
 
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -88,6 +89,7 @@ public class Cache {
 			
 			// query all strings from this project that are children 
 			// of this project's primary patterns
+			
 			ResultSet rs = db.query(
 					" select s.*, f.name as name" +
 					" from files f" +
@@ -96,7 +98,6 @@ public class Cache {
 					" where f.name like '/' || ? || '/%'" +
 					" and pp.pattern_role = " + PATTERN_ROLE_PRIMARY, 
 					projectName, projectName);
-			
 			
 			while (rs.next()) {
 				try {
@@ -204,13 +205,24 @@ public class Cache {
 		return null;
 	}
 	
-	public void markHotspotsAsChecked(Collection<IAbstractString> hotspots) {
+	public void markHotspotsAsChecked(Collection<IPosition> positions) {
 		
+		for (IPosition pos : positions) {
+			db.execute(
+				" update abstract_strings " +
+				" set checked = true " +
+				" where file_id = ?" +
+				" and start = ?" +
+				" and lenght = ?", 
+				getFileId(pos.getPath()), pos.getStart(), pos.getLength());
+		}
 	}
 	
 	public void addHotspot(PatternRecord pattern, NodeDescriptor desc) {
 		if (desc instanceof StringNodeDescriptor) {
-			String projectName = PositionUtil.getProjectName(desc.getPosition()); 
+			String projectName = PositionUtil.getProjectName(desc.getPosition());
+			
+			// TODO should I include item-index? or should i rely on increasing id values ??
 			addAbstractString(((StringNodeDescriptor) desc).getAbstractValue(), pattern.getId(), 
 					null, projectName);
 		}
@@ -218,12 +230,64 @@ public class Cache {
 			addUnsupported(((UnsupportedNodeDescriptor) desc).getProblemMessage(),
 					desc.getPosition(),
 					pattern.getId());
+			
 		}
 		else {
 			throw new IllegalArgumentException();
 		}
+		
+		invalidateCheckingForDependentStrings(pattern.getId());
 	}
 	
+	private void invalidateCheckingForDependentStrings(int id) {
+		
+		// TODO this should be skipped during full scan, because
+		// everything will be rechecked anyway
+		
+		// TODO this can go into cycle
+		
+		// dependent strings are its ancestors 
+		// and if it's a pattern, then also its users (kind = FUNCTION_REF or HOTSPOT_REF)
+		
+		db.execute("update abstract_strings set checked = false where id = ?", id);
+		
+		// invalidate ancestors
+		Integer parentId = db.queryMaybeInteger("select parent_id from abstract_strings where id = ?", id);
+		if (parentId != null) {
+			invalidateCheckingForDependentStrings(parentId);
+		}
+		// string is a pattern iff it doesn't have a parent // TODO check this statement
+		else {
+			ResultSet rs = db.query(
+				" select id from abstract_strings " +
+				" where kind in (" + StringKind.FUNCTION_REF + "," + StringKind.HOTSPOT_REF + ")" +
+				" and int_value = ?",  id);
+			
+			try {
+				while (rs.next()) {
+					invalidateCheckingForDependentStrings(rs.getInt("id"));
+				}
+			} 
+			catch (SQLException e) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+	
+//	/**
+//	 * @param id
+//	 * @return id of an ancestor who is hotspot (ie. contributes to a pattern)
+//	 */
+//	private int getStringPrimaryAncestor(int id) {
+//		Integer parentId = db.queryMaybeInteger("select parent_id from abstract_strings where id = ?", id);
+//		if (parentId == null) {
+//			return id;
+//		}
+//		else {
+//			return getStringPrimaryAncestor(parentId);
+//		}
+//	}
+//	
 	private IAbstractString createAbstractString(ResultSet rs) {
 		try {
 			int kind = rs.getInt("kind");
@@ -289,14 +353,17 @@ public class Cache {
 					" from abstract_strings s" +
 					" join files f on f.id = s.file_id" +
 					" where s.parent_id = ?" +
-					" order by s.item_index asc", rs.getInt("id"));
+					" order by s.item_index asc, s.id asc", rs.getInt("id"));
 			
 			List<IAbstractString> children = new ArrayList<IAbstractString>();
 			while (childrenRs.next()) {
 				children.add(createAbstractString(childrenRs));
 			}
 			
-			if (kind == StringKind.SEQUENCE) {
+			if (children.size() == 1) {
+				return children.get(0);
+			}
+			else if (kind == StringKind.SEQUENCE) {
 				return new StringSequence(createPosition(rs), children);
 			}
 			else if (kind == StringKind.CHOICE) {
@@ -564,5 +631,21 @@ public class Cache {
 	public void printQueryCount() {
 		System.out.println(db.queryCount);
 	}
+	
+//	public void tryStuff() throws SQLException {
+//		ResultSet rs = db.query(
+//				" select" +
+//				" s.id, p.id as parent_id" +
+//				" from abstract_strings s" +
+//				" join abstract_strings p on p.id = s.parent_id");
+//		
+//		ResultSetMetaData md = rs.getMetaData();
+//		
+//		for (int i = 0; i < md.getColumnCount(); i++) {
+//			System.out.println(md.getc);
+//		}
+//
+//
+//	}
 }
 
