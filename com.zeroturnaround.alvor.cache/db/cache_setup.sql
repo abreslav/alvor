@@ -41,7 +41,8 @@ CREATE TABLE abstract_strings
 	str_value2 LONGVARCHAR DEFAULT NULL,
 	file_id INTEGER default null REFERENCES files(id) ON DELETE CASCADE,
 	start INTEGER default null,
-	length INTEGER default null
+	length INTEGER default null,
+	checked boolean default false
 );;;
 
 CREATE TABLE patterns
