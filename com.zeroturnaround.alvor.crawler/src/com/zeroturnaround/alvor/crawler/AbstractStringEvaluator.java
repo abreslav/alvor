@@ -34,7 +34,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 import com.zeroturnaround.alvor.cache.CacheService;
 import com.zeroturnaround.alvor.common.HotspotPattern;
-import com.zeroturnaround.alvor.common.NodeDescriptor;
+import com.zeroturnaround.alvor.common.HotspotDescriptor;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
@@ -90,7 +90,7 @@ public class AbstractStringEvaluator {
 	 * (or markers for unsupported cases)  
 	 * TODO rename?
 	 */
-	public static List<NodeDescriptor> findAndEvaluateHotspots(IJavaElement[] scope, ProjectConfiguration conf,
+	public static List<HotspotDescriptor> findAndEvaluateHotspots(IJavaElement[] scope, ProjectConfiguration conf,
 			IProgressMonitor monitor) {
 		Measurements.resetAll();
 		
@@ -100,7 +100,7 @@ public class AbstractStringEvaluator {
 		if (requests.isEmpty()) {
 			throw new IllegalArgumentException("No hotspot definitions found in options");
 		}
-		List<NodeDescriptor> result = AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(requests, scope, 0, null, monitor);
+		List<HotspotDescriptor> result = AbstractStringEvaluator.evaluateMethodArgumentAtCallSites(requests, scope, 0, null, monitor);
 		timer.printTime(); // String construction
 		
 		LOG.message(Measurements.parseTimer);
@@ -129,7 +129,7 @@ public class AbstractStringEvaluator {
 		return evaluator.eval(node, null);
 	}
 	
-	public static List<NodeDescriptor> evaluateMethodArgumentAtCallSites
+	public static List<HotspotDescriptor> evaluateMethodArgumentAtCallSites
 		(Collection<HotspotPattern> requests, IJavaElement[] scope, int level, ContextLink context,
 				IProgressMonitor monitor) {
 		logMessage("SEARCHING", level, null);
@@ -139,7 +139,7 @@ public class AbstractStringEvaluator {
 		
 		Collection<IPosition> argumentPositions = NodeSearchEngine.findArgumentNodes(scope, requests, monitor);
 		AbstractStringEvaluator evaluator = new AbstractStringEvaluator(level, scope, false, monitor);
-		List<NodeDescriptor> result = new ArrayList<NodeDescriptor>();
+		List<HotspotDescriptor> result = new ArrayList<HotspotDescriptor>();
 		for (IPosition pos: argumentPositions) {
 			try {
 				result.add(new StringNodeDescriptor(pos, evaluator.eval(pos, context)));
@@ -759,7 +759,7 @@ public class AbstractStringEvaluator {
 			String methodName = method.getName().toString();
 			methodName += ASTUtil.getArgumentTypesString(method.resolveBinding());
 			
-			List<NodeDescriptor> descList = evaluateMethodArgumentAtCallSites(
+			List<HotspotDescriptor> descList = evaluateMethodArgumentAtCallSites(
 					Collections.singleton(
 							(HotspotPattern)new HotspotPattern(
 									ASTUtil.getMethodClassName(method), 
@@ -772,7 +772,7 @@ public class AbstractStringEvaluator {
 			
 			List<IAbstractString> choices = new ArrayList<IAbstractString>();
 			
-			for (NodeDescriptor choiceDesc: descList) {
+			for (HotspotDescriptor choiceDesc: descList) {
 				if (choiceDesc instanceof StringNodeDescriptor) {
 					choices.add(((StringNodeDescriptor)choiceDesc).getAbstractValue());
 				}

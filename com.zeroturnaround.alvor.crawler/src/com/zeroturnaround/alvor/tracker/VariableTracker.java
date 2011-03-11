@@ -166,7 +166,7 @@ public class VariableTracker {
 		}
 		else if (scope instanceof ParenthesizedExpression) {
 			if (target == null) {
-				return getLastReachingModIn(var, target, 
+				return getLastReachingModIn(var, null, 
 						((ParenthesizedExpression)scope).getExpression());
 			}
 			else {
