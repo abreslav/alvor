@@ -3,7 +3,7 @@ package com.zeroturnaround.alvor.common;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.IPosition;
 
-public class StringNodeDescriptor extends NodeDescriptor {
+public class StringNodeDescriptor extends HotspotDescriptor {
 
 	private IAbstractString abstractValue;
 

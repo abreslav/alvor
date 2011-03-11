@@ -1,5 +1,6 @@
 DROP TABLE project_patterns if exists;;;
 DROP TABLE patterns if exists;;;
+DROP TABLE hotspots if exists;;;
 DROP TABLE abstract_strings if exists;;;
 DROP TABLE files if exists;;;
 
@@ -41,8 +42,7 @@ CREATE TABLE abstract_strings
 	str_value2 LONGVARCHAR DEFAULT NULL,
 	file_id INTEGER default null REFERENCES files(id) ON DELETE CASCADE,
 	start INTEGER default null,
-	length INTEGER default null,
-	checked boolean default false
+	length INTEGER default null
 );;;
 
 CREATE TABLE patterns
@@ -67,3 +67,11 @@ CREATE TABLE project_patterns
 );;;
 
 
+create table hotspots
+(
+	string_id integer primary key references abstract_strings(id) on delete cascade,
+	file_id integer not null references files(id) on delete cascade,
+	start integer not null,
+	length integer not null,
+	checked boolean default false not null
+);;;

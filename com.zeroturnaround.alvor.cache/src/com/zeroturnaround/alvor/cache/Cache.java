@@ -1,7 +1,6 @@
 package com.zeroturnaround.alvor.cache;
 
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,15 +12,13 @@ import com.zeroturnaround.alvor.common.FunctionPattern;
 import com.zeroturnaround.alvor.common.FunctionPatternReference;
 import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.common.HotspotPatternReference;
-import com.zeroturnaround.alvor.common.NodeDescriptor;
+import com.zeroturnaround.alvor.common.HotspotDescriptor;
 import com.zeroturnaround.alvor.common.PatternReference;
 import com.zeroturnaround.alvor.common.PositionUtil;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.StringPattern;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
-import com.zeroturnaround.alvor.common.logging.ILog;
-import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.string.AbstractStringCollection;
 import com.zeroturnaround.alvor.string.DummyPosition;
 import com.zeroturnaround.alvor.string.IAbstractString;
@@ -36,7 +33,7 @@ import com.zeroturnaround.alvor.string.StringSequence;
 
 public class Cache {
 	
-	private final static ILog LOG = Logs.getLog(ICacheService.class);
+	//private final static ILog LOG = Logs.getLog(ICacheService.class);
 	
 	private final static int PATTERN_KIND_HOTSPOT = 1;
 	private final static int PATTERN_KIND_FUNCTION = 2;
@@ -83,28 +80,50 @@ public class Cache {
 				" (select id from files where name = ?)", fileName);
 	}
 	
-	public List<NodeDescriptor> getProjectHotspots(String projectName) {
+	public List<HotspotDescriptor> getProjectHotspots(String projectName) {
+		return getHotspots(projectName, null);		
+	}
+	public List<HotspotDescriptor> getHotspots(String projectName, String fileName) {
 		try {
-			List<NodeDescriptor> result = new ArrayList<NodeDescriptor>();
+			List<HotspotDescriptor> result = new ArrayList<HotspotDescriptor>();
 			
 			// query all strings from this project that are children 
 			// of this project's primary patterns
 			
-			ResultSet rs = db.query(
-					" select s.*, f.name as name" +
-					" from files f" +
-					" join abstract_strings s on s.file_id = f.id" +
-					" join project_patterns pp on pp.project_name = ? and pp.pattern_id = s.parent_id " +
-					" where f.name like '/' || ? || '/%'" +
-					" and pp.pattern_role = " + PATTERN_ROLE_PRIMARY, 
-					projectName, projectName);
+			String sql = 
+				" select s.*, f.name as name," +
+				" hf.name as hotspot_file_name," +
+				" h.start as hotspot_start," +
+				" h.length as hotspot_length" +
+				" from files f" +
+				" join abstract_strings s on s.file_id = f.id" +
+				" join project_patterns pp on pp.project_name = ? and pp.pattern_id = s.parent_id " +
+				" join hotspots h on h.string_id = s.id" +
+				" join files hf on hf.id = h.file_id";
+			String fileFilter;
+			
+			if (fileName == null) {
+				sql += " where f.name like '/' || ? || '/%'";
+				fileFilter = projectName;
+			}
+			else {
+				sql += " where f.name = ?";
+				fileFilter = fileName;
+			}
+			sql += " and pp.pattern_role = " + PATTERN_ROLE_PRIMARY; 
+			
+			ResultSet rs = db.query(sql, projectName, fileFilter);
 			
 			while (rs.next()) {
+				
+				IPosition hotspotPos = new Position(rs.getString("hotspot_file_name"), 
+						rs.getInt("hotspot_start"), rs.getInt("hotspot_length")); 
+				
 				try {
 					IAbstractString str = createAbstractString(rs);
-					result.add(new StringNodeDescriptor(str.getPosition(), str));
+					result.add(new StringNodeDescriptor(hotspotPos, str));
 				} catch (UnsupportedStringOpEx e) {
-					result.add(new UnsupportedNodeDescriptor(createPosition(rs), 
+					result.add(new UnsupportedNodeDescriptor(hotspotPos, 
 							e.getMessage(), e.getPosition()));
 				}
 			}
@@ -201,15 +220,11 @@ public class Cache {
 		}
 	}
 
-	public List<IAbstractString> getUncheckedHotspots(String projectName) {
-		return null;
-	}
-	
-	public void markHotspotsAsChecked(Collection<IPosition> positions) {
+	private void markHotspotsAsChecked(Collection<IPosition> positions) {
 		
 		for (IPosition pos : positions) {
 			db.execute(
-				" update abstract_strings " +
+				" update hotspots " +
 				" set checked = true " +
 				" where file_id = ?" +
 				" and start = ?" +
@@ -218,16 +233,17 @@ public class Cache {
 		}
 	}
 	
-	public void addHotspot(PatternRecord pattern, NodeDescriptor desc) {
+	public void addHotspot(PatternRecord pattern, HotspotDescriptor desc) {
+		int id; 
 		if (desc instanceof StringNodeDescriptor) {
 			String projectName = PositionUtil.getProjectName(desc.getPosition());
 			
 			// TODO should I include item-index? or should i rely on increasing id values ??
-			addAbstractString(((StringNodeDescriptor) desc).getAbstractValue(), pattern.getId(), 
+			id = addAbstractString(((StringNodeDescriptor) desc).getAbstractValue(), pattern.getId(), 
 					null, projectName);
 		}
 		else if (desc instanceof UnsupportedNodeDescriptor) {
-			addUnsupported(((UnsupportedNodeDescriptor) desc).getProblemMessage(),
+			id = addUnsupported(((UnsupportedNodeDescriptor) desc).getProblemMessage(),
 					desc.getPosition(),
 					pattern.getId());
 			
@@ -236,58 +252,57 @@ public class Cache {
 			throw new IllegalArgumentException();
 		}
 		
+		// need to record also original position (because string inside desc may have other position)
+		createHotspotRecord(desc.getPosition(), id);
+		
 		invalidateCheckingForDependentStrings(pattern.getId());
 	}
 	
-	private void invalidateCheckingForDependentStrings(int id) {
-		
-		// TODO this should be skipped during full scan, because
-		// everything will be rechecked anyway
-		
-		// TODO this can go into cycle
-		
-		// dependent strings are its ancestors 
-		// and if it's a pattern, then also its users (kind = FUNCTION_REF or HOTSPOT_REF)
-		
-		db.execute("update abstract_strings set checked = false where id = ?", id);
-		
-		// invalidate ancestors
-		Integer parentId = db.queryMaybeInteger("select parent_id from abstract_strings where id = ?", id);
-		if (parentId != null) {
-			invalidateCheckingForDependentStrings(parentId);
-		}
-		// string is a pattern iff it doesn't have a parent // TODO check this statement
-		else {
-			ResultSet rs = db.query(
-				" select id from abstract_strings " +
-				" where kind in (" + StringKind.FUNCTION_REF + "," + StringKind.HOTSPOT_REF + ")" +
-				" and int_value = ?",  id);
-			
-			try {
-				while (rs.next()) {
-					invalidateCheckingForDependentStrings(rs.getInt("id"));
-				}
-			} 
-			catch (SQLException e) {
-				throw new RuntimeException(e);
-			}
-		}
+	private void createHotspotRecord(IPosition pos, int stringId) {
+		db.execute(
+				" insert into hotspots (string_id, file_id, start, length)" +
+				" values (?, ?, ?, ?)", 
+				stringId, getFileId(pos.getPath()), pos.getStart(), pos.getLength());
 	}
 	
-//	/**
-//	 * @param id
-//	 * @return id of an ancestor who is hotspot (ie. contributes to a pattern)
-//	 */
-//	private int getStringPrimaryAncestor(int id) {
-//		Integer parentId = db.queryMaybeInteger("select parent_id from abstract_strings where id = ?", id);
-//		if (parentId == null) {
-//			return id;
+	private void invalidateCheckingForDependentStrings(int stringId) {
+		
+//		
+//		
+//		// TODO this should be skipped during full scan, because
+//		// everything will be rechecked anyway
+//		
+//		// TODO this can go into cycle
+//		
+//		// dependent strings are its ancestors 
+//		// and if it's a pattern, then also its users (kind = FUNCTION_REF or HOTSPOT_REF)
+//		
+//		db.execute("update hotspots set checked = false where id = ?", stringId);
+//		
+//		// invalidate ancestors
+//		Integer parentId = db.queryMaybeInteger("select parent_id from abstract_strings where id = ?", stringId);
+//		if (parentId != null) {
+//			invalidateCheckingForDependentStrings(parentId);
 //		}
+//		// String is a pattern iff it doesn't have a parent.
+//		// In case of patterns, invalidate their users 
 //		else {
-//			return getStringPrimaryAncestor(parentId);
+//			ResultSet rs = db.query(
+//				" select id from abstract_strings " +
+//				" where kind in (" + StringKind.FUNCTION_REF + "," + StringKind.HOTSPOT_REF + ")" +
+//				" and int_value = ?",  stringId);
+//			
+//			try {
+//				while (rs.next()) {
+//					invalidateCheckingForDependentStrings(rs.getInt("id"));
+//				}
+//			} 
+//			catch (SQLException e) {
+//				throw new RuntimeException(e);
+//			}
 //		}
-//	}
-//	
+	}
+	
 	private IAbstractString createAbstractString(ResultSet rs) {
 		try {
 			int kind = rs.getInt("kind");
@@ -360,10 +375,11 @@ public class Cache {
 				children.add(createAbstractString(childrenRs));
 			}
 			
-			if (children.size() == 1) {
-				return children.get(0);
-			}
-			else if (kind == StringKind.SEQUENCE) {
+//			if (children.size() == 1) {
+//				return children.get(0);
+//			}
+//			else 
+				if (kind == StringKind.SEQUENCE) {
 				return new StringSequence(createPosition(rs), children);
 			}
 			else if (kind == StringKind.CHOICE) {
@@ -628,24 +644,45 @@ public class Cache {
 		}
 	}
 	
+	public boolean projectIsInitialized(String projectName) {
+		
+		// TODO: measure how slow is it
+		int fileCount = db.queryInt(
+			" select count(*) from files" +
+			" where name like '/' || ? || '/%'", projectName);
+		
+		return fileCount > 0;
+	}
+	
 	public void printQueryCount() {
 		System.out.println(db.queryCount);
 	}
 	
-//	public void tryStuff() throws SQLException {
-//		ResultSet rs = db.query(
-//				" select" +
-//				" s.id, p.id as parent_id" +
-//				" from abstract_strings s" +
-//				" join abstract_strings p on p.id = s.parent_id");
-//		
-//		ResultSetMetaData md = rs.getMetaData();
-//		
-//		for (int i = 0; i < md.getColumnCount(); i++) {
-//			System.out.println(md.getc);
-//		}
-//
-//
-//	}
+	public Collection<HotspotDescriptor> getFileHotspots(String fileName, String projectName) {
+		return getHotspots(projectName, fileName);
+	}
+	
+	public Collection<String> getUncheckedFiles(String projectName) {
+		ResultSet rs = db.query(
+				" select" + 
+				" distinct f.name" + 
+				" from hotspots h" + 
+				" join files f on f.id = h.file_id" + 
+				" where h.checked = false" + 
+				" and f.name like '/' || ? || '/%'", projectName);
+		
+		List<String> result = new ArrayList<String>();
+		try {
+			while (rs.next()) {
+				result.add(rs.getString(1));
+			}
+		} 
+		catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+		
+		return result;
+	}
+	
 }
 

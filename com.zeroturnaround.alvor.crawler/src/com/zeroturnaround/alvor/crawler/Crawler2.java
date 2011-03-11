@@ -1,6 +1,5 @@
 package com.zeroturnaround.alvor.crawler;
 
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,18 +21,16 @@ import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.NullLiteral;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.StringLiteral;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 import com.zeroturnaround.alvor.common.FunctionPatternReference;
-import com.zeroturnaround.alvor.common.NodeDescriptor;
 import com.zeroturnaround.alvor.common.HotspotPatternReference;
+import com.zeroturnaround.alvor.common.HotspotDescriptor;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.crawler.util.ASTUtil;
-import com.zeroturnaround.alvor.crawler.util.JavaModelUtil;
 import com.zeroturnaround.alvor.crawler.util.UnsupportedStringOpExAtNode;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.IPosition;
@@ -42,7 +39,6 @@ import com.zeroturnaround.alvor.string.StringConstant;
 import com.zeroturnaround.alvor.string.StringRandomInteger;
 import com.zeroturnaround.alvor.string.StringRecursion;
 import com.zeroturnaround.alvor.string.StringSequence;
-import com.zeroturnaround.alvor.string.util.ArgumentApplier;
 import com.zeroturnaround.alvor.tracker.NameAssignment;
 import com.zeroturnaround.alvor.tracker.NameInArgument;
 import com.zeroturnaround.alvor.tracker.NameInMethodCallExpression;
@@ -57,7 +53,7 @@ public class Crawler2 {
 	
 	public final static Crawler2 INSTANCE = new Crawler2();
 	
-	public NodeDescriptor evaluate(Expression node) {
+	public HotspotDescriptor evaluate(Expression node) {
 		try {
 			IAbstractString str = eval(node, null); 
 			return new StringNodeDescriptor(ASTUtil.getPosition(node), str);

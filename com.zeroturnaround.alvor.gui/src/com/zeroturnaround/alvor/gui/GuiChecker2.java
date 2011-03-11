@@ -2,18 +2,18 @@ package com.zeroturnaround.alvor.gui;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.ui.texteditor.MarkerUtilities;
 
-import com.zeroturnaround.alvor.cache.CacheService;
+import com.zeroturnaround.alvor.cache.Cache;
+import com.zeroturnaround.alvor.cache.CacheProvider;
 import com.zeroturnaround.alvor.checkers.HotspotCheckingResult;
 import com.zeroturnaround.alvor.checkers.HotspotError;
 import com.zeroturnaround.alvor.checkers.HotspotInfo;
@@ -23,12 +23,12 @@ import com.zeroturnaround.alvor.common.HotspotDescriptor;
 import com.zeroturnaround.alvor.common.PositionUtil;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
+import com.zeroturnaround.alvor.common.WorkspaceUtil;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.configuration.ConfigurationManager;
 import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
-import com.zeroturnaround.alvor.crawler.AbstractStringEvaluator;
-import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
+import com.zeroturnaround.alvor.crawler.StringCollector;
 import com.zeroturnaround.alvor.string.DummyPosition;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.IAbstractStringVisitor;
@@ -43,121 +43,53 @@ import com.zeroturnaround.alvor.string.StringRepetition;
 import com.zeroturnaround.alvor.string.StringSequence;
 import com.zeroturnaround.alvor.string.util.AbstractStringOptimizer;
 
-public class GuiChecker {
-	private static final ILog LOG = Logs.getLog(GuiChecker.class);
+public class GuiChecker2 {
+	private static final ILog LOG = Logs.getLog(GuiChecker2.class);
 	private ComplexChecker complexChecker = new ComplexChecker();
+	private Cache cache = CacheProvider.getCache();
+	private ProjectConfiguration conf;
 	
 	
-	public void performCleanCheck(IProject optionsFrom, IJavaElement[] scope,
-			IProgressMonitor monitor) {
-		NodeSearchEngine.clearASTCache();
-		CacheService.getCacheService().clearAll();
-		performIncrementalCheck(optionsFrom, scope, monitor);
+	public void updateProjectMarkers(IProject project, IProgressMonitor monitor) {
+		StringCollector.updateProjectCache(project, cache, monitor);
+		
+		// TODO
+		conf = ConfigurationManager.readProjectConfiguration(project, true);
+		
+		for (String fileName : cache.getUncheckedFiles(project.getName())) {
+			updateFileMarkers(fileName, project, monitor);
+		}
 	}
 	
-	/**
-	 * NB! Before calling this you should take care that NodeSearchEngine's ASTCache doesn't
-	 * contain old stuff (either clear it completely or remove expired AST-s)
-	 */
-	public void performIncrementalCheck(IProject currentProject, IJavaElement[] scope, 
-			IProgressMonitor monitor) {
-		if (scope.length == 0) {
-			return;
+	private void updateFileMarkers(String fileName, IProject project, IProgressMonitor monitor) {
+		IFile file = WorkspaceUtil.getFile(fileName);
+		Collection<HotspotDescriptor> hotspots = 
+			cache.getFileHotspots(fileName, project.getName());
+		
+		// TODO delete and re-check only changed hotspots
+		clearAlvorMarkers(file);
+		
+		if (conf.getMarkHotspots()) {
+			markHotspots(hotspots);
 		}
 		
-		if (monitor != null) {
-			monitor.beginTask("Checking SQL", 2000);
-		}
+		Collection<HotspotCheckingResult> checkingResults = 
+			complexChecker.checkNodeDescriptors(hotspots, conf, monitor);
 		
-		try {
-			cleanMarkers(scope);
-			cleanConfigurationMarkers(currentProject);
-			
-			ProjectConfiguration conf = ConfigurationManager.readProjectConfiguration(currentProject, true);
-			List<HotspotDescriptor> hotspots = AbstractStringEvaluator.findAndEvaluateHotspots(scope, conf, monitor);
-			
-			if (conf.getMarkHotspots()) {
-				markHotspots(hotspots);
-			}
-			
-			Collection<HotspotCheckingResult> checkingResults = 
-				complexChecker.checkNodeDescriptors(hotspots, conf, monitor);
-			
-			createCheckingMarkers(checkingResults, currentProject);
-		}
-		finally {
-			if (monitor != null) {
-				monitor.done();
-			}
-		}
+		createCheckingMarkers(checkingResults, project);
 	}
-
 	
-	private void cleanConfigurationMarkers(IProject project) {
+	private void clearAlvorMarkers(IResource res) {
 		try {
-			project.deleteMarkers(AlvorGuiPlugin.ERROR_MARKER_ID, true, IResource.DEPTH_ONE);
-			project.deleteMarkers(AlvorGuiPlugin.WARNING_MARKER_ID, true, IResource.DEPTH_ONE);
+			res.deleteMarkers(AlvorGuiPlugin.ERROR_MARKER_ID, true, IResource.DEPTH_INFINITE);
+			res.deleteMarkers(AlvorGuiPlugin.WARNING_MARKER_ID, true, IResource.DEPTH_INFINITE);
+			res.deleteMarkers(AlvorGuiPlugin.HOTSPOT_MARKER_ID, true, IResource.DEPTH_INFINITE);
+			res.deleteMarkers(AlvorGuiPlugin.UNSUPPORTED_MARKER_ID, true, IResource.DEPTH_INFINITE);
+			res.deleteMarkers(AlvorGuiPlugin.STRING_MARKER_ID, true, IResource.DEPTH_INFINITE);
 		} catch (CoreException e) {
-			LOG.error("Cleaning markers", e);
+			throw new RuntimeException(e);
 		}
 	}
-
-	private void cleanMarkers(IJavaElement[] scope) {
-		try {
-			for (IJavaElement element : scope) {
-				element.getResource().deleteMarkers(AlvorGuiPlugin.ERROR_MARKER_ID, true, IResource.DEPTH_INFINITE);
-				element.getResource().deleteMarkers(AlvorGuiPlugin.WARNING_MARKER_ID, true, IResource.DEPTH_INFINITE);
-				element.getResource().deleteMarkers(AlvorGuiPlugin.HOTSPOT_MARKER_ID, true, IResource.DEPTH_INFINITE);
-				element.getResource().deleteMarkers(AlvorGuiPlugin.UNSUPPORTED_MARKER_ID, true, IResource.DEPTH_INFINITE);
-				element.getResource().deleteMarkers(AlvorGuiPlugin.STRING_MARKER_ID, true, IResource.DEPTH_INFINITE);
-			}
-		} catch (Exception e) {
-			LOG.exception(e);
-		}
-	}
-	
-	private static void createMarker(String message, String markerType, Integer severity, IPosition pos) {
-		
-		if (DummyPosition.isDummyPosition(pos)) {
-			// TODO get rid of this situation
-			LOG.message("Warning: Dummy position in 'createMarker'");
-			return;
-		}
-		
-		// collect attributes of markers into this map
-		Map<String, Comparable<?>> map = new HashMap<String, Comparable<?>>();
-		if (severity != null) {
-			map.put(IMarker.SEVERITY, severity);
-		}
-		
-		// Seems that markers with too long messages are not shown
-		String finalMessage = message;
-		if (message.length() > 800) {
-			finalMessage = message.substring(0, 800) + "...";
-		}
-		MarkerUtilities.setMessage(map, finalMessage);
-		
-		
-		IResource res = PositionUtil.getPositionResource(pos);
-		map.put(IMarker.LOCATION, res.getFullPath().toString());
-		
-		
-		// include position info only when there is proper position given
-		int charStart = pos.getStart();
-		int charEnd = charStart + pos.getLength();
-		if (charStart > 0 || charEnd > 0) { 
-			MarkerUtilities.setCharStart(map, charStart);
-			MarkerUtilities.setCharEnd(map, charEnd);
-		}
-
-		
-		try {
-			MarkerUtilities.createMarker(res, map, markerType);
-		} catch (Exception e) {
-			LOG.exception(e);
-		}
-	}
-	
 	private void createCheckingMarkers(Collection<HotspotCheckingResult> checkingResults,
 			IProject currentProject) {
 		for (HotspotCheckingResult result : checkingResults) {
@@ -181,7 +113,7 @@ public class GuiChecker {
 		}
 	}
 
-	private void markHotspots(List<HotspotDescriptor> hotspots) {
+	private void markHotspots(Collection<HotspotDescriptor> hotspots) {
 		for (HotspotDescriptor hotspot : hotspots) {
 			String message;
 			String markerId;
@@ -279,4 +211,46 @@ public class GuiChecker {
 			return pos;
 		}
 	}
+	private static void createMarker(String message, String markerType, Integer severity, IPosition pos) {
+		
+		if (DummyPosition.isDummyPosition(pos)) {
+			// TODO get rid of this situation
+			LOG.message("Warning: Dummy position in 'createMarker'");
+			return;
+		}
+		
+		// collect attributes of markers into this map
+		Map<String, Comparable<?>> map = new HashMap<String, Comparable<?>>();
+		if (severity != null) {
+			map.put(IMarker.SEVERITY, severity);
+		}
+		
+		// Seems that markers with too long messages are not shown
+		String finalMessage = message;
+		if (message.length() > 800) {
+			finalMessage = message.substring(0, 800) + "...";
+		}
+		MarkerUtilities.setMessage(map, finalMessage);
+		
+		
+		IResource res = PositionUtil.getPositionResource(pos);
+		map.put(IMarker.LOCATION, res.getFullPath().toString());
+		
+		
+		// include position info only when there is proper position given
+		int charStart = pos.getStart();
+		int charEnd = charStart + pos.getLength();
+		if (charStart > 0 || charEnd > 0) { 
+			MarkerUtilities.setCharStart(map, charStart);
+			MarkerUtilities.setCharEnd(map, charEnd);
+		}
+
+		
+		try {
+			MarkerUtilities.createMarker(res, map, markerType);
+		} catch (Exception e) {
+			LOG.exception(e);
+		}
+	}
+	
 }

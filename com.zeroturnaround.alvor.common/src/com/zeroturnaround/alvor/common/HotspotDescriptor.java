@@ -6,10 +6,10 @@ import com.zeroturnaround.alvor.string.IPosition;
  * Analyzer creates one NodeDescriptor for each hotspot
  * 
  */
-public class NodeDescriptor {
+public class HotspotDescriptor {
 	private final IPosition position;
 	
-	public NodeDescriptor(IPosition position) {
+	public HotspotDescriptor(IPosition position) {
 		this.position = position;
 	}
 	

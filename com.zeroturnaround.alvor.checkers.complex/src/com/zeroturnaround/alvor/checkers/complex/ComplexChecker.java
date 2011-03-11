@@ -15,7 +15,7 @@ import com.zeroturnaround.alvor.checkers.HotspotInfo;
 import com.zeroturnaround.alvor.checkers.IAbstractStringChecker;
 import com.zeroturnaround.alvor.checkers.sqldynamic.DynamicSQLChecker;
 import com.zeroturnaround.alvor.checkers.sqlstatic.SyntacticalSQLChecker;
-import com.zeroturnaround.alvor.common.NodeDescriptor;
+import com.zeroturnaround.alvor.common.HotspotDescriptor;
 import com.zeroturnaround.alvor.common.PositionUtil;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
@@ -35,7 +35,7 @@ public class ComplexChecker {
 	private static final ILog HOTSPOTS_LOG = Logs.getLog("Hotspots");
 	
 
-	public Collection<HotspotCheckingResult> checkNodeDescriptors(List<NodeDescriptor> hotspots, 
+	public Collection<HotspotCheckingResult> checkNodeDescriptors(Collection<HotspotDescriptor> hotspots, 
 		ProjectConfiguration configuration, IProgressMonitor monitor) {
 		
 		int unsupportedCount = 0;
@@ -44,7 +44,7 @@ public class ComplexChecker {
 		List<IAbstractStringChecker> checkers = AbstractStringCheckerManager.INSTANCE.getCheckers();
 		
 		List<StringNodeDescriptor> validHotspots = new ArrayList<StringNodeDescriptor>();
-		for (NodeDescriptor hotspot : hotspots) {
+		for (HotspotDescriptor hotspot : hotspots) {
 			if (hotspot instanceof StringNodeDescriptor) {
 				validHotspots.add((StringNodeDescriptor) hotspot);
 				// TODO this makes log quite big

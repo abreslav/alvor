@@ -12,8 +12,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -39,9 +37,9 @@ import com.zeroturnaround.alvor.cache.Cache;
 import com.zeroturnaround.alvor.cache.CacheProvider;
 import com.zeroturnaround.alvor.cache.FileRecord;
 import com.zeroturnaround.alvor.cache.PatternRecord;
-import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.common.FunctionPattern;
-import com.zeroturnaround.alvor.common.NodeDescriptor;
+import com.zeroturnaround.alvor.common.HotspotPattern;
+import com.zeroturnaround.alvor.common.HotspotDescriptor;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.StringPattern;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
@@ -53,76 +51,40 @@ import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
 import com.zeroturnaround.alvor.crawler.util.ASTUtil;
 import com.zeroturnaround.alvor.crawler.util.JavaModelUtil;
 
-/*
+/**
+ * This class combines services from SearchEngine, Crawler and Cache to update Cache
+ * and updates Cache
+ * 
  * Observations about speed of searching:
  *   * searching with SearchPattern.createSearchPattern(IJavaElement, ...) is 2x faster than
  *     with SearchPattern.createSearchPattern(String, ...)
  *   * Or-ing several patterns together(with IJavaElement version) doesn't make search noticeably slower
  *   * Searching with scope=IJavaProject vs scope=allFilesInJavaProject seems equally fast
  */
-
-public class SearchBasedCacheBuilder {
-	private static final ILog LOG = Logs.getLog(SearchBasedCacheBuilder.class);
+public class StringCollector {
+	private static final ILog LOG = Logs.getLog(StringCollector.class);
 	private static final int MAX_ITERATIONS_FOR_FINDING_FIXPOINT = 5;
 	private Map<StringPattern, SearchPattern> searchPatterns = new HashMap<StringPattern, SearchPattern>();
 	private SearchEngine searchEngine = new SearchEngine();
 	private Map<ICompilationUnit, ASTNode> astCache = new WeakHashMap<ICompilationUnit, ASTNode>();
-	private Cache cache; 
+	private Cache cache = CacheProvider.getCache();
 	
-	public SearchBasedCacheBuilder() {
-		this.cache = CacheProvider.getCache();
+	public static void updateProjectCache(IProject project, Cache cache, IProgressMonitor monitor) {
+		StringCollector collector = new StringCollector(cache);
+		collector.doUpdateProjectCache(project, monitor);
 	}
 	
-	
-	
-	public void fullBuildProject(IProject project, IProgressMonitor monitor) {
-		cleanProject(project, monitor);
-		updateProjectPrimaryPatterns(project);
-		populateCacheWithFilesInfo(project);
-		updateProjectCache(project, monitor);
+	private StringCollector(Cache cache) {
+		this.cache = cache;		
 	}
 	
-	private void registerFileChanges(IResourceDelta delta) throws CoreException {
-		delta.accept(new IResourceDeltaVisitor() {
-			@Override
-			public boolean visit(IResourceDelta delta) throws CoreException {
-				
-				// TODO detect configuration change ???
-				
-				IResource resource = delta.getResource();
-				if (JavaModelUtil.isSourceFile(resource)) {
-					switch (delta.getKind()) {
-					case IResourceDelta.ADDED:
-						cache.addFile(resource.getProject().getName(), resource.getName());
-						break;
-					case IResourceDelta.REMOVED:
-						cache.removeFile(resource.getName());
-						break;
-					case IResourceDelta.CHANGED:
-						cache.invalidateFile(resource.getName());
-						break;
-					default:
-						throw new IllegalArgumentException("Unexpected kind: " + delta.getKind());
-					}
-					return false; // file doesn't have children resources
-				}
-				else {
-					// visit children only if contains source
-					return JavaModelUtil.isSourceFolderOrPackage(resource);
-				}
-			}
-		});
-	}
-	
-	public void updateProjectPrimaryPatterns(IProject project) {
-		ProjectConfiguration conf = ConfigurationManager.readProjectConfiguration(project, true);
-		cache.setProjectPrimaryPatterns(project.getName(), conf.getHotspotPatterns());
-	}
-	
-	private void updateProjectCache(IProject project, IProgressMonitor monitor) {
-		
-		
+	private void doUpdateProjectCache(IProject project, IProgressMonitor monitor) {
 		// 0) TODO update inter-project stuff (import patterns)
+		
+		if (!cache.projectIsInitialized(project.getName())) {
+			updateProjectPrimaryPatterns(project);
+			populateCacheWithFilesInfo(project);
+		}
 		
 		Timer timer = new Timer("loop");
 		for (int i = 0; i < MAX_ITERATIONS_FOR_FINDING_FIXPOINT; i++) {
@@ -137,6 +99,11 @@ public class SearchBasedCacheBuilder {
 			}
 		}
 		timer.printTime();
+	}
+	
+	private void updateProjectPrimaryPatterns(IProject project) {
+		ProjectConfiguration conf = ConfigurationManager.readProjectConfiguration(project, true);
+		cache.setProjectPrimaryPatterns(project.getName(), conf.getHotspotPatterns());
 	}
 	
 	private void updateProjectCacheForNewPatterns(IJavaProject javaProject, 
@@ -203,9 +170,10 @@ public class SearchBasedCacheBuilder {
 		}
 	}
 	
-	private void processHotspot(MethodInvocation node, PatternRecord patternRecord) {
+	private void processHotspot(MethodInvocation inv, PatternRecord patternRecord) {
 		int argOffset = patternRecord.getPattern().getArgumentNo()-1;
-		NodeDescriptor desc = Crawler2.INSTANCE.evaluate((Expression)node.arguments().get(argOffset));
+		Expression node = (Expression)inv.arguments().get(argOffset);
+		HotspotDescriptor desc = Crawler2.INSTANCE.evaluate(node);
 		
 		if (desc instanceof StringNodeDescriptor) {
 			System.out.println(((StringNodeDescriptor)desc).getAbstractValue());
@@ -271,26 +239,12 @@ public class SearchBasedCacheBuilder {
 	}
 	
 	
-	public void cleanProject(IProject project, IProgressMonitor monitor) {
-		cache.clearProject(project.getName());
-	}
-
 	private void populateCacheWithFilesInfo(IProject project) {
 		Collection<ICompilationUnit> units = JavaModelUtil.getAllCompilationUnits
 		(JavaModelUtil.getJavaProjectFromProject(project), false);
 		cache.addFiles(project.getName(), JavaModelUtil.getCompilationUnitNames(units));
 	}
 
-	public void incrementalBuildProject(IProject project, IResourceDelta delta, IProgressMonitor monitor) {
-		try {
-			registerFileChanges(delta);
-			updateProjectCache(project, monitor);
-		} catch (CoreException e) {
-			throw new RuntimeException(e);
-		}
-	}
-	
-	
 	private SearchPattern getSearchPattern(IJavaProject javaProject, StringPattern stringPattern) {
 		
 		SearchPattern searchPattern = searchPatterns.get(stringPattern);
@@ -369,5 +323,4 @@ public class SearchBasedCacheBuilder {
 		
 		return NodeFinder.perform(ast, match.getOffset(), match.getLength());
 	}
-
 }

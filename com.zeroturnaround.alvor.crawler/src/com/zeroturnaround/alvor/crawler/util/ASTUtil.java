@@ -45,7 +45,6 @@ import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
-import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.common.PositionUtil;
 import com.zeroturnaround.alvor.string.IPosition;
 import com.zeroturnaround.alvor.string.Position;
@@ -175,11 +174,6 @@ public class ASTUtil {
 	}
 	
 	public static boolean invocationMayUseDeclaration (MethodInvocation inv, MethodDeclaration decl) {
-		// exclude abstract methods
-		if (inv.getName().getIdentifier().contains("getSequenceNextValueFunction")
-				|| inv.getName().getIdentifier().contains("getNextValueSQL")) {
-		}
-		
 		if (decl.getBody() == null) {
 			return false;
 		}

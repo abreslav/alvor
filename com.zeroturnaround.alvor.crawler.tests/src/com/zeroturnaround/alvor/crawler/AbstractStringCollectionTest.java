@@ -1,0 +1,33 @@
+package com.zeroturnaround.alvor.crawler;
+
+import java.util.List;
+
+import org.eclipse.core.resources.IProject;
+import org.junit.Test;
+
+import com.zeroturnaround.alvor.cache.Cache;
+import com.zeroturnaround.alvor.cache.CacheProvider;
+import com.zeroturnaround.alvor.common.HotspotDescriptor;
+import com.zeroturnaround.alvor.common.WorkspaceUtil;
+
+/**
+ * Tests Cache, StringCollector and Crawler
+ * @author Aivar
+ *
+ */
+public abstract class AbstractStringCollectionTest {
+	@Test
+	public abstract void findValidNodeDescriptors();
+	
+	protected void findAndValidateNodeDescriptors(String projectName) {
+		IProject project = WorkspaceUtil.getProject(projectName);
+		CrawlerTestUtil.validateNodeDescriptors(getNodeDescriptors(project), project);
+	}
+	
+	private List<HotspotDescriptor> getNodeDescriptors(IProject project) {
+		Cache cache = CacheProvider.getCache();
+		StringCollector.updateProjectCache(project, cache, null);
+		return cache.getProjectHotspots(project.getName());
+	}
+	
+}
