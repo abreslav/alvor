@@ -52,6 +52,7 @@ CREATE TABLE patterns
 	kind tinyint not null,
 	class_name varchar(300) not null,
 	method_name varchar(300) not null,
+	argument_types varchar(300) not null,
 	argument_index tinyint not null
 );;;
 

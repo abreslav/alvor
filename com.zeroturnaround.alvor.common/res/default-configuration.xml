@@ -1,10 +1,10 @@
 <!-- this file is used as starting point for creating custom configuration for specific projects -->
 <alvor>
     <hotspotPatterns>
-    	<hotspot className="java.sql.Connection" methodName="prepareStatement" argumentIndex="1" />
-    	<hotspot className="java.sql.Connection" methodName="prepareCall" argumentIndex="1" />
-    	<hotspot className="java.sql.Statement" methodName="execute" argumentIndex="1" />
-    	<hotspot className="java.sql.Statement" methodName="executeQuery" argumentIndex="1" />
+    	<hotspot className="java.sql.Connection" methodName="prepareStatement" argumentTypes="*" argumentIndex="1" />
+    	<hotspot className="java.sql.Connection" methodName="prepareCall" argumentTypes="*" argumentIndex="1" />
+    	<hotspot className="java.sql.Statement" methodName="execute" argumentTypes="*" argumentIndex="1" />
+    	<hotspot className="java.sql.Statement" methodName="executeQuery" argumentTypes="*" argumentIndex="1" />
     </hotspotPatterns>
     
     <dataSources>

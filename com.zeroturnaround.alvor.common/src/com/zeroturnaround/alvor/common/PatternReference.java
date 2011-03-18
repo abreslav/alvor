@@ -5,29 +5,17 @@ import com.zeroturnaround.alvor.string.IPosition;
 import com.zeroturnaround.alvor.string.PositionedString;
 
 public class PatternReference extends PositionedString {
-	private final String className;
-	private final String methodName;
-	private final int argumentIndex;
+	private final StringPattern pattern;
 
-	/* package */ PatternReference(IPosition pos, String className, String methodName, int argumentIndex) {
-		super(pos); // empty choice
-		this.className = className;
-		this.methodName = methodName;
-		this.argumentIndex = argumentIndex;
+	/* package */ PatternReference(IPosition pos, StringPattern pattern) {
+		super(pos);
+		this.pattern = pattern;
 	}
 	
-	public String getClassName() {
-		return className;
+	public StringPattern getPattern() {
+		return pattern;
 	}
 	
-	public String getMethodName() {
-		return methodName;
-	}
-	
-	public int getArgumentIndex() {
-		return argumentIndex;
-	}
-
 	@Override
 	public <R, D> R accept(
 			IAbstractStringVisitor<? extends R, ? super D> visitor, D data) {

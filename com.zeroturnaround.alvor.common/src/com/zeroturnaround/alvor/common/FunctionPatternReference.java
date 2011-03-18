@@ -9,9 +9,9 @@ public class FunctionPatternReference extends PatternReference {
 
 	private final Map<Integer, IAbstractString> inputArguments;
 
-	public FunctionPatternReference(IPosition pos, String className,
-			String methodName, int argumentIndex, Map<Integer, IAbstractString> inputArguments) {
-		super(pos, className, methodName, argumentIndex);
+	public FunctionPatternReference(IPosition pos, StringPattern pattern, 
+			Map<Integer, IAbstractString> inputArguments) {
+		super(pos, pattern);
 		this.inputArguments = inputArguments;
 		
 	}

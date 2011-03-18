@@ -249,7 +249,7 @@ public class NodeSearchEngine {
 		final List<MethodDeclaration> result = new ArrayList<MethodDeclaration>();
 		
 		String patternStr = inv.getName().getIdentifier()
-			+ ASTUtil.getArgumentTypesString(inv.resolveMethodBinding());
+			+ ASTUtil.getArgumentTypesStringOld(inv.resolveMethodBinding());
 		
 		assert LOG.message("findMethodDeclarations: " + patternStr);
 		

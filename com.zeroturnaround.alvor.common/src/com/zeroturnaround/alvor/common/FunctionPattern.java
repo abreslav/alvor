@@ -2,8 +2,8 @@ package com.zeroturnaround.alvor.common;
 
 public class FunctionPattern extends StringPattern {
 
-	public FunctionPattern(String className, String methodName, int argumentIndex) {
-		super(className, methodName, argumentIndex);
+	public FunctionPattern(String className, String methodName, String argumentTypes, int argumentIndex) {
+		super(className, methodName, argumentTypes, argumentIndex);
 	}
 	
 	

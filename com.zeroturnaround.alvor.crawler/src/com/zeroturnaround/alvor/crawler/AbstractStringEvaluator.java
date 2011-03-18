@@ -33,8 +33,10 @@ import org.eclipse.jdt.core.dom.TagElement;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 import com.zeroturnaround.alvor.cache.CacheService;
+import com.zeroturnaround.alvor.common.EmptyStringConstant;
 import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.common.HotspotDescriptor;
+import com.zeroturnaround.alvor.common.RecursionConverter;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
@@ -130,7 +132,7 @@ public class AbstractStringEvaluator {
 	}
 	
 	public static List<HotspotDescriptor> evaluateMethodArgumentAtCallSites
-		(Collection<HotspotPattern> requests, IJavaElement[] scope, int level, ContextLink context,
+		(Collection<HotspotPattern> requests, IJavaElement[] scope, int level, NodePositionList context,
 				IProgressMonitor monitor) {
 		logMessage("SEARCHING", level, null);
 		for (HotspotPattern hotspotPattern : requests) {
@@ -152,7 +154,7 @@ public class AbstractStringEvaluator {
 		return result;
 	}
 	
-	private IAbstractString eval(IPosition pos, ContextLink context) {
+	private IAbstractString eval(IPosition pos, NodePositionList context) {
 		
 		IAbstractString abstractString = null;
 		if (shouldUseCache()) {
@@ -166,7 +168,7 @@ public class AbstractStringEvaluator {
 		
 		return abstractString;
 	}
-	private IAbstractString eval(Expression node, ContextLink context) {
+	private IAbstractString eval(Expression node, NodePositionList context) {
 		IAbstractString result = null;
 		if (shouldUseCache()) {
 			// may throw UnsupportedStringOpEx instead returning
@@ -204,7 +206,7 @@ public class AbstractStringEvaluator {
 	}
 	
 	
-	private IAbstractString doEval(Expression node, ContextLink context) {
+	private IAbstractString doEval(Expression node, NodePositionList context) {
 		// recursion check
 		IPosition pos = ASTUtil.getPosition(node);
 		if (context != null && context.contains(pos)) { 
@@ -270,8 +272,8 @@ public class AbstractStringEvaluator {
 		}
 		else if (node instanceof ConditionalExpression) {
 			StringChoice choice = new StringChoice(ASTUtil.getPosition(node),
-					eval(((ConditionalExpression)node).getThenExpression(), new ContextLink(node, context)),
-					eval(((ConditionalExpression)node).getElseExpression(), new ContextLink(node, context)));
+					eval(((ConditionalExpression)node).getThenExpression(), new NodePositionList(node, context)),
+					eval(((ConditionalExpression)node).getElseExpression(), new NodePositionList(node, context)));
 
 			if (optimizeChoice /*&& !choice.containsRecursion()*/) {
 				// Recursion removal procedure assumes certain structure
@@ -282,7 +284,7 @@ public class AbstractStringEvaluator {
 			}
 		}
 		else if (node instanceof ParenthesizedExpression) {
-			return eval(((ParenthesizedExpression)node).getExpression(), new ContextLink(node, context));
+			return eval(((ParenthesizedExpression)node).getExpression(), new NodePositionList(node, context));
 		}
 		else if (node instanceof InfixExpression) {
 			return evalInfix((InfixExpression)node, context);
@@ -298,7 +300,7 @@ public class AbstractStringEvaluator {
 		}
 	}
 	
-	private IAbstractString evalName(Name name, ContextLink context) {
+	private IAbstractString evalName(Name name, NodePositionList context) {
 		IVariableBinding var = (IVariableBinding)name.resolveBinding();
 		
 		if (var.isField()) {
@@ -309,7 +311,7 @@ public class AbstractStringEvaluator {
 		}
 	}
 
-	private IAbstractString evalField(IVariableBinding var, ContextLink context) {
+	private IAbstractString evalField(IVariableBinding var, NodePositionList context) {
 		assert var.isField();
 		
 		if ((var.getModifiers() & Modifier.FINAL) == 0) {
@@ -331,13 +333,13 @@ public class AbstractStringEvaluator {
 		return eval(frag.getInitializer(), context);
 	}
 
-	private IAbstractString evalNameBefore(Name name, ASTNode target, ContextLink context) {
+	private IAbstractString evalNameBefore(Name name, ASTNode target, NodePositionList context) {
 		NameUsage usage = VariableTracker.getLastReachingMod
 			((IVariableBinding)name.resolveBinding(), target);
-		return evalNameAfter(name, usage, new ContextLink(name, context)); 
+		return evalNameAfter(name, usage, new NodePositionList(name, context)); 
 	}
 
-	private IAbstractString evalInvocationResult(MethodInvocation inv, ContextLink context) {
+	private IAbstractString evalInvocationResult(MethodInvocation inv, NodePositionList context) {
 //		if (inv.toString().contains("Integer.toString")) {
 //			ITypeBinding typ = inv.getExpression().resolveTypeBinding();
 //			LOG.error(typ.getQualifiedName());
@@ -346,17 +348,17 @@ public class AbstractStringEvaluator {
 		if (inv.getExpression() != null
 				&& ASTUtil.isStringOrStringBuilderOrBuffer(inv.getExpression().resolveTypeBinding())) {
 			if (inv.getName().getIdentifier().equals("toString")) {
-				return eval(inv.getExpression(), new ContextLink(inv, context));
+				return eval(inv.getExpression(), new NodePositionList(inv, context));
 			}
 			else if (inv.getName().getIdentifier().equals("append")) {
 				return new StringSequence(
 						ASTUtil.getPosition(inv), 
-						eval(inv.getExpression(), new ContextLink(inv, context)),
-						eval((Expression)inv.arguments().get(0), new ContextLink(inv, context)));
+						eval(inv.getExpression(), new NodePositionList(inv, context)),
+						eval((Expression)inv.arguments().get(0), new NodePositionList(inv, context)));
 			}
 			else if (inv.getName().getIdentifier().equals("valueOf")) {
 				assert (ASTUtil.isString(inv.getExpression().resolveTypeBinding()));
-				return eval((Expression)inv.arguments().get(0), new ContextLink(inv, context));
+				return eval((Expression)inv.arguments().get(0), new NodePositionList(inv, context));
 			}
 			else {
 				throw new UnsupportedStringOpExAtNode("String/Builder/Buffer, method=" 
@@ -374,12 +376,12 @@ public class AbstractStringEvaluator {
 	}
 	
 	private IAbstractString evalInvocationArgOut(MethodInvocation inv,
-			int argumentIndex, ContextLink context) {
+			int argumentIndex, NodePositionList context) {
 		return evalInvocationResultOrArgOut(inv, argumentIndex, context); 
 	}
 
 	private IAbstractString evalInvocationResultOrArgOut(MethodInvocation inv,
-			int argumentIndex, ContextLink context) {
+			int argumentIndex, NodePositionList context) {
 		if (! supportInvocations) {
 			throw new UnsupportedStringOpExAtNode("Method call", inv);
 		}
@@ -406,7 +408,7 @@ public class AbstractStringEvaluator {
 			Expression arg = (Expression)item;
 			ITypeBinding typ = arg.resolveTypeBinding();
 			if (ASTUtil.isStringOrStringBuilderOrBuffer(typ)) {
-				arguments.add(argEvaluator.eval(arg, new ContextLink(inv, context)));
+				arguments.add(argEvaluator.eval(arg, new NodePositionList(inv, context)));
 			}
 			else {
 				arguments.add(null);
@@ -417,7 +419,7 @@ public class AbstractStringEvaluator {
 		List<IAbstractString> choices = new ArrayList<IAbstractString>();
 		for (IAbstractString template: templates) {
 			assert LOG.message("METHOD STRING for " + inv.getName().getFullyQualifiedName() + ": " + template);
-			choices.add(ArgumentApplier.applyArguments(template, arguments));
+			choices.add(ArgumentApplier.applyArgumentsList(template, arguments));
 		}
 		
 		if (choices.size() == 1) {
@@ -512,7 +514,7 @@ public class AbstractStringEvaluator {
 		}
 	}
 	
-	private IAbstractString evalClassInstanceCreation(ClassInstanceCreation node, ContextLink context) {
+	private IAbstractString evalClassInstanceCreation(ClassInstanceCreation node, NodePositionList context) {
 		if (!ASTUtil.isStringOrStringBuilderOrBuffer(node.resolveTypeBinding())) {
 			throw new UnsupportedStringOpExAtNode("Unsupported type in class instance creation: "
 					+ node.resolveTypeBinding().getQualifiedName(), node);
@@ -537,13 +539,13 @@ public class AbstractStringEvaluator {
 		}
 	}
 
-	private IAbstractString evalInfix(InfixExpression expr, ContextLink context) {
+	private IAbstractString evalInfix(InfixExpression expr, NodePositionList context) {
 		if (expr.getOperator() == InfixExpression.Operator.PLUS) {
 			List<IAbstractString> ops = new ArrayList<IAbstractString>();
-			ops.add(eval(expr.getLeftOperand(), new ContextLink(expr, context)));
-			ops.add(eval(expr.getRightOperand(), new ContextLink(expr, context)));
+			ops.add(eval(expr.getLeftOperand(), new NodePositionList(expr, context)));
+			ops.add(eval(expr.getRightOperand(), new NodePositionList(expr, context)));
 			for (Object operand: expr.extendedOperands()) {
-				ops.add(eval((Expression)operand, new ContextLink(expr, context)));
+				ops.add(eval((Expression)operand, new NodePositionList(expr, context)));
 			}
 			return new StringSequence(ASTUtil.getPosition(expr), ops);
 		}
@@ -552,7 +554,7 @@ public class AbstractStringEvaluator {
 		}
 	}
 	
-	private IAbstractString evalNameAfter(Name name, NameUsage usage, ContextLink context) {
+	private IAbstractString evalNameAfter(Name name, NameUsage usage, NodePositionList context) {
 		if (usage == null) {
 			throw new UnsupportedStringOpEx("internal error: Can't find definition for '" + name + "'", 
 					ASTUtil.getPosition(name));
@@ -581,7 +583,7 @@ public class AbstractStringEvaluator {
 	}
 	
 	
-	private IAbstractString evalNameAfterUsageChoice(Name name, NameUsageChoice uc, ContextLink context) {
+	private IAbstractString evalNameAfterUsageChoice(Name name, NameUsageChoice uc, NodePositionList context) {
 		IAbstractString thenStr;
 		if (uc.getThenUsage() == null) {
 			thenStr = this.evalNameBefore(name, uc.getNode(), context); // eval before if statement
@@ -612,7 +614,7 @@ public class AbstractStringEvaluator {
 	 * Meant for analyzing mutating method calls on name
 	 */
 	private IAbstractString evalNameAfterCallingItsMethod(Name name, 
-			NameInMethodCallExpression usage, ContextLink context) {
+			NameInMethodCallExpression usage, NodePositionList context) {
 		if (ASTUtil.isString(name.resolveTypeBinding())) {
 			// this usage doesn't affect it
 			return evalNameBefore(name, usage.getNode(), context);
@@ -633,8 +635,8 @@ public class AbstractStringEvaluator {
 				
 				return new StringSequence(
 						ASTUtil.getPosition(inv),
-						eval(inv.getExpression(), new ContextLink(inv, context)),
-						eval((Expression)inv.arguments().get(0), new ContextLink(inv, context)));
+						eval(inv.getExpression(), new NodePositionList(inv, context)),
+						eval((Expression)inv.arguments().get(0), new NodePositionList(inv, context)));
 			}
 			// non-modifying method calls
 			else if (methodName.equals("toString")
@@ -653,7 +655,7 @@ public class AbstractStringEvaluator {
 					|| methodName.equals("substring")
 					|| methodName.equals("trimToSize")
 					) {
-				return eval(inv.getExpression(), new ContextLink(inv, context));
+				return eval(inv.getExpression(), new NodePositionList(inv, context));
 			}
 			else {
 				throw new UnsupportedStringOpExAtNode("Unknown method called on StringBuilder: " 
@@ -662,7 +664,7 @@ public class AbstractStringEvaluator {
 		}
 	}
 
-	private IAbstractString evalNameAfterAssignment(Name name, NameAssignment usage, ContextLink context) {
+	private IAbstractString evalNameAfterAssignment(Name name, NameAssignment usage, NodePositionList context) {
 		if (usage.getOperator() == Assignment.Operator.ASSIGN) {
 			return eval(usage.getRightHandSide(), context);
 		}
@@ -678,8 +680,8 @@ public class AbstractStringEvaluator {
 			
 			return new StringSequence(
 					ASTUtil.getPosition(usage.getNode()),
-					eval(usage.getLeftHandSide(), new ContextLink(usage.getNode(), context)),
-					eval(usage.getRightHandSide(), new ContextLink(usage.getNode(), context)));
+					eval(usage.getLeftHandSide(), new NodePositionList(usage.getNode(), context)),
+					eval(usage.getRightHandSide(), new NodePositionList(usage.getNode(), context)));
 		}
 		else {
 			throw new UnsupportedStringOpExAtNode("Unknown assignment operator: " + usage.getOperator(), usage.getNode());
@@ -687,7 +689,7 @@ public class AbstractStringEvaluator {
 	}
 
  
-	private IAbstractString evalNameAfterBeingArgument(Name name, NameInArgument usage, ContextLink context) {
+	private IAbstractString evalNameAfterBeingArgument(Name name, NameInArgument usage, NodePositionList context) {
 		if (ASTUtil.isString(name.resolveTypeBinding())) {
 			// this usage doesn't affect it, keep looking
 			return evalNameBefore(name, usage.getNode(), context);
@@ -748,7 +750,7 @@ public class AbstractStringEvaluator {
 //		*/
 //	}
 
-	private IAbstractString evalNameAfterMethodEntryInParameter(NameInParameter usage, ContextLink context) {
+	private IAbstractString evalNameAfterMethodEntryInParameter(NameInParameter usage, NodePositionList context) {
 		if (this.templateConstructionMode) {
 			return new StringParameter(
 					ASTUtil.getPosition(usage.getNode()),
@@ -757,17 +759,17 @@ public class AbstractStringEvaluator {
 		else {
 			MethodDeclaration method = usage.getMethodDecl();
 			String methodName = method.getName().toString();
-			methodName += ASTUtil.getArgumentTypesString(method.resolveBinding());
+			methodName += ASTUtil.getArgumentTypesStringOld(method.resolveBinding());
 			
 			List<HotspotDescriptor> descList = evaluateMethodArgumentAtCallSites(
 					Collections.singleton(
 							(HotspotPattern)new HotspotPattern(
 									ASTUtil.getMethodClassName(method), 
-									methodName,
+									methodName, "*",
 									usage.getIndex()+1)), 
 					scope, // FIXME should be widened to all required projects 
 					ipLevel+1,
-					new ContextLink(usage.getNode(), context),
+					new NodePositionList(usage.getNode(), context),
 					this.monitor);
 			
 			List<IAbstractString> choices = new ArrayList<IAbstractString>();
@@ -787,7 +789,7 @@ public class AbstractStringEvaluator {
 			if (descList.size() == 0) {
 				throw new UnsupportedStringOpExAtNode("Possible problem, no callsites found in current project for: "
 						+ method.resolveBinding().getDeclaringClass().getQualifiedName() + "."
-						+ method.getName() + ASTUtil.getArgumentTypesString(method.resolveBinding()),
+						+ method.getName() + ASTUtil.getArgumentTypesStringOld(method.resolveBinding()),
 						usage.getNode());
 			}
 			return new StringChoice(

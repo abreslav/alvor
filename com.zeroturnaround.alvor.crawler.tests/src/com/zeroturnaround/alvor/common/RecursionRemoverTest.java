@@ -1,7 +1,9 @@
-package com.zeroturnaround.alvor.crawler;
+package com.zeroturnaround.alvor.common;
 
 import org.junit.Test;
 
+import com.zeroturnaround.alvor.common.EmptyStringConstant;
+import com.zeroturnaround.alvor.common.RecursionConverter;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.IPosition;
 import com.zeroturnaround.alvor.string.Position;

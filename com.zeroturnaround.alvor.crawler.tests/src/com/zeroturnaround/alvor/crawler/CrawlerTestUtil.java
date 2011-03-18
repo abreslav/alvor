@@ -62,8 +62,8 @@ public class CrawlerTestUtil {
 	
 	public static File getAndPrepareTestResultsFolder(IProject project) {
 		File folder = project.getLocation().append("AlvorSelfTestResults").toFile();
-		boolean result = folder.mkdirs();
-		assert result;
+		boolean success = folder.mkdirs();
+		assert (success || folder.exists());
 		return folder;
 	}
 	
@@ -116,10 +116,10 @@ public class CrawlerTestUtil {
 			throw new AssertionError("Positions are different");
 		}
 		else if (!concreteResult) {
-			throw new AssertionError("Node descriptors differ from expected");
+			throw new AssertionError("Concretes are different");
 		}
 		else if (!sortedAbstractResult) {
-			throw new AssertionError("Node descriptors differ from expected, but concretes are same");
+			throw new AssertionError("Abstract are different, but concretes are same");
 		}
 		else if (!abstractResult) {
 			throw new AssertionError("Abstract result is in different order");

@@ -23,8 +23,10 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.NodeFinder;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
@@ -38,8 +40,8 @@ import com.zeroturnaround.alvor.cache.CacheProvider;
 import com.zeroturnaround.alvor.cache.FileRecord;
 import com.zeroturnaround.alvor.cache.PatternRecord;
 import com.zeroturnaround.alvor.common.FunctionPattern;
-import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.common.HotspotDescriptor;
+import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.StringPattern;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
@@ -50,6 +52,7 @@ import com.zeroturnaround.alvor.configuration.ConfigurationManager;
 import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
 import com.zeroturnaround.alvor.crawler.util.ASTUtil;
 import com.zeroturnaround.alvor.crawler.util.JavaModelUtil;
+import com.zeroturnaround.alvor.string.IAbstractString;
 
 /**
  * This class combines services from SearchEngine, Crawler and Cache to update Cache
@@ -63,7 +66,7 @@ import com.zeroturnaround.alvor.crawler.util.JavaModelUtil;
  */
 public class StringCollector {
 	private static final ILog LOG = Logs.getLog(StringCollector.class);
-	private static final int MAX_ITERATIONS_FOR_FINDING_FIXPOINT = 5;
+	private static final int MAX_ITERATIONS_FOR_FINDING_FIXPOINT = 7;
 	private Map<StringPattern, SearchPattern> searchPatterns = new HashMap<StringPattern, SearchPattern>();
 	private SearchEngine searchEngine = new SearchEngine();
 	private Map<ICompilationUnit, ASTNode> astCache = new WeakHashMap<ICompilationUnit, ASTNode>();
@@ -88,7 +91,7 @@ public class StringCollector {
 		
 		Timer timer = new Timer("loop");
 		for (int i = 0; i < MAX_ITERATIONS_FOR_FINDING_FIXPOINT; i++) {
-			cache.startNewBatch();
+			cache.startNextBatch();
 			List<PatternRecord> patternRecords = cache.getNewProjectPatterns(project.getName());
 			if (patternRecords.isEmpty()) { // found fixpoint
 				break; 
@@ -149,32 +152,69 @@ public class StringCollector {
 		
 		assert !patterns.isEmpty();
 		
+		if (node instanceof MethodInvocation) {
+			processInvocationNodeForPatterns((MethodInvocation)node, patterns);
+		}
+		else if (node instanceof SimpleName && node.getParent() instanceof MethodDeclaration) {
+			SimpleName name = (SimpleName)node;
+			MethodDeclaration decl = (MethodDeclaration) name.getParent();
+			processDeclarationNodeForPatterns(name, decl, patterns);
+		}
+		else {
+			LOG.error("unexpected search match: " + node.getClass());
+		}
+		
+	}
+	
+	private void processInvocationNodeForPatterns(MethodInvocation inv, Collection<PatternRecord> patterns) {
 		boolean foundMatch = false;
 		for (PatternRecord rec : patterns) {
-			
-			if (node instanceof MethodInvocation 
-					&& rec.getPattern() instanceof HotspotPattern
-					&& ((MethodInvocation) node).getName().getIdentifier().equals(rec.getPattern().getMethodName())
-					) {
+			StringPattern pattern = rec.getPattern();
+			if (pattern instanceof HotspotPattern
+					// TODO more checks
+					&& pattern.getMethodName().equals(inv.getName().getIdentifier())) {
 				foundMatch = true;
-				processHotspot((MethodInvocation)node, rec);
-			}
-			else {
-				System.out.println("processNode: " + node.getClass());
+				processHotspot(inv, rec);
 			}
 		}
 		
 		if (!foundMatch) {
-			LOG.error("Couldn't match node with patterns, node class=" + node.getClass());
-			//throw new UnsupportedStringOpExAtNode("Couldn't match node with patterns", node);
+			LOG.error("Couldn't match search result with patterns, result=" + inv);
 		}
 	}
 	
+	private void processDeclarationNodeForPatterns(SimpleName name, MethodDeclaration decl, Collection<PatternRecord> patterns) {
+		boolean foundMatch = false;
+		for (PatternRecord rec : patterns) {
+			StringPattern pattern = rec.getPattern();
+			if (pattern instanceof FunctionPattern
+					// TODO more checks
+					&& pattern.getMethodName().equals(name.getIdentifier())) {
+				foundMatch = true;
+				processFunction(decl, rec);
+			}
+		}
+		
+		if (!foundMatch) {
+			LOG.error("Couldn't match search result with patterns, result=" + decl);
+		}
+	}
+	
+	private void processFunction(MethodDeclaration decl, PatternRecord rec) {
+		HotspotDescriptor desc = Crawler2.INSTANCE.getMethodTemplateDescriptor
+			(decl, rec.getPattern().getArgumentNo());
+		
+		cache.addHotspot(rec, desc);
+	}
+
 	private void processHotspot(MethodInvocation inv, PatternRecord patternRecord) {
 		int argOffset = patternRecord.getPattern().getArgumentNo()-1;
 		Expression node = (Expression)inv.arguments().get(argOffset);
 		HotspotDescriptor desc = Crawler2.INSTANCE.evaluate(node);
 		
+		cache.addHotspot(patternRecord, desc);
+		
+		// TODO temporary
 		if (desc instanceof StringNodeDescriptor) {
 			System.out.println(((StringNodeDescriptor)desc).getAbstractValue());
 		}
@@ -182,10 +222,8 @@ public class StringCollector {
 			System.out.println(((UnsupportedNodeDescriptor)desc).getProblemMessage());
 		}
 		else {
-			System.out.println("WHAAAT?");
+			throw new IllegalArgumentException();
 		}
-		cache.addHotspot(patternRecord, desc);
-		
 	}
 
 	private void performSearch(Collection<ICompilationUnit> units, SearchPattern pattern, 
@@ -209,15 +247,28 @@ public class StringCollector {
 		SearchPattern resultPattern = null; 
 		for (PatternRecord rec : patternRecords) {
 			if (rec.getBatchNo() > baseBatchNo) {
-				SearchPattern subPattern = getSearchPattern(javaProject, rec.getPattern());
-				if (subPattern == null) {
-					LOG.error("Hotspot pattern (" + rec.getPattern() + ") is not valid");
+				
+//				if (rec.getPattern().getArgumentNo() == -1) {
+//					LOG.error("SKIPPED function pattern"); // FIXME
+//					continue;
+//				}
+//				
+				
+				try {
+					SearchPattern subPattern = getSearchPattern(javaProject, rec.getPattern());
+					if (subPattern == null) {
+						LOG.error("Hotspot pattern (" + rec.getPattern() + ") is not valid");
+					}
+					else if (resultPattern == null) {
+						resultPattern = subPattern;
+					}
+					else {
+						resultPattern = SearchPattern.createOrPattern(subPattern, resultPattern);
+					}
 				}
-				else if (resultPattern == null) {
-					resultPattern = subPattern;
-				}
-				else {
-					resultPattern = SearchPattern.createOrPattern(subPattern, resultPattern);
+				catch (RuntimeException e) {
+					LOG.error("Failed creating search pattern for: " + rec.getPattern(), e);
+					throw e;
 				}
 			}
 		}
@@ -248,38 +299,94 @@ public class StringCollector {
 	private SearchPattern getSearchPattern(IJavaProject javaProject, StringPattern stringPattern) {
 		
 		SearchPattern searchPattern = searchPatterns.get(stringPattern);
+		
 		if (searchPattern == null) {
 			
+			int limitTo;
 			if (stringPattern instanceof HotspotPattern) {
-				Collection<IMethod> methods = findHotspotMethods(javaProject,
-						stringPattern.getClassName(),
-						stringPattern.getMethodName(),
-						stringPattern.getArgumentNo());
-				searchPattern = createCombinedMethodReferencePattern(methods);
+				limitTo = IJavaSearchConstants.REFERENCES;
 			}
 			else if (stringPattern instanceof FunctionPattern) {
-				throw new IllegalStateException("What now?"); // TODO
+				limitTo = IJavaSearchConstants.DECLARATIONS;
 			}
+			else {
+				throw new IllegalArgumentException();
+			}
+			
+			Collection<IMethod> methods = findPatternMethods(javaProject, stringPattern);
+			searchPattern = createCombinedMethodSearchPattern(methods, limitTo);
 			searchPatterns.put(stringPattern, searchPattern);
 		}
 		
 		return searchPattern;		
 	}
 	
+	
+	private List<IMethod> findPatternMethods(IJavaProject javaProject, StringPattern pattern) {
+		try {
+			IType type = javaProject.findType(pattern.getClassName());
+			if (type == null) {
+				throw new IllegalArgumentException("Can't find type for: " + pattern.getClassName());
+			}
+			
+//			System.out.println("LOOKING FOR: " + pattern.getClassName() 
+//					+ "." + pattern.getMethodName()
+//					+ "(" + pattern.getArgumentTypes() + ")");
+			
+			List<IMethod> result = new ArrayList<IMethod>();
+			for (IMethod method: type.getMethods()) {
+				if (method.getElementName().equals(pattern.getMethodName())) {
+					
+					// all compatible methods
+					if (pattern.getArgumentTypes().equals("*")) {
+						if (pattern.getArgumentNo() == -1) {
+							// TODO check that result is string
+							result.add(method);
+						}
+						else {
+							// TODO check that has enough arguments and respective argument type is string
+							result.add(method);
+						}
+					}
+					
+					// if specific method is required, then type signatures must match
+					else {
+						String methodArgs = ASTUtil.getSimpleArgumentTypesAsString(method);
+						System.out.println("COMPARING: (" + pattern.getMethodName() 
+								+ ") "+ methodArgs + " vs. " + pattern.getArgumentTypes());
+						if (methodArgs.equals(pattern.getArgumentTypes())) {
+							result.add(method);
+						}
+					}
+				}
+			}
+			return result;
+		} 
+		catch (JavaModelException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	@Deprecated
 	private List<IMethod> findHotspotMethods(IJavaProject javaProject, String className, String methodName, 
-			int stringArgumentNo) {
+			String argumentTypes, int stringArgumentNo) {
 		int stringArgIndex = stringArgumentNo-1;
 		try {
 			IType type = javaProject.findType(className);
+			if (type == null) {
+				throw new IllegalArgumentException("Can't find type for: " + className);
+			}
+			
 			List<IMethod> result = new ArrayList<IMethod>();
 			for (IMethod method: type.getMethods()) {
 				if (method.getElementName().equals(methodName)) {
 					String[] paramTypes = method.getParameterTypes();
-					if (paramTypes.length > stringArgIndex && (
+					if (stringArgIndex >= 0 && paramTypes.length > stringArgIndex && (
 							paramTypes[stringArgIndex].equals("Ljava.lang.String;")
 							|| paramTypes[stringArgIndex].equals("Qjava.lang.String;")
 							|| paramTypes[stringArgIndex].equals("QString;")
-							)) {
+							)
+							|| stringArgumentNo == -1) {
 						result.add(method);
 					}
 				}
@@ -291,10 +398,10 @@ public class StringCollector {
 		}
 	}
 	
-	private SearchPattern createCombinedMethodReferencePattern(Collection<IMethod> methods) {
+	private SearchPattern createCombinedMethodSearchPattern(Collection<IMethod> methods, int limitTo) {
 		SearchPattern combinedPattern = null;
 		for (IMethod method : methods) {
-			SearchPattern pattern = SearchPattern.createPattern(method, IJavaSearchConstants.REFERENCES);
+			SearchPattern pattern = SearchPattern.createPattern(method, limitTo);
 			if (combinedPattern == null) {
 				combinedPattern = pattern;
 			}
