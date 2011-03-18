@@ -45,8 +45,8 @@ public class ConfigurationManagerTest {
 	
 	private ProjectConfiguration createNormalConfiguration() {
 		List<HotspotPattern> hotspots = new ArrayList<HotspotPattern>();
-		hotspots.add(new HotspotPattern("ClassName1", "MethodName1", 1));
-		hotspots.add(new HotspotPattern("ClassName2", "MethodName2", 2));
+		hotspots.add(new HotspotPattern("ClassName1", "MethodName1", "*", 1));
+		hotspots.add(new HotspotPattern("ClassName2", "MethodName2", "*", 2));
 		
 		List<DataSourceProperties> dataSources = new ArrayList<DataSourceProperties>();
 		dataSources.add(new DataSourceProperties("*", "DriverName1", "URL1", "userName1", "password1"));

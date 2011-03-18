@@ -9,6 +9,7 @@ public class UnsupportedNodeDescriptor extends HotspotDescriptor {
 	public UnsupportedNodeDescriptor(IPosition hotspotPosition, String problemMessage, 
 			IPosition errorPosition) {
 		super(hotspotPosition);
+		assert problemMessage != null;
 		this.problemMessage = problemMessage;
 		this.errorPosition = errorPosition;
 	}
@@ -21,4 +22,8 @@ public class UnsupportedNodeDescriptor extends HotspotDescriptor {
 		return errorPosition;
 	}
 
+	@Override
+	public String toString() {
+		return getPosition().toString() + ", unsupported: " + problemMessage;
+	}
 }

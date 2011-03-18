@@ -112,9 +112,11 @@ public class ConfigurationManager {
 		NodeList hotspotNodes = doc.getElementsByTagName("hotspot");
 		for (int i = 0; i < hotspotNodes.getLength(); i++) {
 			Element node = (Element)hotspotNodes.item(i);
+			String argTypes = node.getAttribute("argumentTypes"); 
 			hotspotPatterns.add (new HotspotPattern(
 					node.getAttribute("className"),
-					node.getAttribute("methodName"), 
+					node.getAttribute("methodName"),
+					(argTypes.isEmpty() ? "*" : argTypes),
 					Integer.valueOf(node.getAttribute("argumentIndex"))));
 		}
 
@@ -162,6 +164,7 @@ public class ConfigurationManager {
 			Element node = doc.createElement("hotspot");
 			node.setAttribute("className", hotspot.getClassName());
 			node.setAttribute("methodName", hotspot.getMethodName());
+			node.setAttribute("argumentTypes", hotspot.getArgumentTypes());
 			node.setAttribute("argumentIndex", String.valueOf(hotspot.getArgumentNo()));
 			hotspotNodes.appendChild(node);
 		}

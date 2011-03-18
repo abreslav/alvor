@@ -16,8 +16,13 @@ public class NameInArgument extends NameUsage {
 		return inv;
 	}
 	
+	@Deprecated
 	public int getIndex() {
 		return index;
+	}
+	
+	public int getArgumentNo() {
+		return index+1;
 	}
 	
 	public ASTNode getNode() {

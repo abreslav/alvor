@@ -50,7 +50,7 @@ public class ArgumentApplierTest {
 		//System.out.println("Actual: " + ArgumentApplier.applyArguments(abs, args).toString());
 		
 		assertEquals(result.toString(), 
-				ArgumentApplier.applyArguments(abs, args).toString());
+				ArgumentApplier.applyArgumentsList(abs, args).toString());
 	}
 	
 	@Test(expected=IndexOutOfBoundsException.class)
@@ -70,7 +70,7 @@ public class ArgumentApplierTest {
 		args.add(new StringConstant("p0"));
 		args.add(new StringConstant("p1"));
 		
-		ArgumentApplier.applyArguments(abs, args);
+		ArgumentApplier.applyArgumentsList(abs, args);
 	}
 
 	
@@ -86,6 +86,6 @@ public class ArgumentApplierTest {
 				new StringConstant("e"));
 		
 		assertEquals(abs.toString(), 
-				ArgumentApplier.applyArguments(abs, Collections.EMPTY_LIST).toString());
+				ArgumentApplier.applyArgumentsList(abs, Collections.EMPTY_LIST).toString());
 	}
 }

@@ -10,7 +10,7 @@ import com.zeroturnaround.alvor.string.StringRepetition;
 import com.zeroturnaround.alvor.string.StringSequence;
 import com.zeroturnaround.alvor.string.StringParameter;
 
-public class AsbtractStringUtils {
+public class AbstractStringUtils {
 
 	public static final IAbstractStringVisitor<Boolean, Void> LOOP_FINDER = new IAbstractStringVisitor<Boolean, Void>() {
 	
@@ -30,7 +30,7 @@ public class AsbtractStringUtils {
 		public Boolean visitStringChoice(StringChoice stringChoice,
 				Void data) {
 			for (IAbstractString item : stringChoice.getItems()) {
-				if (AsbtractStringUtils.hasLoops(item)) {
+				if (AbstractStringUtils.hasLoops(item)) {
 					return true;
 				}
 			}
@@ -53,7 +53,7 @@ public class AsbtractStringUtils {
 		public Boolean visitStringSequence(StringSequence stringSequence,
 				Void data) {
 			for (IAbstractString item : stringSequence.getItems()) {
-				if (AsbtractStringUtils.hasLoops(item)) {
+				if (AbstractStringUtils.hasLoops(item)) {
 					return true;
 				}
 			}

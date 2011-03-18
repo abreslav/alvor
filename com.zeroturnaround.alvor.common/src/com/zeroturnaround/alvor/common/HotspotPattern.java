@@ -4,8 +4,8 @@ package com.zeroturnaround.alvor.common;
 // could be called also ArgumentPattern
 public class HotspotPattern extends StringPattern {
 
-	public HotspotPattern(String className, String methodName, int argumentIndex) {
-		super(className, methodName, argumentIndex);
+	public HotspotPattern(String className, String methodName, String argumentTypes, int argumentIndex) {
+		super(className, methodName, argumentTypes, argumentIndex);
 	}
 	
 	public boolean equals(Object obj) {

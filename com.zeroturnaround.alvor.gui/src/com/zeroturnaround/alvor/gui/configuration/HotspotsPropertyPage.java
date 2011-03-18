@@ -73,7 +73,7 @@ public class HotspotsPropertyPage extends CommonPropertyPage {
 				}
 				// TODO validate individual parts
 				list.add(new HotspotPattern(parts[0].trim(), parts[1].trim(), 
-						Integer.parseInt(parts[2].trim())));
+						"*", Integer.parseInt(parts[2].trim())));
 			}
 			i++;
 			

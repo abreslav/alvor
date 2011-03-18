@@ -1,4 +1,4 @@
-package com.zeroturnaround.alvor.crawler;
+package com.zeroturnaround.alvor.common;
 
 import com.zeroturnaround.alvor.string.DummyPosition;
 import com.zeroturnaround.alvor.string.IPosition;

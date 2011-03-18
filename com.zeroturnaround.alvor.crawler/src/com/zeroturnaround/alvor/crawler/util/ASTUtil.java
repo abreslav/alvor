@@ -4,7 +4,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -494,7 +496,8 @@ public class ASTUtil {
 		return isString(typeBinding) || isStringBuilderOrBuffer(typeBinding);
 	}
 	
-	public static String getArgumentTypesString(IMethodBinding binding) {
+	@Deprecated
+	public static String getArgumentTypesStringOld(IMethodBinding binding) {
 		String result = "(";
 		for (int i = 0; i < binding.getParameterTypes().length; i++) {
 			if (i > 0) {
@@ -542,9 +545,41 @@ public class ASTUtil {
 		return PositionUtil.getFileString(file);
 	}
 
-//	public static boolean invocationCorrespondsToPattern(MethodInvocation node,
-//			HotspotPattern pattern) {
-//		// TODO
-//		return false;
-//	}
+	/** 
+	 * output should match with getArgumentTypesAsString(IMethod method)
+	 * @param method
+	 * @return
+	 */
+	public static String getSimpleArgumentTypesAsString(IMethodBinding methodBinding) {
+		StringBuilder result = new StringBuilder("");
+		for (ITypeBinding type : methodBinding.getParameterTypes()) {
+			if (result.length() > 0) {
+				result.append(","); 
+			}
+			result.append(type.getErasure().getName());
+		}
+		
+		return result.toString();
+	}
+
+	/** 
+	 * output should match with getArgumentTypesAsString(IMethodBinding methodBinding)
+	 * @param method
+	 * @return
+	 */
+	public static String getSimpleArgumentTypesAsString(IMethod method) {
+		StringBuilder result = new StringBuilder("");
+		for (String type : method.getParameterTypes()) {
+			if (result.length() > 0) {
+				result.append(","); 
+			}
+			String simple = Signature.toString(type);
+			simple = Signature.getSimpleName(simple);
+			simple = Signature.getTypeErasure(simple);
+			result.append(simple);
+		}
+		
+		return result.toString();
+	}
+
 }

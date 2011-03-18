@@ -3,6 +3,7 @@ package com.zeroturnaround.alvor.crawler;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.zeroturnaround.alvor.common.EmptyStringConstant;
 import com.zeroturnaround.alvor.string.AbstractStringCollection;
 import com.zeroturnaround.alvor.string.AbstractStringEqualsVisitor;
 import com.zeroturnaround.alvor.string.IAbstractString;

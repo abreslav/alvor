@@ -1,18 +1,23 @@
 package com.zeroturnaround.alvor.common;
 
 public class StringPattern {
-	private int argumentIndex;
+	private int argumentNo;
 	private String methodName;
+	private String argumentTypes;
 	private String className;
 
-	protected StringPattern(String className, String methodName, int argumentIndex) {
+	protected StringPattern(String className, String methodName, String argumentTypes, int argumentNo) {
+		if (argumentNo == 0 || argumentNo < -1) {
+			throw new IllegalArgumentException("argumentNo must be positive or -1");
+		}
 		this.className = className;
 		this.methodName = methodName;
-		this.argumentIndex = argumentIndex;
+		this.argumentTypes = argumentTypes;
+		this.argumentNo = argumentNo;
 	}
 	
 	public int getArgumentNo() {
-		return argumentIndex;
+		return argumentNo;
 	}
 	
 	public String getClassName() {
@@ -23,21 +28,13 @@ public class StringPattern {
 		return methodName;
 	}
 	
-	public void setClassName(String className) {
-		this.className = className;
-	}
-	
-	public void setMethodName(String methodName) {
-		this.methodName = methodName;
-	}
-	
-	public void setArgumentIndex(int argumentIndex) {
-		this.argumentIndex = argumentIndex;
-	}
-	
 	@Override
 	public String toString() {
 		return "Argument " + getArgumentNo() + " of " + getClassName() + "." +  getMethodName();
+	}
+	
+	public String getArgumentTypes() {
+		return argumentTypes;
 	}
 	
 	@Override
@@ -45,7 +42,8 @@ public class StringPattern {
 		int result = 22;
 		result = result * 31 + className.hashCode();
 		result = result * 31 + methodName.hashCode();
-		result = result * 31 + argumentIndex;
+		result = result * 31 + argumentTypes.hashCode();
+		result = result * 31 + argumentNo;
 		return result;
 	}
 	

@@ -1,9 +1,9 @@
-package com.zeroturnaround.alvor.crawler;
+package com.zeroturnaround.alvor.common;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
+import com.zeroturnaround.alvor.common.EmptyStringConstant;
 import com.zeroturnaround.alvor.string.AbstractStringCollection;
 import com.zeroturnaround.alvor.string.DummyPosition;
 import com.zeroturnaround.alvor.string.IAbstractString;
@@ -101,7 +101,7 @@ public class RecursionConverter {
 	 * 
 	 * 
 	 */
-	/* package */ static IAbstractString recursionToRepetition(IAbstractString str) {
+	public static IAbstractString recursionToRepetition(IAbstractString str) {
 		
 		// simple Abstract Strings
 		if (str instanceof StringConstant

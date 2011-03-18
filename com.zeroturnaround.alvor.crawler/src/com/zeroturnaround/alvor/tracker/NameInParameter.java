@@ -16,8 +16,13 @@ public class NameInParameter extends NameUsage {
 		return methodDecl;
 	}
 
+	@Deprecated
 	public int getIndex() {
 		return index;
+	}
+	
+	public int getParameterNo() {
+		return index+1;
 	}
 	
 	public ASTNode getNode() {
