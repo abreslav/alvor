@@ -44,7 +44,7 @@ public class CleanCheckHandler extends AbstractHandler {
 				
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
-					checker.performCleanCheck(finalElement.getJavaProject().getProject(), new IJavaElement[] {finalElement}, monitor);
+					checker.cleanUpdateProjectMarkers(finalElement.getJavaProject().getProject(), monitor);
 					return Status.OK_STATUS;
 				}
 			};

@@ -10,7 +10,6 @@ import org.junit.Test;
 
 import com.zeroturnaround.alvor.sqlparser.ParserSimulator;
 import com.zeroturnaround.alvor.string.IAbstractString;
-import com.zeroturnaround.alvor.string.parser.AbstractStringParser;
 
 
 public class ParserPerformanceTest {
@@ -37,7 +36,7 @@ public class ParserPerformanceTest {
 //		System.out.println("Lines: " + count);
 //		System.out.println("Unique: " + strings.size());
 		
-		List<IAbstractString> all = AbstractStringParser.parseFile("data/earved_all.txt");
+//		List<IAbstractString> all = AbstractStringParser.parseFile("data/earved_all.txt");
 //		System.out.println("Strings: " + all.size());
 
 //		doTest(all);
@@ -48,7 +47,7 @@ public class ParserPerformanceTest {
 		
 	}
 
-	private void doTest(List<IAbstractString> all) {
+	public void doTest(List<IAbstractString> all) {
 		ParserSimulator.getLALRInstance().allTime = 0;
 		long time = System.nanoTime();
 		for (IAbstractString as : all) {

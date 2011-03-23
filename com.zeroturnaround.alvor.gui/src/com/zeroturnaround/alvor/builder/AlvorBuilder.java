@@ -1,14 +1,7 @@
 package com.zeroturnaround.alvor.builder;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
@@ -16,199 +9,79 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.JavaCore;
 
-import com.zeroturnaround.alvor.cache.CacheService;
-import com.zeroturnaround.alvor.common.PositionUtil;
-import com.zeroturnaround.alvor.common.logging.ILog;
-import com.zeroturnaround.alvor.common.logging.Logs;
-import com.zeroturnaround.alvor.common.logging.Timer;
-import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
+import com.zeroturnaround.alvor.cache.Cache;
+import com.zeroturnaround.alvor.cache.CacheProvider;
+import com.zeroturnaround.alvor.crawler.util.JavaModelUtil;
 import com.zeroturnaround.alvor.gui.GuiChecker;
-import com.zeroturnaround.alvor.string.IPosition;
 
 public class AlvorBuilder extends IncrementalProjectBuilder {
 	public static final String BUILDER_ID = "com.zeroturnaround.alvor.builder.AlvorBuilder";
 
-	GuiChecker checker = null; // seems I can't initialize it here (?)
+	private GuiChecker guiChecker = new GuiChecker();
+	private Cache cache = CacheProvider.getCache();
 	
-	private static ILog LOG = Logs.getLog(AlvorBuilder.class);
-	private Set<IFile> invalidatedFiles = new HashSet<IFile>();
-
-	private class DeltaVisitor implements IResourceDeltaVisitor {
-		private final Collection<IFile> resources = new ArrayList<IFile>();
-		
-		public boolean visit(IResourceDelta delta) throws CoreException {
-			IResource resource = delta.getResource();
-			if (resource instanceof IFile) {
-				switch (delta.getKind()) {
-				case IResourceDelta.ADDED:
-					addResource(resource);
-					break;
-				case IResourceDelta.REMOVED:
-					removeFromCache(resource);
-					break;
-				case IResourceDelta.CHANGED:
-					removeFromCache(resource);
-					addResource(resource);
-					break;
-				default:
-					throw new IllegalArgumentException("Unexpected kind: " + delta.getKind());
-				}
-				return false; // file doesn't have children
-			}
-			else if (resource instanceof IFolder) {
-				if (JavaCore.create((IFolder) resource) == null) {
-					return false; // don't visit non-source folders
-				}
-				else {
-					return true; // will visit children
-				}
-			}
-			else { // project or some other container
-				return true;
-			}
-		}
-
-		private void addResource(IResource resource) {
-			if (resource instanceof IFile && JavaCore.create((IFile) resource) != null) {
-				resources.add((IFile) resource);
-			}
-		}
-
-		public Collection<IFile> getResources() {
-			return resources;
-		};
-	}
-
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected IProject[] build(int kind, Map args, IProgressMonitor monitor) throws CoreException {
-		try {
-			switch (kind) {
-			case FULL_BUILD:
-				cleanBuild(monitor);
-				break;
-			case CLEAN_BUILD:
-				cleanBuild(monitor);
-				break;
-			default:
-	//			cleanBuild(monitor);
-				IResourceDelta delta = getDelta(getProject());
-				if (delta == null) {
-					fullBuild(monitor);
-				} else {
-					incrementalBuild(delta, monitor);
-				}
-			}
-		} catch (OperationCanceledException e) {
-			this.forgetLastBuiltState();
-			throw e;
+
+		// first invalidate files (all or changed)
+		if (kind == FULL_BUILD || kind == CLEAN_BUILD) {
+			this.clean(monitor);
 		}
-		return null;
-	}
+		else if (kind == INCREMENTAL_BUILD || kind == AUTO_BUILD) {
+			this.registerFileChanges(this.getDelta(this.getProject()));
+		}
+		else {
+			throw new IllegalArgumentException("Unknown build kind: " + kind);
+		}
 
-	protected void cleanBuild(final IProgressMonitor monitor) {
-		assert LOG.message("==============================");
-		assert LOG.message("Clean build on " + getProject());
-		clearCache();
-		NodeSearchEngine.clearASTCache();
-		checkResources(new IJavaElement[] {JavaCore.create(getProject())}, monitor);
-	}
-
-	protected void fullBuild(final IProgressMonitor monitor) {
-		assert LOG.message("==============================");
-		assert LOG.message("Full build (no files changed?) on " + getProject());
-		checkResources(new IJavaElement[] {JavaCore.create(getProject())}, monitor);
+		// then bring everything back up-to-date
+		guiChecker.updateProjectMarkersForChangedFiles(this.getProject(), monitor);
+		
+		return null; // TODO what's this?
 	}
 	
-	protected void incrementalBuild(IResourceDelta delta,
-			IProgressMonitor monitor) throws CoreException {
-		assert LOG.message("==============================");
-		assert LOG.message("Incremental build on " + getProject());
+	@Override
+	protected void clean(IProgressMonitor monitor) throws CoreException {
+		cache.clearProject(this.getProject().getName());
+	}
+	
+	private void registerFileChanges(IResourceDelta delta) throws CoreException {
 		
-		invalidatedFiles.clear();
+		// TODO if .alvor ends up here then clean cache
+		// (if .alvor change is not detected, then clean cache after changing in gui)
 		
-		Timer overall = new Timer("Overall");
-		
-		Timer t = new Timer();
-		t.start("Delta visitor");
-		
-		DeltaVisitor visitor = new DeltaVisitor();
-		delta.accept(visitor);
-		
-		// it's supposedly more efficient to remove all files together from cache 
-		Set<String> filesToRecheck = new HashSet<String>();
-		for (IFile f : invalidatedFiles) {
-			// react only to changes in java files (in a source folder)
-			if (JavaCore.create(f) instanceof ICompilationUnit) {
-				filesToRecheck.add(PositionUtil.getFileString(f));
-				NodeSearchEngine.removeASTFromCache(f);
+		delta.accept(new IResourceDeltaVisitor() {
+			@Override
+			public boolean visit(IResourceDelta delta) throws CoreException {
+				
+				// TODO detect configuration change ???
+				
+				IResource resource = delta.getResource();
+				if (JavaModelUtil.isSourceFile(resource)) {
+					switch (delta.getKind()) {
+					case IResourceDelta.ADDED:
+						cache.addFile(resource.getProject().getName(), resource.getName());
+						break;
+					case IResourceDelta.REMOVED:
+						cache.removeFile(resource.getName());
+						break;
+					case IResourceDelta.CHANGED:
+						cache.invalidateFile(resource.getName());
+						break;
+					default:
+						throw new IllegalArgumentException("Unexpected kind: " + delta.getKind());
+					}
+					return false; // file doesn't have children resources
+				}
+				else {
+					// visit children only if contains source
+					return JavaModelUtil.isSourceFolderOrPackage(resource);
+				}
 			}
-		}
-		
-//		if (filesToRecheck.isEmpty()) {
-//			assert LOG.message("no compilation units to re-check");
-//			return;
-//		}
-		
-		assert LOG.message("!!! Files to invalidate (directly): " + filesToRecheck);
-		CacheService.getCacheService().removeFiles(filesToRecheck);
-		
-		t.printTime();
-		
-		Collection<IFile> resources = visitor.getResources();
-		
-//		((CacheServiceImpl) CacheService.getCacheService()).dumpLog();
-		
-		List<IJavaElement> elements = new ArrayList<IJavaElement>();
-
-		t.start("Invalidate Hotspots");
-		Collection<IPosition> hotspots = CacheService.getCacheService().getInvalidatedHotspotPositions();
-		t.printTimeAndStart("Elements");
-		
-		assert LOG.message("Invalidated hotspot positions:");
-		for (IPosition position : hotspots) {
-			assert LOG.message(position);
-			elements.add(JavaCore.create(PositionUtil.getFile(position)));
-		}
-		
-		for (IFile file : resources) {
-			elements.add(JavaCore.create(file));
-		}
-		t.printTime();
-
-		for (IJavaElement e : elements) {
-			assert LOG.message(e);
-		}
-		t.start("Search and check");
-		checkResources(elements.toArray(new IJavaElement[elements.size()]), monitor);
-		t.printTime();
-		
-		overall.printTime();		
+		});
 	}
+	
 
-	private void checkResources(IJavaElement[] elements, IProgressMonitor monitor) {
-		try {
-			if (checker == null) {
-				checker = new GuiChecker();
-			}
-			checker.performIncrementalCheck(getProject(), elements, monitor);
-		} catch (Throwable e) {
-			LOG.error("AlvorBuilder.checkResources", e);
-		} 
-	}
-
-	private void clearCache() {
-		CacheService.getCacheService().clearAll();		
-	}
-
-	private void removeFromCache(IResource resource) {
-		if (resource instanceof IFile) {
-			invalidatedFiles.add((IFile)resource);
-		}
-	}
 }

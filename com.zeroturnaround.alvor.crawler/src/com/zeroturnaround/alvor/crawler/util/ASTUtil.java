@@ -5,6 +5,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.dom.AST;
@@ -32,6 +33,7 @@ import org.eclipse.jdt.core.dom.Javadoc;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.NodeFinder;
 import org.eclipse.jdt.core.dom.NullLiteral;
 import org.eclipse.jdt.core.dom.NumberLiteral;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
@@ -496,22 +498,6 @@ public class ASTUtil {
 		return isString(typeBinding) || isStringBuilderOrBuffer(typeBinding);
 	}
 	
-	@Deprecated
-	public static String getArgumentTypesStringOld(IMethodBinding binding) {
-		String result = "(";
-		for (int i = 0; i < binding.getParameterTypes().length; i++) {
-			if (i > 0) {
-				result += ',';
-			}
-			//result += binding.getParameterTypes()[i].getQualifiedName();
-			result += binding.getParameterTypes()[i].getName();
-		}
-		result += ")";
-		
-		return result;
-	}
-
-	
 	public static ASTNode parseCompilationUnit(ICompilationUnit cUnit, boolean requireBindings) {
 		ASTParser parser = ASTParser.newParser(AST.JLS3);
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
@@ -582,4 +568,28 @@ public class ASTUtil {
 		return result.toString();
 	}
 
+	public static ASTNode getASTNode(IPosition position) {
+		IFile file = PositionUtil.getFile(position);
+		ICompilationUnit cUnit = JavaCore.createCompilationUnitFrom(file);
+		int start = position.getStart();
+		int length = position.getLength();
+		
+		if (cUnit == null) {
+			throw new IllegalArgumentException("Compilation unit is null for the position: " + position);
+		}
+		
+		return getASTNode(cUnit, start, length);
+	}
+
+	private static ASTNode getASTNode(ICompilationUnit cUnit, int start, int length) {
+		assert cUnit != null;
+		ASTParser parser = ASTParser.newParser(AST.JLS3);
+		parser.setKind(ASTParser.K_COMPILATION_UNIT);
+		parser.setResolveBindings(true);
+		parser.setSource(cUnit);
+		ASTNode ast = parser.createAST(null);
+		return NodeFinder.perform(ast, start, length);
+	}
+	
+	
 }

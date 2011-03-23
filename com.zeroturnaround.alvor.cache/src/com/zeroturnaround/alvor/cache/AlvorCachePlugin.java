@@ -20,7 +20,7 @@ public class AlvorCachePlugin extends Plugin {
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		CacheService.getCacheService().shutdown();
+		CacheProvider.shutdownCache();
 		defaultInstance = null;
 		super.stop(context);
 	}

@@ -50,7 +50,8 @@ public class DatabaseHelper {
 	
 	
 	public void execute(String sql, Object... arguments) {
-		executeOrQuery(sql, false, Statement.NO_GENERATED_KEYS, arguments);
+		Object result = executeOrQuery(sql, false, Statement.NO_GENERATED_KEYS, arguments);
+		assert !(result instanceof ResultSet); 
 	}
 	
 	public ResultSet query(String sql, Object... arguments) {
@@ -145,6 +146,7 @@ public class DatabaseHelper {
 				return result;
 			}
 			else {
+				rs.close();
 				return null;
 			}
 		} 
@@ -216,9 +218,11 @@ public class DatabaseHelper {
 			ResultSet res = stmt.getGeneratedKeys();
 			if (res.next()) {
 				int id = res.getInt(1);
+				res.close();
 				return id;
 			}
 			else {
+				res.close();
 				throw new IllegalStateException("Result has no rows");
 			}
 		}
@@ -231,5 +235,9 @@ public class DatabaseHelper {
 	
 	public Connection getConnection() {
 		return conn;
+	}
+	
+	public int getPreparedStatementsCount() {
+		return this.preparedStatments.size();
 	}
 }

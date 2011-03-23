@@ -6,9 +6,6 @@ import com.zeroturnaround.alvor.string.IPosition;
 public class ConnectionDescriptor {
 	
 	private String expression;
-	private String url;
-//	private String username;
-//	private String password;
 	private IPosition pos;
 
 	public ConnectionDescriptor(IPosition pos, String expression) {
@@ -16,15 +13,6 @@ public class ConnectionDescriptor {
 		this.expression = expression;
 	}
 
-	@Override
-	public String toString() {
-		String s = expression;
-		if (url != null) {
-			s += ", URL: " + url;
-		}
-		return s;
-	}
-	
 	public String getExpression() {
 		return expression;
 	}
