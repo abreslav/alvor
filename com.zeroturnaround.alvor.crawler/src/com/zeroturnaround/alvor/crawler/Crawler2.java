@@ -1,5 +1,6 @@
 package com.zeroturnaround.alvor.crawler;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,15 +28,16 @@ import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.TagElement;
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 import com.zeroturnaround.alvor.common.EmptyStringConstant;
+import com.zeroturnaround.alvor.common.FieldPattern;
+import com.zeroturnaround.alvor.common.FieldPatternReference;
 import com.zeroturnaround.alvor.common.FunctionPattern;
 import com.zeroturnaround.alvor.common.FunctionPatternReference;
+import com.zeroturnaround.alvor.common.HotspotDescriptor;
 import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.common.HotspotPatternReference;
-import com.zeroturnaround.alvor.common.HotspotDescriptor;
-import com.zeroturnaround.alvor.common.PositionUtil;
-import com.zeroturnaround.alvor.common.RecursionConverter;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
@@ -47,6 +49,7 @@ import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.IPosition;
 import com.zeroturnaround.alvor.string.StringChoice;
 import com.zeroturnaround.alvor.string.StringConstant;
+import com.zeroturnaround.alvor.string.StringParameter;
 import com.zeroturnaround.alvor.string.StringRandomInteger;
 import com.zeroturnaround.alvor.string.StringRecursion;
 import com.zeroturnaround.alvor.string.StringSequence;
@@ -62,12 +65,34 @@ public class Crawler2 {
 	private static final ILog LOG = Logs.getLog(Crawler2.class);
 	private static final String RESULT_FOR_SQL_CHECKER = "@ResultForSQLChecker";
 	private static boolean optimizeChoice = false;
+	public static enum ParamEvalMode {AS_HOTSPOT, AS_PARAM};
 	
 	public final static Crawler2 INSTANCE = new Crawler2();
 	
-	public HotspotDescriptor evaluate(Expression node) {
+	public HotspotDescriptor evaluateFinalField(VariableDeclarationFragment decl) {
 		try {
-			IAbstractString str = removeRecursion(eval(node, null));
+			Expression init = decl.getInitializer();
+			if (init == null) {
+				throw new UnsupportedStringOpExAtNode("Fields without initializer are not supported", decl);
+			}
+			IVariableBinding var = decl.resolveBinding();
+			if ((var.getModifiers() & Modifier.FINAL) == 0) {
+				// FUTURE: support also non-final String-s
+				throw new UnsupportedStringOpExAtNode("Non-final fields are not supported: "
+						+ var.getDeclaringClass().getName() + '.' + var.getName(), decl);
+			}
+			IAbstractString str = removeRecursion(eval(init, null, ParamEvalMode.AS_HOTSPOT));
+			
+			return new StringNodeDescriptor(ASTUtil.getPosition(decl), str);
+		} catch (UnsupportedStringOpEx e) {
+			return new UnsupportedNodeDescriptor(ASTUtil.getPosition(decl), 
+					e.getMessage(), e.getPosition());
+		}
+	}
+
+	public HotspotDescriptor evaluate(Expression node, ParamEvalMode mode) {
+		try {
+			IAbstractString str = removeRecursion(eval(node, null, mode));
 			
 			return new StringNodeDescriptor(ASTUtil.getPosition(node), str);
 		} catch (UnsupportedStringOpEx e) {
@@ -76,7 +101,7 @@ public class Crawler2 {
 		}
 	}
 
-	private IAbstractString eval(Expression node, NodePositionList context) {
+	private IAbstractString eval(Expression node, NodePositionList context, ParamEvalMode mode) {
 		// recursion check
 		IPosition pos = ASTUtil.getPosition(node);
 		if (context != null && context.contains(pos)) { 
@@ -128,19 +153,19 @@ public class Crawler2 {
 					bStr, "\"" + bStr + "\"");
 		}
 		else if (node instanceof Name) {
-			return evalName((Name)node, context);
+			return evalName((Name)node, context, mode);
 		}
 		else if (node instanceof CastExpression) {
 			CastExpression cExp = (CastExpression)node;
 			LOG.message("CAST expression: " + cExp + ", cast type=" + cExp.getType()
 					+ ", exp type=" + cExp.getExpression().resolveTypeBinding().getQualifiedName());
 			// try evaluating content
-			return eval(cExp.getExpression(), context);
+			return eval(cExp.getExpression(), context, mode);
 		}
 		else if (node instanceof ConditionalExpression) {
 			StringChoice choice = new StringChoice(ASTUtil.getPosition(node),
-					eval(((ConditionalExpression)node).getThenExpression(), new NodePositionList(node, context)),
-					eval(((ConditionalExpression)node).getElseExpression(), new NodePositionList(node, context)));
+					eval(((ConditionalExpression)node).getThenExpression(), new NodePositionList(node, context), mode),
+					eval(((ConditionalExpression)node).getElseExpression(), new NodePositionList(node, context), mode));
 
 			if (optimizeChoice /*&& !choice.containsRecursion()*/) {
 				// Recursion removal procedure assumes certain structure
@@ -151,16 +176,16 @@ public class Crawler2 {
 			}
 		}
 		else if (node instanceof ParenthesizedExpression) {
-			return eval(((ParenthesizedExpression)node).getExpression(), new NodePositionList(node, context));
+			return eval(((ParenthesizedExpression)node).getExpression(), new NodePositionList(node, context), mode);
 		}
 		else if (node instanceof InfixExpression) {
-			return evalInfix((InfixExpression)node, context);
+			return evalInfix((InfixExpression)node, context, mode);
 		}
 		else if (node instanceof MethodInvocation) {
-			return evalInvocationResult((MethodInvocation)node, context);
+			return evalInvocationResult((MethodInvocation)node, context, mode);
 		}
 		else if (node instanceof ClassInstanceCreation) {
-			return evalClassInstanceCreation((ClassInstanceCreation)node, context);
+			return evalClassInstanceCreation((ClassInstanceCreation)node, context, mode);
 		}
 		else {
 			throw new UnsupportedStringOpExAtNode("getValOf(" + node.getClass().getName() + ")", node);
@@ -169,10 +194,10 @@ public class Crawler2 {
 	
 
 	private IAbstractString evalInvocationArgOut(MethodInvocation inv,
-			int argumentNo, NodePositionList context) {
+			int argumentNo, NodePositionList context, ParamEvalMode mode) {
 		
 		IMethodBinding binding = inv.resolveMethodBinding(); 
-		String className = binding.getDeclaringClass().getQualifiedName();
+		String className = binding.getDeclaringClass().getErasure().getQualifiedName();
 		String methodName = inv.getName().getIdentifier();
 		
 		
@@ -181,29 +206,29 @@ public class Crawler2 {
 				className, methodName,
 				ASTUtil.getSimpleArgumentTypesAsString(binding),
 				argumentNo
-		), evaluateStringArguments(inv, context));
+		), evaluateStringArguments(inv, context, mode));
 	}
 
-	private IAbstractString evalInvocationResult(MethodInvocation inv, NodePositionList context) {
+	private IAbstractString evalInvocationResult(MethodInvocation inv, NodePositionList context, ParamEvalMode mode) {
 		//return evalInvocationResultOrArgOut(inv, -1, context);
 		// First handle special methods
 		IMethodBinding binding = inv.resolveMethodBinding(); 
-		String className = binding.getDeclaringClass().getQualifiedName();
+		String className = binding.getDeclaringClass().getErasure().getQualifiedName();
 		
 		if (inv.getExpression() != null
 				&& ASTUtil.isStringOrStringBuilderOrBuffer(inv.getExpression().resolveTypeBinding())) {
 			if (inv.getName().getIdentifier().equals("toString")) {
-				return eval(inv.getExpression(), new NodePositionList(inv, context));
+				return eval(inv.getExpression(), new NodePositionList(inv, context), mode);
 			}
 			else if (inv.getName().getIdentifier().equals("append")) {
 				return new StringSequence(
 						ASTUtil.getPosition(inv), 
-						eval(inv.getExpression(), new NodePositionList(inv, context)),
-						eval((Expression)inv.arguments().get(0), new NodePositionList(inv, context)));
+						eval(inv.getExpression(), new NodePositionList(inv, context), mode),
+						eval((Expression)inv.arguments().get(0), new NodePositionList(inv, context), mode));
 			}
 			else if (inv.getName().getIdentifier().equals("valueOf")) {
 				assert (ASTUtil.isString(inv.getExpression().resolveTypeBinding()));
-				return eval((Expression)inv.arguments().get(0), new NodePositionList(inv, context));
+				return eval((Expression)inv.arguments().get(0), new NodePositionList(inv, context), mode);
 			}
 			else {
 				throw new UnsupportedStringOpExAtNode("String/Builder/Buffer, method=" 
@@ -225,17 +250,17 @@ public class Crawler2 {
 		
 		// handle as general method
 		else  {
-			// TODO need to handle overloading
 			String methodName = inv.getName().getIdentifier();
 			return new FunctionPatternReference(ASTUtil.getPosition(inv), new FunctionPattern(
 					className, methodName, 
 					ASTUtil.getSimpleArgumentTypesAsString(binding),
 					-1
-			), evaluateStringArguments(inv, context));
+			), evaluateStringArguments(inv, context, mode));
 		}			
 	}
 	
-	private Map<Integer, IAbstractString> evaluateStringArguments(MethodInvocation inv, NodePositionList context) {
+	private Map<Integer, IAbstractString> evaluateStringArguments(MethodInvocation inv, 
+			NodePositionList context, ParamEvalMode mode) {
 		Map<Integer, IAbstractString> inputArguments = new HashMap<Integer, IAbstractString>();
 		
 		for (int i = 0; i < inv.arguments().size(); i++) {
@@ -243,13 +268,13 @@ public class Crawler2 {
 			ITypeBinding typ = arg.resolveTypeBinding();
 			if (ASTUtil.isStringOrStringBuilderOrBuffer(typ)) {
 				// using 1-based indexing
-				inputArguments.put(i+1, this.eval(arg, new NodePositionList(inv, context)));
+				inputArguments.put(i+1, this.eval(arg, new NodePositionList(inv, context), mode));
 			}
 		}
 		return inputArguments;
 	}
 
-	private IAbstractString evalName(Name name, NodePositionList context) {
+	private IAbstractString evalName(Name name, NodePositionList context, ParamEvalMode mode) {
 		ITypeBinding type = name.resolveTypeBinding();
 		if (!ASTUtil.isStringOrStringBuilderOrBuffer(type)) {
 			throw new UnsupportedStringOpExAtNode("Unsupported type of Name: " + type.getQualifiedName(), name);
@@ -257,24 +282,23 @@ public class Crawler2 {
 		
 		IVariableBinding var = (IVariableBinding)name.resolveBinding();
 		if (var.isField()) {
-			// FIXME
-			throw new UnsupportedStringOpExAtNode("reference to field", name);
-			// return new StringChoice(ASTUtil.getPosition(name));
-			//throw new RuntimeException();
-//			return evalField(var, context);
+			return new FieldPatternReference(ASTUtil.getPosition(name),
+					new FieldPattern(var.getDeclaringClass().getErasure().getQualifiedName(), var.getName()));
 		}
 		else {
-			return evalNameBefore(name, name, context);
+			
+			return evalNameBefore(name, name, context, mode);
 		}
 	}
 
-	private IAbstractString evalNameBefore(Name name, ASTNode target, NodePositionList context) {
+	private IAbstractString evalNameBefore(Name name, ASTNode target, 
+			NodePositionList context, ParamEvalMode mode) {
 		NameUsage usage = VariableTracker.getLastReachingMod
 			((IVariableBinding)name.resolveBinding(), target);
-		return evalNameAfter(name, usage, new NodePositionList(name, context)); 
+		return evalNameAfter(name, usage, new NodePositionList(name, context), mode); 
 	}
 
-	private IAbstractString evalNameAfter(Name name, NameUsage usage, NodePositionList context) {
+	private IAbstractString evalNameAfter(Name name, NameUsage usage, NodePositionList context, ParamEvalMode mode) {
 		if (usage == null) {
 			throw new UnsupportedStringOpEx("internal error: Can't find definition for '" + name + "'", 
 					ASTUtil.getPosition(name));
@@ -283,27 +307,19 @@ public class Crawler2 {
 		
 		
 		if (usage instanceof NameUsageChoice) {
-			return evalNameAfterUsageChoice(name, (NameUsageChoice)usage, context);
+			return evalNameAfterUsageChoice(name, (NameUsageChoice)usage, context, mode);
 		}
 		else if (usage instanceof NameAssignment) {
-			return evalNameAfterAssignment(name, (NameAssignment)usage, context);
+			return evalNameAfterAssignment(name, (NameAssignment)usage, context, mode);
 		}
 		else if (usage instanceof NameInParameter) {
-			IPosition pos = ASTUtil.getPosition(usage.getNode());
-			NameInParameter nip = (NameInParameter) usage;
-			IMethodBinding binding = nip.getMethodDecl().resolveBinding();
-			return new HotspotPatternReference(pos, new HotspotPattern( 
-					binding.getDeclaringClass().getQualifiedName(),
-					binding.getName(),
-					ASTUtil.getSimpleArgumentTypesAsString(binding),
-					nip.getParameterNo()
-			));
+			return evalNameInParameter(name, (NameInParameter)usage, context, mode);
 		}
 		else if (usage instanceof NameInArgument) {
-			return evalNameAfterBeingArgument(name, (NameInArgument)usage, context);
+			return evalNameAfterBeingArgument(name, (NameInArgument)usage, context, mode);
 		}
 		else if (usage instanceof NameInMethodCallExpression) {
-			return evalNameAfterCallingItsMethod(name, (NameInMethodCallExpression)usage, context);
+			return evalNameAfterCallingItsMethod(name, (NameInMethodCallExpression)usage, context, mode);
 		}
 		else {
 			throw new UnsupportedStringOpExAtNode("Unsupported NameUsage: " + usage.getClass(), usage.getNode());
@@ -311,32 +327,51 @@ public class Crawler2 {
 	}
 	
 	
-	private IAbstractString evalNameAfterBeingArgument(Name name, NameInArgument usage, NodePositionList context) {
-		if (ASTUtil.isString(name.resolveTypeBinding())) {
-			// this usage doesn't affect it, keep looking
-			return evalNameBefore(name, usage.getNode(), context);
-		}
+	private IAbstractString evalNameInParameter(Name name, NameInParameter usage, 
+			NodePositionList context, ParamEvalMode mode) {
+		
+		IPosition pos = ASTUtil.getPosition(usage.getNode());
+		
+		if (mode == ParamEvalMode.AS_PARAM) { // this means that client is constructing a method template
+			return new StringParameter(pos, usage.getParameterNo());
+		} 
 		else {
-			assert ASTUtil.isStringBuilderOrBuffer(name.resolveTypeBinding());
-			return evalInvocationArgOut(usage.getInv(), usage.getArgumentNo(), context); 
+			IMethodBinding binding = usage.getMethodDecl().resolveBinding();
+			return new HotspotPatternReference(pos, new HotspotPattern( 
+					binding.getDeclaringClass().getErasure().getQualifiedName(),
+					binding.getName(),
+					ASTUtil.getSimpleArgumentTypesAsString(binding),
+					usage.getParameterNo()
+			));
 		}
 	}
 
-	private IAbstractString evalNameAfterUsageChoice(Name name, NameUsageChoice uc, NodePositionList context) {
-		IAbstractString thenStr;
-		if (uc.getThenUsage() == null) {
-			thenStr = this.evalNameBefore(name, uc.getNode(), context); // eval before if statement
+	private IAbstractString evalNameAfterBeingArgument(Name name, NameInArgument usage, NodePositionList context, ParamEvalMode mode) {
+		if (ASTUtil.isString(name.resolveTypeBinding())) {
+			// this usage doesn't affect it, keep looking
+			return evalNameBefore(name, usage.getNode(), context, mode);
 		}
 		else {
-			 thenStr = this.evalNameAfter(name, uc.getThenUsage(), context);
+			assert ASTUtil.isStringBuilderOrBuffer(name.resolveTypeBinding());
+			return evalInvocationArgOut(usage.getInv(), usage.getArgumentNo(), context, mode); 
+		}
+	}
+
+	private IAbstractString evalNameAfterUsageChoice(Name name, NameUsageChoice uc, NodePositionList context, ParamEvalMode mode) {
+		IAbstractString thenStr;
+		if (uc.getThenUsage() == null) {
+			thenStr = this.evalNameBefore(name, uc.getNode(), context, mode); // eval before if statement
+		}
+		else {
+			 thenStr = this.evalNameAfter(name, uc.getThenUsage(), context, mode);
 		}
 		
 		IAbstractString elseStr;
 		if (uc.getElseUsage() == null) {
-			elseStr = this.evalNameBefore(name, uc.getNode(), context); // eval before if statement
+			elseStr = this.evalNameBefore(name, uc.getNode(), context, mode); // eval before if statement
 		}
 		else {
-			elseStr = this.evalNameAfter(name, uc.getElseUsage(), context);
+			elseStr = this.evalNameAfter(name, uc.getElseUsage(), context, mode);
 		}
 		
 		StringChoice result = new StringChoice(ASTUtil.getPosition(uc.getNode()),
@@ -350,13 +385,13 @@ public class Crawler2 {
 	}
 	
 
-	private IAbstractString evalInfix(InfixExpression expr, NodePositionList context) {
+	private IAbstractString evalInfix(InfixExpression expr, NodePositionList context, ParamEvalMode mode) {
 		if (expr.getOperator() == InfixExpression.Operator.PLUS) {
 			List<IAbstractString> ops = new ArrayList<IAbstractString>();
-			ops.add(eval(expr.getLeftOperand(), new NodePositionList(expr, context)));
-			ops.add(eval(expr.getRightOperand(), new NodePositionList(expr, context)));
+			ops.add(eval(expr.getLeftOperand(), new NodePositionList(expr, context), mode));
+			ops.add(eval(expr.getRightOperand(), new NodePositionList(expr, context), mode));
 			for (Object operand: expr.extendedOperands()) {
-				ops.add(eval((Expression)operand, new NodePositionList(expr, context)));
+				ops.add(eval((Expression)operand, new NodePositionList(expr, context), mode));
 			}
 			return new StringSequence(ASTUtil.getPosition(expr), ops);
 		}
@@ -365,7 +400,7 @@ public class Crawler2 {
 		}
 	}
 	
-	private IAbstractString evalClassInstanceCreation(ClassInstanceCreation node, NodePositionList context) {
+	private IAbstractString evalClassInstanceCreation(ClassInstanceCreation node, NodePositionList context, ParamEvalMode mode) {
 		if (!ASTUtil.isStringOrStringBuilderOrBuffer(node.resolveTypeBinding())) {
 			throw new UnsupportedStringOpExAtNode("Unsupported type in class instance creation: "
 					+ node.resolveTypeBinding().getQualifiedName(), node);
@@ -374,7 +409,7 @@ public class Crawler2 {
 			Expression arg = (Expression)node.arguments().get(0);
 			// string initializer
 			if (arg.resolveTypeBinding().getName().equals("String")) {
-				return eval(arg, context);
+				return eval(arg, context, mode);
 			}
 			else if (arg.resolveTypeBinding().getName().equals("int")) {
 				return new EmptyStringConstant(ASTUtil.getPosition(node));
@@ -390,9 +425,9 @@ public class Crawler2 {
 		}
 	}
 
-	private IAbstractString evalNameAfterAssignment(Name name, NameAssignment usage, NodePositionList context) {
+	private IAbstractString evalNameAfterAssignment(Name name, NameAssignment usage, NodePositionList context, ParamEvalMode mode) {
 		if (usage.getOperator() == Assignment.Operator.ASSIGN) {
-			return eval(usage.getRightHandSide(), context);
+			return eval(usage.getRightHandSide(), context, mode);
 		}
 		else if (usage.getOperator() == Assignment.Operator.PLUS_ASSIGN) {
 			// extra recursion check because concatenation expression is implicit
@@ -406,8 +441,8 @@ public class Crawler2 {
 			
 			return new StringSequence(
 					ASTUtil.getPosition(usage.getNode()),
-					eval(usage.getLeftHandSide(), new NodePositionList(usage.getNode(), context)),
-					eval(usage.getRightHandSide(), new NodePositionList(usage.getNode(), context)));
+					eval(usage.getLeftHandSide(), new NodePositionList(usage.getNode(), context), mode),
+					eval(usage.getRightHandSide(), new NodePositionList(usage.getNode(), context), mode));
 		}
 		else {
 			throw new UnsupportedStringOpExAtNode("Unknown assignment operator: " + usage.getOperator(), usage.getNode());
@@ -417,10 +452,10 @@ public class Crawler2 {
 	 * Meant for analyzing mutating method calls on name
 	 */
 	private IAbstractString evalNameAfterCallingItsMethod(Name name, 
-			NameInMethodCallExpression usage, NodePositionList context) {
+			NameInMethodCallExpression usage, NodePositionList context, ParamEvalMode mode) {
 		if (ASTUtil.isString(name.resolveTypeBinding())) {
 			// this usage doesn't affect it
-			return evalNameBefore(name, usage.getNode(), context);
+			return evalNameBefore(name, usage.getNode(), context, mode);
 		}
 		
 		else {
@@ -438,8 +473,8 @@ public class Crawler2 {
 				
 				return new StringSequence(
 						ASTUtil.getPosition(inv),
-						eval(inv.getExpression(), new NodePositionList(inv, context)),
-						eval((Expression)inv.arguments().get(0), new NodePositionList(inv, context)));
+						eval(inv.getExpression(), new NodePositionList(inv, context), mode),
+						eval((Expression)inv.arguments().get(0), new NodePositionList(inv, context), mode));
 			}
 			// non-modifying method calls
 			else if (methodName.equals("toString")
@@ -458,7 +493,7 @@ public class Crawler2 {
 					|| methodName.equals("substring")
 					|| methodName.equals("trimToSize")
 					) {
-				return eval(inv.getExpression(), new NodePositionList(inv, context));
+				return eval(inv.getExpression(), new NodePositionList(inv, context), mode);
 			}
 			else {
 				throw new UnsupportedStringOpExAtNode("Unknown method called on StringBuilder: " 
@@ -511,7 +546,7 @@ public class Crawler2 {
 		// get choice out of different return expressions
 		List<IAbstractString> options = new ArrayList<IAbstractString>();
 		for (ReturnStatement ret: returnStmts) {
-			options.add(eval(ret.getExpression(), null));
+			options.add(eval(ret.getExpression(), null, ParamEvalMode.AS_PARAM));
 		}
 		if (options.size() == 1) {
 			return options.get(0);
@@ -529,7 +564,7 @@ public class Crawler2 {
 		NameUsage lastMod = VariableTracker.getLastModIn(
 				(IVariableBinding)paramName.resolveBinding(), decl);
 
-		return evalNameAfter(paramName, lastMod, null);
+		return evalNameAfter(paramName, lastMod, null, ParamEvalMode.AS_PARAM);
 	}
 
 	private IAbstractString getMethodReturnValueFromJavadoc(MethodDeclaration decl) {

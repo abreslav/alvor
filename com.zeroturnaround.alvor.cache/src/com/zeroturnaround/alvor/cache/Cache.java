@@ -8,15 +8,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.zeroturnaround.alvor.common.FieldPattern;
+import com.zeroturnaround.alvor.common.FieldPatternReference;
 import com.zeroturnaround.alvor.common.FunctionPattern;
 import com.zeroturnaround.alvor.common.FunctionPatternReference;
+import com.zeroturnaround.alvor.common.HotspotDescriptor;
 import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.common.HotspotPatternReference;
-import com.zeroturnaround.alvor.common.HotspotDescriptor;
 import com.zeroturnaround.alvor.common.PatternReference;
 import com.zeroturnaround.alvor.common.PositionList;
 import com.zeroturnaround.alvor.common.PositionUtil;
-import com.zeroturnaround.alvor.common.RecursionConverter;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.StringPattern;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
@@ -32,6 +33,7 @@ import com.zeroturnaround.alvor.string.StringConstant;
 import com.zeroturnaround.alvor.string.StringParameter;
 import com.zeroturnaround.alvor.string.StringRepetition;
 import com.zeroturnaround.alvor.string.StringSequence;
+import com.zeroturnaround.alvor.string.util.AbstractStringUtils;
 import com.zeroturnaround.alvor.string.util.ArgumentApplier;
 
 public class Cache {
@@ -40,6 +42,7 @@ public class Cache {
 	
 	private final static int PATTERN_KIND_HOTSPOT = 1;
 	private final static int PATTERN_KIND_FUNCTION = 2;
+	private final static int PATTERN_KIND_FIELD = 3;
 	
 	private final static int PATTERN_ROLE_PRIMARY = 1;
 	private final static int PATTERN_ROLE_SECONDARY = 2;
@@ -52,9 +55,10 @@ public class Cache {
 		public final static int CHOICE       = 4;
 		public final static int FUNCTION_REF = 5;
 		public final static int HOTSPOT_REF  = 6;
-		public final static int REPETITION   = 7;
-		public final static int PARAMETER    = 8;
-		public final static int UNSUPPORTED  = 9;
+		public final static int FIELD_REF    = 7;
+		public final static int REPETITION   = 8;
+		public final static int PARAMETER    = 9;
+		public final static int UNSUPPORTED  = 10;
 	}	
 	
 	
@@ -215,6 +219,10 @@ public class Cache {
 							rs.getString("method_name"), rs.getString("argument_types"), 
 							rs.getInt("argument_index"));
 				}
+				else if (rs.getInt("kind") == PATTERN_KIND_FIELD) {
+					pattern = new FieldPattern(rs.getString("class_name"), 
+							rs.getString("method_name"));
+				}
 				else {
 					throw new IllegalArgumentException();
 				}
@@ -317,6 +325,17 @@ public class Cache {
 			IPosition pos = createPosition(rs);
 			if (context != null && pos != null && context.contains(pos)) {
 				// TODO
+				System.err.println("REC ------------------");
+				System.err.println("TRYING: " + PositionUtil.getLineString(pos));
+				PositionList pl = context;
+				while (pl != null) {
+					if (pl.getPosition() != null) {
+						System.err.println("context: " + PositionUtil.getLineString(pl.getPosition()));
+					}
+					pl = pl.getPrev();
+				}
+				
+				
 				throw new UnsupportedStringOpEx("Cache recursion at: " + PositionUtil.getLineString(pos), pos); 
 			}
 				
@@ -334,7 +353,9 @@ public class Cache {
 			case StringKind.FUNCTION_REF: 
 				return createStringFromFunctionRef(rs, context);
 			case StringKind.HOTSPOT_REF: 
-				return createStringFromHotspotRef(rs, context);
+				return createStringFromHotspotOrFieldRef(rs, context);
+			case StringKind.FIELD_REF: 
+				return createStringFromHotspotOrFieldRef(rs, context);
 			case StringKind.REPETITION: 
 				return createStringRepetition(rs, context);
 			case StringKind.PARAMETER: 
@@ -373,7 +394,7 @@ public class Cache {
 		}
 	}
 
-	private IAbstractString createStringFromHotspotRef(ResultSet rs, PositionList context) {
+	private IAbstractString createStringFromHotspotOrFieldRef(ResultSet rs, PositionList context) {
 		// Return a pattern(choice) referred to by int_value.
 		// Take all from referred record, except position info.
 		// ch - choice
@@ -398,13 +419,13 @@ public class Cache {
 			
 			boolean found = newRs.next();
 			assert found;
-			IPosition refPos = createPosition(rs);
-			return createAbstractString(newRs, new PositionList(refPos, context));
+//			IPosition refPos = createPosition(rs);
+//			return createAbstractString(newRs, new PositionList(refPos, context));
+			return createAbstractString(newRs, context); // jääb sama kontekst, sest patternil pole positsiooni
 		} 
 		catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
-//		throw new UnsupportedStringOpEx("TODO: createStringFromHotspotRef", createPosition(rs));
 	}
 
 	private IAbstractString createStringRepetition(ResultSet rs, PositionList context) {
@@ -458,7 +479,13 @@ public class Cache {
 				return new StringSequence(pos, children);
 			}
 			else if (kind == StringKind.CHOICE) {
-				return new StringChoice(pos, children);
+				children = AbstractStringUtils.removeDuplicates(children, true);
+				if (children.size() == 1) {
+					return children.get(0);
+				}
+				else {
+					return new StringChoice(pos, children);
+				}
 			}
 			else {
 				throw new IllegalArgumentException();
@@ -545,12 +572,15 @@ public class Cache {
 		registerPatternForProject(patternId, projectName, PATTERN_ROLE_SECONDARY);
 		
 		// add reference to this pattern
-		int recKind = (patternKind == PATTERN_KIND_FUNCTION) 
-			? StringKind.FUNCTION_REF : StringKind.HOTSPOT_REF;
+		int recKind;
+		if (str.getPattern() instanceof FunctionPattern) { recKind = StringKind.FUNCTION_REF; }
+		else if (str.getPattern() instanceof HotspotPattern) { recKind = StringKind.HOTSPOT_REF; }
+		else if (str.getPattern() instanceof FieldPattern) { recKind = StringKind.FIELD_REF; }
+		else {throw new IllegalArgumentException(); }
 		
 		int id = addAbstractStringRecord(recKind, parentId, itemIndex, patternId, null, null, str.getPosition());
 		
-		// more work for FunctionReference: add each argument
+		// more work in case of FunctionReference: add each argument
 		if (str instanceof FunctionPatternReference) {
 			FunctionPatternReference fpr = (FunctionPatternReference)str;
 			for (Map.Entry<Integer, IAbstractString> entry : fpr.getInputArguments().entrySet()) {
@@ -725,6 +755,9 @@ public class Cache {
 		}
 		else if (patternReference instanceof FunctionPatternReference) {
 			return PATTERN_KIND_FUNCTION;
+		}
+		else if (patternReference instanceof FieldPatternReference) {
+			return PATTERN_KIND_FIELD;
 		}
 		else {
 			throw new IllegalArgumentException();

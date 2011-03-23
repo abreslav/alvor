@@ -17,7 +17,7 @@ import com.zeroturnaround.alvor.string.StringRepetition;
 import com.zeroturnaround.alvor.string.StringSequence;
 
 public class StringConverter {
-	private static IAbstractStringVisitor<Boolean, IAbstractString> EQUALS_VISITOR = new AbstractStringEqualsVisitor();
+	private static IAbstractStringVisitor<Boolean, IAbstractString> EQUALS_VISITOR = new AbstractStringEqualsVisitor(false);
 	
 	
 	public static boolean includesStringExtensions(IAbstractString str) {

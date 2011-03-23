@@ -23,7 +23,7 @@ import com.zeroturnaround.alvor.string.StringSequence;
  */
 public class AbstractStringOptimizer {
 
-	private static IAbstractStringVisitor<Boolean, IAbstractString> EQUALS_VISITOR = new AbstractStringEqualsVisitor();
+	private static IAbstractStringVisitor<Boolean, IAbstractString> EQUALS_VISITOR = new AbstractStringEqualsVisitor(false);
 	
 	public static boolean abstractStringEquals(IAbstractString a, IAbstractString b) {
 		return a.accept(EQUALS_VISITOR, b);

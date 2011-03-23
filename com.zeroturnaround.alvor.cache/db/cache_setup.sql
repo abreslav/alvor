@@ -30,9 +30,10 @@ CREATE TABLE abstract_strings
 	    but a pattern can be "instantiated" by different overridden methods.
 	    Basically there's n-to-n correspondance between pattern options and pattern instances,
 	    thats why this indirection is required).
-	7 - repetition (child is repetition body) 
-	8 - function parameter (used inside string function definitions, int_value is the number of parameter)
-	9 - unsupported(str_value = message)
+	7 - field pattern reference, int_value refers to field_pattern
+	8 - repetition (child is repetition body) 
+	9 - function parameter (used inside string function definitions, int_value is the number of parameter)
+	10 - unsupported(str_value = message)
 	*/
 	kind TINYINT NOT NULL, 
 	parent_id integer default null references abstract_strings(id) on delete cascade,

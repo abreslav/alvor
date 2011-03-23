@@ -19,4 +19,8 @@ public class PositionList {
 		return pos.equals(this.pos)
 			|| prev != null && prev.contains(pos);
 	}
+	
+	public PositionList getPrev() {
+		return prev;
+	}
 }
