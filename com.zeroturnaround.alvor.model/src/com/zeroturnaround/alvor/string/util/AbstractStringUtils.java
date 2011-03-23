@@ -1,5 +1,9 @@
 package com.zeroturnaround.alvor.string.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.zeroturnaround.alvor.string.AbstractStringEqualsVisitor;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.IAbstractStringVisitor;
 import com.zeroturnaround.alvor.string.StringCharacterSet;
@@ -69,5 +73,31 @@ public class AbstractStringUtils {
 	public static boolean hasLoops(IAbstractString str) {
 		return str.accept(LOOP_FINDER, null);
 	}
+	
+	public static boolean stringsAreEqual(IAbstractString a, IAbstractString b, boolean ignorePositions) {
+		if (ignorePositions) {
+			return a.accept(AbstractStringEqualsVisitor.INSTANCE_IGNORE_POS, b);
+		}
+		else {
+			return a.accept(AbstractStringEqualsVisitor.INSTANCE, b);
+		}
+	}
 
+	public static List<IAbstractString> removeDuplicates(List<IAbstractString> strings, boolean ignorePositions) {
+		List<IAbstractString> uniques = new ArrayList<IAbstractString>();
+		
+		for (IAbstractString string : strings) {
+			boolean seenAlready = false;
+			for (IAbstractString comparison : uniques) {
+				if (stringsAreEqual(string, comparison, ignorePositions)) {
+					seenAlready = true;
+					break;
+				}
+			}
+			if (!seenAlready) {
+				uniques.add(string);
+			}
+		}
+		return uniques;
+	}
 }

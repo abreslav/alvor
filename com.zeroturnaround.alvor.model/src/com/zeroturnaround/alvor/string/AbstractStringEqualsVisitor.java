@@ -8,13 +8,25 @@ import java.util.List;
 
 public class AbstractStringEqualsVisitor implements
 		IAbstractStringVisitor<Boolean, IAbstractString> {
+	public static IAbstractStringVisitor<Boolean, IAbstractString> INSTANCE = new AbstractStringEqualsVisitor(false);
+	public static IAbstractStringVisitor<Boolean, IAbstractString> INSTANCE_IGNORE_POS = new AbstractStringEqualsVisitor(true);
+	
+	private boolean ignorePositions;
+	public AbstractStringEqualsVisitor(boolean ignorePositions) {
+		this.ignorePositions = ignorePositions;
+	}
+	
+	private boolean checkComparePositions(IAbstractString a, IAbstractString b) {
+		return this.ignorePositions || positionEquals(a, b);
+	}
+	
 	@Override
 	public Boolean visitStringCharacterSet(
 			StringCharacterSet me, IAbstractString data) {
 		if (data instanceof StringCharacterSet) {
 			StringCharacterSet other = (StringCharacterSet) data;
 			return areEqual(me.getContents(), other.getContents())
-			&& positionEquals(me, other);
+			&& checkComparePositions(me, other);
 		}
 		return false;
 	}
@@ -24,7 +36,7 @@ public class AbstractStringEqualsVisitor implements
 			IAbstractString data) {
 		if (data instanceof StringChoice) {
 			StringChoice other = (StringChoice) data;
-			return positionEquals(me, other)
+			return checkComparePositions(me, other)
 				&& contentEquals(me.getItems(), other.getItems());
 		}
 		return false;
@@ -35,7 +47,7 @@ public class AbstractStringEqualsVisitor implements
 			IAbstractString data) {
 		if (data instanceof StringConstant) {
 			StringConstant other = (StringConstant) data;
-			return positionEquals(me, other)
+			return checkComparePositions(me, other)
 				&& areEqual(me.getEscapedValue(), other.getEscapedValue());
 		}
 		return false;
@@ -53,7 +65,7 @@ public class AbstractStringEqualsVisitor implements
 			StringRepetition me, IAbstractString data) {
 		if (data instanceof StringRepetition) {
 			StringRepetition other = (StringRepetition) data;
-			return positionEquals(me, other)
+			return checkComparePositions(me, other)
 				&& abstractStringEquals(me.getBody(), other.getBody());
 		}
 		return false;
@@ -68,7 +80,7 @@ public class AbstractStringEqualsVisitor implements
 			IAbstractString data) {
 		if (data instanceof StringSequence) {
 			StringSequence other = (StringSequence) data;
-			return positionEquals(me, other)
+			return checkComparePositions(me, other)
 				&& contentEquals(me.getItems(), other.getItems());
 		}
 		return false;
@@ -107,7 +119,7 @@ public class AbstractStringEqualsVisitor implements
 
 	@Override
 	public Boolean visitStringRecursion(StringRecursion me, IAbstractString data) {
-		return (data instanceof StringRecursion) && positionEquals(me, data);
+		return (data instanceof StringRecursion) && checkComparePositions(me, data);
 	}
 
 }

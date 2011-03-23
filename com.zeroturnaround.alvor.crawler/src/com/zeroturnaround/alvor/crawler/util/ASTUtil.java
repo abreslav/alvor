@@ -279,7 +279,7 @@ public class ASTUtil {
 		assert (method.getParent() instanceof TypeDeclaration);
 		TypeDeclaration typeDecl = (TypeDeclaration)method.getParent();
 		ITypeBinding classBinding = typeDecl.resolveBinding();
-		return classBinding.getQualifiedName();
+		return classBinding.getErasure().getQualifiedName();
 	}
 	
 	public static MethodDeclaration getContainingMethodDeclaration(ASTNode node) {
