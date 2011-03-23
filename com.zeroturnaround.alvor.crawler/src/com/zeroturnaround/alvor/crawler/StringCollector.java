@@ -422,36 +422,6 @@ public class StringCollector {
 		}
 	}
 	
-	@Deprecated
-	private List<IMethod> findHotspotMethods(IJavaProject javaProject, String className, String methodName, 
-			String argumentTypes, int stringArgumentNo) {
-		int stringArgIndex = stringArgumentNo-1;
-		try {
-			IType type = javaProject.findType(className);
-			if (type == null) {
-				throw new IllegalArgumentException("Can't find type for: " + className);
-			}
-			
-			List<IMethod> result = new ArrayList<IMethod>();
-			for (IMethod method: type.getMethods()) {
-				if (method.getElementName().equals(methodName)) {
-					String[] paramTypes = method.getParameterTypes();
-					if (stringArgIndex >= 0 && paramTypes.length > stringArgIndex && (
-							paramTypes[stringArgIndex].equals("Ljava.lang.String;")
-							|| paramTypes[stringArgIndex].equals("Qjava.lang.String;")
-							|| paramTypes[stringArgIndex].equals("QString;")
-							)
-							|| stringArgumentNo == -1) {
-						result.add(method);
-					}
-				}
-			}
-			return result;
-		} 
-		catch (JavaModelException e) {
-			throw new RuntimeException(e);
-		}
-	}
 	
 	private SearchPattern createCombinedMethodSearchPattern(Collection<IMethod> methods, int limitTo) {
 		SearchPattern combinedPattern = null;

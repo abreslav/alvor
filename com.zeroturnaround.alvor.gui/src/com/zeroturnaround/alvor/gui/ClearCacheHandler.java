@@ -7,15 +7,13 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 
-import com.zeroturnaround.alvor.cache.CacheService;
-import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
+import com.zeroturnaround.alvor.cache.CacheProvider;
 
 public class ClearCacheHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		NodeSearchEngine.clearASTCache();
-		CacheService.getCacheService().clearAll();
+		CacheProvider.getCache().clearAll();
 		clearAlvorMarkers();
 		return null;
 	}

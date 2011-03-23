@@ -13,10 +13,17 @@ public class EarvedGuiChecker2TestNew extends AbstractMarkerTest {
 		IProject project = WorkspaceUtil.getProject("earved");
 		CacheProvider.getCache().clearAll();
 		
-		GuiChecker2 checker = new GuiChecker2();
-//		checker.updateProjectMarkersForChangedFiles(project, null);
-		checker.cleanUpdateProjectMarkers(project, null);
-		
-		AbstractMarkerTest.selectedProject = project;
+		try {
+			GuiChecker checker = new GuiChecker();
+//			checker.updateProjectMarkersForChangedFiles(project, null);
+			checker.cleanUpdateProjectMarkers(project, null);
+		}
+//		catch (Exception e) {
+//			
+//		}
+		finally {
+			CacheProvider.getCache().printMaxDepth();
+			AbstractMarkerTest.selectedProject = project;
+		}
 	}
 }

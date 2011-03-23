@@ -34,6 +34,7 @@ import com.zeroturnaround.alvor.string.StringConstant;
 import com.zeroturnaround.alvor.string.StringParameter;
 import com.zeroturnaround.alvor.string.StringRepetition;
 import com.zeroturnaround.alvor.string.StringSequence;
+import com.zeroturnaround.alvor.string.util.AbstractStringSizeCounter;
 import com.zeroturnaround.alvor.string.util.AbstractStringUtils;
 import com.zeroturnaround.alvor.string.util.ArgumentApplier;
 
@@ -67,6 +68,9 @@ public class Cache {
 	private Map<String, Integer> fileIDs = new HashMap<String, Integer>();
 	private int currentBatchNo;
 	
+	private int maxDepth = 0;
+	private int depth;
+	
 	
 	/*package*/ Cache(DatabaseHelper db) {
 		this.db = db;
@@ -93,6 +97,8 @@ public class Cache {
 	}
 	
 	public List<HotspotDescriptor> getHotspots(String projectName, String fileName) {
+		ResultSet rs = null;
+		
 		try {
 			List<HotspotDescriptor> result = new ArrayList<HotspotDescriptor>();
 			
@@ -121,7 +127,7 @@ public class Cache {
 			}
 			sql += " and pp.pattern_role = " + PATTERN_ROLE_PRIMARY; 
 			
-			ResultSet rs = db.query(sql, projectName, fileFilter);
+			rs = db.query(sql, projectName, fileFilter);
 			
 			while (rs.next()) {
 				
@@ -143,8 +149,22 @@ public class Cache {
 		catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
+		finally {
+			checkCloseResult(rs);
+		}
+		
 	}
 	
+	private void checkCloseResult(ResultSet rs) {
+		if (rs != null) {
+			try { 
+				rs.close();
+			} catch (SQLException e) { 
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
 	public List<FileRecord> getFilesToUpdate(String projectName) {
 		ResultSet rs = db.query (
 				" select f.id, f.name, f.batch_no" +
@@ -162,6 +182,9 @@ public class Cache {
 		}
 		catch (SQLException e) {
 			throw new RuntimeException(e);
+		}
+		finally {
+			checkCloseResult(rs);
 		}
 	}
 	
@@ -234,6 +257,9 @@ public class Cache {
 		catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
+		finally {
+			checkCloseResult(rs);
+		}
 	}
 
 	private void markHotspotsAsChecked(Collection<IPosition> positions) {
@@ -254,9 +280,10 @@ public class Cache {
 		if (desc instanceof StringNodeDescriptor) {
 			String projectName = PositionUtil.getProjectName(desc.getPosition());
 			
+			IAbstractString str = ((StringNodeDescriptor) desc).getAbstractValue();
+			
 			// TODO should I include item-index? or should i rely on increasing id values ??
-			id = addAbstractString(((StringNodeDescriptor) desc).getAbstractValue(), pattern.getId(), 
-					null, projectName);
+			id = addAbstractString(str, pattern.getId(), null, projectName);
 		}
 		else if (desc instanceof UnsupportedNodeDescriptor) {
 			id = addUnsupported(((UnsupportedNodeDescriptor) desc).getProblemMessage(),
@@ -316,10 +343,16 @@ public class Cache {
 //			catch (SQLException e) {
 //				throw new RuntimeException(e);
 //			}
+		
+		// TODO close result set
 //		}
 	}
 	
 	private IAbstractString createAbstractString(ResultSet rs, PositionList context) {
+		this.depth++;
+		if (this.depth > maxDepth) {
+			maxDepth = depth;
+		}
 		
 		try {
 			// recursion check
@@ -368,6 +401,9 @@ public class Cache {
 		catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
+		finally {
+			this.depth--;
+		}
 	}
 	
 	private IAbstractString createStringFromFunctionRef(ResultSet rs, PositionList context) {
@@ -384,6 +420,7 @@ public class Cache {
 			while (argRs.next()) {
 				args.put(argRs.getInt("item_index"), createAbstractString(argRs, new PositionList(pos, context)));
 			}
+			checkCloseResult(argRs);
 			
 			// TODO isn't there wrong position for resulting string?
 			return ArgumentApplier.applyArgumentsMap(template, args);
@@ -398,8 +435,9 @@ public class Cache {
 		// Take all from referred record, except position info.
 		// ch - choice
 		// ref - reference
+		ResultSet newRs = null;
 		try {
-			ResultSet newRs = db.query(
+			newRs = db.query(
 					" select ch.id," +
 					"        ch.kind," +
 					"        ch.parent_id," +
@@ -425,12 +463,16 @@ public class Cache {
 		catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
+		finally {
+			checkCloseResult(newRs);
+		}
 	}
 
 	private IAbstractString createStringRepetition(ResultSet rs, PositionList context) {
+		ResultSet childRs = null;
 		try {
 			IPosition pos = createPosition(rs);
-			ResultSet childRs = queryChildren(rs.getInt("id"));
+			childRs = queryChildren(rs.getInt("id"));
 			boolean found = childRs.next();
 			assert found;
 			IAbstractString body = createAbstractString(childRs, new PositionList(pos, context));
@@ -441,11 +483,15 @@ public class Cache {
 		catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
+		finally {
+			checkCloseResult(childRs);
+		}
 	}
 	
 	private IAbstractString createAbstractString(int id, PositionList context) {
+		ResultSet rs = null;
 		try {
-			ResultSet rs = db.query(
+			rs = db.query(
 					" select s.*, f.name as file_name" +
 					" from abstract_strings s" +
 					" left join files f on f.id = s.file_id" +
@@ -458,23 +504,24 @@ public class Cache {
 		catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
+		finally {
+			checkCloseResult(rs);
+		}
 	}
 
 	private IAbstractString createStringCollection(ResultSet rs, int kind, PositionList context) {
 		try {
+			int id = rs.getInt("id");
 			IPosition pos = createPosition(rs);
-			ResultSet childrenRs = queryChildren(rs.getInt("id"));
+			ResultSet childrenRs = queryChildren(id);
 			
 			List<IAbstractString> children = new ArrayList<IAbstractString>();
 			while (childrenRs.next()) {
 				children.add(createAbstractString(childrenRs, new PositionList(pos, context)));
 			}
+			checkCloseResult(childrenRs);
 			
-//			if (children.size() == 1) {
-//				return children.get(0);
-//			}
-//			else 
-				if (kind == StringKind.SEQUENCE) {
+			if (kind == StringKind.SEQUENCE) {
 				return new StringSequence(pos, children);
 			}
 			else if (kind == StringKind.CHOICE) {
@@ -497,6 +544,7 @@ public class Cache {
 			}
 		} 
 		catch (SQLException e) {
+			System.out.println("PREP_STMT: " + db.getPreparedStatementsCount());
 			throw new RuntimeException(e);
 		}
 	}
@@ -807,17 +855,26 @@ public class Cache {
 				" where h.checked = false" + 
 				" and f.name like '/' || ? || '/%'", projectName);
 		
-		List<String> result = new ArrayList<String>();
 		try {
-			while (rs.next()) {
-				result.add(rs.getString(1));
+			List<String> result = new ArrayList<String>();
+			try {
+				while (rs.next()) {
+					result.add(rs.getString(1));
+				}
+			} 
+			catch (SQLException e) {
+				throw new RuntimeException(e);
 			}
+			
+			return result;
 		} 
-		catch (SQLException e) {
-			throw new RuntimeException(e);
+		finally {
+			checkCloseResult(rs);
 		}
-		
-		return result;
+	}
+	
+	public void printMaxDepth() {
+		System.out.println("MAX DEPTH: " + maxDepth);
 	}
 	
 }

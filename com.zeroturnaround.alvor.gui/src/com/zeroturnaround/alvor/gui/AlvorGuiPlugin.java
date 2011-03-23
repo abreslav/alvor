@@ -2,8 +2,6 @@ package com.zeroturnaround.alvor.gui;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-import com.zeroturnaround.alvor.cache.CacheService;
-
 
 public class AlvorGuiPlugin extends AbstractUIPlugin {
 	public static final String ID = "com.zeroturnaround.alvor.gui";
@@ -26,7 +24,6 @@ public class AlvorGuiPlugin extends AbstractUIPlugin {
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		CacheService.getCacheService().shutdown();
 		defaultInstance = null;
 		super.stop(context);
 	}

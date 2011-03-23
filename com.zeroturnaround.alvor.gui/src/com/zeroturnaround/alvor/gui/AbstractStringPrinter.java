@@ -12,11 +12,11 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorPart;
 
-import com.zeroturnaround.alvor.cache.CacheService;
+import com.zeroturnaround.alvor.common.HotspotDescriptor;
+import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
-import com.zeroturnaround.alvor.crawler.AbstractStringEvaluator;
-import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
+import com.zeroturnaround.alvor.crawler.Crawler2;
 import com.zeroturnaround.alvor.crawler.util.ASTUtil;
 import com.zeroturnaround.alvor.string.IAbstractString;
 
@@ -61,11 +61,14 @@ public class AbstractStringPrinter implements IEditorActionDelegate{
 			LOG.message("###############################");
 			LOG.message("Selection is : " + node.getClass().getName());
 			
-			NodeSearchEngine.clearASTCache();
-			CacheService.getCacheService().clearAll();
-			CacheService.getCacheService().setNocache(false);
-			IAbstractString abstr = AbstractStringEvaluator.evaluateExpression((Expression)node); 
-			LOG.message("Abstract value is: " + abstr.toString());
+			HotspotDescriptor desc = Crawler2.INSTANCE.evaluate((Expression)node, Crawler2.ParamEvalMode.AS_HOTSPOT);
+			if (desc instanceof StringNodeDescriptor) {
+				IAbstractString abstr = ((StringNodeDescriptor)desc).getAbstractValue();
+				LOG.message("Abstract value is: " + abstr.toString());
+			}
+			else {
+				LOG.message("Error: ...");
+			}
 		} 
 		else {
 			assert LOG.message("Selection is not expression, but: "

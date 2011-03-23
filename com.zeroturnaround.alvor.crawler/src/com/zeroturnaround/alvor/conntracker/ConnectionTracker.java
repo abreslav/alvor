@@ -8,7 +8,6 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 
 import com.zeroturnaround.alvor.common.PositionUtil;
-import com.zeroturnaround.alvor.crawler.NodeSearchEngine;
 import com.zeroturnaround.alvor.crawler.util.ASTUtil;
 import com.zeroturnaround.alvor.string.IPosition;
 import com.zeroturnaround.alvor.tracker.NameAssignment;
@@ -18,7 +17,7 @@ import com.zeroturnaround.alvor.tracker.VariableTracker;
 
 public class ConnectionTracker {
 	public static ConnectionDescriptor getConnectionDescriptorForHotspot(IPosition pos) {
-		Expression arg = (Expression) NodeSearchEngine.getASTNode(pos);
+		Expression arg = (Expression) ASTUtil.getASTNode(pos);
 		assert(arg != null);
 		MethodInvocation inv = (MethodInvocation)arg.getParent();
 		assert(inv != null);

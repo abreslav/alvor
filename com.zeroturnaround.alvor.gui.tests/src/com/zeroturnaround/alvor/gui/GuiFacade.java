@@ -11,17 +11,14 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaModelMarker;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 
 import com.zeroturnaround.alvor.common.PositionUtil;
@@ -31,20 +28,10 @@ public class GuiFacade {
 	public static void executeAlvorCleanCheck(IProject project) throws Exception {
 		// TODO should do it via GUI only
 		GuiChecker checker = new GuiChecker();
-		IJavaProject javaProject = (IJavaProject)project.getNature(JavaCore.NATURE_ID);
-		IJavaElement[] scope = {javaProject};
-		
-		checker.performCleanCheck(project, scope, null);
+		checker.cleanUpdateProjectMarkers(project, null);
 	}
 	
 	public static void startIncrementalBuild(IProject project) {
-		try {
-			ICommand[] builders = project.getDescription().getBuildSpec();
-			System.out.println(builders);
-		} catch (CoreException e1) {
-			throw new RuntimeException(e1);
-		}
-		
 		try {
 			project.build(IncrementalProjectBuilder.INCREMENTAL_BUILD, null);
 		} catch (CoreException e) {
