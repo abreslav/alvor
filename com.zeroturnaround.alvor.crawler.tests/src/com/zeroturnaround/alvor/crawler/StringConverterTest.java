@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import com.zeroturnaround.alvor.common.StringConverter;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.StringChoice;
 import com.zeroturnaround.alvor.string.StringConstant;

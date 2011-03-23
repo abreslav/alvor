@@ -2,6 +2,7 @@ package com.zeroturnaround.alvor.gui;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
@@ -48,23 +49,44 @@ public class GuiChecker2 {
 	private ComplexChecker complexChecker = new ComplexChecker();
 	private Cache cache = CacheProvider.getCache();
 	private ProjectConfiguration conf;
+	private int hotspotCount = 0;
 	
 	
-	public void updateProjectMarkers(IProject project, IProgressMonitor monitor) {
+	public void cleanUpdateProjectMarkers(IProject project, IProgressMonitor monitor) {
+		cache.clearAll(); // FIXME clear project
+		StringCollector.updateProjectCache(project, cache, null);
+		List<HotspotDescriptor> hotspots = cache.getProjectHotspots(project.getName());
+		clearAlvorMarkers(project);
+
+		conf = ConfigurationManager.readProjectConfiguration(project, true);
+		
+		Collection<HotspotCheckingResult> checkingResults = 
+			complexChecker.checkNodeDescriptors(hotspots, conf, monitor);
+		
+		createCheckingMarkers(checkingResults, project);
+	}
+		
+	public void updateProjectMarkersForChangedFiles(IProject project, IProgressMonitor monitor) {
 		StringCollector.updateProjectCache(project, cache, monitor);
 		
 		// TODO
 		conf = ConfigurationManager.readProjectConfiguration(project, true);
 		
+		
+		this.hotspotCount = 0;
 		for (String fileName : cache.getUncheckedFiles(project.getName())) {
 			updateFileMarkers(fileName, project, monitor);
 		}
+		
+		System.out.println("Finished: Checked " + hotspotCount + " hotspots");
 	}
 	
 	private void updateFileMarkers(String fileName, IProject project, IProgressMonitor monitor) {
 		IFile file = WorkspaceUtil.getFile(fileName);
 		Collection<HotspotDescriptor> hotspots = 
 			cache.getFileHotspots(fileName, project.getName());
+		
+		this.hotspotCount += hotspots.size();
 		
 		// TODO delete and re-check only changed hotspots
 		clearAlvorMarkers(file);

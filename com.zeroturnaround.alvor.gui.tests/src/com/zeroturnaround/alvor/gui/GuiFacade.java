@@ -119,6 +119,8 @@ public class GuiFacade {
 //	}
 	
 	public static List<String> getMarkersAsStrings(IProject project, String markerId) throws CoreException {
+		assert project != null;
+		
 		List<String> lines = new ArrayList<String>();
 		IMarker[] markers = project.findMarkers(markerId, false, IResource.DEPTH_INFINITE);
 		for (IMarker marker: markers) {
