@@ -22,6 +22,7 @@ import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.StringPattern;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
+import com.zeroturnaround.alvor.common.StringConverter;
 import com.zeroturnaround.alvor.string.AbstractStringCollection;
 import com.zeroturnaround.alvor.string.DummyPosition;
 import com.zeroturnaround.alvor.string.IAbstractString;
@@ -334,8 +335,6 @@ public class Cache {
 					}
 					pl = pl.getPrev();
 				}
-				
-				
 				throw new UnsupportedStringOpEx("Cache recursion at: " + PositionUtil.getLineString(pos), pos); 
 			}
 				
@@ -484,7 +483,13 @@ public class Cache {
 					return children.get(0);
 				}
 				else {
-					return new StringChoice(pos, children);
+					StringChoice choice = new StringChoice(pos, children);
+					if (!choice.containsRecursion()) {
+						return StringConverter.optimizeChoice(choice);
+					}
+					else {
+						return choice;
+					}
 				}
 			}
 			else {

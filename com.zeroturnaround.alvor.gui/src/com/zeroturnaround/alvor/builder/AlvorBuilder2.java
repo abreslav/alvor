@@ -36,7 +36,7 @@ public class AlvorBuilder2 extends IncrementalProjectBuilder {
 		}
 
 		// then bring everything back up-to-date
-		guiChecker.updateProjectMarkers(this.getProject(), monitor);
+		guiChecker.updateProjectMarkersForChangedFiles(this.getProject(), monitor);
 		
 		return null; // TODO what's this?
 	}

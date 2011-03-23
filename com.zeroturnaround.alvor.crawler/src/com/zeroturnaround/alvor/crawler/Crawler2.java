@@ -38,6 +38,7 @@ import com.zeroturnaround.alvor.common.FunctionPatternReference;
 import com.zeroturnaround.alvor.common.HotspotDescriptor;
 import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.common.HotspotPatternReference;
+import com.zeroturnaround.alvor.common.StringConverter;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;

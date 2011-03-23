@@ -173,7 +173,7 @@ public class GuiChecker {
 				severity = IMarker.SEVERITY_WARNING;  
 			}
 			else if (result instanceof HotspotInfo) {
-				markerId = AlvorGuiPlugin.WARNING_MARKER_ID;
+				markerId = AlvorGuiPlugin.HOTSPOT_MARKER_ID;
 				severity = IMarker.SEVERITY_INFO;  
 			}
 			createMarker(result.getMessage(), markerId, severity, 

@@ -11,7 +11,6 @@ import java.util.Map.Entry;
 import com.zeroturnaround.alvor.checkers.CheckerException;
 import com.zeroturnaround.alvor.checkers.HotspotCheckingResult;
 import com.zeroturnaround.alvor.checkers.HotspotError;
-import com.zeroturnaround.alvor.checkers.HotspotInfo;
 import com.zeroturnaround.alvor.checkers.IAbstractStringChecker;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
@@ -114,7 +113,7 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 		}
 		
 		if (results.isEmpty()) {
-			results.add(new HotspotInfo("SQL testing passed", descriptor.getPosition()));
+			// results.add(new HotspotInfo("SQL testing passed", descriptor.getPosition()));
 		}
 		
 		return results;

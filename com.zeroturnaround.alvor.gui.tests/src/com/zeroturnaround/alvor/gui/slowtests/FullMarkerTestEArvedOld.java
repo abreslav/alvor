@@ -6,7 +6,7 @@ import com.zeroturnaround.alvor.common.WorkspaceUtil;
 import com.zeroturnaround.alvor.gui.AbstractMarkerTest;
 import com.zeroturnaround.alvor.gui.GuiFacade;
 
-public class FullMarkerTestEArved extends AbstractMarkerTest {
+public class FullMarkerTestEArvedOld extends AbstractMarkerTest {
 	
 	@BeforeClass
 	public static void prepare() throws Exception {
