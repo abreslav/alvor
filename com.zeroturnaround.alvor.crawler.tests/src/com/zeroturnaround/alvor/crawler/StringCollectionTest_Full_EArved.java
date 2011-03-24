@@ -7,10 +7,16 @@ public class StringCollectionTest_Full_EArved extends
 
 	@Override
 	public void findValidNodeDescriptors() {
-		String projectName = "earved";
-		// CacheProvider.getCache().clearProject(projectName);
-		CacheProvider.getCache().clearAll();
-		findAndValidateNodeDescriptors(projectName);
+		try {
+			String projectName = "earved";
+			// CacheProvider.getCache().clearProject(projectName);
+			CacheProvider.getCache().clearAll();
+			findAndValidateNodeDescriptors(projectName);
+		}
+		finally {
+			CacheProvider.getCache().printDBInfo();
+			CacheProvider.shutdownCache();
+		}
 	}
 
 }

@@ -324,7 +324,8 @@ public class StringCollector {
 	private void populateCacheWithFilesInfo(IProject project) {
 		Collection<ICompilationUnit> units = JavaModelUtil.getAllCompilationUnits
 		(JavaModelUtil.getJavaProjectFromProject(project), false);
-		cache.addFiles(project.getName(), JavaModelUtil.getCompilationUnitNames(units));
+		List<String> files = JavaModelUtil.getCompilationUnitNames(units);
+		cache.addFiles(project.getName(), files);
 	}
 
 	private SearchPattern getSearchPattern(IJavaProject javaProject, StringPattern stringPattern) {

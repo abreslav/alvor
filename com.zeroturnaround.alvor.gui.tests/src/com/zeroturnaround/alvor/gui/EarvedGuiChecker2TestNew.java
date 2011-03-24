@@ -22,7 +22,7 @@ public class EarvedGuiChecker2TestNew extends AbstractMarkerTest {
 //			
 //		}
 		finally {
-			CacheProvider.getCache().printMaxDepth();
+			CacheProvider.getCache().printDBInfo();
 			AbstractMarkerTest.selectedProject = project;
 		}
 	}

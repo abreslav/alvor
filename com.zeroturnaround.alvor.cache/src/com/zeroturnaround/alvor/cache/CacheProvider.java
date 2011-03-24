@@ -43,7 +43,7 @@ public class CacheProvider {
 	
 	private static Connection connectToHSQLDB() throws SQLException, ClassNotFoundException {
 		Class.forName("org.hsqldb.jdbc.JDBCDriver");
-		String path = AlvorCachePlugin.getDefault().getStateLocation().append("/cache2").toPortableString();
+		String path = AlvorCachePlugin.getDefault().getStateLocation().append("/cache_hsqldb").toPortableString();
 		String fileUrl = "jdbc:hsqldb:file:" + path + ";shutdown=true";
 		String serverUrl = "jdbc:hsqldb:hsql://localhost/xdb";
 		
