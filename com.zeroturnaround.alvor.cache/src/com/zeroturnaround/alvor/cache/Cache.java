@@ -63,8 +63,7 @@ public class Cache {
 		public final static int UNSUPPORTED  = 10;
 	}	
 	
-	// FIXME
-	public DatabaseHelper db;
+	private DatabaseHelper db;
 	private Map<String, Integer> fileIDs = new HashMap<String, Integer>();
 	private int currentBatchNo;
 	
@@ -150,7 +149,7 @@ public class Cache {
 			throw new RuntimeException(e);
 		}
 		finally {
-			DatabaseHelper.checkCloseResult(rs);
+			db.checkCloseResult(rs);
 		}
 		
 	}
@@ -174,7 +173,7 @@ public class Cache {
 			throw new RuntimeException(e);
 		}
 		finally {
-			DatabaseHelper.checkCloseResult(rs);
+			db.checkCloseResult(rs);
 		}
 	}
 	
@@ -248,7 +247,7 @@ public class Cache {
 			throw new RuntimeException(e);
 		}
 		finally {
-			DatabaseHelper.checkCloseResult(rs);
+			db.checkCloseResult(rs);
 		}
 	}
 
@@ -412,7 +411,7 @@ public class Cache {
 				}
 			}
 			finally {
-				DatabaseHelper.checkCloseResult(argRs);
+				db.checkCloseResult(argRs);
 			}
 			
 			// TODO isn't there wrong position for resulting string?
@@ -458,7 +457,7 @@ public class Cache {
 			throw new RuntimeException(e);
 		}
 		finally {
-			DatabaseHelper.checkCloseResult(newRs);
+			db.checkCloseResult(newRs);
 		}
 	}
 
@@ -475,7 +474,7 @@ public class Cache {
 				return new StringRepetition(pos, body);
 			}
 			finally {
-				DatabaseHelper.checkCloseResult(childRs);
+				db.checkCloseResult(childRs);
 			}
 		} 
 		catch (SQLException e) {
@@ -500,7 +499,7 @@ public class Cache {
 			throw new RuntimeException(e);
 		}
 		finally {
-			DatabaseHelper.checkCloseResult(rs);
+			db.checkCloseResult(rs);
 		}
 	}
 
@@ -517,7 +516,7 @@ public class Cache {
 				}
 			}
 			finally {
-				DatabaseHelper.checkCloseResult(childrenRs);
+				db.checkCloseResult(childrenRs);
 			}
 			
 			if (kind == StringKind.SEQUENCE) {
@@ -870,14 +869,14 @@ public class Cache {
 			return result;
 		} 
 		finally {
-			DatabaseHelper.checkCloseResult(rs);
+			db.checkCloseResult(rs);
 		}
 	}
 	
 	public void printDBInfo() {
-		System.out.println("MAX OPEN: " + DatabaseHelper.maxOpenCount);
-		System.out.println("OPEN: " + DatabaseHelper.openCount);
-		db.printStatementCounts();
+		System.out.println("Currenlty open ResultSet-s: " + db.openResultSetCount);
+		System.out.println("Max open ResultSet-s so far: " + db.maxOpenResultSetCount);
+		System.out.println("Nr of executed queries: " + db.queryCount);
 	}
 	
 }
