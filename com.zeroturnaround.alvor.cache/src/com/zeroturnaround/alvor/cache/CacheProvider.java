@@ -17,7 +17,6 @@ public class CacheProvider {
 	private final static ILog LOG = Logs.getLog(CacheProvider.class);
 	
 	public static Cache getCache() {
-		System.setProperty("h2.serverCachedObjects", "20000");
 		if (INSTANCE == null) {
 			try {
 				Connection conn;
@@ -64,24 +63,33 @@ public class CacheProvider {
 	}
 	
 	private static Connection connectToH2() throws SQLException, ClassNotFoundException {
+		System.setProperty("h2.serverCachedObjects", "20000");
 		Class.forName("org.h2.Driver");
 		String path = AlvorCachePlugin.getDefault().getStateLocation().append("/cache_h2").toPortableString();
-		String fileUrl = "jdbc:h2:" + path;
-		String serverUrl = "jdbc:h2:tcp://localhost/" + path;
-		
-		// if db is locked, then assume that server is running and connect in server mode (this is debugging mode)
-		if (new File(path + ".lock.db").exists()) {
-			try {
-				return DriverManager.getConnection(serverUrl, "SA", "");
-			} catch (SQLException e) {
-				// Seems that server is not running after all, probably the lock is leftover from a crash
-				return DriverManager.getConnection(fileUrl, "SA", "");
-			}
-		}
-		else {
-			return DriverManager.getConnection(fileUrl, "SA", "");
-		}
+		String url = "jdbc:h2:" + path + ";TRACE_LEVEL_FILE=3";
+		return DriverManager.getConnection(url, "SA", "");
 	}
+	
+//	private static Connection connectToH2_old() throws SQLException, ClassNotFoundException {
+//		System.setProperty("h2.serverCachedObjects", "20000");
+//		Class.forName("org.h2.Driver");
+//		String path = AlvorCachePlugin.getDefault().getStateLocation().append("/cache_h2").toPortableString();
+//		String fileUrl = "jdbc:h2:" + path + ";TRACE_LEVEL_FILE=3";
+//		String serverUrl = "jdbc:h2:tcp://localhost/" + path;
+//		
+//		// if db is locked, then assume that server is running and connect in server mode (this is debugging mode)
+//		if (new File(path + ".lock.db").exists()) {
+//			try {
+//				return DriverManager.getConnection(serverUrl, "SA", "");
+//			} catch (SQLException e) {
+//				// Seems that server is not running after all, probably the lock is leftover from a crash
+//				return DriverManager.getConnection(fileUrl, "SA", "");
+//			}
+//		}
+//		else {
+//			return DriverManager.getConnection(fileUrl, "SA", "");
+//		}
+//	}
 	
 	private static void checkCreateTables(DatabaseHelper db) throws SQLException {
 		ResultSet res = db.getConnection().getMetaData().getTables(null, null, "FILES", null);
