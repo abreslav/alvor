@@ -63,8 +63,8 @@ public class Cache {
 		public final static int UNSUPPORTED  = 10;
 	}	
 	
-	
-	private DatabaseHelper db;
+	// FIXME
+	public DatabaseHelper db;
 	private Map<String, Integer> fileIDs = new HashMap<String, Integer>();
 	private int currentBatchNo;
 	
@@ -150,21 +150,11 @@ public class Cache {
 			throw new RuntimeException(e);
 		}
 		finally {
-			checkCloseResult(rs);
+			DatabaseHelper.checkCloseResult(rs);
 		}
 		
 	}
 	
-	private void checkCloseResult(ResultSet rs) {
-		if (rs != null) {
-			try { 
-				rs.close();
-			} catch (SQLException e) { 
-				throw new RuntimeException(e);
-			}
-		}
-	}
-
 	public List<FileRecord> getFilesToUpdate(String projectName) {
 		ResultSet rs = db.query (
 				" select f.id, f.name, f.batch_no" +
@@ -184,7 +174,7 @@ public class Cache {
 			throw new RuntimeException(e);
 		}
 		finally {
-			checkCloseResult(rs);
+			DatabaseHelper.checkCloseResult(rs);
 		}
 	}
 	
@@ -258,7 +248,7 @@ public class Cache {
 			throw new RuntimeException(e);
 		}
 		finally {
-			checkCloseResult(rs);
+			DatabaseHelper.checkCloseResult(rs);
 		}
 	}
 
@@ -416,16 +406,20 @@ public class Cache {
 			// get arguments
 			Map<Integer, IAbstractString> args = new HashMap<Integer, IAbstractString>();
 			ResultSet argRs = queryChildren(rs.getInt("id"));
-			
-			while (argRs.next()) {
-				args.put(argRs.getInt("item_index"), createAbstractString(argRs, new PositionList(pos, context)));
+			try {
+				while (argRs.next()) {
+					args.put(argRs.getInt("item_index"), createAbstractString(argRs, new PositionList(pos, context)));
+				}
 			}
-			checkCloseResult(argRs);
+			finally {
+				DatabaseHelper.checkCloseResult(argRs);
+			}
 			
 			// TODO isn't there wrong position for resulting string?
 			return ArgumentApplier.applyArgumentsMap(template, args);
 		} 
 		catch (SQLException e) {
+			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 	}
@@ -464,27 +458,28 @@ public class Cache {
 			throw new RuntimeException(e);
 		}
 		finally {
-			checkCloseResult(newRs);
+			DatabaseHelper.checkCloseResult(newRs);
 		}
 	}
 
 	private IAbstractString createStringRepetition(ResultSet rs, PositionList context) {
-		ResultSet childRs = null;
 		try {
 			IPosition pos = createPosition(rs);
-			childRs = queryChildren(rs.getInt("id"));
-			boolean found = childRs.next();
-			assert found;
-			IAbstractString body = createAbstractString(childRs, new PositionList(pos, context));
-			assert (!childRs.next());
 			
-			return new StringRepetition(pos, body);
+			ResultSet childRs = queryChildren(rs.getInt("id"));
+			try {
+				boolean found = childRs.next();
+				assert found;
+				IAbstractString body = createAbstractString(childRs, new PositionList(pos, context));
+				assert (!childRs.next());
+				return new StringRepetition(pos, body);
+			}
+			finally {
+				DatabaseHelper.checkCloseResult(childRs);
+			}
 		} 
 		catch (SQLException e) {
 			throw new RuntimeException(e);
-		}
-		finally {
-			checkCloseResult(childRs);
 		}
 	}
 	
@@ -505,7 +500,7 @@ public class Cache {
 			throw new RuntimeException(e);
 		}
 		finally {
-			checkCloseResult(rs);
+			DatabaseHelper.checkCloseResult(rs);
 		}
 	}
 
@@ -513,13 +508,17 @@ public class Cache {
 		try {
 			int id = rs.getInt("id");
 			IPosition pos = createPosition(rs);
-			ResultSet childrenRs = queryChildren(id);
-			
 			List<IAbstractString> children = new ArrayList<IAbstractString>();
-			while (childrenRs.next()) {
-				children.add(createAbstractString(childrenRs, new PositionList(pos, context)));
+			
+			ResultSet childrenRs = queryChildren(id);
+			try {
+				while (childrenRs.next()) {
+					children.add(createAbstractString(childrenRs, new PositionList(pos, context)));
+				}
 			}
-			checkCloseResult(childrenRs);
+			finally {
+				DatabaseHelper.checkCloseResult(childrenRs);
+			}
 			
 			if (kind == StringKind.SEQUENCE) {
 				return new StringSequence(pos, children);
@@ -545,6 +544,8 @@ public class Cache {
 		} 
 		catch (SQLException e) {
 			System.out.println("PREP_STMT: " + db.getPreparedStatementsCount());
+			System.out.println("DEPTH: " + this.depth);
+			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 	}
@@ -869,12 +870,14 @@ public class Cache {
 			return result;
 		} 
 		finally {
-			checkCloseResult(rs);
+			DatabaseHelper.checkCloseResult(rs);
 		}
 	}
 	
-	public void printMaxDepth() {
-		System.out.println("MAX DEPTH: " + maxDepth);
+	public void printDBInfo() {
+		System.out.println("MAX OPEN: " + DatabaseHelper.maxOpenCount);
+		System.out.println("OPEN: " + DatabaseHelper.openCount);
+		db.printStatementCounts();
 	}
 	
 }
