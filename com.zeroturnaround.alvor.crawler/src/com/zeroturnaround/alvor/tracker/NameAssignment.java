@@ -10,24 +10,29 @@ public class NameAssignment extends NameUsage {
 	private Assignment.Operator operator;
 	private Expression leftHandSide;
 	private Expression rightHandSide;
-	private ASTNode node;
+	private ASTNode assOrDecl;
 	
 	public NameAssignment(Assignment assignment) {
-		this.node = assignment;
+		this.assOrDecl = assignment;
 		this.operator = assignment.getOperator();
 		this.leftHandSide = assignment.getLeftHandSide();
 		this.rightHandSide = assignment.getRightHandSide();
 	}
 	
 	public NameAssignment(VariableDeclaration decl) {
-		this.node = decl;
+		this.assOrDecl = decl;
 		this.operator = Assignment.Operator.ASSIGN;
 		this.rightHandSide = decl.getInitializer();
 		this.leftHandSide = decl.getName();
 	}
 	
-	public ASTNode getNode() {
-		return node;
+	public ASTNode getAssignmentOrDeclaration() {
+		return assOrDecl;
+	}
+	
+	@Override
+	public ASTNode getMainNode() {
+		return assOrDecl;
 	}
 	
 	@Deprecated
@@ -46,4 +51,5 @@ public class NameAssignment extends NameUsage {
 	public Assignment.Operator getOperator() {
 		return operator;
 	}
+	
 }

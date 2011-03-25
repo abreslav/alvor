@@ -1,6 +1,7 @@
 package com.zeroturnaround.alvor.tracker;
 
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 
 public class NameInArgument extends NameUsage {
@@ -12,8 +13,12 @@ public class NameInArgument extends NameUsage {
 		this.index = index;
 	}
 
-	public MethodInvocation getInv() {
+	public MethodInvocation getInvocation() {
 		return inv;
+	}
+	
+	public Expression getArgument() {
+		return (Expression)inv.arguments().get(index);
 	}
 	
 	@Deprecated
@@ -25,8 +30,9 @@ public class NameInArgument extends NameUsage {
 		return index+1;
 	}
 	
-	public ASTNode getNode() {
-		return inv;
+	@Override
+	public ASTNode getMainNode() {
+		return getArgument();
 	}
 	
 }
