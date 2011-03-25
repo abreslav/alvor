@@ -199,6 +199,59 @@ public class Cache {
 //		return null;
 //	}
 
+	private StringPattern createPattern(int id) {
+		ResultSet rs = null;
+
+		try {
+			rs = db.query(
+				" select p.id," +
+				"        p.kind," +
+				"        p.class_name," +
+				" 		 p.method_name," +
+				" 		 p.argument_types," +
+				"        p.argument_index" +
+				" from patterns p" +
+				" where p.id = ?", 
+				id);
+			boolean found = rs.next();
+			assert found;
+			return createPattern(rs);
+		}
+		catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			db.checkCloseResult(rs);
+		}
+	}
+	
+	private StringPattern createPattern(ResultSet rs) {
+		try {
+			StringPattern pattern;
+			if (rs.getInt("kind") == PATTERN_KIND_HOTSPOT) {
+				pattern = new HotspotPattern(rs.getString("class_name"), 
+						rs.getString("method_name"), rs.getString("argument_types"),
+						rs.getInt("argument_index"));
+			} 
+			else if (rs.getInt("kind") == PATTERN_KIND_FUNCTION) {
+				pattern = new FunctionPattern(rs.getString("class_name"), 
+						rs.getString("method_name"), rs.getString("argument_types"), 
+						rs.getInt("argument_index"));
+			}
+			else if (rs.getInt("kind") == PATTERN_KIND_FIELD) {
+				pattern = new FieldPattern(rs.getString("class_name"), 
+						rs.getString("method_name"));
+			}
+			else {
+				throw new IllegalArgumentException();
+			}
+			return pattern;
+			
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 	public List<PatternRecord> getNewProjectPatterns(String projectName) {
 		int minFileBatchNo = db.queryInt(
 				" select coalesce(min(batch_no),0)" +
@@ -221,24 +274,7 @@ public class Cache {
 		List<PatternRecord> result = new ArrayList<PatternRecord>();
 		try {
 			while (rs.next()) {
-				StringPattern pattern;
-				if (rs.getInt("kind") == PATTERN_KIND_HOTSPOT) {
-					pattern = new HotspotPattern(rs.getString("class_name"), 
-							rs.getString("method_name"), rs.getString("argument_types"),
-							rs.getInt("argument_index"));
-				} 
-				else if (rs.getInt("kind") == PATTERN_KIND_FUNCTION) {
-					pattern = new FunctionPattern(rs.getString("class_name"), 
-							rs.getString("method_name"), rs.getString("argument_types"), 
-							rs.getInt("argument_index"));
-				}
-				else if (rs.getInt("kind") == PATTERN_KIND_FIELD) {
-					pattern = new FieldPattern(rs.getString("class_name"), 
-							rs.getString("method_name"));
-				}
-				else {
-					throw new IllegalArgumentException();
-				}
+				StringPattern pattern = createPattern(rs);
 				result.add(new PatternRecord(pattern, rs.getInt("batch_no"), rs.getInt("id")));
 			}
 			return result;
@@ -524,8 +560,26 @@ public class Cache {
 			}
 			else if (kind == StringKind.CHOICE) {
 				children = AbstractStringUtils.removeDuplicates(children, true);
+				
 				if (children.size() == 1) {
 					return children.get(0);
+				}
+				else if (children.size() == 0) {
+					// must be a pattern
+					StringPattern pattern = createPattern(id);
+					if (pattern != null) {
+						String problem = "Can't find definition for: ";
+						if (pattern instanceof HotspotPattern) {
+							problem = "Can't find call-sites for:";
+						}
+						throw new UnsupportedStringOpEx(problem
+								+ pattern.getClassName()
+								+ "." + pattern.getMethodName()
+								+ "(" + pattern.getArgumentTypes() + ")", pos);
+					}
+					else {
+						throw new UnsupportedStringOpEx("String collection failed (empty choice)", pos);
+					}
 				}
 				else {
 					StringChoice choice = new StringChoice(pos, children);

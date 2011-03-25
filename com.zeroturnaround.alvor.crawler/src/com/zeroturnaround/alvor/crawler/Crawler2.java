@@ -24,7 +24,9 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.NullLiteral;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
+import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.ReturnStatement;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.TagElement;
@@ -242,11 +244,26 @@ public class Crawler2 {
 				&& inv.getName().getIdentifier().equals("toString")) {
 			return new StringRandomInteger(ASTUtil.getPosition(inv));
 		}
-		// enum
+		// enum.name()
 		else if (inv.getExpression() != null
-				// FIXME
-				&& className.toLowerCase().contains("enum")) {
-			throw new UnsupportedStringOpEx("TODO Enum", ASTUtil.getPosition(inv));
+				&& inv.getExpression().resolveTypeBinding().isEnum()) {
+			
+			if (! inv.getName().getIdentifier().equals("name")) {
+				throw new UnsupportedStringOpExAtNode("Only 'name' method is supported with enums", inv);
+			}
+			
+			SimpleName name;
+			if (inv.getExpression() instanceof SimpleName) {
+				name = (SimpleName)inv.getExpression();
+			}
+			else if (inv.getExpression() instanceof QualifiedName) {
+				name = ((QualifiedName)inv.getExpression()).getName();
+			}
+			else {
+				throw new UnsupportedStringOpExAtNode("Unsupported usage of Enum", inv);
+			}
+			return new StringConstant(ASTUtil.getPosition(name), name.getIdentifier(),
+					"\"" + name.getIdentifier() + "\"");
 		}
 		
 		// handle as general method
@@ -595,8 +612,8 @@ public class Crawler2 {
 		if (str.containsRecursion()) {
 			System.out.println("FOUND RECURSION");
 			
-			throw new UnsupportedStringOpEx("Recursion", str.getPosition());
-//			TODO put back when path-sens is done				
+			throw new UnsupportedStringOpEx("Unsupported modification scheme in loop", str.getPosition());
+//			FIXME put back when path-sens is done				
 //			return RecursionConverter.recursionToRepetition(str);
 		}
 		else {
