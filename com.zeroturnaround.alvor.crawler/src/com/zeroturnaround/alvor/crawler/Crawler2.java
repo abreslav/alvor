@@ -85,6 +85,7 @@ public class Crawler2 {
 						+ var.getDeclaringClass().getName() + '.' + var.getName(), decl);
 			}
 			IAbstractString str = removeRecursion(eval(init, null, ParamEvalMode.AS_HOTSPOT));
+			assert ! str.containsRecursion();
 			
 			return new StringNodeDescriptor(ASTUtil.getPosition(decl), str);
 		} catch (UnsupportedStringOpEx e) {
@@ -96,6 +97,7 @@ public class Crawler2 {
 	public HotspotDescriptor evaluate(Expression node, ParamEvalMode mode) {
 		try {
 			IAbstractString str = removeRecursion(eval(node, null, mode));
+			assert ! str.containsRecursion();
 			
 			return new StringNodeDescriptor(ASTUtil.getPosition(node), str);
 		} catch (UnsupportedStringOpEx e) {
@@ -311,8 +313,10 @@ public class Crawler2 {
 
 	private IAbstractString evalNameBefore(Name name, ASTNode target, 
 			NodePositionList context, ParamEvalMode mode) {
+		
 		NameUsage usage = VariableTracker.getLastReachingMod
 			((IVariableBinding)name.resolveBinding(), target);
+		
 		return evalNameAfter(name, usage, new NodePositionList(name, context), mode); 
 	}
 
@@ -525,6 +529,7 @@ public class Crawler2 {
 		IPosition pos = ASTUtil.getPosition(decl);
 		try {
 			IAbstractString str = removeRecursion(getMethodTemplate(decl, argNo));
+			assert ! str.containsRecursion();
 			return new StringNodeDescriptor(pos, str);
 		}
 		catch (UnsupportedStringOpEx e) {

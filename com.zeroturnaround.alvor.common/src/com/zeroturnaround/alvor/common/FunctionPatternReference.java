@@ -19,4 +19,14 @@ public class FunctionPatternReference extends PatternReference {
 	public Map<Integer, IAbstractString> getInputArguments() {
 		return inputArguments;
 	}
+	
+	@Override
+	public boolean containsRecursion() {
+		for (Map.Entry<Integer, IAbstractString> argEntry : inputArguments.entrySet()) {
+			if (argEntry.getValue().containsRecursion()) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

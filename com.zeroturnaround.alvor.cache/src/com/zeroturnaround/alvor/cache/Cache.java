@@ -308,7 +308,12 @@ public class Cache {
 			IAbstractString str = ((StringNodeDescriptor) desc).getAbstractValue();
 			
 			// TODO should I include item-index? or should i rely on increasing id values ??
-			id = addAbstractString(str, pattern.getId(), null, projectName);
+			try {
+				id = addAbstractString(str, pattern.getId(), null, projectName);
+			} catch (IllegalArgumentException e) {
+				System.err.println("RECSTRING: " + str);
+				throw e;
+			}
 		}
 		else if (desc instanceof UnsupportedNodeDescriptor) {
 			id = addUnsupported(((UnsupportedNodeDescriptor) desc).getProblemMessage(),

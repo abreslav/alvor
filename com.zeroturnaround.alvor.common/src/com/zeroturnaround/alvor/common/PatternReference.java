@@ -5,7 +5,7 @@ import com.zeroturnaround.alvor.string.IPosition;
 import com.zeroturnaround.alvor.string.PositionedString;
 import com.zeroturnaround.alvor.string.StringConstant;
 
-public class PatternReference extends PositionedString {
+public abstract class PatternReference extends PositionedString {
 	private final StringPattern pattern;
 
 	/* package */ PatternReference(IPosition pos, StringPattern pattern) {
@@ -29,10 +29,4 @@ public class PatternReference extends PositionedString {
 	public boolean isEmpty() {
 		return false;
 	}
-
-	@Override
-	public boolean containsRecursion() {
-		return false;
-	}
-	
 }
