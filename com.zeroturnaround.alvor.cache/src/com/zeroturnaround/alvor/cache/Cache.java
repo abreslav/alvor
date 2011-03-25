@@ -15,14 +15,14 @@ import com.zeroturnaround.alvor.common.FunctionPatternReference;
 import com.zeroturnaround.alvor.common.HotspotDescriptor;
 import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.common.HotspotPatternReference;
+import com.zeroturnaround.alvor.common.IntegerList;
 import com.zeroturnaround.alvor.common.PatternReference;
-import com.zeroturnaround.alvor.common.PositionList;
 import com.zeroturnaround.alvor.common.PositionUtil;
+import com.zeroturnaround.alvor.common.StringConverter;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.StringPattern;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
-import com.zeroturnaround.alvor.common.StringConverter;
 import com.zeroturnaround.alvor.string.AbstractStringCollection;
 import com.zeroturnaround.alvor.string.DummyPosition;
 import com.zeroturnaround.alvor.string.IAbstractString;
@@ -34,7 +34,6 @@ import com.zeroturnaround.alvor.string.StringConstant;
 import com.zeroturnaround.alvor.string.StringParameter;
 import com.zeroturnaround.alvor.string.StringRepetition;
 import com.zeroturnaround.alvor.string.StringSequence;
-import com.zeroturnaround.alvor.string.util.AbstractStringSizeCounter;
 import com.zeroturnaround.alvor.string.util.AbstractStringUtils;
 import com.zeroturnaround.alvor.string.util.ArgumentApplier;
 
@@ -378,7 +377,7 @@ public class Cache {
 //		}
 	}
 	
-	private IAbstractString createAbstractString(ResultSet rs, PositionList context) {
+	private IAbstractString createAbstractString(ResultSet rs, IntegerList context) {
 		this.depth++;
 		if (this.depth > maxDepth) {
 			maxDepth = depth;
@@ -387,17 +386,7 @@ public class Cache {
 		try {
 			// recursion check
 			IPosition pos = createPosition(rs);
-			if (context != null && pos != null && context.contains(pos)) {
-				// TODO
-				System.err.println("REC ------------------");
-				System.err.println("TRYING: " + PositionUtil.getLineString(pos));
-				PositionList pl = context;
-				while (pl != null) {
-					if (pl.getPosition() != null) {
-						System.err.println("context: " + PositionUtil.getLineString(pl.getPosition()));
-					}
-					pl = pl.getPrev();
-				}
+			if (context != null && pos != null && context.contains(pos.hashCode())) {
 				throw new UnsupportedStringOpEx("Cache recursion at: " + PositionUtil.getLineString(pos), pos); 
 			}
 				
@@ -436,19 +425,19 @@ public class Cache {
 		}
 	}
 	
-	private IAbstractString createStringFromFunctionRef(ResultSet rs, PositionList context) {
+	private IAbstractString createStringFromFunctionRef(ResultSet rs, IntegerList context) {
 		try {
 			IPosition pos = createPosition(rs);
 			
 			// get function
-			IAbstractString template = createAbstractString(rs.getInt("int_value"), new PositionList(pos, context));
+			IAbstractString template = createAbstractString(rs.getInt("int_value"), new IntegerList(pos.hashCode(), context));
 			
 			// get arguments
 			Map<Integer, IAbstractString> args = new HashMap<Integer, IAbstractString>();
 			ResultSet argRs = queryChildren(rs.getInt("id"));
 			try {
 				while (argRs.next()) {
-					args.put(argRs.getInt("item_index"), createAbstractString(argRs, new PositionList(pos, context)));
+					args.put(argRs.getInt("item_index"), createAbstractString(argRs, new IntegerList(pos.hashCode(), context)));
 				}
 			}
 			finally {
@@ -464,7 +453,7 @@ public class Cache {
 		}
 	}
 
-	private IAbstractString createStringFromHotspotOrFieldRef(ResultSet rs, PositionList context) {
+	private IAbstractString createStringFromHotspotOrFieldRef(ResultSet rs, IntegerList context) {
 		// Return a pattern(choice) referred to by int_value.
 		// Take all from referred record, except position info.
 		// ch - choice
@@ -491,7 +480,7 @@ public class Cache {
 			boolean found = newRs.next();
 			assert found;
 //			IPosition refPos = createPosition(rs);
-//			return createAbstractString(newRs, new PositionList(refPos, context));
+//			return createAbstractString(newRs, new IntegerList(refPos, context));
 			return createAbstractString(newRs, context); // jääb sama kontekst, sest patternil pole positsiooni
 		} 
 		catch (SQLException e) {
@@ -502,7 +491,7 @@ public class Cache {
 		}
 	}
 
-	private IAbstractString createStringRepetition(ResultSet rs, PositionList context) {
+	private IAbstractString createStringRepetition(ResultSet rs, IntegerList context) {
 		try {
 			IPosition pos = createPosition(rs);
 			
@@ -510,7 +499,7 @@ public class Cache {
 			try {
 				boolean found = childRs.next();
 				assert found;
-				IAbstractString body = createAbstractString(childRs, new PositionList(pos, context));
+				IAbstractString body = createAbstractString(childRs, new IntegerList(pos.hashCode(), context));
 				assert (!childRs.next());
 				return new StringRepetition(pos, body);
 			}
@@ -523,7 +512,7 @@ public class Cache {
 		}
 	}
 	
-	private IAbstractString createAbstractString(int id, PositionList context) {
+	private IAbstractString createAbstractString(int id, IntegerList context) {
 		ResultSet rs = null;
 		try {
 			rs = db.query(
@@ -544,16 +533,21 @@ public class Cache {
 		}
 	}
 
-	private IAbstractString createStringCollection(ResultSet rs, int kind, PositionList context) {
+	private IAbstractString createStringCollection(ResultSet rs, int kind, IntegerList context) {
 		try {
 			int id = rs.getInt("id");
 			IPosition pos = createPosition(rs);
 			List<IAbstractString> children = new ArrayList<IAbstractString>();
 			
+			IntegerList newContext = context;
+			if (pos != null) {
+				newContext = new IntegerList(pos.hashCode(), context);
+			}
+			
 			ResultSet childrenRs = queryChildren(id);
 			try {
 				while (childrenRs.next()) {
-					children.add(createAbstractString(childrenRs, new PositionList(pos, context)));
+					children.add(createAbstractString(childrenRs, newContext));
 				}
 			}
 			finally {
@@ -937,6 +931,12 @@ public class Cache {
 		System.out.println("Max open ResultSet-s so far: " + db.maxOpenResultSetCount);
 		System.out.println("Nr of executed queries: " + db.queryCount);
 	}
+	
+	private IntegerList contextOf(IPosition pos, IntegerList prevContext) {
+		return new IntegerList(pos.hashCode(), prevContext);
+	}
+	
+	
 	
 }
 

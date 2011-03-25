@@ -3,7 +3,6 @@ package com.zeroturnaround.alvor.common;
 import com.zeroturnaround.alvor.string.IAbstractStringVisitor;
 import com.zeroturnaround.alvor.string.IPosition;
 import com.zeroturnaround.alvor.string.PositionedString;
-import com.zeroturnaround.alvor.string.StringConstant;
 
 public abstract class PatternReference extends PositionedString {
 	private final StringPattern pattern;
