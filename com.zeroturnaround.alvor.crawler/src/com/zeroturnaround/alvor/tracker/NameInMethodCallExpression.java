@@ -13,12 +13,16 @@ public class NameInMethodCallExpression extends NameUsage {
 		this.expression = expression;
 	}
 
-	public MethodInvocation getInv() {
+	public MethodInvocation getInvocation() {
 		return inv;
 	}
 	
-	public ASTNode getNode() {
-		return expression; // TODO maybe inv is more appropriate answer here
+	public Expression getExpression() {
+		return expression;
+	}
+	
+	public ASTNode getMainNode() {
+		return expression;
 	}
 	
 }

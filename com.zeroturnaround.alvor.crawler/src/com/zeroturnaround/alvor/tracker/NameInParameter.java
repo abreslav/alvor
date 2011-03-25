@@ -25,8 +25,12 @@ public class NameInParameter extends NameUsage {
 		return index+1;
 	}
 	
-	public ASTNode getNode() {
+	public ASTNode getParameterNode() {
 		return (ASTNode)methodDecl.parameters().get(index);
+	}
+	
+	public ASTNode getMainNode() {
+		return getParameterNode();
 	}
 	
 }

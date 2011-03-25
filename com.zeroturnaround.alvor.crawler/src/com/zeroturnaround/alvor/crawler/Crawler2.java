@@ -40,6 +40,7 @@ import com.zeroturnaround.alvor.common.FunctionPatternReference;
 import com.zeroturnaround.alvor.common.HotspotDescriptor;
 import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.common.HotspotPatternReference;
+import com.zeroturnaround.alvor.common.IntegerList;
 import com.zeroturnaround.alvor.common.StringConverter;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
@@ -85,7 +86,6 @@ public class Crawler2 {
 						+ var.getDeclaringClass().getName() + '.' + var.getName(), decl);
 			}
 			IAbstractString str = removeRecursion(eval(init, null, ParamEvalMode.AS_HOTSPOT));
-			assert ! str.containsRecursion();
 			
 			return new StringNodeDescriptor(ASTUtil.getPosition(decl), str);
 		} catch (UnsupportedStringOpEx e) {
@@ -97,7 +97,6 @@ public class Crawler2 {
 	public HotspotDescriptor evaluate(Expression node, ParamEvalMode mode) {
 		try {
 			IAbstractString str = removeRecursion(eval(node, null, mode));
-			assert ! str.containsRecursion();
 			
 			return new StringNodeDescriptor(ASTUtil.getPosition(node), str);
 		} catch (UnsupportedStringOpEx e) {
@@ -106,10 +105,10 @@ public class Crawler2 {
 		}
 	}
 
-	private IAbstractString eval(Expression node, NodePositionList context, ParamEvalMode mode) {
+	private IAbstractString eval(Expression node, IntegerList context, ParamEvalMode mode) {
 		// recursion check
 		IPosition pos = ASTUtil.getPosition(node);
-		if (context != null && context.contains(pos)) { 
+		if (context != null && pos != null && context.contains(pos.hashCode())) { 
 			// ie. i'm already computing the value of this node lower in the call stack
 			// ie. it's recursion!
 			return new StringRecursion(pos);			
@@ -169,8 +168,8 @@ public class Crawler2 {
 		}
 		else if (node instanceof ConditionalExpression) {
 			StringChoice choice = new StringChoice(ASTUtil.getPosition(node),
-					eval(((ConditionalExpression)node).getThenExpression(), new NodePositionList(node, context), mode),
-					eval(((ConditionalExpression)node).getElseExpression(), new NodePositionList(node, context), mode));
+					eval(((ConditionalExpression)node).getThenExpression(), contextOf(node, context), mode),
+					eval(((ConditionalExpression)node).getElseExpression(), contextOf(node, context), mode));
 
 			if (optimizeChoice /*&& !choice.containsRecursion()*/) {
 				// Recursion removal procedure assumes certain structure
@@ -181,7 +180,7 @@ public class Crawler2 {
 			}
 		}
 		else if (node instanceof ParenthesizedExpression) {
-			return eval(((ParenthesizedExpression)node).getExpression(), new NodePositionList(node, context), mode);
+			return eval(((ParenthesizedExpression)node).getExpression(), context, mode);
 		}
 		else if (node instanceof InfixExpression) {
 			return evalInfix((InfixExpression)node, context, mode);
@@ -199,7 +198,7 @@ public class Crawler2 {
 	
 
 	private IAbstractString evalInvocationArgOut(MethodInvocation inv,
-			int argumentNo, NodePositionList context, ParamEvalMode mode) {
+			int argumentNo, IntegerList context, ParamEvalMode mode) {
 		
 		IMethodBinding binding = inv.resolveMethodBinding(); 
 		String className = binding.getDeclaringClass().getErasure().getQualifiedName();
@@ -214,26 +213,29 @@ public class Crawler2 {
 		), evaluateStringArguments(inv, context, mode));
 	}
 
-	private IAbstractString evalInvocationResult(MethodInvocation inv, NodePositionList context, ParamEvalMode mode) {
+	private IAbstractString evalInvocationResult(MethodInvocation inv, IntegerList context, ParamEvalMode mode) {
 		//return evalInvocationResultOrArgOut(inv, -1, context);
 		// First handle special methods
+		
+		IntegerList invContext = contextOf(inv, context);
+		
 		IMethodBinding binding = inv.resolveMethodBinding(); 
 		String className = binding.getDeclaringClass().getErasure().getQualifiedName();
 		
 		if (inv.getExpression() != null
 				&& ASTUtil.isStringOrStringBuilderOrBuffer(inv.getExpression().resolveTypeBinding())) {
 			if (inv.getName().getIdentifier().equals("toString")) {
-				return eval(inv.getExpression(), new NodePositionList(inv, context), mode);
+				return eval(inv.getExpression(), invContext, mode);
 			}
 			else if (inv.getName().getIdentifier().equals("append")) {
 				return new StringSequence(
 						ASTUtil.getPosition(inv), 
-						eval(inv.getExpression(), new NodePositionList(inv, context), mode),
-						eval((Expression)inv.arguments().get(0), new NodePositionList(inv, context), mode));
+						eval(inv.getExpression(), invContext, mode),
+						eval((Expression)inv.arguments().get(0), invContext, mode));
 			}
 			else if (inv.getName().getIdentifier().equals("valueOf")) {
 				assert (ASTUtil.isString(inv.getExpression().resolveTypeBinding()));
-				return eval((Expression)inv.arguments().get(0), new NodePositionList(inv, context), mode);
+				return eval((Expression)inv.arguments().get(0), invContext, mode);
 			}
 			else {
 				throw new UnsupportedStringOpExAtNode("String/Builder/Buffer, method=" 
@@ -280,7 +282,7 @@ public class Crawler2 {
 	}
 	
 	private Map<Integer, IAbstractString> evaluateStringArguments(MethodInvocation inv, 
-			NodePositionList context, ParamEvalMode mode) {
+			IntegerList context, ParamEvalMode mode) {
 		Map<Integer, IAbstractString> inputArguments = new HashMap<Integer, IAbstractString>();
 		
 		for (int i = 0; i < inv.arguments().size(); i++) {
@@ -288,13 +290,13 @@ public class Crawler2 {
 			ITypeBinding typ = arg.resolveTypeBinding();
 			if (ASTUtil.isStringOrStringBuilderOrBuffer(typ)) {
 				// using 1-based indexing
-				inputArguments.put(i+1, this.eval(arg, new NodePositionList(inv, context), mode));
+				inputArguments.put(i+1, this.eval(arg, contextOf(inv, context), mode));
 			}
 		}
 		return inputArguments;
 	}
 
-	private IAbstractString evalName(Name name, NodePositionList context, ParamEvalMode mode) {
+	private IAbstractString evalName(Name name, IntegerList context, ParamEvalMode mode) {
 		ITypeBinding type = name.resolveTypeBinding();
 		if (!ASTUtil.isStringOrStringBuilderOrBuffer(type)) {
 			throw new UnsupportedStringOpExAtNode("Unsupported type of Name: " + type.getQualifiedName(), name);
@@ -307,52 +309,56 @@ public class Crawler2 {
 		}
 		else {
 			
-			return evalNameBefore(name, name, context, mode);
+			return evalVarBefore((IVariableBinding)name.resolveBinding(), name, context, mode);
 		}
 	}
 
-	private IAbstractString evalNameBefore(Name name, ASTNode target, 
-			NodePositionList context, ParamEvalMode mode) {
+	private IAbstractString evalVarBefore(IVariableBinding var, ASTNode target, 
+			IntegerList context, ParamEvalMode mode) {
 		
-		NameUsage usage = VariableTracker.getLastReachingMod
-			((IVariableBinding)name.resolveBinding(), target);
-		
-		return evalNameAfter(name, usage, new NodePositionList(name, context), mode); 
-	}
-
-	private IAbstractString evalNameAfter(Name name, NameUsage usage, NodePositionList context, ParamEvalMode mode) {
+		NameUsage usage = VariableTracker.getLastReachingMod(var, target);
 		if (usage == null) {
-			throw new UnsupportedStringOpEx("internal error: Can't find definition for '" + name + "'", 
-					ASTUtil.getPosition(name));
+			throw new UnsupportedStringOpEx("internal error: Can't find definition for '" + var + "'", null);
 		}
-		assert usage.getNode() != null;
+		
+		return evalVarAfter(var, usage, context, mode); 
+	}
+
+	private IAbstractString evalVarAfter(IVariableBinding var, NameUsage usage, IntegerList context, ParamEvalMode mode) {
+		
+		// recursion check
+		if (context != null && context.contains(usage.hashCode())) { 
+			// ie. i'm already computing the effect of this usage somewhere lower in the call stack
+			// ie. it's recursion!
+			return new StringRecursion(ASTUtil.getPosition(usage.getMainNode()));			
+		}
 		
 		
 		if (usage instanceof NameUsageChoice) {
-			return evalNameAfterUsageChoice(name, (NameUsageChoice)usage, context, mode);
+			return evalVarAfterUsageChoice(var, (NameUsageChoice)usage, context, mode);
 		}
 		else if (usage instanceof NameAssignment) {
-			return evalNameAfterAssignment(name, (NameAssignment)usage, context, mode);
+			return evalVarAfterAssignment(var, (NameAssignment)usage, context, mode);
 		}
 		else if (usage instanceof NameInParameter) {
-			return evalNameInParameter(name, (NameInParameter)usage, context, mode);
+			return evalVarInParameter(var, (NameInParameter)usage, context, mode);
 		}
 		else if (usage instanceof NameInArgument) {
-			return evalNameAfterBeingArgument(name, (NameInArgument)usage, context, mode);
+			return evalVarAfterBeingArgument(var, (NameInArgument)usage, context, mode);
 		}
 		else if (usage instanceof NameInMethodCallExpression) {
-			return evalNameAfterCallingItsMethod(name, (NameInMethodCallExpression)usage, context, mode);
+			return evalVarAfterCallingItsMethod(var, (NameInMethodCallExpression)usage, context, mode);
 		}
 		else {
-			throw new UnsupportedStringOpExAtNode("Unsupported NameUsage: " + usage.getClass(), usage.getNode());
+			throw new IllegalArgumentException();
 		}
 	}
 	
 	
-	private IAbstractString evalNameInParameter(Name name, NameInParameter usage, 
-			NodePositionList context, ParamEvalMode mode) {
+	private IAbstractString evalVarInParameter(IVariableBinding var, NameInParameter usage, 
+			IntegerList context, ParamEvalMode mode) {
 		
-		IPosition pos = ASTUtil.getPosition(usage.getNode());
+		IPosition pos = ASTUtil.getPosition(usage.getParameterNode());
 		
 		if (mode == ParamEvalMode.AS_PARAM) { // this means that client is constructing a method template
 			return new StringParameter(pos, usage.getParameterNo());
@@ -368,35 +374,40 @@ public class Crawler2 {
 		}
 	}
 
-	private IAbstractString evalNameAfterBeingArgument(Name name, NameInArgument usage, NodePositionList context, ParamEvalMode mode) {
-		if (ASTUtil.isString(name.resolveTypeBinding())) {
+	private IAbstractString evalVarAfterBeingArgument(IVariableBinding var, NameInArgument usage, IntegerList context, ParamEvalMode mode) {
+		if (ASTUtil.isString(var.getType())) {
 			// this usage doesn't affect it, keep looking
-			return evalNameBefore(name, usage.getNode(), context, mode);
+			return evalVarBefore(var, usage.getInvocation(), context, mode);
 		}
 		else {
-			assert ASTUtil.isStringBuilderOrBuffer(name.resolveTypeBinding());
-			return evalInvocationArgOut(usage.getInv(), usage.getArgumentNo(), context, mode); 
+			assert ASTUtil.isStringBuilderOrBuffer(var.getType());
+			
+			// TODO does it need new context ?
+			return evalInvocationArgOut(usage.getInvocation(), usage.getArgumentNo(), contextOf(usage, context), mode); 
 		}
 	}
 
-	private IAbstractString evalNameAfterUsageChoice(Name name, NameUsageChoice uc, NodePositionList context, ParamEvalMode mode) {
+	private IAbstractString evalVarAfterUsageChoice(IVariableBinding var, NameUsageChoice uc, IntegerList context, ParamEvalMode mode) {
+		
+		IntegerList newContext = contextOf(uc, context);
+		
 		IAbstractString thenStr;
 		if (uc.getThenUsage() == null) {
-			thenStr = this.evalNameBefore(name, uc.getNode(), context, mode); // eval before if statement
+			thenStr = this.evalVarBefore(var, uc.getCommonParentNode(), newContext, mode); // eval before if statement
 		}
 		else {
-			 thenStr = this.evalNameAfter(name, uc.getThenUsage(), context, mode);
+			 thenStr = this.evalVarAfter(var, uc.getThenUsage(), newContext, mode);
 		}
 		
 		IAbstractString elseStr;
 		if (uc.getElseUsage() == null) {
-			elseStr = this.evalNameBefore(name, uc.getNode(), context, mode); // eval before if statement
+			elseStr = this.evalVarBefore(var, uc.getCommonParentNode(), newContext, mode); // eval before if statement
 		}
 		else {
-			elseStr = this.evalNameAfter(name, uc.getElseUsage(), context, mode);
+			elseStr = this.evalVarAfter(var, uc.getElseUsage(), newContext, mode);
 		}
 		
-		StringChoice result = new StringChoice(ASTUtil.getPosition(uc.getNode()),
+		StringChoice result = new StringChoice(ASTUtil.getPosition(uc.getCommonParentNode()),
 				thenStr, elseStr); 
 		
 		if (optimizeChoice) {
@@ -407,13 +418,13 @@ public class Crawler2 {
 	}
 	
 
-	private IAbstractString evalInfix(InfixExpression expr, NodePositionList context, ParamEvalMode mode) {
+	private IAbstractString evalInfix(InfixExpression expr, IntegerList context, ParamEvalMode mode) {
 		if (expr.getOperator() == InfixExpression.Operator.PLUS) {
 			List<IAbstractString> ops = new ArrayList<IAbstractString>();
-			ops.add(eval(expr.getLeftOperand(), new NodePositionList(expr, context), mode));
-			ops.add(eval(expr.getRightOperand(), new NodePositionList(expr, context), mode));
+			ops.add(eval(expr.getLeftOperand(), contextOf(expr, context), mode));
+			ops.add(eval(expr.getRightOperand(), contextOf(expr, context), mode));
 			for (Object operand: expr.extendedOperands()) {
-				ops.add(eval((Expression)operand, new NodePositionList(expr, context), mode));
+				ops.add(eval((Expression)operand, contextOf(expr, context), mode));
 			}
 			return new StringSequence(ASTUtil.getPosition(expr), ops);
 		}
@@ -422,7 +433,7 @@ public class Crawler2 {
 		}
 	}
 	
-	private IAbstractString evalClassInstanceCreation(ClassInstanceCreation node, NodePositionList context, ParamEvalMode mode) {
+	private IAbstractString evalClassInstanceCreation(ClassInstanceCreation node, IntegerList context, ParamEvalMode mode) {
 		if (!ASTUtil.isStringOrStringBuilderOrBuffer(node.resolveTypeBinding())) {
 			throw new UnsupportedStringOpExAtNode("Unsupported type in class instance creation: "
 					+ node.resolveTypeBinding().getQualifiedName(), node);
@@ -447,56 +458,46 @@ public class Crawler2 {
 		}
 	}
 
-	private IAbstractString evalNameAfterAssignment(Name name, NameAssignment usage, NodePositionList context, ParamEvalMode mode) {
+	private IAbstractString evalVarAfterAssignment(IVariableBinding var, NameAssignment usage, IntegerList context, ParamEvalMode mode) {
+		
+		IntegerList assContext = contextOf(usage, context);
+		
 		if (usage.getOperator() == Assignment.Operator.ASSIGN) {
-			return eval(usage.getRightHandSide(), context, mode);
+			return eval(usage.getRightHandSide(), assContext, mode);
 		}
 		else if (usage.getOperator() == Assignment.Operator.PLUS_ASSIGN) {
-			// extra recursion check because concatenation expression is implicit
-			// and i can't pass it's node to eval (for common recursion check)
-			IPosition pos = ASTUtil.getPosition(usage.getNode());
-			if (context != null && context.contains(pos)) { 
-				// ie. i'm already computing the value of this node lower in the call stack
-				// ie. it's recursion!
-				return new StringRecursion(pos);			
-			}
-			
 			return new StringSequence(
-					ASTUtil.getPosition(usage.getNode()),
-					eval(usage.getLeftHandSide(), new NodePositionList(usage.getNode(), context), mode),
-					eval(usage.getRightHandSide(), new NodePositionList(usage.getNode(), context), mode));
+					ASTUtil.getPosition(usage.getAssignmentOrDeclaration()),
+					eval(usage.getLeftHandSide(), assContext, mode),
+					eval(usage.getRightHandSide(), assContext, mode));
 		}
 		else {
-			throw new UnsupportedStringOpExAtNode("Unknown assignment operator: " + usage.getOperator(), usage.getNode());
+			throw new UnsupportedStringOpExAtNode("Unknown assignment operator: " + usage.getOperator(), usage.getAssignmentOrDeclaration());
 		}
 	}
+	
 	/*
 	 * Meant for analyzing mutating method calls on name
 	 */
-	private IAbstractString evalNameAfterCallingItsMethod(Name name, 
-			NameInMethodCallExpression usage, NodePositionList context, ParamEvalMode mode) {
-		if (ASTUtil.isString(name.resolveTypeBinding())) {
+	private IAbstractString evalVarAfterCallingItsMethod(IVariableBinding var, 
+			NameInMethodCallExpression usage, IntegerList context, ParamEvalMode mode) {
+		IntegerList newContext = contextOf(usage, context);
+		
+		if (ASTUtil.isString(var.getType())) {
 			// this usage doesn't affect it
-			return evalNameBefore(name, usage.getNode(), context, mode);
+			return evalVarBefore(var, usage.getInvocation(), newContext, mode);
 		}
 		
 		else {
-			assert ASTUtil.isStringBuilderOrBuffer(name.resolveTypeBinding());
-			MethodInvocation inv = usage.getInv();
+			assert ASTUtil.isStringBuilderOrBuffer(var.getType());
+			MethodInvocation inv = usage.getInvocation();
 			String methodName = inv.getName().getIdentifier(); 
 			
 			if (methodName.equals("append")) {
-				// extra recursion check because concatenation expression is implicit
-				// and i can't pass it's node to eval (for normal recursion check)
-				IPosition pos = ASTUtil.getPosition(inv);
-				if (context != null && context.contains(pos)) { 
-					return new StringRecursion(pos);			
-				}
-				
 				return new StringSequence(
 						ASTUtil.getPosition(inv),
-						eval(inv.getExpression(), new NodePositionList(inv, context), mode),
-						eval((Expression)inv.arguments().get(0), new NodePositionList(inv, context), mode));
+						eval(inv.getExpression(), newContext, mode),
+						eval((Expression)inv.arguments().get(0), newContext, mode));
 			}
 			// non-modifying method calls
 			else if (methodName.equals("toString")
@@ -515,7 +516,7 @@ public class Crawler2 {
 					|| methodName.equals("substring")
 					|| methodName.equals("trimToSize")
 					) {
-				return eval(inv.getExpression(), new NodePositionList(inv, context), mode);
+				return eval(inv.getExpression(), newContext, mode);
 			}
 			else {
 				throw new UnsupportedStringOpExAtNode("Unknown method called on StringBuilder: " 
@@ -529,7 +530,6 @@ public class Crawler2 {
 		IPosition pos = ASTUtil.getPosition(decl);
 		try {
 			IAbstractString str = removeRecursion(getMethodTemplate(decl, argNo));
-			assert ! str.containsRecursion();
 			return new StringNodeDescriptor(pos, str);
 		}
 		catch (UnsupportedStringOpEx e) {
@@ -584,10 +584,10 @@ public class Crawler2 {
 		// TODO: at first look for javadoc annotation for this arg
 		Name paramName = ((SingleVariableDeclaration)decl.parameters().get(argumentIndex0)).getName();
 		
-		NameUsage lastMod = VariableTracker.getLastModIn(
-				(IVariableBinding)paramName.resolveBinding(), decl);
+		IVariableBinding var = (IVariableBinding)paramName.resolveBinding();
+		NameUsage lastMod = VariableTracker.getLastModIn(var, decl);
 
-		return evalNameAfter(paramName, lastMod, null, ParamEvalMode.AS_PARAM);
+		return evalVarAfter(var, lastMod, null, ParamEvalMode.AS_PARAM);
 	}
 
 	private IAbstractString getMethodReturnValueFromJavadoc(MethodDeclaration decl) {
@@ -620,10 +620,23 @@ public class Crawler2 {
 			throw new UnsupportedStringOpEx("Unsupported modification scheme in loop", str.getPosition());
 //			FIXME put back when path-sens is done				
 //			return RecursionConverter.recursionToRepetition(str);
+//			assert ! result.containsRecursion();
 		}
 		else {
 			return str;
 		}
+	}
+	
+	private IntegerList contextOf(IPosition pos, IntegerList prevContext) {
+		return new IntegerList(pos.hashCode(), prevContext);
+	}
+	
+	private IntegerList contextOf(NameUsage usage, IntegerList prevContext) {
+		return new IntegerList(usage.hashCode(), prevContext);
+	}
+	
+	private IntegerList contextOf(ASTNode node, IntegerList prevContext) {
+		return contextOf(ASTUtil.getPosition(node), prevContext);
 	}
 	
 }
