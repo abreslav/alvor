@@ -7,6 +7,9 @@ public class PositionList {
 	private final IPosition pos;
 
 	public PositionList(IPosition pos, PositionList prevLink) {
+		if (prevLink != null && pos != null) {
+			assert ! prevLink.contains(pos);
+		}
 		this.prev = prevLink;
 		this.pos = pos;
 	}

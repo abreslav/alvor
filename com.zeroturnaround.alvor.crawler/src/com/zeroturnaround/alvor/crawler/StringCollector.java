@@ -141,9 +141,9 @@ public class StringCollector {
 			});
 			
 			searchTimer.printTime();
-			System.out.println("Count=" + count);
+			System.out.println("Match count=" + count);
 			System.out.println(files);
-			System.out.println("FileCount=" + files.size());
+			System.out.println("File count=" + files.size());
 		}
 		
 		// TODO should be more granular

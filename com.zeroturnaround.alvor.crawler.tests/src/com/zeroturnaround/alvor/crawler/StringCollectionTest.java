@@ -15,9 +15,22 @@ import com.zeroturnaround.alvor.common.WorkspaceUtil;
  * @author Aivar
  *
  */
-public abstract class AbstractStringCollectionTest {
+public abstract class StringCollectionTest {
 	@Test
-	public abstract void findValidNodeDescriptors();
+	public void findValidNodeDescriptors() {
+		try {
+			String projectName = this.getProjectName();
+			// CacheProvider.getCache().clearProject(projectName);
+			CacheProvider.getCache().clearAll();
+			findAndValidateNodeDescriptors(projectName);
+		}
+		finally {
+			CacheProvider.getCache().printDBInfo();
+			CacheProvider.shutdownCache();
+		}
+	}
+	
+	protected abstract String getProjectName();
 	
 	protected void findAndValidateNodeDescriptors(String projectName) {
 		IProject project = WorkspaceUtil.getProject(projectName);

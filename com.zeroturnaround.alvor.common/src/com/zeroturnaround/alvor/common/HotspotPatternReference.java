@@ -8,4 +8,8 @@ public class HotspotPatternReference extends PatternReference {
 	public HotspotPatternReference(IPosition pos, HotspotPattern pattern) {
 		super(pos, pattern);
 	}
+	@Override
+	public boolean containsRecursion() {
+		return false;
+	}
 }

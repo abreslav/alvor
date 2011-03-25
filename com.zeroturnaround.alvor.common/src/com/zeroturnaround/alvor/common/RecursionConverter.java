@@ -102,6 +102,9 @@ public class RecursionConverter {
 	 * 
 	 */
 	public static IAbstractString recursionToRepetition(IAbstractString str) {
+
+		// FIXME remove recursion from function-ref arguments independently
+		
 		
 		// simple Abstract Strings
 		if (str instanceof StringConstant
@@ -192,6 +195,7 @@ public class RecursionConverter {
 			throw new IllegalArgumentException("Unknown abstract string: " + str.getClass());
 		}
 		
+		// FIXME remove recursion from function-ref arguments independently
 		
 		// TODO after creating a resulting repetition, check that there's no recursion in it
 	}
