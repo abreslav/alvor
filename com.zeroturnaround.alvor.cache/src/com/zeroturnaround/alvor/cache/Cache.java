@@ -595,7 +595,6 @@ public class Cache {
 			}
 		} 
 		catch (SQLException e) {
-			System.out.println("PREP_STMT: " + db.getPreparedStatementsCount());
 			System.out.println("DEPTH: " + this.depth);
 			e.printStackTrace();
 			throw new RuntimeException(e);

@@ -66,7 +66,7 @@ public class CacheProvider {
 		System.setProperty("h2.serverCachedObjects", "20000");
 		Class.forName("org.h2.Driver");
 		String path = AlvorCachePlugin.getDefault().getStateLocation().append("/cache_h2").toPortableString();
-		String url = "jdbc:h2:" + path + ";TRACE_LEVEL_FILE=3";
+		String url = "jdbc:h2:" + path + ";CACHE_SIZE=500000";
 		return DriverManager.getConnection(url, "SA", "");
 	}
 	
