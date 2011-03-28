@@ -4,11 +4,6 @@ DROP TABLE hotspots if exists;;;
 DROP TABLE abstract_strings if exists;;;
 DROP TABLE files if exists;;;
 
-SET FILES LOG FALSE;;;
-
-SET DATABASE DEFAULT TABLE TYPE CACHED;;;
-
-
 CREATE TABLE files
 ( 
 	id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

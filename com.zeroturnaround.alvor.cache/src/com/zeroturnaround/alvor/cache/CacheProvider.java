@@ -12,7 +12,7 @@ import com.zeroturnaround.alvor.common.logging.Logs;
 
 public class CacheProvider {
 	private static Cache INSTANCE = null;
-	private static boolean USE_H2 = false;
+	private static boolean USE_H2 = true;
 	
 	private final static ILog LOG = Logs.getLog(CacheProvider.class);
 	
@@ -44,7 +44,8 @@ public class CacheProvider {
 	private static Connection connectToHSQLDB() throws SQLException, ClassNotFoundException {
 		Class.forName("org.hsqldb.jdbc.JDBCDriver");
 		String path = AlvorCachePlugin.getDefault().getStateLocation().append("/cache_hsqldb").toPortableString();
-		String fileUrl = "jdbc:hsqldb:file:" + path + ";shutdown=true";
+		String fileUrl = "jdbc:hsqldb:file:" + path + ";shutdown=true;hsqldb.log_data=true;hsqldb.default_table_type=cached";
+		
 		String serverUrl = "jdbc:hsqldb:hsql://localhost/xdb";
 		
 		// if db is locked, then assume that server is running and connect in server mode (this is debugging mode)
@@ -66,7 +67,7 @@ public class CacheProvider {
 		System.setProperty("h2.serverCachedObjects", "20000");
 		Class.forName("org.h2.Driver");
 		String path = AlvorCachePlugin.getDefault().getStateLocation().append("/cache_h2").toPortableString();
-		String url = "jdbc:h2:" + path + ";CACHE_SIZE=500000";
+		String url = "jdbc:h2:" + path + ";LOG=0;CACHE_SIZE=25536;LOCK_MODE=0;UNDO_LOG=0";
 		return DriverManager.getConnection(url, "SA", "");
 	}
 	
@@ -95,9 +96,6 @@ public class CacheProvider {
 		ResultSet res = db.getConnection().getMetaData().getTables(null, null, "FILES", null);
 		if (!res.next()) {
 			String scriptName = "db/cache_setup.sql";
-			if (USE_H2) {
-				scriptName = "db/cache_setup_h2.sql";
-			}
 			InputStream script = CacheProvider.class.getClassLoader().getResourceAsStream(scriptName);
 			db.runScript(script);
 		}
