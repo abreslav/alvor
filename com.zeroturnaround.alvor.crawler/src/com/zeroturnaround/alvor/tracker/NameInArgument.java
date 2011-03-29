@@ -21,11 +21,6 @@ public class NameInArgument extends NameUsage {
 		return (Expression)inv.arguments().get(index);
 	}
 	
-	@Deprecated
-	public int getIndex() {
-		return index;
-	}
-	
 	public int getArgumentNo() {
 		return index+1;
 	}

@@ -3,7 +3,6 @@ package com.zeroturnaround.alvor.crawler.util;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
@@ -124,7 +123,7 @@ public class ASTUtil {
 		}
 	}
 	
-	/*package*/ static int getNodeLineNumber(int offset, ASTNode node) {
+	public static int getNodeLineNumber(int offset, ASTNode node) {
 		if (node.getRoot() instanceof CompilationUnit) {
 			return ((CompilationUnit)node.getRoot()).getLineNumber(offset);
 		}
@@ -267,23 +266,6 @@ public class ASTUtil {
 		}
 	}
 	
-	public static IJavaProject getNodeProject(ASTNode node) {
-		assert node.getRoot() instanceof CompilationUnit;
-		CompilationUnit cUnit = (CompilationUnit)node.getRoot();
-		return cUnit.getJavaElement().getJavaProject();
-	}
-
-	public static Statement getLastStmt(Block block) {
-		return (Statement)block.statements().get(block.statements().size()-1);
-	}
-	
-	public static String getMethodClassName(MethodDeclaration method) {
-		assert (method.getParent() instanceof TypeDeclaration);
-		TypeDeclaration typeDecl = (TypeDeclaration)method.getParent();
-		ITypeBinding classBinding = typeDecl.resolveBinding();
-		return classBinding.getErasure().getQualifiedName();
-	}
-	
 	public static MethodDeclaration getContainingMethodDeclaration(ASTNode node) {
 		ASTNode result = node;
 		while (result != null && ! (result instanceof MethodDeclaration)) {
@@ -305,24 +287,11 @@ public class ASTUtil {
 		return -1;
 	}
 	
-	// NB! uses 0-based indexing
-	public static int getArgumentIndex0(MethodInvocation inv, IBinding var) {
-		int i = 0;
-		for (Object elem: inv.arguments()) {
-			if (elem instanceof Name 
-					&& ((Name)elem).resolveBinding().isEqualTo(var)) {
-				return i;
-			}
-			i++;
-		}
-		return -1;
-	}
-	
-	public static VariableDeclaration getVarDeclFragment(VariableDeclarationStatement stmt, Name name) {
+	public static VariableDeclaration getVarDeclFragment(VariableDeclarationStatement stmt, IVariableBinding var) {
 		for (Object frag : stmt.fragments()) {
 			VariableDeclaration vDec = (VariableDeclaration)frag;
 			
-			if (sameBinding(vDec.getName(), name)) {
+			if (sameBinding(vDec.getName(), var)) {
 				return vDec;
 			}
 		}
@@ -334,43 +303,9 @@ public class ASTUtil {
 		return (CompilationUnit)node.getRoot();
 	}
 	
-	public static ICompilationUnit getICompilationUnit(ASTNode node) {
-		return (ICompilationUnit)getCompilationUnit(node).getJavaElement();
-	}
-	
-	public static boolean sameBinding(Expression exp, Name name) {
-		return sameBinding(exp, name.resolveBinding());
-	}
-	
 	public static boolean sameBinding(Expression exp, IBinding var) {
 		return (exp instanceof Name)
 			&& ((Name)exp).resolveBinding().isEqualTo(var);
-	}
-	
-	/*
-	 * Return true if a is in a loop and b is not in this loop (body)
-	 */
-	public static boolean inALoopSeparatingFrom(ASTNode nodeA, ASTNode nodeB) {
-		assert nodeA != null;
-		assert nodeB != null;
-		
-		if (nodeA == nodeB) {
-			return false;
-		}
-		else if (nodeA instanceof MethodDeclaration) {
-			return false;
-		}
-		else if (!isLoopStatement(nodeA)) {
-			// go up with A until reach a loop
-			return inALoopSeparatingFrom(nodeA.getParent(), nodeB);
-		}
-		// here nodeA is loop
-		else if (nodeB instanceof MethodDeclaration) {
-			return true;
-		}
-		else {
-			return inALoopSeparatingFrom(nodeA, nodeB.getParent());
-		}
 	}
 	
 	public static ASTNode getContainingLoop(ASTNode node) {
@@ -460,26 +395,6 @@ public class ASTUtil {
 			|| node instanceof ContinueStatement;
 	}
 	
-	public static  String getErasedSignature(IMethodBinding m) {
-		String paramString;
-		ITypeBinding[] parameterTypes = m.getParameterTypes();
-		if (parameterTypes.length == 1) {
-			paramString = parameterTypes[0].getQualifiedName();
-		} else if (parameterTypes.length > 0) {
-			StringBuilder params = new StringBuilder();
-			for (ITypeBinding t : parameterTypes) {
-				params.append(t.getQualifiedName()).append(" ");
-			}
-			paramString = params.toString();
-		} else {
-			paramString = "";
-		}
-		return m.getDeclaringClass().getQualifiedName()
-			+ "." + m.getName()
-			+ "(" + paramString + ")"
-			;
-	}
-
 	public static boolean isString(ITypeBinding typeBinding) {
 		return typeBinding.getQualifiedName().equals("java.lang.String");
 	}
@@ -506,10 +421,6 @@ public class ASTUtil {
 		ASTNode ast = parser.createAST(null);
 		return ast;
 
-	}
-
-	public static int getLineNumber(ASTNode node) {
-		return PositionUtil.getLineNumber(ASTUtil.getPosition(node));
 	}
 
 	public static IPosition getPosition(ASTNode node) {

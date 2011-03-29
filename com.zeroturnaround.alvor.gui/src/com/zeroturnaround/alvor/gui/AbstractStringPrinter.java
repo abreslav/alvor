@@ -16,7 +16,7 @@ import com.zeroturnaround.alvor.common.HotspotDescriptor;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
-import com.zeroturnaround.alvor.crawler.Crawler2;
+import com.zeroturnaround.alvor.crawler.StringExpressionEvaluator;
 import com.zeroturnaround.alvor.crawler.util.ASTUtil;
 import com.zeroturnaround.alvor.string.IAbstractString;
 
@@ -61,7 +61,7 @@ public class AbstractStringPrinter implements IEditorActionDelegate{
 			LOG.message("###############################");
 			LOG.message("Selection is : " + node.getClass().getName());
 			
-			HotspotDescriptor desc = Crawler2.INSTANCE.evaluate((Expression)node, Crawler2.ParamEvalMode.AS_HOTSPOT);
+			HotspotDescriptor desc = StringExpressionEvaluator.INSTANCE.evaluate((Expression)node, StringExpressionEvaluator.ParamEvalMode.AS_HOTSPOT);
 			if (desc instanceof StringNodeDescriptor) {
 				IAbstractString abstr = ((StringNodeDescriptor)desc).getAbstractValue();
 				LOG.message("Abstract value is: " + abstr.toString());

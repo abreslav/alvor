@@ -76,8 +76,8 @@ public class Cache {
 	}
 	
 	public void removeFile(String fileName) {
-		invalidateFile(fileName);
 		db.execute("delete from files where name = ?", fileName);
+		// this cascade-deletes related stuff
 	}
 	
 	public void addFile(String projectName, String fileName) {
@@ -88,13 +88,21 @@ public class Cache {
 	public void invalidateFile(String fileName) {
 		db.execute("delete from abstract_strings where file_id = " +
 				" (select id from files where name = ?)", fileName);
+		db.execute("update files set batch_no = 0 where name = ?", fileName);
 	}
 	
-	public List<HotspotDescriptor> getProjectHotspots(String projectName) {
-		return getHotspots(projectName, null);		
+	private List<HotspotDescriptor> getAllProjectHotspots(String projectName) {
+		return getPrimaryHotspots(projectName, null, false);		
+	}
+	public List<HotspotDescriptor> getUncheckedPrimaryProjectHotspots(String projectName) {
+		return getPrimaryHotspots(projectName, null, true);		
+	}
+	private Collection<HotspotDescriptor> getAllFileHotspots(String fileName, String projectName) {
+		return getPrimaryHotspots(projectName, fileName, false);
 	}
 	
-	public List<HotspotDescriptor> getHotspots(String projectName, String fileName) {
+	
+	private List<HotspotDescriptor> getPrimaryHotspots(String projectName, String fileName, boolean onlyUnchecked) {
 		ResultSet rs = null;
 		
 		try {
@@ -123,6 +131,11 @@ public class Cache {
 				sql += " where f.name = ?";
 				fileFilter = fileName;
 			}
+			
+			if (onlyUnchecked) {
+				sql += " and h.checked = false ";
+			}
+			
 			sql += " and pp.pattern_role = " + PATTERN_ROLE_PRIMARY; 
 			
 			rs = db.query(sql, projectName, fileFilter);
@@ -286,15 +299,17 @@ public class Cache {
 		}
 	}
 
-	private void markHotspotsAsChecked(Collection<IPosition> positions) {
+	public void markHotspotsAsChecked(Collection<HotspotDescriptor> hotspots) {
 		
-		for (IPosition pos : positions) {
+		// TODO maybe should do it in batches
+		for (HotspotDescriptor hotspot : hotspots) {
+			IPosition pos = hotspot.getPosition();
 			db.execute(
 				" update hotspots " +
 				" set checked = true " +
 				" where file_id = ?" +
 				" and start = ?" +
-				" and lenght = ?", 
+				" and length = ?", 
 				getFileId(pos.getPath()), pos.getStart(), pos.getLength());
 		}
 	}
@@ -797,18 +812,15 @@ public class Cache {
 
 	public void clearAll() {
 		db.execute("delete from abstract_strings"); 
-		db.execute("delete from project_patterns"); 
 		db.execute("delete from patterns"); 
-		db.execute("delete from hotspots"); 
 		db.execute("delete from files"); 
+		db.execute("delete from project_patterns"); // not strictly necessary: deleting patterns cascades 
+		db.execute("delete from hotspots"); // not strictly necessary: deleting abstract_string cascades to hotspots 
 	}
 	
 	public void clearProject(String projectName) {
-		//int projectId = getProjectId(projectName);
-		db.execute("delete from abstract_strings where file_id in " +
-				" (select id from files where name like ('/' || ? || '/%'))", projectName); 
-		// ... or delete abstract strings using triggers??
 		db.execute("delete from files where name like ('/' || ? || '/%')", projectName); 
+		// hotspots and abstract strings get deleted by cascade
 		db.execute("delete from project_patterns where project_name = ?", projectName); 
 	}
 
@@ -826,7 +838,7 @@ public class Cache {
 			try {
 				id = db.queryInt("select id from files where name = ?", name);
 				assert id != null; // TODO maybe should just create if doesn't exist ??
-				fileIDs.put(name, id);
+				//fileIDs.put(name, id);
 			} catch (Exception e) {
 				throw new IllegalArgumentException("Can't find file: " + name);
 			}
@@ -894,11 +906,9 @@ public class Cache {
 		System.out.println(db.queryCount);
 	}
 	
-	public Collection<HotspotDescriptor> getFileHotspots(String fileName, String projectName) {
-		return getHotspots(projectName, fileName);
-	}
-	
 	public Collection<String> getUncheckedFiles(String projectName) {
+		// return files which have hotspots, but some of them are not checked
+		
 		ResultSet rs = db.query(
 				" select" + 
 				" distinct f.name" + 

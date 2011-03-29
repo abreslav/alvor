@@ -2,10 +2,8 @@ package com.zeroturnaround.alvor.gui;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -15,6 +13,7 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
 
 import com.zeroturnaround.alvor.cache.Cache;
 import com.zeroturnaround.alvor.cache.CacheProvider;
+import com.zeroturnaround.alvor.checkers.CheckerException;
 import com.zeroturnaround.alvor.checkers.HotspotCheckingResult;
 import com.zeroturnaround.alvor.checkers.HotspotError;
 import com.zeroturnaround.alvor.checkers.HotspotInfo;
@@ -24,7 +23,6 @@ import com.zeroturnaround.alvor.common.HotspotDescriptor;
 import com.zeroturnaround.alvor.common.PositionUtil;
 import com.zeroturnaround.alvor.common.StringNodeDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
-import com.zeroturnaround.alvor.common.WorkspaceUtil;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.configuration.ConfigurationManager;
@@ -46,62 +44,44 @@ import com.zeroturnaround.alvor.string.util.AbstractStringOptimizer;
 
 public class GuiChecker {
 	private static final ILog LOG = Logs.getLog(GuiChecker.class);
-	private ComplexChecker complexChecker = new ComplexChecker();
+	private ComplexChecker checker = new ComplexChecker();
 	private Cache cache = CacheProvider.getCache();
-	private ProjectConfiguration conf;
-	private int hotspotCount = 0;
 	
 	
 	public void cleanUpdateProjectMarkers(IProject project, IProgressMonitor monitor) {
-		cache.clearAll(); // FIXME clear project
-		StringCollector.updateProjectCache(project, cache, null);
-		List<HotspotDescriptor> hotspots = cache.getProjectHotspots(project.getName());
+		cache.clearProject(project.getName());
 		clearAlvorMarkers(project);
-
-		conf = ConfigurationManager.readProjectConfiguration(project, true);
-		
-		Collection<HotspotCheckingResult> checkingResults = 
-			complexChecker.checkNodeDescriptors(hotspots, conf, monitor);
-		
-		createCheckingMarkers(checkingResults, project);
+		updateProjectMarkers(project, monitor);
 	}
+	
+	public void updateProjectMarkers(IProject project, IProgressMonitor monitor) {
+		// assumes that markers of invalidated files are already deleted
 		
-	public void updateProjectMarkersForChangedFiles(IProject project, IProgressMonitor monitor) {
 		StringCollector.updateProjectCache(project, cache, monitor);
 		
-		// TODO
-		conf = ConfigurationManager.readProjectConfiguration(project, true);
-		
-		
-		this.hotspotCount = 0;
-		for (String fileName : cache.getUncheckedFiles(project.getName())) {
-			updateFileMarkers(fileName, project, monitor);
-		}
-		
-		System.out.println("Finished: Checked " + hotspotCount + " hotspots");
-	}
-	
-	private void updateFileMarkers(String fileName, IProject project, IProgressMonitor monitor) {
-		IFile file = WorkspaceUtil.getFile(fileName);
+		ProjectConfiguration conf = ConfigurationManager.readProjectConfiguration(project, true);
 		Collection<HotspotDescriptor> hotspots = 
-			cache.getFileHotspots(fileName, project.getName());
+			cache.getUncheckedPrimaryProjectHotspots(project.getName());
 		
-		this.hotspotCount += hotspots.size();
 		
-		// TODO delete and re-check only changed hotspots
-		clearAlvorMarkers(file);
-		
-		if (conf.getMarkHotspots()) {
-			markHotspots(hotspots);
+		try {
+			for (HotspotDescriptor hotspot : hotspots) {
+				Collection<HotspotCheckingResult> checkingResults = checker.checkHotspot(hotspot, conf);
+				createCheckingMarkers(checkingResults, project);
+			}
+			cache.markHotspotsAsChecked(hotspots);
+		} 
+		catch (CheckerException e) {
+			createMarker("Checker exception: " + e.getMessage(), AlvorGuiPlugin.ERROR_MARKER_ID,
+					IMarker.SEVERITY_ERROR, e.getPosition(), project);
 		}
 		
-		Collection<HotspotCheckingResult> checkingResults = 
-			complexChecker.checkNodeDescriptors(hotspots, conf, monitor);
-		
-		createCheckingMarkers(checkingResults, project);
+		// TODO clean orphaned (constant) markers
 	}
 	
-	private void clearAlvorMarkers(IResource res) {
+	public static void clearAlvorMarkers(IResource res) {
+		// TODO if res is not project, then clear also "sub-markers"
+		
 		try {
 			res.deleteMarkers(AlvorGuiPlugin.ERROR_MARKER_ID, true, IResource.DEPTH_INFINITE);
 			res.deleteMarkers(AlvorGuiPlugin.WARNING_MARKER_ID, true, IResource.DEPTH_INFINITE);
@@ -113,7 +93,8 @@ public class GuiChecker {
 		}
 	}
 	private void createCheckingMarkers(Collection<HotspotCheckingResult> checkingResults,
-			IProject currentProject) {
+			IProject project) {
+		
 		for (HotspotCheckingResult result : checkingResults) {
 			String markerId = null; 
 			Integer severity = null;
@@ -130,12 +111,12 @@ public class GuiChecker {
 				markerId = AlvorGuiPlugin.WARNING_MARKER_ID;
 				severity = IMarker.SEVERITY_INFO;  
 			}
-			createMarker(result.getMessage(), markerId, severity, 
-					preparePosition(result.getPosition(), currentProject));				
+			createMarker(result.getMessage(), markerId, severity, result.getPosition(), project); 
 		}
 	}
 
-	private void markHotspots(Collection<HotspotDescriptor> hotspots) {
+	@Deprecated
+	private void markHotspots(Collection<HotspotDescriptor> hotspots, IProject project) {
 		for (HotspotDescriptor hotspot : hotspots) {
 			String message;
 			String markerId;
@@ -147,7 +128,9 @@ public class GuiChecker {
 					message = message.substring(0, Character.MAX_VALUE - 3) + "...";
 				}
 				markerId = AlvorGuiPlugin.HOTSPOT_MARKER_ID;
-				markConstants(abstractValue);
+				
+				// TODO
+				//markConstants(abstractValue);
 			} else if (hotspot instanceof UnsupportedNodeDescriptor) {
 				UnsupportedNodeDescriptor und = (UnsupportedNodeDescriptor) hotspot;
 				message = "Unsupported construction: " + und.getProblemMessage();
@@ -159,20 +142,21 @@ public class GuiChecker {
 					message, 
 					markerId,
 					IMarker.SEVERITY_INFO,
-					hotspot.getPosition());
+					hotspot.getPosition(), project);
 		}		
 	}
 
 	/*
 	 * This method makes things slow on big projects, although on small ones the markers look nice
 	 */
-	private void markConstants(IAbstractString abstractValue) {
+	@Deprecated
+	private void markConstants(IAbstractString abstractValue, final IProject project) {
 		IAbstractStringVisitor<Void, Void> visitor = new IAbstractStringVisitor<Void, Void>() {
 
 			@Override
 			public Void visitStringCharacterSet(
 					StringCharacterSet characterSet, Void data) {
-				createMarker("", AlvorGuiPlugin.STRING_MARKER_ID, null, preparePosition(characterSet.getPosition(), null));
+				createMarker("", AlvorGuiPlugin.STRING_MARKER_ID, null, characterSet.getPosition(), project);
 				return null;
 			}
 
@@ -187,7 +171,7 @@ public class GuiChecker {
 			@Override
 			public Void visitStringConstant(StringConstant stringConstant,
 					Void data) {
-				createMarker("", AlvorGuiPlugin.STRING_MARKER_ID, null, preparePosition(stringConstant.getPosition(), null));
+				createMarker("", AlvorGuiPlugin.STRING_MARKER_ID, null, stringConstant.getPosition(), null);
 				return null;
 			}
 
@@ -222,22 +206,17 @@ public class GuiChecker {
 		abstractValue.accept(visitor, null);
 	}
 
-	private IPosition preparePosition(IPosition pos, IProject currentProject) {
+	private static void createMarker(String message, String markerType, Integer severity, IPosition pos2,
+			IProject project) {
+		
+		IPosition pos = pos2;
 		if (pos == null) {
-			if (currentProject == null) {
-				throw new IllegalArgumentException("Can't create marker when both position and project are null");
-			}
-			return new Position(currentProject.getFullPath().toPortableString(), 0, 0);
+			pos = new Position(project.getFullPath().toPortableString(), 0, 0);
 		}
-		else {
-			return pos;
-		}
-	}
-	private static void createMarker(String message, String markerType, Integer severity, IPosition pos) {
 		
 		if (DummyPosition.isDummyPosition(pos)) {
-			// TODO get rid of this situation
-			LOG.message("Warning: Dummy position in 'createMarker'");
+			// FIXME this should not be required anymore
+			LOG.error("Warning: Dummy position in 'createMarker'");
 			return;
 		}
 		

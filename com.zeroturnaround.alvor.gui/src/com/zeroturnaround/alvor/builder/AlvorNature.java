@@ -55,8 +55,6 @@ public class AlvorNature implements IProjectNature {
 	}
 
 	public static void toggleNature(IProject project) {
-		removeOldNature(project);
-		
 		try {
 			IProjectDescription description = project.getDescription();
 			String[] natures = description.getNatureIds();
@@ -85,43 +83,4 @@ public class AlvorNature implements IProjectNature {
 		}
 	}
 	
-	@Deprecated // temporary
-	private static void removeOldNature(IProject project) {
-		try {
-			IProjectDescription description = project.getDescription();
-			String[] natures = description.getNatureIds();
-
-			// remove nature
-			for (int i = 0; i < natures.length; ++i) {
-				if ("com.zeroturnaround.alvor.javaproject.esqlNature".equals(natures[i])) {
-					// Remove the nature
-					String[] newNatures = new String[natures.length - 1];
-					System.arraycopy(natures, 0, newNatures, 0, i);
-					System.arraycopy(natures, i + 1, newNatures, i,
-							natures.length - i - 1);
-					description.setNatureIds(newNatures);
-					project.setDescription(description, null);
-					return;
-				}
-			}
-			
-			// remove builder
-			ICommand[] commands = description.getBuildSpec();
-			for (int i = 0; i < commands.length; ++i) {
-				if (commands[i].getBuilderName().equals("com.zeroturnaround.alvor.javaproject.esqlBuilder")) {
-					ICommand[] newCommands = new ICommand[commands.length - 1];
-					System.arraycopy(commands, 0, newCommands, 0, i);
-					System.arraycopy(commands, i + 1, newCommands, i,
-							commands.length - i - 1);
-					description.setBuildSpec(newCommands);
-					project.setDescription(description, null);			
-					return;
-				}
-			}
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
 }

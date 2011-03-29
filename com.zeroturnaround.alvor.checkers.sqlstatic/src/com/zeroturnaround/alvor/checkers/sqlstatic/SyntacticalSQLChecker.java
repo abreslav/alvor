@@ -40,16 +40,6 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 	 */
 	private static int SIZE_THRESHOLD = 25000;
 	
-	@Override
-	public Collection<HotspotCheckingResult> checkAbstractStrings(List<StringNodeDescriptor> descriptors,
-			ProjectConfiguration configuration) throws CheckerException {
-		List<HotspotCheckingResult> result = new ArrayList<HotspotCheckingResult>();
-		for (final StringNodeDescriptor descriptor : descriptors) {
-			result.addAll(checkAbstractString(descriptor, configuration));
-		}
-		return result;
-	}
-
 	private Collection<HotspotCheckingResult> checkStringOfAppropriateSize(
 			final StringNodeDescriptor descriptor,
 			IAbstractString abstractString) throws CheckerException {

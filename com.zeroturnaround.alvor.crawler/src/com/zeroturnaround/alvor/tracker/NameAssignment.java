@@ -3,7 +3,6 @@ package com.zeroturnaround.alvor.tracker;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 
 public class NameAssignment extends NameUsage {
@@ -33,11 +32,6 @@ public class NameAssignment extends NameUsage {
 	@Override
 	public ASTNode getMainNode() {
 		return assOrDecl;
-	}
-	
-	@Deprecated
-	public Name getName() {
-		return (Name)leftHandSide; 
 	}
 	
 	public Expression getLeftHandSide() {
