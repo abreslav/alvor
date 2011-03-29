@@ -13,7 +13,7 @@ import com.zeroturnaround.alvor.common.logging.Logs;
 public class CacheProvider {
 	private static Cache INSTANCE = null;
 	private static boolean USE_H2 = true;
-	private static boolean USE_SERVER = true; 
+	private static boolean USE_SERVER = false; 
 	
 	private final static ILog LOG = Logs.getLog(CacheProvider.class);
 	
