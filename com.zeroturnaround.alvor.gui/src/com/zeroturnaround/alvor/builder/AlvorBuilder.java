@@ -50,7 +50,7 @@ public class AlvorBuilder extends IncrementalProjectBuilder {
 	@Override
 	protected void clean(IProgressMonitor monitor) throws CoreException {
 		cache.clearProject(this.getProject().getName());
-		GuiChecker.clearAlvorMarkers(this.getProject());
+		GuiChecker.deleteAlvorMarkers(this.getProject());
 	}
 	
 	private void registerFileChanges(IResourceDelta delta) throws CoreException {
@@ -76,7 +76,7 @@ public class AlvorBuilder extends IncrementalProjectBuilder {
 						break;
 					case IResourceDelta.CHANGED:
 						cache.invalidateFile(fileName);
-						GuiChecker.clearAlvorMarkers(resource);
+						GuiChecker.deleteAlvorMarkers(resource);
 						break;
 					default:
 						throw new IllegalArgumentException("Unexpected kind: " + delta.getKind());

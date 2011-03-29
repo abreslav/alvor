@@ -176,73 +176,6 @@ public class ASTUtil {
 		}
 	}
 	
-	public static boolean invocationMayUseDeclaration (MethodInvocation inv, MethodDeclaration decl) {
-		if (decl.getBody() == null) {
-			return false;
-		}
-		
-		IMethodBinding declMethodBinding = decl.resolveBinding();
-		IMethodBinding invMethodBinding = inv.resolveMethodBinding();
-		ITypeBinding invType = invMethodBinding.getDeclaringClass();
-		ITypeBinding declType = declMethodBinding.getDeclaringClass();
-		
-		// easy case
-		if (invMethodBinding.isEqualTo(declMethodBinding)) {
-			return true;
-		}
-		
-		if (!inv.getName().getIdentifier().equals(decl.getName().getIdentifier())) {
-			throw new IllegalStateException("INV: " + inv.getName().getIdentifier()
-					+ ", DECL: " + decl.getName().getIdentifier());
-		}
-		
-		if (inv.arguments().size() != decl.parameters().size()) {
-			return false;
-		}
-		
-		// finally compare parameter types
-		ITypeBinding[] invPTypes = inv.resolveMethodBinding().getParameterTypes();
-		ITypeBinding[] declPTypes = decl.resolveBinding().getParameterTypes();
-		
-		for (int i = 0; i < invPTypes.length; i++) {
-			if (!invPTypes[i].isEqualTo(declPTypes[i])) {
-				return false;
-			}
-		}
-		
-		// FIXME: need proper checks for expression type here
-		// not working if units are not parsed together
-		// if (! declType.isSubTypeCompatible(invType)) {
-		//	return false;
-		//}
-		return isSubtypeOf(declType, invType);		
-		
-		// Approach 2
-		// Does not work if units are not parsed together
-		//return invBinding.isEqualTo(declBinding) || declBinding.overrides(invBinding);
-	}
-	
-	private static boolean isSubtypeOf(ITypeBinding sub, ITypeBinding sup) {
-		
-		// FIXME it's too simplistic at the moment, should do recursion 
-		
-		if (sub.isEqualTo(sup)) {
-			return true;
-		}
-		
-		if (sub.getSuperclass() != null && sub.getSuperclass().isEqualTo(sup)) {
-			return true;
-		}
-
-		for (ITypeBinding iFace : sub.getInterfaces()) {
-			if (iFace.isEqualTo(sup)) {
-				return true;
-			}
-		}
-		
-		return false;
-	}
-	
 	public static TagElement getJavadocTag(Javadoc javadoc, String name) {
 		if (javadoc == null) {
 			return null;
@@ -317,34 +250,6 @@ public class ASTUtil {
 		}
 		else {
 			return getContainingLoop(node.getParent());
-		}
-	}
-	
-	public static boolean containsConditional(ASTNode node) {
-		// TODO a hack
-		if (node == null) {
-			return false;
-		}
-		else if (node instanceof IfStatement) {
-			return true;
-		}
-		else if (node instanceof Block) {
-			for (Object stmt : ((Block)node).statements()) {
-				if (containsConditional((ASTNode)stmt)) {
-					return true;
-				}
-			}
-			return false;
-		}
-		else if (isLoopStatement(node)) {
-			return containsConditional(getLoopBody(node));
-		}
-		else if (node instanceof TryStatement) {
-			TryStatement tStmt = (TryStatement)node;
-			return containsConditional(tStmt.getBody());
-		}
-		else {
-			return false;
 		}
 	}
 	

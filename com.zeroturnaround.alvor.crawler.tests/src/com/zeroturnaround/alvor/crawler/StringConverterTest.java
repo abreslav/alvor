@@ -66,7 +66,7 @@ public class StringConverterTest {
 //		System.out.println("FLATTENED: " + flattened);
 //		System.out.println("FLAT: " + flat);
 		
-		// FIXME string representation is not good for this
+		// TODO string representation is not good for this
 		assertEquals(flat.toString(), flattened.toString());
 	}
 

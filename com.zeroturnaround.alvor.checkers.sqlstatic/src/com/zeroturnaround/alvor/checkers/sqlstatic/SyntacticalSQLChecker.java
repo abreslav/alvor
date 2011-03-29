@@ -10,7 +10,7 @@ import com.zeroturnaround.alvor.checkers.HotspotError;
 import com.zeroturnaround.alvor.checkers.HotspotInfo;
 import com.zeroturnaround.alvor.checkers.HotspotWarning;
 import com.zeroturnaround.alvor.checkers.IAbstractStringChecker;
-import com.zeroturnaround.alvor.common.StringNodeDescriptor;
+import com.zeroturnaround.alvor.common.StringHotspotDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
@@ -41,7 +41,7 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 	private static int SIZE_THRESHOLD = 25000;
 	
 	private Collection<HotspotCheckingResult> checkStringOfAppropriateSize(
-			final StringNodeDescriptor descriptor,
+			final StringHotspotDescriptor descriptor,
 			IAbstractString abstractString) throws CheckerException {
 		
 		final List<HotspotCheckingResult> result = new ArrayList<HotspotCheckingResult>();
@@ -105,7 +105,7 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 	}
 
 	@Override
-	public Collection<HotspotCheckingResult> checkAbstractString(StringNodeDescriptor descriptor,
+	public Collection<HotspotCheckingResult> checkAbstractString(StringHotspotDescriptor descriptor,
 			ProjectConfiguration configuration)
 			throws CheckerException {
 		

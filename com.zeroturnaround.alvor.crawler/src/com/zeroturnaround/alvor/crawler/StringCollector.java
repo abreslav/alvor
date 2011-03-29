@@ -46,9 +46,9 @@ import com.zeroturnaround.alvor.common.FieldPattern;
 import com.zeroturnaround.alvor.common.FunctionPattern;
 import com.zeroturnaround.alvor.common.HotspotDescriptor;
 import com.zeroturnaround.alvor.common.HotspotPattern;
-import com.zeroturnaround.alvor.common.StringNodeDescriptor;
+import com.zeroturnaround.alvor.common.StringHotspotDescriptor;
 import com.zeroturnaround.alvor.common.StringPattern;
-import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
+import com.zeroturnaround.alvor.common.UnsupportedHotspotDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.common.logging.Timer;
@@ -85,11 +85,10 @@ public class StringCollector {
 	}
 	
 	private void doUpdateProjectCache(IProject project, IProgressMonitor monitor) {
-		// 0) TODO update inter-project stuff (import patterns)
+		// 0) FIXME update inter-project stuff (import patterns)
 		
-		if (!cache.projectIsInitialized(project.getName())) {
-			updateProjectPrimaryPatterns(project);
-			populateCacheWithFilesInfo(project);
+		if (!cache.projectHasFiles(project.getName())) {
+			initializeProject(project);
 		}
 		
 		Timer timer = new Timer("loop");
@@ -113,9 +112,13 @@ public class StringCollector {
 		timer.printTime();
 	}
 	
-	private void updateProjectPrimaryPatterns(IProject project) {
+	private void initializeProject(IProject project) {
+		Collection<ICompilationUnit> units = JavaModelUtil.getAllCompilationUnits
+		(JavaModelUtil.getJavaProjectFromProject(project), false);
+		List<String> files = JavaModelUtil.getCompilationUnitNames(units);
+		
 		ProjectConfiguration conf = ConfigurationManager.readProjectConfiguration(project, true);
-		cache.setProjectPrimaryPatterns(project.getName(), conf.getHotspotPatterns());
+		cache.initializeProject(project.getName(), conf.getHotspotPatterns(), files);
 	}
 	
 	private void updateProjectCacheForNewPatterns(IJavaProject javaProject, 
@@ -258,11 +261,11 @@ public class StringCollector {
 		cache.addHotspot(patternRecord, desc);
 		
 		// TODO temporary
-		if (desc instanceof StringNodeDescriptor) {
-			System.out.println(((StringNodeDescriptor)desc).getAbstractValue());
+		if (desc instanceof StringHotspotDescriptor) {
+			System.out.println(((StringHotspotDescriptor)desc).getAbstractValue());
 		}
-		else if (desc instanceof UnsupportedNodeDescriptor) {
-			System.out.println(((UnsupportedNodeDescriptor)desc).getProblemMessage());
+		else if (desc instanceof UnsupportedHotspotDescriptor) {
+			System.out.println(((UnsupportedHotspotDescriptor)desc).getProblemMessage());
 		}
 		else {
 			throw new IllegalArgumentException();
@@ -327,13 +330,6 @@ public class StringCollector {
 	}
 	
 	
-	private void populateCacheWithFilesInfo(IProject project) {
-		Collection<ICompilationUnit> units = JavaModelUtil.getAllCompilationUnits
-		(JavaModelUtil.getJavaProjectFromProject(project), false);
-		List<String> files = JavaModelUtil.getCompilationUnitNames(units);
-		cache.addFiles(project.getName(), files);
-	}
-
 	private SearchPattern getSearchPattern(IJavaProject javaProject, StringPattern stringPattern) {
 		
 		SearchPattern searchPattern = searchPatterns.get(stringPattern);

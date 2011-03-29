@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -21,8 +22,9 @@ import com.zeroturnaround.alvor.checkers.HotspotWarning;
 import com.zeroturnaround.alvor.checkers.complex.ComplexChecker;
 import com.zeroturnaround.alvor.common.HotspotDescriptor;
 import com.zeroturnaround.alvor.common.PositionUtil;
-import com.zeroturnaround.alvor.common.StringNodeDescriptor;
-import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
+import com.zeroturnaround.alvor.common.StringHotspotDescriptor;
+import com.zeroturnaround.alvor.common.UnsupportedHotspotDescriptor;
+import com.zeroturnaround.alvor.common.WorkspaceUtil;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.configuration.ConfigurationManager;
@@ -44,18 +46,22 @@ import com.zeroturnaround.alvor.string.util.AbstractStringOptimizer;
 
 public class GuiChecker {
 	private static final ILog LOG = Logs.getLog(GuiChecker.class);
+	private static final int MAX_MARKER_MESSAGE_LENGTH = 500;
+	private static final String CHILDREN_ATT_NAME = "children";
 	private ComplexChecker checker = new ComplexChecker();
 	private Cache cache = CacheProvider.getCache();
 	
 	
 	public void cleanUpdateProjectMarkers(IProject project, IProgressMonitor monitor) {
 		cache.clearProject(project.getName());
-		clearAlvorMarkers(project);
+		deleteAlvorMarkers(project);
 		updateProjectMarkers(project, monitor);
 	}
 	
 	public void updateProjectMarkers(IProject project, IProgressMonitor monitor) {
 		// assumes that markers of invalidated files are already deleted
+		
+		// TODO clear project markers (about checking exceptions)
 		
 		StringCollector.updateProjectCache(project, cache, monitor);
 		
@@ -66,97 +72,131 @@ public class GuiChecker {
 		
 		try {
 			for (HotspotDescriptor hotspot : hotspots) {
-				Collection<HotspotCheckingResult> checkingResults = checker.checkHotspot(hotspot, conf);
-				createCheckingMarkers(checkingResults, project);
+				createMarkersForHotspot(hotspot, conf, project);
 			}
 			cache.markHotspotsAsChecked(hotspots);
 		} 
 		catch (CheckerException e) {
 			createMarker("Checker exception: " + e.getMessage(), AlvorGuiPlugin.ERROR_MARKER_ID,
-					IMarker.SEVERITY_ERROR, e.getPosition(), project);
+					IMarker.SEVERITY_ERROR, e.getPosition(), null, project);
 		}
 		
-		// TODO clean orphaned (constant) markers
+		// FIXME clean orphaned (constant) markers
 	}
 	
-	public static void clearAlvorMarkers(IResource res) {
-		// TODO if res is not project, then clear also "sub-markers"
+	private void createMarkersForHotspot(HotspotDescriptor hotspot, ProjectConfiguration conf, 
+			IProject project) throws CheckerException {
+		
+		if (hotspot instanceof UnsupportedHotspotDescriptor) {
+			UnsupportedHotspotDescriptor uh = (UnsupportedHotspotDescriptor)hotspot;
+			String msg = "Unsupported SQL construction: " + uh.getProblemMessage(); 
+			if (uh.getErrorPosition() != null && !uh.getPosition().equals(uh.getErrorPosition())) {
+				msg += " at: " + PositionUtil.getLineString(uh.getErrorPosition());
+			}
+			createMarker(msg, AlvorGuiPlugin.UNSUPPORTED_MARKER_ID, 
+					IMarker.SEVERITY_INFO, hotspot.getPosition(), null, project);
+		}
+		
+		else {
+			assert hotspot instanceof StringHotspotDescriptor;
+			StringHotspotDescriptor sh = (StringHotspotDescriptor)hotspot;
+			
+			// create hotspot marker
+			String hotspotMessage = "Value: " + CommonNotationRenderer.render
+				(AbstractStringOptimizer.optimize(sh.getAbstractValue()));
+			if (hotspotMessage.length() > MAX_MARKER_MESSAGE_LENGTH) {
+				hotspotMessage = hotspotMessage.substring(0, MAX_MARKER_MESSAGE_LENGTH - 3) + "...";
+			}
+			IMarker hotspotMarker = createMarker(hotspotMessage, AlvorGuiPlugin.HOTSPOT_MARKER_ID, 
+					IMarker.SEVERITY_INFO, sh.getPosition(), null, project);
+
+			// create checking markers
+			Collection<HotspotCheckingResult> checkingResults = checker.checkAbstractString(sh, conf);
+			for (HotspotCheckingResult checkingResult : checkingResults) { 
+				createCheckingMarker(checkingResult, hotspotMarker, project);
+			}
+			
+			// create constant markers
+			// TODO
+			//markConstants(sh.getAbstractValue(), hotspotMarker, project);
+		}
+	}
+	
+	public static void deleteAlvorMarkers(IResource res) {
 		
 		try {
+			// TODO if res is not project, then clear also "sub-markers"
+			if (res instanceof IFile) {
+				// find all hotspot markers and clear all child markers that are not in this file
+				IMarker[] markers = res.findMarkers(AlvorGuiPlugin.HOTSPOT_MARKER_ID, true, IResource.DEPTH_INFINITE);
+				for (IMarker marker : markers) {
+					deleteChildMarkers(marker);
+				}
+			}
+			
+			
+			// clear markers directly in this resource
 			res.deleteMarkers(AlvorGuiPlugin.ERROR_MARKER_ID, true, IResource.DEPTH_INFINITE);
 			res.deleteMarkers(AlvorGuiPlugin.WARNING_MARKER_ID, true, IResource.DEPTH_INFINITE);
 			res.deleteMarkers(AlvorGuiPlugin.HOTSPOT_MARKER_ID, true, IResource.DEPTH_INFINITE);
 			res.deleteMarkers(AlvorGuiPlugin.UNSUPPORTED_MARKER_ID, true, IResource.DEPTH_INFINITE);
 			res.deleteMarkers(AlvorGuiPlugin.STRING_MARKER_ID, true, IResource.DEPTH_INFINITE);
-		} catch (CoreException e) {
-			throw new RuntimeException(e);
+		} 
+		catch (CoreException e) {
+			LOG.exception(e);
 		}
 	}
-	private void createCheckingMarkers(Collection<HotspotCheckingResult> checkingResults,
-			IProject project) {
-		
-		for (HotspotCheckingResult result : checkingResults) {
-			String markerId = null; 
-			Integer severity = null;
-			
-			if (result instanceof HotspotError) {
-				markerId = AlvorGuiPlugin.ERROR_MARKER_ID;
-				severity = IMarker.SEVERITY_ERROR;  
-			}
-			else if (result instanceof HotspotWarning) {
-				markerId = AlvorGuiPlugin.WARNING_MARKER_ID;
-				severity = IMarker.SEVERITY_WARNING;  
-			}
-			else if (result instanceof HotspotInfo) {
-				markerId = AlvorGuiPlugin.WARNING_MARKER_ID;
-				severity = IMarker.SEVERITY_INFO;  
-			}
-			createMarker(result.getMessage(), markerId, severity, result.getPosition(), project); 
+	
+	private static void deleteChildMarkers(IMarker marker) throws CoreException {
+		Object att = marker.getAttribute(CHILDREN_ATT_NAME);
+		if (att == null) {
+			return;
 		}
-	}
-
-	@Deprecated
-	private void markHotspots(Collection<HotspotDescriptor> hotspots, IProject project) {
-		for (HotspotDescriptor hotspot : hotspots) {
-			String message;
-			String markerId;
-			if (hotspot instanceof StringNodeDescriptor) {
-				StringNodeDescriptor snd = (StringNodeDescriptor) hotspot;
-				IAbstractString abstractValue = snd.getAbstractValue();
-				message = "Abstract string: " + CommonNotationRenderer.render(AbstractStringOptimizer.optimize(abstractValue));
-				if (message.length() > Character.MAX_VALUE) {
-					message = message.substring(0, Character.MAX_VALUE - 3) + "...";
+		String[] childrenPathIds = att.toString().split(";");
+		for (String childrenPathId : childrenPathIds) {
+			String[] parts = childrenPathId.split(":");
+			if (parts.length == 2) {
+				IFile file = WorkspaceUtil.getFile(parts[0]);
+				long markerId = Long.valueOf(parts[1]);
+				IMarker childMarker = file.findMarker(markerId);
+				if (childMarker != null) {
+					childMarker.delete();
 				}
-				markerId = AlvorGuiPlugin.HOTSPOT_MARKER_ID;
-				
-				// TODO
-				//markConstants(abstractValue);
-			} else if (hotspot instanceof UnsupportedNodeDescriptor) {
-				UnsupportedNodeDescriptor und = (UnsupportedNodeDescriptor) hotspot;
-				message = "Unsupported construction: " + und.getProblemMessage();
-				markerId = AlvorGuiPlugin.UNSUPPORTED_MARKER_ID;
-			} else {
-				throw new IllegalArgumentException(hotspot + "");
 			}
-			createMarker(
-					message, 
-					markerId,
-					IMarker.SEVERITY_INFO,
-					hotspot.getPosition(), project);
-		}		
+		}
+	}
+	
+	private void createCheckingMarker(HotspotCheckingResult checkingResult,	IMarker parentMarker, IProject project) {
+		String markerId = null; 
+		Integer severity = null;
+
+		if (checkingResult instanceof HotspotError) {
+			markerId = AlvorGuiPlugin.ERROR_MARKER_ID;
+			severity = IMarker.SEVERITY_ERROR;  
+		}
+		else if (checkingResult instanceof HotspotWarning) {
+			markerId = AlvorGuiPlugin.WARNING_MARKER_ID;
+			severity = IMarker.SEVERITY_WARNING;  
+		}
+		else if (checkingResult instanceof HotspotInfo) {
+			markerId = AlvorGuiPlugin.WARNING_MARKER_ID;
+			severity = IMarker.SEVERITY_INFO;  
+		}
+		createMarker(checkingResult.getMessage(), markerId, severity, 
+				checkingResult.getPosition(), parentMarker, project); 
 	}
 
 	/*
 	 * This method makes things slow on big projects, although on small ones the markers look nice
 	 */
-	@Deprecated
-	private void markConstants(IAbstractString abstractValue, final IProject project) {
+	private void markConstants(IAbstractString abstractValue, final IMarker parentMarker, final IProject project) {
 		IAbstractStringVisitor<Void, Void> visitor = new IAbstractStringVisitor<Void, Void>() {
 
 			@Override
 			public Void visitStringCharacterSet(
 					StringCharacterSet characterSet, Void data) {
-				createMarker("", AlvorGuiPlugin.STRING_MARKER_ID, null, characterSet.getPosition(), project);
+				createMarker("", AlvorGuiPlugin.STRING_MARKER_ID, null, 
+						characterSet.getPosition(), parentMarker, project);
 				return null;
 			}
 
@@ -171,7 +211,8 @@ public class GuiChecker {
 			@Override
 			public Void visitStringConstant(StringConstant stringConstant,
 					Void data) {
-				createMarker("", AlvorGuiPlugin.STRING_MARKER_ID, null, stringConstant.getPosition(), null);
+				createMarker("", AlvorGuiPlugin.STRING_MARKER_ID, null, 
+						stringConstant.getPosition(), parentMarker, project);
 				return null;
 			}
 
@@ -206,18 +247,18 @@ public class GuiChecker {
 		abstractValue.accept(visitor, null);
 	}
 
-	private static void createMarker(String message, String markerType, Integer severity, IPosition pos2,
-			IProject project) {
+	private static IMarker createMarker(String message, String markerType, Integer severity, IPosition pos,
+			IMarker parentMarker, IProject project) {
 		
-		IPosition pos = pos2;
-		if (pos == null) {
-			pos = new Position(project.getFullPath().toPortableString(), 0, 0);
+		IPosition adaptedPos = pos;
+		if (adaptedPos == null) {
+			adaptedPos = new Position(project.getFullPath().toPortableString(), 0, 0);
 		}
 		
-		if (DummyPosition.isDummyPosition(pos)) {
+		if (DummyPosition.isDummyPosition(adaptedPos)) {
 			// FIXME this should not be required anymore
 			LOG.error("Warning: Dummy position in 'createMarker'");
-			return;
+			return null;
 		}
 		
 		// collect attributes of markers into this map
@@ -234,23 +275,44 @@ public class GuiChecker {
 		MarkerUtilities.setMessage(map, finalMessage);
 		
 		
-		IResource res = PositionUtil.getPositionResource(pos);
+		IResource res = PositionUtil.getPositionResource(adaptedPos);
 		map.put(IMarker.LOCATION, res.getFullPath().toString());
 		
-		
-		// include position info only when there is proper position given
-		int charStart = pos.getStart();
-		int charEnd = charStart + pos.getLength();
+		// include position info only when proper position is given
+		int charStart = adaptedPos.getStart();
+		int charEnd = charStart + adaptedPos.getLength();
 		if (charStart > 0 || charEnd > 0) { 
 			MarkerUtilities.setCharStart(map, charStart);
 			MarkerUtilities.setCharEnd(map, charEnd);
 		}
+		
 
 		
 		try {
-			MarkerUtilities.createMarker(res, map, markerType);
-		} catch (Exception e) {
+			IMarker marker = res.createMarker(markerType);
+			// TODO do I need to store reference to parent ?
+			marker.setAttributes(map);
+			
+			// register itself in parent marker
+			if (parentMarker != null) {
+				String markerPathId = res.getFullPath().toPortableString() + ":" + marker.getId();
+				Object attr = parentMarker.getAttribute(CHILDREN_ATT_NAME);
+				String childrenStr = "";
+				if (attr != null) {
+					childrenStr = attr.toString() + ";" + markerPathId;
+				}
+				else {
+					childrenStr = markerPathId;
+				}
+				// TODO try setting attributes like "MarkerUtilities.createMarker" does, to see if it's faster
+				parentMarker.setAttribute(CHILDREN_ATT_NAME, childrenStr);
+			}
+			
+			return marker;
+			//MarkerUtilities.createMarker(res, map, markerType);
+		} catch (CoreException e) {
 			LOG.exception(e);
+			throw new RuntimeException(e);
 		}
 	}
 	

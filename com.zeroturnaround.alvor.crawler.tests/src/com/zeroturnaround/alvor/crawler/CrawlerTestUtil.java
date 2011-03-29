@@ -12,8 +12,8 @@ import org.eclipse.core.resources.IProject;
 
 import com.zeroturnaround.alvor.common.HotspotDescriptor;
 import com.zeroturnaround.alvor.common.PositionUtil;
-import com.zeroturnaround.alvor.common.StringNodeDescriptor;
-import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
+import com.zeroturnaround.alvor.common.StringHotspotDescriptor;
+import com.zeroturnaround.alvor.common.UnsupportedHotspotDescriptor;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.samplegen.SampleGenerator;
 
@@ -77,8 +77,8 @@ public class CrawlerTestUtil {
 			String positionString = PositionUtil.getLineString(desc.getPosition());
 			positionLines.add(positionString);
 			
-			if (desc instanceof StringNodeDescriptor) {
-				IAbstractString aStr = ((StringNodeDescriptor)desc).getAbstractValue(); 
+			if (desc instanceof StringHotspotDescriptor) {
+				IAbstractString aStr = ((StringHotspotDescriptor)desc).getAbstractValue(); 
 				descriptorLines.add(positionString + ", " + aStr.toString());
 				try {
 					concreteLines.addAll(SampleGenerator.getConcreteStrings(aStr));
@@ -87,9 +87,9 @@ public class CrawlerTestUtil {
 							+ ", POS=" + aStr.getPosition() + ", ABS_STR=" + aStr);
 				}
 			}
-			else if (desc instanceof UnsupportedNodeDescriptor) {
+			else if (desc instanceof UnsupportedHotspotDescriptor) {
 				descriptorLines.add(positionString + ", unsupported: " 
-						+ ((UnsupportedNodeDescriptor)desc).getProblemMessage());
+						+ ((UnsupportedHotspotDescriptor)desc).getProblemMessage());
 			}
 			else {
 				descriptorLines.add("???");

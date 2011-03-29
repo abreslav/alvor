@@ -21,7 +21,7 @@ public abstract class StringCollectionTest {
 		try {
 			String projectName = this.getProjectName();
 			// CacheProvider.getCache().clearProject(projectName);
-			CacheProvider.getCache().clearAll();
+			CacheProvider.getCache().clearAllProjects();
 			findAndValidateNodeDescriptors(projectName);
 		}
 		finally {
