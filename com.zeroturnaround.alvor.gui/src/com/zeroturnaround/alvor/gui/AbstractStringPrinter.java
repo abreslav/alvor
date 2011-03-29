@@ -13,7 +13,7 @@ import org.eclipse.ui.IEditorActionDelegate;
 import org.eclipse.ui.IEditorPart;
 
 import com.zeroturnaround.alvor.common.HotspotDescriptor;
-import com.zeroturnaround.alvor.common.StringNodeDescriptor;
+import com.zeroturnaround.alvor.common.StringHotspotDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.crawler.StringExpressionEvaluator;
@@ -62,8 +62,8 @@ public class AbstractStringPrinter implements IEditorActionDelegate{
 			LOG.message("Selection is : " + node.getClass().getName());
 			
 			HotspotDescriptor desc = StringExpressionEvaluator.INSTANCE.evaluate((Expression)node, StringExpressionEvaluator.ParamEvalMode.AS_HOTSPOT);
-			if (desc instanceof StringNodeDescriptor) {
-				IAbstractString abstr = ((StringNodeDescriptor)desc).getAbstractValue();
+			if (desc instanceof StringHotspotDescriptor) {
+				IAbstractString abstr = ((StringHotspotDescriptor)desc).getAbstractValue();
 				LOG.message("Abstract value is: " + abstr.toString());
 			}
 			else {

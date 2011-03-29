@@ -42,8 +42,8 @@ import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.common.HotspotPatternReference;
 import com.zeroturnaround.alvor.common.IntegerList;
 import com.zeroturnaround.alvor.common.StringConverter;
-import com.zeroturnaround.alvor.common.StringNodeDescriptor;
-import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
+import com.zeroturnaround.alvor.common.StringHotspotDescriptor;
+import com.zeroturnaround.alvor.common.UnsupportedHotspotDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
@@ -87,9 +87,9 @@ public class StringExpressionEvaluator {
 			}
 			IAbstractString str = removeRecursion(eval(init, null, ParamEvalMode.AS_HOTSPOT));
 			
-			return new StringNodeDescriptor(ASTUtil.getPosition(decl), str);
+			return new StringHotspotDescriptor(ASTUtil.getPosition(decl), str);
 		} catch (UnsupportedStringOpEx e) {
-			return new UnsupportedNodeDescriptor(ASTUtil.getPosition(decl), 
+			return new UnsupportedHotspotDescriptor(ASTUtil.getPosition(decl), 
 					e.getMessage(), e.getPosition());
 		}
 	}
@@ -98,9 +98,9 @@ public class StringExpressionEvaluator {
 		try {
 			IAbstractString str = removeRecursion(eval(node, null, mode));
 			
-			return new StringNodeDescriptor(ASTUtil.getPosition(node), str);
+			return new StringHotspotDescriptor(ASTUtil.getPosition(node), str);
 		} catch (UnsupportedStringOpEx e) {
-			return new UnsupportedNodeDescriptor(ASTUtil.getPosition(node), 
+			return new UnsupportedHotspotDescriptor(ASTUtil.getPosition(node), 
 					e.getMessage(), e.getPosition());
 		}
 	}
@@ -530,10 +530,10 @@ public class StringExpressionEvaluator {
 		IPosition pos = ASTUtil.getPosition(decl);
 		try {
 			IAbstractString str = removeRecursion(getMethodTemplate(decl, argNo));
-			return new StringNodeDescriptor(pos, str);
+			return new StringHotspotDescriptor(pos, str);
 		}
 		catch (UnsupportedStringOpEx e) {
-			return new UnsupportedNodeDescriptor(pos, e.getMessage(), e.getPosition());
+			return new UnsupportedHotspotDescriptor(pos, e.getMessage(), e.getPosition());
 		}
 	}
 	
@@ -618,7 +618,7 @@ public class StringExpressionEvaluator {
 			System.out.println("FOUND RECURSION");
 			
 			throw new UnsupportedStringOpEx("Unsupported modification scheme in loop", str.getPosition());
-//			FIXME put back when path-sens is done				
+//			TODO put back when path-sens is done				
 //			return RecursionConverter.recursionToRepetition(str);
 //			assert ! result.containsRecursion();
 		}

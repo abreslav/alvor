@@ -2,11 +2,11 @@ package com.zeroturnaround.alvor.common;
 
 import com.zeroturnaround.alvor.string.IPosition;
 
-public class UnsupportedNodeDescriptor extends HotspotDescriptor {
+public class UnsupportedHotspotDescriptor extends HotspotDescriptor {
 	private String problemMessage;
 	private IPosition errorPosition;
 	
-	public UnsupportedNodeDescriptor(IPosition hotspotPosition, String problemMessage, 
+	public UnsupportedHotspotDescriptor(IPosition hotspotPosition, String problemMessage, 
 			IPosition errorPosition) {
 		super(hotspotPosition);
 		assert problemMessage != null;

@@ -3,11 +3,11 @@ package com.zeroturnaround.alvor.common;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.IPosition;
 
-public class StringNodeDescriptor extends HotspotDescriptor {
+public class StringHotspotDescriptor extends HotspotDescriptor {
 
 	private IAbstractString abstractValue;
 
-	public StringNodeDescriptor(IPosition position,
+	public StringHotspotDescriptor(IPosition position,
 			IAbstractString abstractValue) {
 		super(position);
 		if (abstractValue == null)

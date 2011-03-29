@@ -11,7 +11,7 @@ public class EarvedGuiChecker2TestNew extends AbstractMarkerTest {
 	@BeforeClass
 	public static void createMarkers() {
 		IProject project = WorkspaceUtil.getProject("earved");
-		CacheProvider.getCache().clearAll();
+		CacheProvider.getCache().clearAllProjects();
 		
 		try {
 			GuiChecker checker = new GuiChecker();

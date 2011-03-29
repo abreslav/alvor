@@ -45,24 +45,14 @@ public class SampleGenerator {
 			}
 		}
 		else if (aStr instanceof StringRandomInteger) {
-//			result.add(((StringRandomInteger)aStr).getExample());
-			result.add("666");
+			result.add("123");
 		}
 		else if (aStr instanceof StringCharacterSet) {
-			// FIXME incorrect shortcut solution
-			
-			result.add("666");
-			
-			
-//			StringCharacterSet cs = (StringCharacterSet)aStr;
-//			if (cs.getContents().containsAll(intCharset) // gives NullPointerException
-//					&& intCharset.containsAll(cs.getContents())) {
-//				result.add("666");
-//			}
-//			else {
-//				// creates nonvalid SQL
-//				result.add(cs.toString());
-//			}
+			StringCharacterSet cs = (StringCharacterSet)aStr;
+			// take only one character
+			if (cs.getContents().iterator().hasNext()) {
+				result.add(cs.getContents().iterator().next().toString());
+			}
 		}
 		else if (aStr instanceof StringRepetition) {
 			return getConcreteStrings(repetitionToChoice((StringRepetition)aStr));

@@ -2,17 +2,14 @@ package com.zeroturnaround.alvor.checkers.complex;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 
 import com.zeroturnaround.alvor.checkers.CheckerException;
 import com.zeroturnaround.alvor.checkers.HotspotCheckingResult;
 import com.zeroturnaround.alvor.checkers.HotspotInfo;
+import com.zeroturnaround.alvor.checkers.IAbstractStringChecker;
 import com.zeroturnaround.alvor.checkers.sqldynamic.DynamicSQLChecker;
 import com.zeroturnaround.alvor.checkers.sqlstatic.SyntacticalSQLChecker;
-import com.zeroturnaround.alvor.common.HotspotDescriptor;
-import com.zeroturnaround.alvor.common.PositionUtil;
-import com.zeroturnaround.alvor.common.StringNodeDescriptor;
-import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
+import com.zeroturnaround.alvor.common.StringHotspotDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.configuration.DataSourceProperties;
@@ -22,7 +19,7 @@ import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
  * This class combines static and dynamic checking
  * 
  */
-public class ComplexChecker {
+public class ComplexChecker implements IAbstractStringChecker {
 
 	private static final ILog LOG = Logs.getLog(ComplexChecker.class);
 //	private static final ILog HOTSPOTS_LOG = Logs.getLog("Hotspots");
@@ -30,41 +27,23 @@ public class ComplexChecker {
 	private DynamicSQLChecker dynamicChecker = new DynamicSQLChecker();
 	private SyntacticalSQLChecker staticChecker = new SyntacticalSQLChecker();
 
-	public Collection<HotspotCheckingResult> checkHotspot(HotspotDescriptor hotspot, ProjectConfiguration configuration) throws CheckerException {
+	@Override
+	public Collection<HotspotCheckingResult> checkAbstractString(StringHotspotDescriptor hotspot, ProjectConfiguration configuration) throws CheckerException {
 		
-		if (hotspot instanceof StringNodeDescriptor) {
-			StringNodeDescriptor stringHotspot = (StringNodeDescriptor)hotspot;
-			if (configuration.getCheckingStrategy() == ProjectConfiguration.CheckingStrategy.ALL_CHECKERS) {
-				return checkStringNodeDescriptorsWithBothCheckers(stringHotspot, configuration);
-			}
-			else if (configuration.getCheckingStrategy() == ProjectConfiguration.CheckingStrategy.PREFER_DYNAMIC
-					&& dynamicCheckerIsConfigured(configuration)) { 
-				return checkStringNodeDescriptorPreferDynamic(stringHotspot, configuration);
-			}
-			else {
-				return checkStringNodeDescriptorPreferStatic(stringHotspot, configuration);
-			}
+		if (configuration.getCheckingStrategy() == ProjectConfiguration.CheckingStrategy.ALL_CHECKERS) {
+			return checkStringNodeDescriptorsWithBothCheckers(hotspot, configuration);
 		}
-		
-		else if (hotspot instanceof UnsupportedNodeDescriptor) {
-			UnsupportedNodeDescriptor und = (UnsupportedNodeDescriptor) hotspot; 
-			assert LOG.message("UNSUPPORTED node desc, file=" + PositionUtil.getLineString(hotspot.getPosition())
-					+ ", msg=" + (und).getProblemMessage());
-			
-			String msg = "Unsupported SQL construction: " + und.getProblemMessage(); 
-			if (und.getErrorPosition() != null && !und.getPosition().equals(und.getErrorPosition())) {
-				msg += " at: " + PositionUtil.getLineString(und.getErrorPosition());
-			}
-			HotspotCheckingResult result = new HotspotInfo(msg, hotspot.getPosition());
-			return Collections.singletonList(result);
+		else if (configuration.getCheckingStrategy() == ProjectConfiguration.CheckingStrategy.PREFER_DYNAMIC
+				&& dynamicCheckerIsConfigured(configuration)) { 
+			return checkStringNodeDescriptorPreferDynamic(hotspot, configuration);
 		}
 		else {
-			throw new IllegalArgumentException();
+			return checkStringNodeDescriptorPreferStatic(hotspot, configuration);
 		}
 	}
 
 	private Collection<HotspotCheckingResult> checkStringNodeDescriptorsWithBothCheckers(
-			StringNodeDescriptor hotspot, 
+			StringHotspotDescriptor hotspot, 
 			ProjectConfiguration configuration) throws CheckerException {
 		
 		Collection<HotspotCheckingResult> results = new ArrayList<HotspotCheckingResult>();
@@ -87,7 +66,7 @@ public class ComplexChecker {
 	}
 	
 	private Collection<HotspotCheckingResult> checkStringNodeDescriptorPreferDynamic(
-			StringNodeDescriptor descriptor, 
+			StringHotspotDescriptor descriptor, 
 			ProjectConfiguration configuration) {
 		
 		Collection<HotspotCheckingResult> nodeResults = new ArrayList<HotspotCheckingResult>();
@@ -109,7 +88,7 @@ public class ComplexChecker {
 	
 	
 	private Collection<HotspotCheckingResult> checkStringNodeDescriptorPreferStatic(
-			StringNodeDescriptor descriptor, 
+			StringHotspotDescriptor descriptor, 
 			ProjectConfiguration configuration) {
 
 		Collection<HotspotCheckingResult> nodeResults = new ArrayList<HotspotCheckingResult>();

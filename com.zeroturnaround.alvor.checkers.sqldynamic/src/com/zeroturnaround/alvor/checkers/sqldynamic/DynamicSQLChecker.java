@@ -13,7 +13,7 @@ import com.zeroturnaround.alvor.checkers.CheckerException;
 import com.zeroturnaround.alvor.checkers.HotspotCheckingResult;
 import com.zeroturnaround.alvor.checkers.HotspotError;
 import com.zeroturnaround.alvor.checkers.IAbstractStringChecker;
-import com.zeroturnaround.alvor.common.StringNodeDescriptor;
+import com.zeroturnaround.alvor.common.StringHotspotDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.configuration.DataSourceProperties;
@@ -29,11 +29,11 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 	private static final ILog LOG = Logs.getLog(DynamicSQLChecker.class);
 	private static final int SIZE_LIMIT = 10000;
 	
-	// analyzers indexed by hash-code of options map
-	Map<Integer, SqlTester> testers = new HashMap<Integer, SqlTester>();
+	// testers indexed by hash-code of options map
+	private Map<Integer, SqlTester> testers = new HashMap<Integer, SqlTester>();
 
 	@Override
-	public Collection<HotspotCheckingResult> checkAbstractString(StringNodeDescriptor descriptor,
+	public Collection<HotspotCheckingResult> checkAbstractString(StringHotspotDescriptor descriptor,
 			ProjectConfiguration configuration) throws CheckerException {
 		
 		if (AbstractStringSizeCounter.size(descriptor.getAbstractValue()) > SIZE_LIMIT) {
@@ -42,7 +42,7 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 			return Collections.singletonList(result);
 		}
 		
-		SqlTester tester = this.getAnalyzer(configuration);
+		SqlTester tester = this.getTester(configuration);
 		
 		List<HotspotCheckingResult> results = new ArrayList<HotspotCheckingResult>();
 		Map<String, Integer> concretes = new HashMap<String, Integer>();
@@ -92,7 +92,7 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 	
 	
 
-	private SqlTester getAnalyzer(ProjectConfiguration configuration) throws CheckerException {
+	private SqlTester getTester(ProjectConfiguration configuration) throws CheckerException {
 		// give different analyzer for different options
 		// first search for cached version
 		

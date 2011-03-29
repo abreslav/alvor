@@ -19,9 +19,9 @@ import com.zeroturnaround.alvor.common.IntegerList;
 import com.zeroturnaround.alvor.common.PatternReference;
 import com.zeroturnaround.alvor.common.PositionUtil;
 import com.zeroturnaround.alvor.common.StringConverter;
-import com.zeroturnaround.alvor.common.StringNodeDescriptor;
+import com.zeroturnaround.alvor.common.StringHotspotDescriptor;
 import com.zeroturnaround.alvor.common.StringPattern;
-import com.zeroturnaround.alvor.common.UnsupportedNodeDescriptor;
+import com.zeroturnaround.alvor.common.UnsupportedHotspotDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
 import com.zeroturnaround.alvor.string.AbstractStringCollection;
 import com.zeroturnaround.alvor.string.DummyPosition;
@@ -37,6 +37,11 @@ import com.zeroturnaround.alvor.string.StringSequence;
 import com.zeroturnaround.alvor.string.util.AbstractStringUtils;
 import com.zeroturnaround.alvor.string.util.ArgumentApplier;
 
+/**
+ * see db/cache_setup.sql about structure of the database
+ * @author Aivar
+ *
+ */
 public class Cache {
 	
 	//private final static ILog LOG = Logs.getLog(ICacheService.class);
@@ -91,14 +96,8 @@ public class Cache {
 		db.execute("update files set batch_no = 0 where name = ?", fileName);
 	}
 	
-	private List<HotspotDescriptor> getAllProjectHotspots(String projectName) {
-		return getPrimaryHotspots(projectName, null, false);		
-	}
 	public List<HotspotDescriptor> getUncheckedPrimaryProjectHotspots(String projectName) {
 		return getPrimaryHotspots(projectName, null, true);		
-	}
-	private Collection<HotspotDescriptor> getAllFileHotspots(String fileName, String projectName) {
-		return getPrimaryHotspots(projectName, fileName, false);
 	}
 	
 	
@@ -147,9 +146,9 @@ public class Cache {
 				
 				try {
 					IAbstractString str = createAbstractString(rs, null);
-					result.add(new StringNodeDescriptor(hotspotPos, str));
+					result.add(new StringHotspotDescriptor(hotspotPos, str));
 				} catch (UnsupportedStringOpEx e) {
-					result.add(new UnsupportedNodeDescriptor(hotspotPos, 
+					result.add(new UnsupportedHotspotDescriptor(hotspotPos, 
 							e.getMessage(), e.getPosition()));
 				}
 			}
@@ -189,28 +188,19 @@ public class Cache {
 		}
 	}
 	
-//	public Collection<NodeDescriptor> getPrimaryHotspotDescriptors(String projectName) {
-//		return null;
-//	}
-
-	public void setProjectPrimaryPatterns(String projectName,
-			Collection<HotspotPattern> patterns) {
+	public void initializeProject(String projectName, Collection<HotspotPattern> primaryPatterns, 
+			List<String> projectFiles) {
 		
-		// FIXME delete only primary patterns. Or clean everything???
-		db.execute("delete from project_patterns where project_name = ?", projectName);
-		
-		for (StringPattern pattern : patterns) {
+		for (StringPattern pattern : primaryPatterns) {
 			int kind = getPatternKind(pattern);
 			int patternId = getPatternId(kind, pattern.getClassName(), 
 					pattern.getMethodName(), pattern.getArgumentTypes(), pattern.getArgumentNo());
 			registerPatternForProject(patternId, projectName, PATTERN_ROLE_PRIMARY);
 		}
+		
+		this.addFiles(projectName, projectFiles);
 	}
 	
-//	public List<PatternRecord> getProjectPatterns(String projectName) {
-//		return null;
-//	}
-
 	private StringPattern createPattern(int id) {
 		ResultSet rs = null;
 
@@ -316,10 +306,10 @@ public class Cache {
 	
 	public void addHotspot(PatternRecord pattern, HotspotDescriptor desc) {
 		int id; 
-		if (desc instanceof StringNodeDescriptor) {
+		if (desc instanceof StringHotspotDescriptor) {
 			String projectName = PositionUtil.getProjectName(desc.getPosition());
 			
-			IAbstractString str = ((StringNodeDescriptor) desc).getAbstractValue();
+			IAbstractString str = ((StringHotspotDescriptor) desc).getAbstractValue();
 			
 			// TODO should I include item-index? or should i rely on increasing id values ??
 			try {
@@ -329,8 +319,8 @@ public class Cache {
 				throw e;
 			}
 		}
-		else if (desc instanceof UnsupportedNodeDescriptor) {
-			id = addUnsupported(((UnsupportedNodeDescriptor) desc).getProblemMessage(),
+		else if (desc instanceof UnsupportedHotspotDescriptor) {
+			id = addUnsupported(((UnsupportedHotspotDescriptor) desc).getProblemMessage(),
 					desc.getPosition(),
 					pattern.getId());
 			
@@ -342,7 +332,7 @@ public class Cache {
 		// need to record also original position (because string inside desc may have other position)
 		createHotspotRecord(desc.getPosition(), id);
 		
-		invalidateCheckingForDependentStrings(pattern.getId());
+		invalidateCheckingForDependentStrings(pattern.getId(), null);
 	}
 	
 	private void createHotspotRecord(IPosition pos, int stringId) {
@@ -352,44 +342,40 @@ public class Cache {
 				stringId, getFileId(pos.getPath()), pos.getStart(), pos.getLength());
 	}
 	
-	private void invalidateCheckingForDependentStrings(int stringId) {
+	private void invalidateCheckingForDependentStrings(int stringId, IntegerList context) {
 		
-//		
-//		
-//		// TODO this should be skipped during full scan, because
-//		// everything will be rechecked anyway
-//		
-//		// TODO this can go into cycle
-//		
-//		// dependent strings are its ancestors 
-//		// and if it's a pattern, then also its users (kind = FUNCTION_REF or HOTSPOT_REF)
-//		
-//		db.execute("update hotspots set checked = false where id = ?", stringId);
-//		
-//		// invalidate ancestors
-//		Integer parentId = db.queryMaybeInteger("select parent_id from abstract_strings where id = ?", stringId);
-//		if (parentId != null) {
-//			invalidateCheckingForDependentStrings(parentId);
-//		}
-//		// String is a pattern iff it doesn't have a parent.
-//		// In case of patterns, invalidate their users 
-//		else {
-//			ResultSet rs = db.query(
-//				" select id from abstract_strings " +
-//				" where kind in (" + StringKind.FUNCTION_REF + "," + StringKind.HOTSPOT_REF + ")" +
-//				" and int_value = ?",  stringId);
-//			
-//			try {
-//				while (rs.next()) {
-//					invalidateCheckingForDependentStrings(rs.getInt("id"));
-//				}
-//			} 
-//			catch (SQLException e) {
-//				throw new RuntimeException(e);
-//			}
+		// infinite recursion check
+		if (context != null && context.contains(stringId)) {
+			return;
+		}
 		
-		// TODO close result set
-//		}
+		db.execute("update hotspots set checked = false where string_id = ?", stringId);
+		
+		// invalidate ancestors or users
+		Integer parentId = db.queryMaybeInteger("select parent_id from abstract_strings where id = ?", stringId);
+		if (parentId != null) {
+			invalidateCheckingForDependentStrings(parentId, new IntegerList(stringId, context));
+		}
+		// String is a pattern iff it doesn't have a parent.
+		// In case of patterns, invalidate their users 
+		else {
+			ResultSet rs = db.query(
+				" select id from abstract_strings " +
+				" where kind in (" + StringKind.FUNCTION_REF + "," + StringKind.HOTSPOT_REF + ")" +
+				" and int_value = ?",  stringId);
+			
+			try {
+				while (rs.next()) {
+					invalidateCheckingForDependentStrings(rs.getInt("id"), new IntegerList(stringId, context));
+				}
+			} 
+			catch (SQLException e) {
+				throw new RuntimeException(e);
+			}
+			finally {
+				db.checkCloseResult(rs);
+			}
+		}
 	}
 	
 	private IAbstractString createAbstractString(ResultSet rs, IntegerList context) {
@@ -803,14 +789,10 @@ public class Cache {
 				DatabaseHelper.encodeNull(length));
 	}
 	
-	public void cleanup() {
-		removeOrphanedSecondaryPatterns();
-	}
-	
 	private void removeOrphanedSecondaryPatterns() {
 	}
 
-	public void clearAll() {
+	public void clearAllProjects() {
 		db.execute("delete from abstract_strings"); 
 		db.execute("delete from patterns"); 
 		db.execute("delete from files"); 
@@ -892,9 +874,7 @@ public class Cache {
 		}
 	}
 	
-	public boolean projectIsInitialized(String projectName) {
-		
-		// TODO: measure how slow is it
+	public boolean projectHasFiles(String projectName) {
 		int fileCount = db.queryInt(
 			" select count(*) from files" +
 			" where name like '/' || ? || '/%'", projectName);
@@ -902,11 +882,7 @@ public class Cache {
 		return fileCount > 0;
 	}
 	
-	public void printQueryCount() {
-		System.out.println(db.queryCount);
-	}
-	
-	public Collection<String> getUncheckedFiles(String projectName) {
+	private Collection<String> getUncheckedFiles(String projectName) {
 		// return files which have hotspots, but some of them are not checked
 		
 		ResultSet rs = db.query(
@@ -940,12 +916,6 @@ public class Cache {
 		System.out.println("Max open ResultSet-s so far: " + db.maxOpenResultSetCount);
 		System.out.println("Nr of executed queries: " + db.queryCount);
 	}
-	
-	private IntegerList contextOf(IPosition pos, IntegerList prevContext) {
-		return new IntegerList(pos.hashCode(), prevContext);
-	}
-	
-	
 	
 }
 
