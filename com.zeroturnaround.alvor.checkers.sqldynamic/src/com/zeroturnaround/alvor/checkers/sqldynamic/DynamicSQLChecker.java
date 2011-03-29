@@ -3,6 +3,7 @@ package com.zeroturnaround.alvor.checkers.sqldynamic;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,92 +33,64 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 	Map<Integer, SqlTester> testers = new HashMap<Integer, SqlTester>();
 
 	@Override
-	public Collection<HotspotCheckingResult> checkAbstractStrings(List<StringNodeDescriptor> descriptors,
-			ProjectConfiguration configuration) throws CheckerException {
-		SqlTester tester = this.getAnalyzer(configuration);
-		List<HotspotCheckingResult> result = new ArrayList<HotspotCheckingResult>();
-		
-		for (StringNodeDescriptor descriptor: descriptors) {
-			result.addAll(this.checkAbstractString(descriptor, tester));
-		}
-		return result;
-	}
-	
-	@Override
 	public Collection<HotspotCheckingResult> checkAbstractString(StringNodeDescriptor descriptor,
 			ProjectConfiguration configuration) throws CheckerException {
-		return checkAbstractString(descriptor, this.getAnalyzer(configuration));
-	}
-	
-	
-	private Collection<HotspotCheckingResult> checkAbstractString(StringNodeDescriptor descriptor,
-			SqlTester tester) {
-
+		
+		if (AbstractStringSizeCounter.size(descriptor.getAbstractValue()) > SIZE_LIMIT) {
+			HotspotCheckingResult result = new HotspotError
+				("Dynamic SQL checker: SQL string has too many possible variations", descriptor.getPosition());
+			return Collections.singletonList(result);
+		}
+		
+		SqlTester tester = this.getAnalyzer(configuration);
+		
 		List<HotspotCheckingResult> results = new ArrayList<HotspotCheckingResult>();
 		Map<String, Integer> concretes = new HashMap<String, Integer>();
-
-		assert LOG.message("DYN CHECK ABS: " + descriptor.getAbstractValue());
-		
-		// FIXME if AS contains repetition then check but return false
-
 		Map<String, String> errorMap = new HashMap<String, String>();
-		if (AbstractStringSizeCounter.size(descriptor.getAbstractValue()) > SIZE_LIMIT) {
-			results.add(new HotspotError("Dynamic SQL checker: SQL string has too many possible variations", 
-					descriptor.getPosition()));
-		} 
-		else { 
-			List<String> concreteStrings = null;
-			try {
-				concreteStrings = SampleGenerator.getConcreteStrings(descriptor.getAbstractValue());
-			} catch (Exception e) {
-				results.add(new HotspotError("Sample generation failed: " + e.getMessage()
-						+ ", str=" + descriptor.getAbstractValue(), descriptor.getPosition()));
-			}
+		List<String> concreteStrings = null;
+		
+		concreteStrings = SampleGenerator.getConcreteStrings(descriptor.getAbstractValue());
+		int duplicates = 0;
+		// maps error msg to all concrete strings that cause this message
 
-			int duplicates = 0;
-			// maps error msg to all concrete strings that cause this message
+		for (String s: concreteStrings) {
+			Integer countSoFar = concretes.get(s);
+			duplicates = 0;
+			if (countSoFar == null) {
+				assert LOG.message("CON: " + s);
+				try {
+					tester.testSql(s);
+				} catch (SQLException e) {
+					assert LOG.message("    ERR: " + e.getMessage());
 
-			for (String s: concreteStrings) {
-				Integer countSoFar = concretes.get(s);
-				duplicates = 0;
-				if (countSoFar == null) {
-					assert LOG.message("CON: " + s);
-					try {
-						tester.testSql(s);
-					} catch (SQLException e) {
-						assert LOG.message("    ERR: " + e.getMessage());
-
-						String errStrings = errorMap.get(e.getMessage());
-						if (errStrings == null) {
-							errStrings = s; 
-						} else {
-							errStrings += ";;;\n" + s;
-						}
-						errorMap.put(e.getMessage(), errStrings);
+					String errStrings = errorMap.get(e.getMessage());
+					if (errStrings == null) {
+						errStrings = s; 
+					} else {
+						errStrings += ";;;\n" + s;
 					}
-					concretes.put(s, 1);
+					errorMap.put(e.getMessage(), errStrings);
 				}
-				else {
-					concretes.put(s, countSoFar+1);
-					duplicates++;
-				}
+				concretes.put(s, 1);
 			}
-
-			for (Entry<String, String> entry : errorMap.entrySet()) {
-				String message = entry.getKey().trim() + "\nSQL: \n" + entry.getValue();
-				results.add(new HotspotError("SQL test failed  - " + message, descriptor.getPosition()));
+			else {
+				concretes.put(s, countSoFar+1);
+				duplicates++;
 			}
+		}
 
-			assert LOG.message("DUPLICATES: " + duplicates);
-			assert LOG.message("____________________________________________");
+		for (Entry<String, String> entry : errorMap.entrySet()) {
+			String message = entry.getKey().trim() + "\nSQL: \n" + entry.getValue();
+			results.add(new HotspotError("SQL test failed  - " + message, descriptor.getPosition()));
 		}
-		
-		if (results.isEmpty()) {
-			// results.add(new HotspotInfo("SQL testing passed", descriptor.getPosition()));
-		}
-		
+
+		assert LOG.message("DUPLICATES: " + duplicates);
+		assert LOG.message("____________________________________________");
+
 		return results;
 	}
+	
+	
 
 	private SqlTester getAnalyzer(ProjectConfiguration configuration) throws CheckerException {
 		// give different analyzer for different options

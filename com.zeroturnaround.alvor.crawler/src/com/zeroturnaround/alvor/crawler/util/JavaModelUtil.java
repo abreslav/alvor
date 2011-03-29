@@ -168,9 +168,13 @@ public class JavaModelUtil {
 		return JavaCore.create(res) instanceof ICompilationUnit;
 	}
 	
-	public static boolean isSourceFolderOrPackage(IResource resource) {
+	public static boolean isSourceContainer(IResource resource) {
 		IJavaElement element = JavaCore.create(resource); 
-		return element != null && (element instanceof IPackageFragment || element instanceof IPackageFragmentRoot);
+		return element != null && (
+				element instanceof IJavaProject ||
+				element instanceof IPackageFragmentRoot ||
+				element instanceof IPackageFragment 
+		);
 	}
 	
 	public static List<String> getCompilationUnitNames(Collection<ICompilationUnit> units) {

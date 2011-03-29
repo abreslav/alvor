@@ -2,9 +2,8 @@ package com.zeroturnaround.alvor.string;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -25,10 +24,10 @@ public class ArgumentApplierTest {
 			new StringParameter(2),
 			new StringConstant("e"));
 		
-		List<IAbstractString> args = new ArrayList<IAbstractString>();
-		args.add(new StringConstant("p0"));
-		args.add(new StringConstant("p1"));
-		args.add(new StringChoice(
+		Map<Integer, IAbstractString> args = new HashMap<Integer, IAbstractString>();
+		args.put(1, new StringConstant("p0"));
+		args.put(2, new StringConstant("p1"));
+		args.put(3, new StringChoice(
 				new StringConstant("p2a"),
 				new StringConstant("p2b")));
 		
@@ -50,7 +49,7 @@ public class ArgumentApplierTest {
 		//System.out.println("Actual: " + ArgumentApplier.applyArguments(abs, args).toString());
 		
 		assertEquals(result.toString(), 
-				ArgumentApplier.applyArgumentsList(abs, args).toString());
+				ArgumentApplier.applyArgumentsMap(abs, args).toString());
 	}
 	
 	@Test(expected=IndexOutOfBoundsException.class)
@@ -66,15 +65,14 @@ public class ArgumentApplierTest {
 				new StringParameter(2),
 				new StringConstant("e"));
 		
-		List<IAbstractString> args = new ArrayList<IAbstractString>();
-		args.add(new StringConstant("p0"));
-		args.add(new StringConstant("p1"));
+		Map<Integer, IAbstractString> args = new HashMap<Integer, IAbstractString>();
+		args.put(1, new StringConstant("p0"));
+		args.put(2, new StringConstant("p1"));
 		
-		ArgumentApplier.applyArgumentsList(abs, args);
+		ArgumentApplier.applyArgumentsMap(abs, args);
 	}
 
 	
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testApplyZeroArguments() {
 		IAbstractString abs = new StringSequence(
@@ -85,7 +83,8 @@ public class ArgumentApplierTest {
 					),
 				new StringConstant("e"));
 		
+		Map<Integer, IAbstractString> args = new HashMap<Integer, IAbstractString>();
 		assertEquals(abs.toString(), 
-				ArgumentApplier.applyArgumentsList(abs, Collections.EMPTY_LIST).toString());
+				ArgumentApplier.applyArgumentsMap(abs, args).toString());
 	}
 }

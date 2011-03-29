@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
 import com.zeroturnaround.alvor.cache.Cache;
 import com.zeroturnaround.alvor.cache.CacheProvider;
+import com.zeroturnaround.alvor.common.logging.Timer;
 import com.zeroturnaround.alvor.crawler.util.JavaModelUtil;
 import com.zeroturnaround.alvor.gui.GuiChecker;
 
@@ -24,6 +25,8 @@ public class AlvorBuilder extends IncrementalProjectBuilder {
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected IProject[] build(int kind, Map args, IProgressMonitor monitor) throws CoreException {
+		
+		Timer timer = new Timer("BUILD TIMER");
 
 		// first invalidate files (all or changed)
 		if (kind == FULL_BUILD || kind == CLEAN_BUILD) {
@@ -37,7 +40,9 @@ public class AlvorBuilder extends IncrementalProjectBuilder {
 		}
 
 		// then bring everything back up-to-date
-		guiChecker.updateProjectMarkersForChangedFiles(this.getProject(), monitor);
+		guiChecker.updateProjectMarkers(this.getProject(), monitor);
+		
+		timer.printTime();
 		
 		return null; // TODO what's this?
 	}
@@ -45,6 +50,7 @@ public class AlvorBuilder extends IncrementalProjectBuilder {
 	@Override
 	protected void clean(IProgressMonitor monitor) throws CoreException {
 		cache.clearProject(this.getProject().getName());
+		GuiChecker.clearAlvorMarkers(this.getProject());
 	}
 	
 	private void registerFileChanges(IResourceDelta delta) throws CoreException {
@@ -60,15 +66,17 @@ public class AlvorBuilder extends IncrementalProjectBuilder {
 				
 				IResource resource = delta.getResource();
 				if (JavaModelUtil.isSourceFile(resource)) {
+					String fileName = resource.getFullPath().toPortableString();
 					switch (delta.getKind()) {
 					case IResourceDelta.ADDED:
-						cache.addFile(resource.getProject().getName(), resource.getName());
+						cache.addFile(resource.getProject().getName(), fileName);
 						break;
 					case IResourceDelta.REMOVED:
-						cache.removeFile(resource.getName());
+						cache.removeFile(fileName);
 						break;
 					case IResourceDelta.CHANGED:
-						cache.invalidateFile(resource.getName());
+						cache.invalidateFile(fileName);
+						GuiChecker.clearAlvorMarkers(resource);
 						break;
 					default:
 						throw new IllegalArgumentException("Unexpected kind: " + delta.getKind());
@@ -77,11 +85,15 @@ public class AlvorBuilder extends IncrementalProjectBuilder {
 				}
 				else {
 					// visit children only if contains source
-					return JavaModelUtil.isSourceFolderOrPackage(resource);
+					return JavaModelUtil.isSourceContainer(resource);
 				}
+				
 			}
 		});
 	}
 	
-
+	private static boolean projectHasJavaErrors(IProject project) {
+		// FIXME
+		return false;
+	}
 }

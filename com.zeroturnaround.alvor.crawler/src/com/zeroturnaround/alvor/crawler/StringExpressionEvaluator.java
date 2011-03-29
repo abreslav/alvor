@@ -65,13 +65,13 @@ import com.zeroturnaround.alvor.tracker.NameUsage;
 import com.zeroturnaround.alvor.tracker.NameUsageChoice;
 import com.zeroturnaround.alvor.tracker.VariableTracker;
 
-public class Crawler2 {
-	private static final ILog LOG = Logs.getLog(Crawler2.class);
+public class StringExpressionEvaluator {
+	private static final ILog LOG = Logs.getLog(StringExpressionEvaluator.class);
 	private static final String RESULT_FOR_SQL_CHECKER = "@ResultForSQLChecker";
 	private static boolean optimizeChoice = false;
 	public static enum ParamEvalMode {AS_HOTSPOT, AS_PARAM};
 	
-	public final static Crawler2 INSTANCE = new Crawler2();
+	public final static StringExpressionEvaluator INSTANCE = new StringExpressionEvaluator();
 	
 	public HotspotDescriptor evaluateFinalField(VariableDeclarationFragment decl) {
 		try {

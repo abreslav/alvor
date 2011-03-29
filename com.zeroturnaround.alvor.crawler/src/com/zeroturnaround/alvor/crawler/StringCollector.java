@@ -93,7 +93,8 @@ public class StringCollector {
 		}
 		
 		Timer timer = new Timer("loop");
-		for (int i = 0; i < MAX_ITERATIONS_FOR_FINDING_FIXPOINT; i++) {
+		int i = 0;
+		while (i < MAX_ITERATIONS_FOR_FINDING_FIXPOINT) {
 			cache.startNextBatch();
 			List<PatternRecord> patternRecords = cache.getNewProjectPatterns(project.getName());
 			if (patternRecords.isEmpty()) { // found fixpoint
@@ -103,6 +104,11 @@ public class StringCollector {
 				updateProjectCacheForNewPatterns(JavaModelUtil.getJavaProjectFromProject(project),
 						patternRecords, monitor);
 			}
+			i++;
+		}
+		if (i == MAX_ITERATIONS_FOR_FINDING_FIXPOINT
+				&& ! cache.getNewProjectPatterns(project.getName()).isEmpty()) {
+			LOG.error("Fixpoint not found while updating cache");
 		}
 		timer.printTime();
 	}
@@ -146,7 +152,7 @@ public class StringCollector {
 			System.out.println("File count=" + files.size());
 		}
 		
-		// TODO should be more granular
+		// FIXME should be more granular
 		cache.markFilesAsCurrent(fileRecords);
 	}
 	
@@ -187,7 +193,7 @@ public class StringCollector {
 					&& pattern.getClassName().equals(className)
 					&& ((FieldPattern)pattern).getFieldName().equals(name.getIdentifier())) {
 				foundMatch = true;
-				HotspotDescriptor desc = Crawler2.INSTANCE.evaluateFinalField(decl);
+				HotspotDescriptor desc = StringExpressionEvaluator.INSTANCE.evaluateFinalField(decl);
 				cache.addHotspot(rec, desc);
 			}
 		}
@@ -233,7 +239,7 @@ public class StringCollector {
 					&& pattern.getClassName().equals(className)
 					&& pattern.getArgumentTypes().equals(argumentTypes)) {
 				foundMatch = true;
-				HotspotDescriptor desc = Crawler2.INSTANCE.getMethodTemplateDescriptor
+				HotspotDescriptor desc = StringExpressionEvaluator.INSTANCE.getMethodTemplateDescriptor
 					(decl, rec.getPattern().getArgumentNo());
 				cache.addHotspot(rec, desc);
 			}
@@ -247,7 +253,7 @@ public class StringCollector {
 	private void processHotspot(MethodInvocation inv, PatternRecord patternRecord) {
 		int argOffset = patternRecord.getPattern().getArgumentNo()-1;
 		Expression node = (Expression)inv.arguments().get(argOffset);
-		HotspotDescriptor desc = Crawler2.INSTANCE.evaluate(node, Crawler2.ParamEvalMode.AS_HOTSPOT);
+		HotspotDescriptor desc = StringExpressionEvaluator.INSTANCE.evaluate(node, StringExpressionEvaluator.ParamEvalMode.AS_HOTSPOT);
 		
 		cache.addHotspot(patternRecord, desc);
 		

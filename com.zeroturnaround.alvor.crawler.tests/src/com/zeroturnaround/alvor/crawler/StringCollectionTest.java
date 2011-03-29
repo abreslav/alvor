@@ -40,7 +40,7 @@ public abstract class StringCollectionTest {
 	private List<HotspotDescriptor> getNodeDescriptors(IProject project) {
 		Cache cache = CacheProvider.getCache();
 		StringCollector.updateProjectCache(project, cache, null);
-		return cache.getProjectHotspots(project.getName());
+		return cache.getUncheckedPrimaryProjectHotspots(project.getName());
 	}
 	
 }
