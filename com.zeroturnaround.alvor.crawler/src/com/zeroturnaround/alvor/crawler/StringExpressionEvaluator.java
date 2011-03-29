@@ -51,6 +51,7 @@ import com.zeroturnaround.alvor.crawler.util.ASTUtil;
 import com.zeroturnaround.alvor.crawler.util.UnsupportedStringOpExAtNode;
 import com.zeroturnaround.alvor.string.IAbstractString;
 import com.zeroturnaround.alvor.string.IPosition;
+import com.zeroturnaround.alvor.string.Position;
 import com.zeroturnaround.alvor.string.StringChoice;
 import com.zeroturnaround.alvor.string.StringConstant;
 import com.zeroturnaround.alvor.string.StringParameter;
@@ -141,7 +142,8 @@ public class StringExpressionEvaluator {
 					String.valueOf(characterLiteral.charValue()), characterLiteral.getEscapedValue());
 		}
 		else if (node instanceof NullLiteral) {
-			return new StringConstant(ASTUtil.getPosition(node),
+			IPosition actualPos = ASTUtil.getPosition(node);
+			return new StringConstant(new Position(actualPos.getPath(), actualPos.getStart()-1, actualPos.getLength()),
 					"null", "\"null\"");
 		}
 		else if (node instanceof BooleanLiteral) {
@@ -219,11 +221,12 @@ public class StringExpressionEvaluator {
 		
 		IntegerList invContext = contextOf(inv, context);
 		
-		IMethodBinding binding = inv.resolveMethodBinding(); 
+		IMethodBinding binding = inv.resolveMethodBinding();
+		ITypeBinding typeBinding = inv.resolveTypeBinding();
 		String className = binding.getDeclaringClass().getErasure().getQualifiedName();
 		
 		if (inv.getExpression() != null
-				&& ASTUtil.isStringOrStringBuilderOrBuffer(inv.getExpression().resolveTypeBinding())) {
+				&& ASTUtil.isStringOrStringBuilderOrBuffer(typeBinding)) {
 			if (inv.getName().getIdentifier().equals("toString")) {
 				return eval(inv.getExpression(), invContext, mode);
 			}
@@ -234,7 +237,7 @@ public class StringExpressionEvaluator {
 						eval((Expression)inv.arguments().get(0), invContext, mode));
 			}
 			else if (inv.getName().getIdentifier().equals("valueOf")) {
-				assert (ASTUtil.isString(inv.getExpression().resolveTypeBinding()));
+				assert (ASTUtil.isString(typeBinding));
 				return eval((Expression)inv.arguments().get(0), invContext, mode);
 			}
 			else {
@@ -244,7 +247,7 @@ public class StringExpressionEvaluator {
 		}
 		// method with numeric result
 		else if (inv.getExpression() != null
-				&& ASTUtil.isIntegral(inv.getExpression().resolveTypeBinding())
+				&& ASTUtil.isIntegral(typeBinding)
 				&& inv.getName().getIdentifier().equals("toString")) {
 			return new StringRandomInteger(ASTUtil.getPosition(inv));
 		}
@@ -269,7 +272,10 @@ public class StringExpressionEvaluator {
 			return new StringConstant(ASTUtil.getPosition(name), name.getIdentifier(),
 					"\"" + name.getIdentifier() + "\"");
 		}
-		
+		// unsupported type
+		else if (!ASTUtil.isStringOrStringBuilderOrBuffer(typeBinding)) {
+			throw new UnsupportedStringOpExAtNode("Invocation type is not supported", inv);
+		}
 		// handle as general method
 		else  {
 			String methodName = inv.getName().getIdentifier();
