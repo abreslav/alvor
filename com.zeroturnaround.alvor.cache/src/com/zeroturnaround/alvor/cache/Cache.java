@@ -81,6 +81,7 @@ public class Cache {
 	}
 	
 	public void removeFile(String fileName) {
+		fileIDs.remove(fileName);
 		db.execute("delete from files where name = ?", fileName);
 		// this cascade-deletes related stuff
 	}
@@ -796,12 +797,14 @@ public class Cache {
 		db.execute("delete from abstract_strings"); 
 		db.execute("delete from patterns"); 
 		db.execute("delete from files"); 
+		fileIDs.clear();
 		db.execute("delete from project_patterns"); // not strictly necessary: deleting patterns cascades 
 		db.execute("delete from hotspots"); // not strictly necessary: deleting abstract_string cascades to hotspots 
 	}
 	
 	public void clearProject(String projectName) {
 		db.execute("delete from files where name like ('/' || ? || '/%')", projectName); 
+		fileIDs.clear();
 		// hotspots and abstract strings get deleted by cascade
 		db.execute("delete from project_patterns where project_name = ?", projectName); 
 	}
@@ -819,10 +822,10 @@ public class Cache {
 		if (id == null) {
 			try {
 				id = db.queryInt("select id from files where name = ?", name);
-				assert id != null; // TODO maybe should just create if doesn't exist ??
-				//fileIDs.put(name, id);
+				assert id != null; 
+				fileIDs.put(name, id);
 			} catch (Exception e) {
-				throw new IllegalArgumentException("Can't find file: " + name);
+				throw new IllegalArgumentException("Can't find file: " + name, e);
 			}
 		}
 		return id;

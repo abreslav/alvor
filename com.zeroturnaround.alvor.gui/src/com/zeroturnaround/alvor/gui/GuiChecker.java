@@ -22,6 +22,7 @@ import com.zeroturnaround.alvor.checkers.HotspotWarning;
 import com.zeroturnaround.alvor.checkers.complex.ComplexChecker;
 import com.zeroturnaround.alvor.common.HotspotDescriptor;
 import com.zeroturnaround.alvor.common.PositionUtil;
+import com.zeroturnaround.alvor.common.ProgressUtil;
 import com.zeroturnaround.alvor.common.StringHotspotDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedHotspotDescriptor;
 import com.zeroturnaround.alvor.common.WorkspaceUtil;
@@ -53,26 +54,49 @@ public class GuiChecker {
 	
 	
 	public void cleanUpdateProjectMarkers(IProject project, IProgressMonitor monitor) {
-		cache.clearProject(project.getName());
-		deleteAlvorMarkers(project);
-		updateProjectMarkers(project, monitor);
+		try {
+			ProgressUtil.beginTask(monitor, "Full SQL check for " + project.getName(), 100);
+			cache.clearProject(project.getName());
+			deleteAlvorMarkers(project);
+			ProgressUtil.worked(monitor, 3);
+			updateProjectMarkers(project, ProgressUtil.subMonitor(monitor, 97));
+		}
+		finally {
+			ProgressUtil.done(monitor);
+		}
 	}
 	
 	public void updateProjectMarkers(IProject project, IProgressMonitor monitor) {
 		// assumes that markers of invalidated files are already deleted
-		
 		// TODO clear project markers (about checking exceptions)
-		
-		StringCollector.updateProjectCache(project, cache, monitor);
-		
-		ProjectConfiguration conf = ConfigurationManager.readProjectConfiguration(project, true);
-		Collection<HotspotDescriptor> hotspots = 
-			cache.getUncheckedPrimaryProjectHotspots(project.getName());
-		
+		ProgressUtil.beginTask(monitor, "Full SQL check for " + project.getName(), 100);
 		
 		try {
+			StringCollector.updateProjectCache(project, cache, ProgressUtil.subMonitor(monitor, 80));
+			
+			ProgressUtil.checkAbort(monitor);
+			ProjectConfiguration conf = ConfigurationManager.readProjectConfiguration(project, true);
+			Collection<HotspotDescriptor> hotspots = 
+				cache.getUncheckedPrimaryProjectHotspots(project.getName());
+			
+			ProgressUtil.checkAbort(monitor);
+			createMarkersForHotspots(hotspots, conf, project, ProgressUtil.subMonitor(monitor, 20));
+			// FIXME clean orphaned (constant) markers
+		} 
+		finally {
+			ProgressUtil.done(monitor);
+		}
+	}
+	
+	private void createMarkersForHotspots(Collection<HotspotDescriptor> hotspots, 
+			ProjectConfiguration conf, IProject project, IProgressMonitor monitor) {
+		
+		ProgressUtil.beginTask(monitor, "Checking hotspots", hotspots.size());
+		try {
 			for (HotspotDescriptor hotspot : hotspots) {
+				ProgressUtil.checkAbort(monitor);
 				createMarkersForHotspot(hotspot, conf, project);
+				ProgressUtil.worked(monitor, 1);
 			}
 			cache.markHotspotsAsChecked(hotspots);
 		} 
@@ -80,8 +104,9 @@ public class GuiChecker {
 			createMarker("Checker exception: " + e.getMessage(), AlvorGuiPlugin.ERROR_MARKER_ID,
 					IMarker.SEVERITY_ERROR, e.getPosition(), null, project);
 		}
-		
-		// FIXME clean orphaned (constant) markers
+		finally {
+			ProgressUtil.done(monitor);
+		}
 	}
 	
 	private void createMarkersForHotspot(HotspotDescriptor hotspot, ProjectConfiguration conf, 
