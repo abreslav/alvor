@@ -7,7 +7,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jdt.core.IJavaElement;
@@ -39,7 +38,6 @@ public class CleanCheckHandler extends AbstractHandler {
 			// TODO add dialog
 			
 			Job job = new Job("Full SQL checking") {
-				
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
 					checker.cleanUpdateProjectMarkers(finalElement.getJavaProject().getProject(), monitor);

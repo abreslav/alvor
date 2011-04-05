@@ -46,6 +46,7 @@ import com.zeroturnaround.alvor.common.FieldPattern;
 import com.zeroturnaround.alvor.common.FunctionPattern;
 import com.zeroturnaround.alvor.common.HotspotDescriptor;
 import com.zeroturnaround.alvor.common.HotspotPattern;
+import com.zeroturnaround.alvor.common.ProgressUtil;
 import com.zeroturnaround.alvor.common.StringHotspotDescriptor;
 import com.zeroturnaround.alvor.common.StringPattern;
 import com.zeroturnaround.alvor.common.UnsupportedHotspotDescriptor;
@@ -85,31 +86,51 @@ public class StringCollector {
 	}
 	
 	private void doUpdateProjectCache(IProject project, IProgressMonitor monitor) {
-		// 0) FIXME update inter-project stuff (import patterns)
-		
-		if (!cache.projectHasFiles(project.getName())) {
-			initializeProject(project);
-		}
-		
-		Timer timer = new Timer("loop");
-		int i = 0;
-		while (i < MAX_ITERATIONS_FOR_FINDING_FIXPOINT) {
-			cache.startNextBatch();
-			List<PatternRecord> patternRecords = cache.getNewProjectPatterns(project.getName());
-			if (patternRecords.isEmpty()) { // found fixpoint
-				break; 
+		try {
+			int workLeft = 100; 
+			int work;
+			ProgressUtil.beginTask(monitor, "Collecting strings", workLeft);
+			
+			// 0) FIXME update inter-project stuff (import patterns)
+			
+			if (!cache.projectHasFiles(project.getName())) {
+				initializeProject(project);
+				work = 2;
+				ProgressUtil.worked(monitor, work); 
+				workLeft -= work;
 			}
-			else {
-				updateProjectCacheForNewPatterns(JavaModelUtil.getJavaProjectFromProject(project),
-						patternRecords, monitor);
+			
+			Timer timer = new Timer("loop");
+			int i = 0;
+			while (i < MAX_ITERATIONS_FOR_FINDING_FIXPOINT) {
+				ProgressUtil.checkAbort(monitor);
+				
+				cache.startNextBatch();
+				List<PatternRecord> patternRecords = cache.getNewProjectPatterns(project.getName());
+				if (patternRecords.isEmpty()) { // found fixpoint
+					break; 
+				}
+				else {
+					work = (int)(workLeft * 0.75);
+					IProgressMonitor subMonitor = ProgressUtil.subMonitor(monitor, work);
+					if (subMonitor != null) {
+						subMonitor.setTaskName("Collecting strings, iteration " + (i+1));
+					}
+					updateProjectCacheForNewPatterns(JavaModelUtil.getJavaProjectFromProject(project),
+							patternRecords, subMonitor);
+					workLeft -= work;
+				}
+				i++;
 			}
-			i++;
+			if (i == MAX_ITERATIONS_FOR_FINDING_FIXPOINT
+					&& ! cache.getNewProjectPatterns(project.getName()).isEmpty()) {
+				LOG.error("Fixpoint not found while updating cache");
+			}
+			timer.printTime();
+		} 
+		finally {
+			
 		}
-		if (i == MAX_ITERATIONS_FOR_FINDING_FIXPOINT
-				&& ! cache.getNewProjectPatterns(project.getName()).isEmpty()) {
-			LOG.error("Fixpoint not found while updating cache");
-		}
-		timer.printTime();
 	}
 	
 	private void initializeProject(IProject project) {
@@ -122,7 +143,7 @@ public class StringCollector {
 	}
 	
 	private void updateProjectCacheForNewPatterns(IJavaProject javaProject, 
-			final Collection<PatternRecord> patternRecords, IProgressMonitor monitor) {
+			final Collection<PatternRecord> patternRecords, final IProgressMonitor monitor) {
 		
 		List<FileRecord> fileRecords = cache.getFilesToUpdate(javaProject.getProject().getName());
 		
@@ -137,17 +158,15 @@ public class StringCollector {
 			performSearch(group.getValue(), searchPattern, new SearchRequestor() {
 				@Override
 				public void acceptSearchMatch(SearchMatch match) throws CoreException {
-					//System.out.println(match.getElement().getClass().getCanonicalName());
+					ProgressUtil.checkAbort(monitor);
+					
 					files.add(match.getResource());
-					
 					// TODO parse everything together
-					
 					ASTNode node = getASTNode(match);
-					//System.out.println(node.getClass());
 					count.incrementAndGet();
 					processNodeForPatterns(node, patternRecords);
 				}
-			});
+			}, monitor);
 			
 			searchTimer.printTime();
 			System.out.println("Match count=" + count);
@@ -262,10 +281,10 @@ public class StringCollector {
 		
 		// TODO temporary
 		if (desc instanceof StringHotspotDescriptor) {
-			System.out.println(((StringHotspotDescriptor)desc).getAbstractValue());
+			assert LOG.message(((StringHotspotDescriptor)desc).getAbstractValue());
 		}
 		else if (desc instanceof UnsupportedHotspotDescriptor) {
-			System.out.println(((UnsupportedHotspotDescriptor)desc).getProblemMessage());
+			assert LOG.message(((UnsupportedHotspotDescriptor)desc).getProblemMessage());
 		}
 		else {
 			throw new IllegalArgumentException();
@@ -273,7 +292,7 @@ public class StringCollector {
 	}
 
 	private void performSearch(Collection<ICompilationUnit> units, SearchPattern pattern, 
-			SearchRequestor requestor) {
+			SearchRequestor requestor, IProgressMonitor monitor) {
 		
 		try {
 			IJavaElement[] elements = units.toArray(new ICompilationUnit[units.size()]);
@@ -281,7 +300,7 @@ public class StringCollector {
 			SearchParticipant[] participants = { SearchEngine.getDefaultSearchParticipant()};
 			
 			// TODO do I want to use monitor?
-			searchEngine.search(pattern, participants, scope, requestor, null);
+			searchEngine.search(pattern, participants, scope, requestor, monitor);
 		}
 		catch (CoreException e) {
 			throw new RuntimeException(e);
