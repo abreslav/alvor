@@ -222,11 +222,10 @@ public class StringExpressionEvaluator {
 		IntegerList invContext = contextOf(inv, context);
 		
 		IMethodBinding binding = inv.resolveMethodBinding();
-		ITypeBinding typeBinding = inv.resolveTypeBinding();
 		String className = binding.getDeclaringClass().getErasure().getQualifiedName();
 		
 		if (inv.getExpression() != null
-				&& ASTUtil.isStringOrStringBuilderOrBuffer(typeBinding)) {
+				&& ASTUtil.isStringOrStringBuilderOrBuffer(inv.getExpression().resolveTypeBinding())) {
 			if (inv.getName().getIdentifier().equals("toString")) {
 				return eval(inv.getExpression(), invContext, mode);
 			}
@@ -237,7 +236,7 @@ public class StringExpressionEvaluator {
 						eval((Expression)inv.arguments().get(0), invContext, mode));
 			}
 			else if (inv.getName().getIdentifier().equals("valueOf")) {
-				assert (ASTUtil.isString(typeBinding));
+				assert (ASTUtil.isString(inv.getExpression().resolveTypeBinding()));
 				return eval((Expression)inv.arguments().get(0), invContext, mode);
 			}
 			else {
@@ -247,7 +246,7 @@ public class StringExpressionEvaluator {
 		}
 		// method with numeric result
 		else if (inv.getExpression() != null
-				&& ASTUtil.isIntegral(typeBinding)
+				&& ASTUtil.isIntegral(inv.getExpression().resolveTypeBinding())
 				&& inv.getName().getIdentifier().equals("toString")) {
 			return new StringRandomInteger(ASTUtil.getPosition(inv));
 		}
@@ -271,10 +270,6 @@ public class StringExpressionEvaluator {
 			}
 			return new StringConstant(ASTUtil.getPosition(name), name.getIdentifier(),
 					"\"" + name.getIdentifier() + "\"");
-		}
-		// unsupported type
-		else if (!ASTUtil.isStringOrStringBuilderOrBuffer(typeBinding)) {
-			throw new UnsupportedStringOpExAtNode("Invocation type is not supported", inv);
 		}
 		// handle as general method
 		else  {
