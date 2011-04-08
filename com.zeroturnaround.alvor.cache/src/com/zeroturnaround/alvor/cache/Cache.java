@@ -97,8 +97,12 @@ public class Cache {
 		db.execute("update files set batch_no = 0 where name = ?", fileName);
 	}
 	
-	public List<HotspotDescriptor> getUncheckedPrimaryProjectHotspots(String projectName) {
+	public List<HotspotDescriptor> getUncheckedPrimaryHotspots(String projectName) {
 		return getPrimaryHotspots(projectName, null, true);		
+	}
+	
+	public List<HotspotDescriptor> getPrimaryHotspots(String projectName) {
+		return getPrimaryHotspots(projectName, null, false);		
 	}
 	
 	

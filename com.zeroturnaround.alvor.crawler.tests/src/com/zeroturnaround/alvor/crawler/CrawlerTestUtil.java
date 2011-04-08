@@ -34,8 +34,7 @@ public class CrawlerTestUtil {
 		return !scA.hasNextLine() && !scB.hasNextLine();
 	}
 
-	public static boolean stringsAreExpected(List<String> items, String filePrefix) {
-		
+	public static void storeFoundStrings(List<String> items, String filePrefix) {
 		File outFile = new File(filePrefix + "_found.txt");
 		if (outFile.exists()) {
 			boolean result = outFile.delete();
@@ -47,8 +46,18 @@ public class CrawlerTestUtil {
 				outStream.println(item);
 			}
 			outStream.close();
-			
+		} 
+		catch (FileNotFoundException e){
+			throw new IllegalStateException(e);
+		}
+	}
+	public static boolean stringsAreExpected(List<String> items, String filePrefix) {
+		
+		try {
+			storeFoundStrings(items, filePrefix);
+			File outFile = new File(filePrefix + "_found.txt");
 			File expectedFile = new File(filePrefix + "_expected.txt");
+			
 			if (expectedFile.exists()) {
 				return CrawlerTestUtil.filesAreEqual(outFile, expectedFile);
 			} else {

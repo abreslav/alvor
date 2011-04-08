@@ -46,12 +46,14 @@ import com.zeroturnaround.alvor.string.StringSequence;
 import com.zeroturnaround.alvor.string.util.AbstractStringOptimizer;
 
 public class GuiChecker {
+	public static GuiChecker INSTANCE = new GuiChecker();
 	private static final ILog LOG = Logs.getLog(GuiChecker.class);
 	private static final int MAX_MARKER_MESSAGE_LENGTH = 500;
 	private static final String CHILDREN_ATT_NAME = "children";
 	private ComplexChecker checker = new ComplexChecker();
 	private Cache cache = CacheProvider.getCache();
 	
+	private GuiChecker() {}
 	
 	public void cleanUpdateProjectMarkers(IProject project, IProgressMonitor monitor) {
 		try {
@@ -77,7 +79,7 @@ public class GuiChecker {
 			ProgressUtil.checkAbort(monitor);
 			ProjectConfiguration conf = ConfigurationManager.readProjectConfiguration(project, true);
 			Collection<HotspotDescriptor> hotspots = 
-				cache.getUncheckedPrimaryProjectHotspots(project.getName());
+				cache.getUncheckedPrimaryHotspots(project.getName());
 			
 			ProgressUtil.checkAbort(monitor);
 			createMarkersForHotspots(hotspots, conf, project, ProgressUtil.subMonitor(monitor, 10));
@@ -339,6 +341,11 @@ public class GuiChecker {
 			LOG.exception(e);
 			throw new RuntimeException(e);
 		}
+	}
+
+	public void clearProject(IProject project) {
+		deleteAlvorMarkers(project);
+		cache.clearProject(project.getName());
 	}
 	
 }

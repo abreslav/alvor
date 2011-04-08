@@ -20,7 +20,6 @@ import com.zeroturnaround.alvor.gui.GuiUtil;
 public class AlvorBuilder extends IncrementalProjectBuilder {
 	public static final String BUILDER_ID = "com.zeroturnaround.alvor.builder.AlvorBuilder";
 
-	private GuiChecker guiChecker = new GuiChecker();
 	private Cache cache = CacheProvider.getCache();
 	
 	@SuppressWarnings("rawtypes")
@@ -42,7 +41,7 @@ public class AlvorBuilder extends IncrementalProjectBuilder {
 
 		// then bring everything back up-to-date
 		if (!JavaModelUtil.projectHasJavaErrors(this.getProject())) {
-			guiChecker.updateProjectMarkers(this.getProject(), monitor);
+			GuiChecker.INSTANCE.updateProjectMarkers(this.getProject(), monitor);
 		}
 		else {
 			GuiUtil.setStatusbarMessage("Did not check SQL because project has Java errors");
@@ -56,8 +55,7 @@ public class AlvorBuilder extends IncrementalProjectBuilder {
 	
 	@Override
 	protected void clean(IProgressMonitor monitor) throws CoreException {
-		cache.clearProject(this.getProject().getName());
-		GuiChecker.deleteAlvorMarkers(this.getProject());
+		GuiChecker.INSTANCE.clearProject(this.getProject());
 	}
 	
 	/**

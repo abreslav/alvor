@@ -16,9 +16,8 @@ public class EarvedGuiChecker2TestNew extends AbstractMarkerTest {
 		CacheProvider.getCache().clearAllProjects();
 		
 		try {
-			GuiChecker checker = new GuiChecker();
 //			checker.updateProjectMarkersForChangedFiles(project, null);
-			checker.cleanUpdateProjectMarkers(project, null);
+			GuiChecker.INSTANCE.cleanUpdateProjectMarkers(project, null);
 		}
 //		catch (Exception e) {
 //			

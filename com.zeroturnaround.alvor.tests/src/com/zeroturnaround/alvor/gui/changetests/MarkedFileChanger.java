@@ -1,47 +1,57 @@
 package com.zeroturnaround.alvor.gui.changetests;
 
-import java.util.Collection;
+import java.io.ByteArrayInputStream;
+import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.core.resources.IProject;
 
-import com.zeroturnaround.alvor.crawler.util.JavaModelUtil;
-import com.zeroturnaround.alvor.gui.GuiFacade;
+import com.zeroturnaround.alvor.common.WorkspaceUtil;
 
 public class MarkedFileChanger {
-	public static void undoAllChangesInProject(IJavaProject project) {
-		applyChangesInProject(project, 0);
+	public static void undoAllChangesInProject(IProject project, Pattern fileNamePattern) {
+		applyChangesInProject(project, fileNamePattern, 0);
 	}
 	
 	public static void undoAllChangesInFile(IFile file) {
 		applyChangesInFile(file, 0);
 	}
 	
-	public static void applyChangesInProject(IJavaProject project, int changeNo) {
-		Collection<ICompilationUnit> cunits = JavaModelUtil.getAllCompilationUnits(project, false);
-		for (ICompilationUnit cunit : cunits) {
-			try {
-				applyChangesInFile((IFile)cunit.getCorrespondingResource(), changeNo);
-			} catch (JavaModelException e) {
-				throw new RuntimeException(e);
-			}
+	public static boolean applyChangesInProject(IProject project, Pattern fileNamePattern, int changeNo) {
+		
+		List<IFile> files = WorkspaceUtil.getAllFilesInContainer(project, fileNamePattern);
+		
+		boolean projectHadChanges = false;
+		
+		for (IFile file : files) {
+			boolean fileHadChanges = applyChangesInFile(file, changeNo);
+			projectHadChanges = projectHadChanges || fileHadChanges;
 		}
+		
+		return projectHadChanges;
 	}
 	
-	public static void applyChangesInFile(IFile file, int changeNo) {
+	public static boolean applyChangesInFile(IFile file, int changeNo) {
 		try {
 			Scanner sc = new Scanner(file.getLocation().toFile());
 			
+			StringBuilder oldText = new StringBuilder();
 			StringBuilder newText = new StringBuilder();
 			while (sc.hasNextLine()) {
-				newText.append(makeChangeInLine(sc.nextLine(), changeNo) + "\n");
+				String line = sc.nextLine();
+				oldText.append(line + "\n");
+				newText.append(makeChangeInLine(line, changeNo) + "\n");
 			}
-			GuiFacade.setFileContent(file, newText.toString());
+			if (!newText.equals(oldText)) {
+				file.setContents(new ByteArrayInputStream(newText.toString().getBytes()), 0, null);
+				return true;
+			}
+			else {
+				return false;
+			}
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
