@@ -1,8 +1,9 @@
-package com.zeroturnaround.alvor.gui.changetests;
+package com.zeroturnaround.alvor.tests.util;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
+
 
 /**
  * This tests the FileChanger itself

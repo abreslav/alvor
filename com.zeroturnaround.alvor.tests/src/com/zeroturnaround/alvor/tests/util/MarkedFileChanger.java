@@ -1,4 +1,4 @@
-package com.zeroturnaround.alvor.gui.changetests;
+package com.zeroturnaround.alvor.tests.util;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;

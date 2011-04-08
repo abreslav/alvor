@@ -1,9 +1,10 @@
-package uk.ac.lkl.common.util.testing;
+package com.zeroturnaround.alvor.tests.util;
+
+// It gives labels for parameterized tests
 
 // got it from here:
 // http://stackoverflow.com/questions/650894/change-test-name-of-parameterized-tests
 // http://code.google.com/p/migen/source/browse/trunk/java/src/uk/ac/lkl/common/util/testing/LabelledParameterized.java
-// gives labels for parameterized tests
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
