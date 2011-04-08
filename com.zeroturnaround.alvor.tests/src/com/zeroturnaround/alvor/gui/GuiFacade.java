@@ -24,8 +24,7 @@ import com.zeroturnaround.alvor.common.WorkspaceUtil;
 public class GuiFacade {
 	public static void executeAlvorCleanCheck(IProject project) throws Exception {
 		// TODO should do it via GUI only
-		GuiChecker checker = new GuiChecker();
-		checker.cleanUpdateProjectMarkers(project, null);
+		GuiChecker.INSTANCE.cleanUpdateProjectMarkers(project, null);
 	}
 	
 	public static void startIncrementalBuild(IProject project) {

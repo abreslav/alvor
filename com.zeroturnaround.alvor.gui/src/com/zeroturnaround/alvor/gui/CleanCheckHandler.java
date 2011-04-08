@@ -18,7 +18,6 @@ import com.zeroturnaround.alvor.common.logging.Timer;
 import com.zeroturnaround.alvor.crawler.util.JavaModelUtil;
 
 public class CleanCheckHandler extends AbstractHandler {
-	GuiChecker checker = new GuiChecker();
 	private static final ILog LOG = Logs.getLog(CleanCheckHandler.class);
 	
 
@@ -47,7 +46,7 @@ public class CleanCheckHandler extends AbstractHandler {
 			Job job = new Job("Full SQL checking") {
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
-					checker.cleanUpdateProjectMarkers(project, monitor);
+					GuiChecker.INSTANCE.cleanUpdateProjectMarkers(project, monitor);
 					return Status.OK_STATUS;
 				}
 			};
@@ -67,5 +66,7 @@ public class CleanCheckHandler extends AbstractHandler {
 		
 		return null;
 	}
+	
+	
 
 }

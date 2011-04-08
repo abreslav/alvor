@@ -1,0 +1,30 @@
+Here try to break caching system by having complex dependencies between files.
+For simplicity, use only static checking
+
+Test
+	* change in one file removes/adds error in another file
+	* add (or remove) a callsite to fixed hotspot method
+	* add (or remove) a callsite to wrapper hotspot method
+	* modify the implementation of a string method (which is used in some SQL construction)
+	* change existing method into (full or partial) hotspot wrapper without changing signature
+	  (and vice versa: remove wrapper hotspot status). The method should have callsites both in the same file and other files
+
+
+Changes are shown inside code with change marker "//1>>". 
+Number denotes the stage when the change is applied.
+Change means swapping left-hand-side and right-hand-side of the marker.
+After change, the marker is changed to "//1<<" -- to remind which changes to undo after testing. 
+
+
+Testing is done in 4 steps, markers are recorded after each step
+0) full build from clean cache
+1) stage 1 changes are applied
+2) ...
+3) ...
+
+Finally found markers (from each step) are compared to expected markers 
+
+
+More unlikely casese
+	* add (or remove) a new implementation of hotstpot method
+	* add (or remove) a new implementation of string method (whose signature is already used in some abstract SQL) 
