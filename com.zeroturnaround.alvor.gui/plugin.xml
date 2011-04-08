@@ -78,9 +78,11 @@
       <menuContribution
             locationURI="popup:org.eclipse.jdt.ui.PackageExplorer?after=additions">
    <menu
+         id="com.zeroturnaround.alvor.projectcontextmenu"
          label="Alvor SQL checker">
       <command
             commandId="com.zeroturnaround.alvor.plugin.CleanCheck"
+            label="Check SQL"
             style="push">
          <visibleWhen
                checkEnabled="false">

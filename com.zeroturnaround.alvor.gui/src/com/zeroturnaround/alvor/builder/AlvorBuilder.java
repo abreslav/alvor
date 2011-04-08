@@ -15,6 +15,7 @@ import com.zeroturnaround.alvor.cache.CacheProvider;
 import com.zeroturnaround.alvor.common.logging.Timer;
 import com.zeroturnaround.alvor.crawler.util.JavaModelUtil;
 import com.zeroturnaround.alvor.gui.GuiChecker;
+import com.zeroturnaround.alvor.gui.GuiUtil;
 
 public class AlvorBuilder extends IncrementalProjectBuilder {
 	public static final String BUILDER_ID = "com.zeroturnaround.alvor.builder.AlvorBuilder";
@@ -40,9 +41,15 @@ public class AlvorBuilder extends IncrementalProjectBuilder {
 		}
 
 		// then bring everything back up-to-date
-		guiChecker.updateProjectMarkers(this.getProject(), monitor);
+		if (!JavaModelUtil.projectHasJavaErrors(this.getProject())) {
+			guiChecker.updateProjectMarkers(this.getProject(), monitor);
+		}
+		else {
+			GuiUtil.setStatusbarMessage("Did not check SQL because project has Java errors");
+		}
 		
 		timer.printTime();
+		
 		
 		return null; // TODO what's this?
 	}
@@ -53,6 +60,11 @@ public class AlvorBuilder extends IncrementalProjectBuilder {
 		GuiChecker.deleteAlvorMarkers(this.getProject());
 	}
 	
+	/**
+	 * Invalidates data about changed files in cache and removes their Alvor markers 
+	 * @param delta
+	 * @throws CoreException
+	 */
 	private void registerFileChanges(IResourceDelta delta) throws CoreException {
 		
 		// TODO if .alvor ends up here then clean cache
@@ -90,10 +102,5 @@ public class AlvorBuilder extends IncrementalProjectBuilder {
 				
 			}
 		});
-	}
-	
-	private static boolean projectHasJavaErrors(IProject project) {
-		// FIXME
-		return false;
 	}
 }
