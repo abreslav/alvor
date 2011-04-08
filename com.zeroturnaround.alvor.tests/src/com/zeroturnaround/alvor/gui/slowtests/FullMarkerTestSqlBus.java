@@ -4,7 +4,7 @@ import org.junit.BeforeClass;
 
 import com.zeroturnaround.alvor.common.WorkspaceUtil;
 import com.zeroturnaround.alvor.gui.AbstractMarkerTest;
-import com.zeroturnaround.alvor.gui.GuiFacade;
+import com.zeroturnaround.alvor.tests.util.GuiFacade;
 
 public class FullMarkerTestSqlBus extends AbstractMarkerTest {
 	

@@ -1,4 +1,4 @@
-package com.zeroturnaround.alvor.gui;
+package com.zeroturnaround.alvor.tests.util;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.CoreException;
 
 import com.zeroturnaround.alvor.common.PositionUtil;
 import com.zeroturnaround.alvor.common.WorkspaceUtil;
+import com.zeroturnaround.alvor.gui.GuiChecker;
 
 public class GuiFacade {
 	public static void executeAlvorCleanCheck(IProject project) throws Exception {

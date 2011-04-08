@@ -10,7 +10,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.zeroturnaround.alvor.common.HotspotPattern;
-import com.zeroturnaround.alvor.crawler.CrawlerTestUtil;
+import com.zeroturnaround.alvor.tests.util.CrawlerTestUtil;
 
 public class ConfigurationManagerTest {
 	

@@ -9,7 +9,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.zeroturnaround.alvor.crawler.CrawlerTestUtil;
+import com.zeroturnaround.alvor.tests.util.CrawlerTestUtil;
+import com.zeroturnaround.alvor.tests.util.GuiFacade;
 
 /**
  * Base class for tests which check the validity of markers produced by Alvor
