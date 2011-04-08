@@ -3,6 +3,7 @@ package com.zeroturnaround.alvor.gui;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -14,6 +15,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.common.logging.Timer;
+import com.zeroturnaround.alvor.crawler.util.JavaModelUtil;
 
 public class CleanCheckHandler extends AbstractHandler {
 	GuiChecker checker = new GuiChecker();
@@ -27,20 +29,25 @@ public class CleanCheckHandler extends AbstractHandler {
 		try {
 			// first expect right-click in package explorer
 			IJavaElement element = GuiUtil.getSingleSelectedJavaElement();
-			// fall back to other means (like active editor)
+			final IProject project;
+			
 			if (element == null) {
-				element = GuiUtil.getCurrentJavaProject();
+				project = GuiUtil.getCurrentJavaProject().getProject();
+			}
+			else {
+				project = element.getJavaProject().getProject();
 			}
 			
-			final IJavaElement finalElement = element;
+			if (JavaModelUtil.projectHasJavaErrors(project)) {
+				GuiUtil.showDialog("Please correct Java errors before checking SQL", "Problem");
+				return null;
+			}
 			
-			LOG.message("Checking project: " + element.getElementName());
-			// TODO add dialog
-			
+			LOG.message("Checking project: " + project.getName());
 			Job job = new Job("Full SQL checking") {
 				@Override
 				protected IStatus run(IProgressMonitor monitor) {
-					checker.cleanUpdateProjectMarkers(finalElement.getJavaProject().getProject(), monitor);
+					checker.cleanUpdateProjectMarkers(project, monitor);
 					return Status.OK_STATUS;
 				}
 			};

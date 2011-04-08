@@ -72,7 +72,7 @@ public class GuiChecker {
 		ProgressUtil.beginTask(monitor, "Full SQL check for " + project.getName(), 100);
 		
 		try {
-			StringCollector.updateProjectCache(project, cache, ProgressUtil.subMonitor(monitor, 80));
+			StringCollector.updateProjectCache(project, cache, ProgressUtil.subMonitor(monitor, 90));
 			
 			ProgressUtil.checkAbort(monitor);
 			ProjectConfiguration conf = ConfigurationManager.readProjectConfiguration(project, true);
@@ -80,7 +80,7 @@ public class GuiChecker {
 				cache.getUncheckedPrimaryProjectHotspots(project.getName());
 			
 			ProgressUtil.checkAbort(monitor);
-			createMarkersForHotspots(hotspots, conf, project, ProgressUtil.subMonitor(monitor, 20));
+			createMarkersForHotspots(hotspots, conf, project, ProgressUtil.subMonitor(monitor, 10));
 			// FIXME clean orphaned (constant) markers
 		} 
 		finally {
