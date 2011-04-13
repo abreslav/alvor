@@ -794,8 +794,9 @@ public class Cache {
 				DatabaseHelper.encodeNull(length));
 	}
 	
-	private void removeOrphanedSecondaryPatterns() {
-	}
+//	//TODO
+//	private void removeOrphanedSecondaryPatterns() {
+//	}
 
 	public void clearAllProjects() {
 		db.execute("delete from abstract_strings"); 
@@ -887,35 +888,6 @@ public class Cache {
 			" where name like '/' || ? || '/%'", projectName);
 		
 		return fileCount > 0;
-	}
-	
-	private Collection<String> getUncheckedFiles(String projectName) {
-		// return files which have hotspots, but some of them are not checked
-		
-		ResultSet rs = db.query(
-				" select" + 
-				" distinct f.name" + 
-				" from hotspots h" + 
-				" join files f on f.id = h.file_id" + 
-				" where h.checked = false" + 
-				" and f.name like '/' || ? || '/%'", projectName);
-		
-		try {
-			List<String> result = new ArrayList<String>();
-			try {
-				while (rs.next()) {
-					result.add(rs.getString(1));
-				}
-			} 
-			catch (SQLException e) {
-				throw new RuntimeException(e);
-			}
-			
-			return result;
-		} 
-		finally {
-			db.checkCloseResult(rs);
-		}
 	}
 	
 	public void printDBInfo() {

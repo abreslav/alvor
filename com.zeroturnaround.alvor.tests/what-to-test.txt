@@ -63,6 +63,8 @@ caching issues and incrementality
 	* add new hotspot method
 	* add second hotspot into a method
 	* move file (using refactoring)
+	* rename a class
+	* rename a method
 
 
 Configuration:

@@ -93,6 +93,7 @@ public class DijkstraAbstractInterpreter<S> implements IAbstractInterpreter<S> {
 				return false;
 			if (getClass() != obj.getClass())
 				return false;
+			@SuppressWarnings("unchecked")
 			PredicateState other = (PredicateState) obj;
 			if (data == null) {
 				if (other.data != null)

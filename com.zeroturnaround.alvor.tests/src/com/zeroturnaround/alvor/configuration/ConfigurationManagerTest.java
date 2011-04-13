@@ -10,7 +10,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.zeroturnaround.alvor.common.HotspotPattern;
-import com.zeroturnaround.alvor.tests.util.CrawlerTestUtil;
+import com.zeroturnaround.alvor.tests.util.TestUtil;
 
 public class ConfigurationManagerTest {
 	
@@ -28,16 +28,18 @@ public class ConfigurationManagerTest {
 			
 			// Maybe test also ProjectConfiguration.equals ?
 			Assert.assertEquals(conf1, conf2);
-			Assert.assertTrue(CrawlerTestUtil.filesAreEqual(file1, file2));
+			Assert.assertTrue(TestUtil.filesAreEqual(file1, file2));
 			//printFile(file1);
 			
 			//Assert.f
 		} finally {
 			if (file1.exists()) {
-				file1.delete();
+				boolean success = file1.delete();
+				assert success;
 			}
 			if (file2.exists()) {
-				file2.delete();
+				boolean success = file2.delete();
+				assert success;
 			}
 		}
 	}

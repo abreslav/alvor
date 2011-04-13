@@ -3,9 +3,7 @@ package com.zeroturnaround.alvor.parser;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,7 +17,6 @@ import org.junit.runners.Parameterized.Parameters;
 import com.zeroturnaround.alvor.checkers.sqlstatic.SyntacticalSQLChecker;
 import com.zeroturnaround.alvor.sqlparser.ParserSimulator;
 import com.zeroturnaround.alvor.string.IAbstractString;
-import com.zeroturnaround.alvor.string.StringConstant;
 import com.zeroturnaround.alvor.string.parser.AbstractStringParser;
 import com.zeroturnaround.alvor.string.util.AbstractStringOptimizer;
 import com.zeroturnaround.alvor.string.util.AbstractStringSizeCounter;
@@ -64,17 +61,17 @@ public class SQLSyntaxCheckerTest {
 		}
 	}
 	
-	private static void addConcreteFromFile(String fileName, boolean expected,
-			List<Object[]> result) throws IOException {
-		BufferedReader bufferedReader = new BufferedReader(new FileReader(fileName));
-		do {
-			String line = bufferedReader.readLine();
-			if (line == null) {
-				return;
-			}
-			result.add(new Object[] {new StringConstant(line), expected});
-		} while (true);
-	}
+//	private static void addConcreteFromFile(String fileName, boolean expected,
+//			List<Object[]> result) throws IOException {
+//		BufferedReader bufferedReader = new BufferedReader(new FileReader(fileName));
+//		do {
+//			String line = bufferedReader.readLine();
+//			if (line == null) {
+//				return;
+//			}
+//			result.add(new Object[] {new StringConstant(line), expected});
+//		} while (true);
+//	}
 	
 	private final IAbstractString abstractString;
 	private final boolean expected;
@@ -91,7 +88,7 @@ public class SQLSyntaxCheckerTest {
 		optimized = AbstractStringOptimizer.optimize(abstractString);
 		size = size - AbstractStringSizeCounter.size(optimized);
 		if (size > 0) {
-//			System.out.println(size);
+			System.out.println(size);
 		}
 		assertTrue("String is too big: " + AbstractStringSizeCounter.size(optimized), SyntacticalSQLChecker.hasAcceptableSize(optimized));
 //		List<String> errors = SQLSyntaxChecker.INSTANCE.check(optimized);
