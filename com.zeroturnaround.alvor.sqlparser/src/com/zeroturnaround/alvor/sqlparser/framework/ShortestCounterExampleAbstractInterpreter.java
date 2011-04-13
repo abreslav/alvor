@@ -73,6 +73,7 @@ public class ShortestCounterExampleAbstractInterpreter<S> implements IAbstractIn
 				return false;
 			if (getClass() != obj.getClass())
 				return false;
+			@SuppressWarnings("unchecked")
 			PredicateState other = (PredicateState) obj;
 			if (data == null) {
 				if (other.data != null)

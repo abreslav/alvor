@@ -3,13 +3,14 @@ package com.zeroturnaround.alvor.crawler;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IPath;
 import org.junit.Test;
 
 import com.zeroturnaround.alvor.cache.Cache;
 import com.zeroturnaround.alvor.cache.CacheProvider;
 import com.zeroturnaround.alvor.common.HotspotDescriptor;
 import com.zeroturnaround.alvor.common.WorkspaceUtil;
-import com.zeroturnaround.alvor.tests.util.CrawlerTestUtil;
+import com.zeroturnaround.alvor.tests.util.TestUtil;
 
 /**
  * Tests Cache, StringCollector and Crawler
@@ -17,12 +18,13 @@ import com.zeroturnaround.alvor.tests.util.CrawlerTestUtil;
  *
  */
 public abstract class StringCollectionTest {
+	protected abstract String getProjectName();
+	
 	@Test
 	public void findValidNodeDescriptors() {
 		try {
 			String projectName = this.getProjectName();
-			// CacheProvider.getCache().clearProject(projectName);
-			CacheProvider.getCache().clearAllProjects();
+			CacheProvider.getCache().clearProject(projectName);
 			findAndValidateNodeDescriptors(projectName);
 		}
 		finally {
@@ -31,17 +33,45 @@ public abstract class StringCollectionTest {
 		}
 	}
 	
-	protected abstract String getProjectName();
-	
-	protected void findAndValidateNodeDescriptors(String projectName) {
+	private void findAndValidateNodeDescriptors(String projectName) {
 		IProject project = WorkspaceUtil.getProject(projectName);
-		CrawlerTestUtil.validateNodeDescriptors(getNodeDescriptors(project), project);
+		IPath resultsFolder = TestUtil.getTestResultsFolder(project, null);
+		TestUtil.storeFoundHotspotInfo(getNodeDescriptors(project), resultsFolder);
+		validateFoundHotspotInfo(resultsFolder);
 	}
 	
 	private List<HotspotDescriptor> getNodeDescriptors(IProject project) {
 		Cache cache = CacheProvider.getCache();
 		StringCollector.updateProjectCache(project, cache, null);
 		return cache.getUncheckedPrimaryHotspots(project.getName());
+	}
+
+	private void validateFoundHotspotInfo(IPath folder) {
+		boolean concreteResult = foundFilesAreExpected(folder, "concrete_strings");
+		boolean sortedAbstractResult = foundFilesAreExpected(folder, "node_descriptors_sorted");
+		boolean abstractResult = foundFilesAreExpected(folder, "node_descriptors");
+		boolean positionResult = foundFilesAreExpected(folder, "node_positions");
+		
+		if (!positionResult) {
+			throw new AssertionError("Positions are different");
+		}
+		else if (!concreteResult) {
+			throw new AssertionError("Concretes are different");
+		}
+		else if (!sortedAbstractResult) {
+			throw new AssertionError("Abstract are different, but concretes are same");
+		}
+		else if (!abstractResult) {
+			throw new AssertionError("Abstract result is in different order");
+		}
+		else {
+			// all OK
+		}
+	}
+
+	private boolean foundFilesAreExpected(IPath folder, String topic) {
+		return TestUtil.filesAreEqual(folder.append(topic + "_found.txt").toFile(), 
+				folder.append(topic + "_expected.txt").toFile());
 	}
 	
 }
