@@ -4,10 +4,10 @@ import org.junit.Test;
 
 import com.zeroturnaround.alvor.tests.util.ProjectBasedTester;
 
-public class MarkerTest_earved {
+public class ChangeTest_Simple {
 	@Test
 	public void testMarkers() {
-		ProjectBasedTester.runOn("earved", ProjectBasedTester.TestScenario.CLEAN, 
+		ProjectBasedTester.runOn("SimpleChangeTest", ProjectBasedTester.TestScenario.INCREMENTAL, 
 				ProjectBasedTester.TestSubject.MARKERS);
 	}
 }
