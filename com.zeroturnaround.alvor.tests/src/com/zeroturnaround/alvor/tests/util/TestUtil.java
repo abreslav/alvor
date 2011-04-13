@@ -49,7 +49,7 @@ public class TestUtil {
 		// prepare folder
 		IPath folderPath = project.getLocation().append("AlvorSelfTestResults");
 		if (subfolderName != null && !subfolderName.isEmpty() && !subfolderName.equals(".")) {
-			folderPath.append(subfolderName);
+			folderPath = folderPath.append(subfolderName);
 		}
 		if (!folderPath.toFile().exists()) {
 			boolean success = folderPath.toFile().mkdirs();

@@ -5,81 +5,142 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 
+import com.zeroturnaround.alvor.builder.AlvorNature;
 import com.zeroturnaround.alvor.cache.CacheProvider;
 import com.zeroturnaround.alvor.common.HotspotDescriptor;
 import com.zeroturnaround.alvor.common.WorkspaceUtil;
 import com.zeroturnaround.alvor.crawler.StringCollector;
 import com.zeroturnaround.alvor.gui.AlvorGuiPlugin;
+import com.zeroturnaround.alvor.gui.GuiChecker;
 
 /**
  * This is helper for WorkspaceBasedTest and others. It's not used directly by JUnit
  */
 public class ProjectBasedTester {
+	public static enum TestScenario {CLEAN, INCREMENTAL};
+	public static enum TestSubject {HOTSPOTS, MARKERS};
 	private static final Pattern filePattern = Pattern.compile("^(.*\\.java)|(\\.alvor)$", Pattern.CASE_INSENSITIVE);
 	private final IProject project;
 	private final IPath resultsFolder;
-	private final boolean testChanges;
-	private final boolean testMarkers;
+	private final TestScenario testScenario;
+	private final TestSubject testSubject;
 	
-	public static void runOn(String projectName, boolean testChanges, boolean testMarkers) {
-		runOn(WorkspaceUtil.getProject(projectName), testChanges, testMarkers);
+	public static void runOn(String projectName, TestScenario testScenario, TestSubject testSubject) {
+		runOn(WorkspaceUtil.getProject(projectName), testScenario, testSubject);
 	}
 	
-	public static void runOn(IProject project, boolean testChanges, boolean testMarkers) {
-		ProjectBasedTester test = new ProjectBasedTester(project, testChanges, testMarkers);
+	public static void runOn(IProject project, TestScenario testScenario, TestSubject testSubject) {
+		ProjectBasedTester test = new ProjectBasedTester(project, testScenario, testSubject);
 		test.testAlvorFeaturesAsRequiredByProject();
 	}
 	
-    private ProjectBasedTester(IProject project, boolean testChanges, boolean testMarkers) {
+    private ProjectBasedTester(IProject project, TestScenario testScenario, TestSubject testsubject) {
 		this.project = project;
-		this.testChanges = testChanges;
-		this.testMarkers = testMarkers;
+		this.testScenario = testScenario;
+		this.testSubject = testsubject;
 		this.resultsFolder = TestUtil.getTestResultsFolder(project, null);
 	}
     
     public void testAlvorFeaturesAsRequiredByProject() {
-    	// initialize project
-		if (this.testChanges) {
-			MarkedFileChanger.undoAllChangesInProject(project, filePattern);
-		}
-		CacheProvider.getCache().clearProject(project.getName());
-		
-		// always test hotspot strings
-		StringCollector.updateProjectCache(project, CacheProvider.getCache(), null);
-		List<HotspotDescriptor> hotspots = (CacheProvider.getCache().getPrimaryHotspots(project.getName()));
-		TestUtil.storeFoundHotspotInfo(hotspots, this.resultsFolder);
-    	
-		
-    	if (this.testMarkers) {
-    		findAndStoreAlvorMarkers(this.resultsFolder);
+    	try {
+	    	waitForBuild();
+	    	// initialize project
+			if (this.testScenario == TestScenario.INCREMENTAL) {
+				MarkedFileChanger.undoAllChangesInProject(project, filePattern);
+		    	waitForBuild();
+			}
+			
+			// always test hotspot strings
+//			CacheProvider.getCache().clearProject(project.getName());
+//			StringCollector.updateProjectCache(project, CacheProvider.getCache(), null);
+			performCleanBuild();
+	    	waitForBuild();
+	    	
+	    	if (this.testSubject == TestSubject.HOTSPOTS) {
+	    		findAndStoreHotspots(this.resultsFolder);
+	    	}
+	    	
+	    	if (this.testSubject == TestSubject.MARKERS) {
+	    		findAndStoreAlvorMarkers(this.resultsFolder);
+	    	}
+	    	
+	    	if (this.testScenario == TestScenario.INCREMENTAL) {
+	    		performChangesAndStoreResults();
+	    	}
+	    	
+	    	// now finally validate stuff (when all data is collected)
+	    	String differences = TestUtil.findDifferencesInResults(this.resultsFolder.toFile());
+	    	if (differences != null && !differences.isEmpty()) {
+	    		throw new AssertionError("Diff: " + differences);
+	    	}
     	}
-    	
-    	// perform changes in files and store resulting markers
-    	if (this.testChanges) {
-    		// TODO check that it has alvor builder enabled
-    		int changeNo = 1;
-    		while (MarkedFileChanger.applyChangesInProject(project, filePattern, changeNo)) {
-    			// TODO wait until alvor has finished
-    			IPath folder = TestUtil.getTestResultsFolder(project, "change_" + changeNo);
-        		findAndStoreAlvorMarkers(folder);
-    			changeNo++;
-    		}
-    	}
-    	
-    	// now finally validate stuff (when all data is collected)
-    	String differences = TestUtil.findDifferencesInResults(this.resultsFolder.toFile());
-    	if (differences != null && !differences.isEmpty()) {
-    		throw new AssertionError("Diff: " + differences);
-    	}
+	    finally {
+			if (this.testScenario == TestScenario.INCREMENTAL) {
+				MarkedFileChanger.undoAllChangesInProject(project, filePattern);
+		    	waitForBuild();
+			}
+	    }
     }
     
+	private void performCleanBuild() {
+		Job job = new Job("clean build") {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				GuiChecker.INSTANCE.cleanUpdateProjectMarkers(project, monitor);
+				return Status.OK_STATUS;
+			}
+			
+			@Override
+			public boolean belongsTo(Object family) {
+				return family.equals(ResourcesPlugin.FAMILY_AUTO_BUILD);
+			}
+		};
+		job.setPriority(Job.INTERACTIVE);
+		job.setUser(false);
+		job.schedule();
+	}
+
+	private void performChangesAndStoreResults() {
+		try {
+			assert project.hasNature(AlvorNature.NATURE_ID);
+
+			int changeNo = 1;
+			while (MarkedFileChanger.applyChangesInProject(project, filePattern, changeNo)) {
+				waitForBuild();
+				IPath folder = TestUtil.getTestResultsFolder(project, "change_" + changeNo);
+		    	if (this.testSubject == TestSubject.HOTSPOTS) {
+		    		findAndStoreHotspots(folder);
+		    	}
+		    	if (this.testSubject == TestSubject.MARKERS) {
+		    		findAndStoreAlvorMarkers(folder);
+		    	}
+				changeNo++;
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	private void findAndStoreAlvorMarkers(IPath folder) {
 		findAndStoreMarkers(AlvorGuiPlugin.ERROR_MARKER_ID, folder);
 		findAndStoreMarkers(AlvorGuiPlugin.WARNING_MARKER_ID, folder);
 		findAndStoreMarkers(AlvorGuiPlugin.HOTSPOT_MARKER_ID, folder);
     }
+	
+	private void findAndStoreHotspots(IPath folder) {
+		List<HotspotDescriptor> hotspots = (CacheProvider.getCache().getPrimaryHotspots(project.getName()));
+		TestUtil.storeFoundHotspotInfo(hotspots, folder);
+	}
     
     private void findAndStoreMarkers(String markerId, IPath folder) {
 		List<String> markers = WorkspaceUtil.getMarkersAsStrings(this.project, markerId);
@@ -87,4 +148,22 @@ public class ProjectBasedTester {
 		String shortId = markerId.substring(markerId.lastIndexOf('.')+1);
 		TestUtil.storeFoundTestResults(markers, folder, shortId);
     }
+    
+    private void waitForBuild() {
+    	try {
+			Thread.sleep(2000); // FIXME should be more intelligent
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+    	// got it from here:
+    	// http://www.devdaily.com/java/jwarehouse/eclipse/org.eclipse.core.tests.resources/src/org/eclipse/core/tests/resources/ResourceTest.java.shtml
+		try {
+			Job.getJobManager().join(ResourcesPlugin.FAMILY_AUTO_BUILD, null);
+		} catch (OperationCanceledException e) {
+			//ignore
+		} catch (InterruptedException e) {
+			//ignore
+		}
+	}    
 }

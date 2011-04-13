@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 
 import com.zeroturnaround.alvor.common.WorkspaceUtil;
 
@@ -36,6 +37,7 @@ public class MarkedFileChanger {
 	
 	public static boolean applyChangesInFile(IFile file, int changeNo) {
 		try {
+			file.refreshLocal(IResource.DEPTH_INFINITE, null);
 			Scanner sc = new Scanner(file.getLocation().toFile());
 			
 			StringBuilder oldText = new StringBuilder();
@@ -45,8 +47,9 @@ public class MarkedFileChanger {
 				oldText.append(line + "\n");
 				newText.append(makeChangeInLine(line, changeNo) + "\n");
 			}
-			if (!newText.equals(oldText)) {
+			if (!newText.toString().equals(oldText.toString())) {
 				file.setContents(new ByteArrayInputStream(newText.toString().getBytes()), 0, null);
+				file.refreshLocal(IResource.DEPTH_INFINITE, null);
 				return true;
 			}
 			else {

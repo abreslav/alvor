@@ -11,23 +11,25 @@ import org.junit.runners.Parameterized.Parameters;
 
 import com.zeroturnaround.alvor.tests.util.LabelledParameterized;
 import com.zeroturnaround.alvor.tests.util.ProjectBasedTester;
+import com.zeroturnaround.alvor.tests.util.ProjectBasedTester.TestScenario;
+import com.zeroturnaround.alvor.tests.util.ProjectBasedTester.TestSubject;
 
 
 @RunWith(value=LabelledParameterized.class)
 public class MultiProjectTest {
 	private final IProject project;
-	private final boolean testChanges;
-	private final boolean testMarkers;
+	private final TestScenario testScenario;
+	private final TestSubject testSubject;
 	
-	public MultiProjectTest(IProject project, boolean testChanges, boolean testMarkers) {
+	public MultiProjectTest(IProject project, TestScenario testScenario, TestSubject testSubject) {
 		this.project = project;
-		this.testChanges = testChanges;
-		this.testMarkers = testMarkers;
+		this.testScenario = testScenario;
+		this.testSubject = testSubject;
 	}
 	
 	@Test
 	public void testOnProject() {
-		ProjectBasedTester.runOn(this.project, testChanges, testMarkers);
+		ProjectBasedTester.runOn(this.project, testScenario, testSubject);
 	}
 
 	/**
