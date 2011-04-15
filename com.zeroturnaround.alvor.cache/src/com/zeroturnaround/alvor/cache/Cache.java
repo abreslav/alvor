@@ -271,7 +271,8 @@ public class Cache {
 				" 		 p.method_name," +
 				" 		 p.argument_types," +
 				"        p.argument_index," +
-				"        pp.batch_no" +
+				"        pp.batch_no," +
+				"        pp.pattern_role" +
 				" from project_patterns pp" +
 				" join patterns p on p.id = pp.pattern_id" +
 				" where pp.project_name = ?" +
@@ -282,7 +283,8 @@ public class Cache {
 		try {
 			while (rs.next()) {
 				StringPattern pattern = createPattern(rs);
-				result.add(new PatternRecord(pattern, rs.getInt("batch_no"), rs.getInt("id")));
+				result.add(new PatternRecord(pattern, rs.getInt("batch_no"), 
+						rs.getInt("pattern_role"), rs.getInt("id")));
 			}
 			return result;
 		}
@@ -794,9 +796,20 @@ public class Cache {
 				DatabaseHelper.encodeNull(length));
 	}
 	
-//	//TODO
-//	private void removeOrphanedSecondaryPatterns() {
-//	}
+	// TODO should be called, when cache is up-to-date
+	// otherwise you delete a pattern but later realize it was still needed
+	private void removeOrphanedSecondaryPatterns() {
+		// when I delete corresponding abstract string (choice) then pattern and project_pattern
+		// records get deleted automatically
+		
+		// delete those patterns, whose
+		
+		db.execute(
+				" delete from abstract_strings s" +
+				" where parent_id is null " + // ie. it's a pattern
+				" and not exists (select " +
+				" and not exists (");
+	}
 
 	public void clearAllProjects() {
 		db.execute("delete from abstract_strings"); 

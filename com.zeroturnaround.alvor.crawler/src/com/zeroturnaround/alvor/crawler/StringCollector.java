@@ -2,6 +2,7 @@ package com.zeroturnaround.alvor.crawler;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -316,7 +317,10 @@ public class StringCollector {
 				try {
 					SearchPattern subPattern = getSearchPattern(javaProject, rec.getPattern());
 					if (subPattern == null) {
-						LOG.error("Hotspot pattern (" + rec.getPattern() + ") is not valid");
+						// probably the class or method is deleted or renamed
+						if (rec.isPrimaryPattern()) {
+							LOG.error("Primary hotspot pattern (" + rec.getPattern() + ") is not valid");
+						}
 					}
 					else if (resultPattern == null) {
 						resultPattern = subPattern;
@@ -372,6 +376,9 @@ public class StringCollector {
 				}
 				
 				Collection<IMethod> methods = findPatternMethods(javaProject, stringPattern);
+				if (methods.isEmpty()) {
+					return null;
+				}
 				searchPattern = createCombinedMethodSearchPattern(methods, limitTo);
 			}
 			
@@ -403,7 +410,7 @@ public class StringCollector {
 		try {
 			IType type = javaProject.findType(pattern.getClassName());
 			if (type == null) {
-				throw new IllegalArgumentException("Can't find type for: " + pattern.getClassName());
+				return Collections.emptyList();
 			}
 			
 //			System.out.println("LOOKING FOR: " + pattern.getClassName() 
@@ -437,7 +444,7 @@ public class StringCollector {
 					}
 				}
 			}
-			return result;
+			return result; 
 		} 
 		catch (JavaModelException e) {
 			throw new RuntimeException(e);

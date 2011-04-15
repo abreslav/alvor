@@ -41,9 +41,16 @@ public class MultiProjectTest {
     	List<Object[]> parameters = new ArrayList<Object[]>();
     	
     	for (IProject project : projects) {
-    		Boolean testChanges = project.getName().contains("_changes");
-    		Boolean testMarkers = project.getName().contains("_markers");
-    		parameters.add(new Object[]{project, testChanges, testMarkers});
+    		ProjectBasedTester.TestScenario scenario = ProjectBasedTester.TestScenario.CLEAN;
+    		ProjectBasedTester.TestSubject subject = ProjectBasedTester.TestSubject.HOTSPOTS;
+    		if (project.getName().contains("_incremental")) {
+    			scenario = ProjectBasedTester.TestScenario.INCREMENTAL;
+    		}
+    		if (project.getName().contains("_markers")) {
+    			subject = ProjectBasedTester.TestSubject.MARKERS;
+    		}
+    		
+    		parameters.add(new Object[]{project, scenario, subject});
     	}
         return parameters;
     }
