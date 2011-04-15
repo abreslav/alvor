@@ -131,8 +131,14 @@ public class DatabaseHelper {
 			ResultSet rs = query(sql, arguments);
 			if (rs.next()) {
 				int result = rs.getInt(1);
+				boolean wasNull = rs.wasNull();
 				checkCloseResult(rs);
-				return result;
+				if (wasNull) {
+					return null;
+				}
+				else {
+					return result;
+				}
 			}
 			else {
 				checkCloseResult(rs);
