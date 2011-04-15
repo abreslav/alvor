@@ -80,6 +80,9 @@ public class AlvorBuilder extends IncrementalProjectBuilder {
 					switch (delta.getKind()) {
 					case IResourceDelta.ADDED:
 						cache.addFile(resource.getProject().getName(), fileName);
+						// ADDED could be one step of rename, in this case need to delete markers 
+						// that were carried over from old filename (otherwise they get duplicated)
+						GuiChecker.deleteAlvorMarkers(resource); 
 						break;
 					case IResourceDelta.REMOVED:
 						cache.removeFile(fileName);
