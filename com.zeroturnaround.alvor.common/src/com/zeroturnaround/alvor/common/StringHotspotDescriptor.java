@@ -9,7 +9,11 @@ public class StringHotspotDescriptor extends HotspotDescriptor {
 
 	public StringHotspotDescriptor(IPosition position,
 			IAbstractString abstractValue) {
-		super(position);
+		this(position, abstractValue, 0);
+	}
+	public StringHotspotDescriptor(IPosition position,
+			IAbstractString abstractValue, int markerId) {
+		super(position, markerId);
 		if (abstractValue == null)
 			throw new IllegalStateException();
 		this.abstractValue = abstractValue;

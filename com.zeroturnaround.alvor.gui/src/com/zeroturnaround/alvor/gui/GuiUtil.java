@@ -126,6 +126,10 @@ public class GuiUtil {
 	
 	public static void setStatusbarMessage(final String message) {
 		// http://robertvarttinen.blogspot.com/2007/02/writing-to-statusbar-in-eclipse-from.html
+		
+		// TODO causes
+		// java.lang.ClassCastException: org.eclipse.ui.internal.EditorSite cannot be cast to org.eclipse.ui.IViewSite
+		
 		final Display display = Display.getDefault();
 
 		new Thread() {
