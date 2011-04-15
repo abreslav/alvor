@@ -8,7 +8,12 @@ public class UnsupportedHotspotDescriptor extends HotspotDescriptor {
 	
 	public UnsupportedHotspotDescriptor(IPosition hotspotPosition, String problemMessage, 
 			IPosition errorPosition) {
-		super(hotspotPosition);
+		this(hotspotPosition, problemMessage, errorPosition, 0);
+	}
+
+	public UnsupportedHotspotDescriptor(IPosition hotspotPosition, String problemMessage, 
+			IPosition errorPosition, int markerId) {
+		super(hotspotPosition, markerId);
 		assert problemMessage != null;
 		this.problemMessage = problemMessage;
 		this.errorPosition = errorPosition;

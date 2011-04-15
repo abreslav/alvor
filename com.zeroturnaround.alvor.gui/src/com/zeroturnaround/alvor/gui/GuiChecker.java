@@ -97,10 +97,10 @@ public class GuiChecker {
 		try {
 			for (HotspotDescriptor hotspot : hotspots) {
 				ProgressUtil.checkAbort(monitor);
-				createMarkersForHotspot(hotspot, conf, project);
+				IMarker hotspotMarker = createMarkersForHotspot(hotspot, conf, project);
+				cache.markHotspotAsChecked(hotspot, hotspotMarker.getId());
 				ProgressUtil.worked(monitor, 1);
 			}
-			cache.markHotspotsAsChecked(hotspots);
 		} 
 		catch (CheckerException e) {
 			createMarker("Checker exception: " + e.getMessage(), AlvorGuiPlugin.ERROR_MARKER_ID,
@@ -111,8 +111,10 @@ public class GuiChecker {
 		}
 	}
 	
-	private void createMarkersForHotspot(HotspotDescriptor hotspot, ProjectConfiguration conf, 
+	private IMarker createMarkersForHotspot(HotspotDescriptor hotspot, ProjectConfiguration conf, 
 			IProject project) throws CheckerException {
+		
+		IMarker hotspotMarker;
 		
 		if (hotspot instanceof UnsupportedHotspotDescriptor) {
 			UnsupportedHotspotDescriptor uh = (UnsupportedHotspotDescriptor)hotspot;
@@ -120,7 +122,7 @@ public class GuiChecker {
 			if (uh.getErrorPosition() != null && !uh.getPosition().equals(uh.getErrorPosition())) {
 				msg += " at: " + PositionUtil.getLineString(uh.getErrorPosition());
 			}
-			createMarker(msg, AlvorGuiPlugin.UNSUPPORTED_MARKER_ID, 
+			hotspotMarker = createMarker(msg, AlvorGuiPlugin.UNSUPPORTED_MARKER_ID, 
 					IMarker.SEVERITY_INFO, hotspot.getPosition(), null, project);
 		}
 		
@@ -134,7 +136,7 @@ public class GuiChecker {
 			if (hotspotMessage.length() > MAX_MARKER_MESSAGE_LENGTH) {
 				hotspotMessage = hotspotMessage.substring(0, MAX_MARKER_MESSAGE_LENGTH - 3) + "...";
 			}
-			IMarker hotspotMarker = createMarker(hotspotMessage, AlvorGuiPlugin.HOTSPOT_MARKER_ID, 
+			hotspotMarker = createMarker(hotspotMessage, AlvorGuiPlugin.HOTSPOT_MARKER_ID, 
 					IMarker.SEVERITY_INFO, sh.getPosition(), null, project);
 
 			// create checking markers
@@ -147,6 +149,19 @@ public class GuiChecker {
 			// TODO
 			//markConstants(sh.getAbstractValue(), hotspotMarker, project);
 		}
+		
+		// if there exists previous marker for this same hotspot, then delete it
+		try {
+			IMarker oldMarker = hotspotMarker.getResource().findMarker(hotspot.getMarkerId());
+			if (oldMarker != null) {
+				deleteChildMarkers(oldMarker);
+				oldMarker.delete();
+			}
+		} catch (CoreException e) {
+			LOG.exception(e); 
+		}
+		
+		return hotspotMarker;
 	}
 	
 	public static void deleteAlvorMarkers(IResource res) {

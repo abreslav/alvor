@@ -44,7 +44,8 @@ public class AlvorBuilder extends IncrementalProjectBuilder {
 			GuiChecker.INSTANCE.updateProjectMarkers(this.getProject(), monitor);
 		}
 		else {
-			GuiUtil.setStatusbarMessage("Did not check SQL because project has Java errors");
+			// TODO give some other notification, this one gives errors
+			// GuiUtil.setStatusbarMessage("Did not check SQL because project has Java errors");
 		}
 		
 		timer.printTime();

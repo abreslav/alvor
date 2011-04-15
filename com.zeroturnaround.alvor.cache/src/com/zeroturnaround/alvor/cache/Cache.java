@@ -119,7 +119,8 @@ public class Cache {
 				" select s.*, f.name as file_name," +
 				" hf.name as hotspot_file_name," +
 				" h.start as hotspot_start," +
-				" h.length as hotspot_length" +
+				" h.length as hotspot_length," +
+				" h.marker_id as marker_id" +
 				" from files f" +
 				" join abstract_strings s on s.file_id = f.id" +
 				" join project_patterns pp on pp.project_name = ? and pp.pattern_id = s.parent_id " +
@@ -147,14 +148,15 @@ public class Cache {
 			while (rs.next()) {
 				
 				IPosition hotspotPos = new Position(rs.getString("hotspot_file_name"), 
-						rs.getInt("hotspot_start"), rs.getInt("hotspot_length")); 
+						rs.getInt("hotspot_start"), rs.getInt("hotspot_length"));
+				int markerId = rs.getInt("marker_id");
 				
 				try {
 					IAbstractString str = createAbstractString(rs, null);
-					result.add(new StringHotspotDescriptor(hotspotPos, str));
+					result.add(new StringHotspotDescriptor(hotspotPos, str, markerId));
 				} catch (UnsupportedStringOpEx e) {
 					result.add(new UnsupportedHotspotDescriptor(hotspotPos, 
-							e.getMessage(), e.getPosition()));
+							e.getMessage(), e.getPosition(), markerId));
 				}
 			}
 			
@@ -296,19 +298,17 @@ public class Cache {
 		}
 	}
 
-	public void markHotspotsAsChecked(Collection<HotspotDescriptor> hotspots) {
-		
-		// TODO maybe should do it in batches
-		for (HotspotDescriptor hotspot : hotspots) {
-			IPosition pos = hotspot.getPosition();
-			db.execute(
-				" update hotspots " +
-				" set checked = true " +
-				" where file_id = ?" +
-				" and start = ?" +
-				" and length = ?", 
-				getFileId(pos.getPath()), pos.getStart(), pos.getLength());
-		}
+	public void markHotspotAsChecked(HotspotDescriptor hotspot, long newMarkerId) {
+	
+		IPosition pos = hotspot.getPosition();
+		db.execute(
+			" update hotspots " +
+			" set checked = true, " +
+			"     marker_id = ? " +
+			" where file_id = ?" +
+			" and start = ?" +
+			" and length = ?", 
+			newMarkerId, getFileId(pos.getPath()), pos.getStart(), pos.getLength());
 	}
 	
 	public void addHotspot(PatternRecord pattern, HotspotDescriptor desc) {
@@ -339,7 +339,7 @@ public class Cache {
 		// need to record also original position (because string inside desc may have other position)
 		createHotspotRecord(desc.getPosition(), id);
 		
-		invalidateCheckingForDependentStrings(pattern.getId(), null);
+		invalidateCheckingForDependentStrings(id, null);
 	}
 	
 	private void createHotspotRecord(IPosition pos, int stringId) {
