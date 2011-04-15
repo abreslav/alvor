@@ -19,6 +19,7 @@ public class DatabaseHelper {
 	private final Connection conn;
 	private final static String PSEUDO_NULL_STRING = "<<<null string for binding>>>";
 	private final static int PSEUDO_NULL_INTEGER = Integer.MAX_VALUE;
+	private final static long PSEUDO_NULL_LONG = Long.MAX_VALUE;
 	
 	
 	public int maxOpenResultSetCount = 0;
@@ -78,6 +79,14 @@ public class DatabaseHelper {
 					}
 					else {
 						stmt.setInt(i, (Integer)o);
+					}
+				}
+				else if (o instanceof Long) {
+					if (o.equals(PSEUDO_NULL_LONG)) {
+						stmt.setNull(i, Types.BIGINT);
+					}
+					else {
+						stmt.setLong(i, (Long)o);
 					}
 				}
 				else {
