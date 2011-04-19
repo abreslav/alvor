@@ -31,7 +31,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 public class GuiUtil {
-	public static IProject getSelectedProject() {
+	public static IProject getSelectedJavaProject() {
 		ISelection selection = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService().getSelection();
 		if (selection instanceof StructuredSelection) {
 			StructuredSelection structSel = (StructuredSelection) selection;
@@ -40,8 +40,8 @@ public class GuiUtil {
 			}
 			else {
 				Object sel = structSel.iterator().next();
-				if (sel instanceof IResource) {
-					return ((IResource)sel).getProject();
+				if (sel instanceof IJavaProject) {
+					return ((IJavaProject)sel).getProject();
 				}
 				else {
 					return null;

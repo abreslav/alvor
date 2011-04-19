@@ -43,7 +43,7 @@ public abstract class StringCollectionTest {
 	private List<HotspotDescriptor> getNodeDescriptors(IProject project) {
 		Cache cache = CacheProvider.getCache(project.getName());
 		StringCollector.updateProjectCache(project, null);
-		return cache.getUncheckedPrimaryHotspots();
+		return cache.getPrimaryHotspots(true);
 	}
 
 	private void validateFoundHotspotInfo(IPath folder) {

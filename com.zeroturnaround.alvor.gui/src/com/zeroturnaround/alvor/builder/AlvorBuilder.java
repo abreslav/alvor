@@ -17,7 +17,6 @@ import com.zeroturnaround.alvor.cache.CacheProvider;
 import com.zeroturnaround.alvor.common.logging.Timer;
 import com.zeroturnaround.alvor.crawler.util.JavaModelUtil;
 import com.zeroturnaround.alvor.gui.GuiChecker;
-import com.zeroturnaround.alvor.gui.GuiUtil;
 
 public class AlvorBuilder extends IncrementalProjectBuilder {
 	public static final String BUILDER_ID = "com.zeroturnaround.alvor.builder.AlvorBuilder";

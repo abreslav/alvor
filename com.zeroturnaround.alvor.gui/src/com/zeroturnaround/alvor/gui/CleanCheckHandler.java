@@ -10,7 +10,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
-import org.eclipse.jdt.core.IJavaElement;
 
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
@@ -26,18 +25,7 @@ public class CleanCheckHandler extends AbstractHandler {
 		
 		final Timer timer = new Timer("Clean check time");
 		try {
-			// first expect right-click in package explorer
-//			IJavaElement element = GuiUtil.getSingleSelectedJavaElement();
-//			final IProject project;
-//			
-//			if (element == null) {
-//				project = GuiUtil.getCurrentJavaProject().getProject();
-//			}
-//			else {
-//				project = element.getJavaProject().getProject();
-//			}
-			
-			final IProject project = GuiUtil.getSelectedProject();
+			final IProject project = GuiUtil.getSelectedJavaProject();
 			
 			if (JavaModelUtil.projectHasJavaErrors(project)) {
 				GuiUtil.showDialog("Please correct Java errors before checking SQL", "Problem");

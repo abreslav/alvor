@@ -79,7 +79,7 @@ public class GuiChecker {
 			ProgressUtil.checkAbort(monitor);
 			ProjectConfiguration conf = ConfigurationManager.readProjectConfiguration(project, true);
 			Collection<HotspotDescriptor> hotspots = 
-				cache.getUncheckedPrimaryHotspots();
+				cache.getPrimaryHotspots(true);
 			
 			ProgressUtil.checkAbort(monitor);
 			createMarkersForHotspots(hotspots, conf, project, ProgressUtil.subMonitor(monitor, 10));
@@ -93,12 +93,12 @@ public class GuiChecker {
 	private void createMarkersForHotspots(Collection<HotspotDescriptor> hotspots, 
 			ProjectConfiguration conf, IProject project, IProgressMonitor monitor) {
 		
-		ProgressUtil.beginTask(monitor, "Checking hotspots", hotspots.size());
+		ProgressUtil.beginTask(monitor, "Checking strings", hotspots.size());
 		try {
 			for (HotspotDescriptor hotspot : hotspots) {
 				ProgressUtil.checkAbort(monitor);
-				IMarker hotspotMarker = createMarkersForHotspot(hotspot, conf, project);
-				CacheProvider.getCache(project.getName()).markHotspotAsChecked(hotspot, hotspotMarker.getId());
+				createMarkersForHotspot(hotspot, conf, project);
+				CacheProvider.getCache(project.getName()).markHotspotAsChecked(hotspot);
 				ProgressUtil.worked(monitor, 1);
 			}
 		} 
@@ -113,6 +113,8 @@ public class GuiChecker {
 	
 	private IMarker createMarkersForHotspot(HotspotDescriptor hotspot, ProjectConfiguration conf, 
 			IProject project) throws CheckerException {
+		
+		removeOldMarkers(hotspot);
 		
 		IMarker hotspotMarker;
 		
@@ -150,18 +152,24 @@ public class GuiChecker {
 			//markConstants(sh.getAbstractValue(), hotspotMarker, project);
 		}
 		
-		// if there exists previous markers for this same hotspot, then delete them
+		return hotspotMarker;
+	}
+	
+	private static void removeOldMarkers(HotspotDescriptor hotspot) {
 		try {
-			IMarker oldMarker = hotspotMarker.getResource().findMarker(hotspot.getMarkerId());
-			if (oldMarker != null) {
-				deleteChildMarkers(oldMarker);
-				oldMarker.delete();
+			IFile file = PositionUtil.getFile(hotspot.getPosition());
+			
+			IMarker[] markers = file.findMarkers(AlvorGuiPlugin.HOTSPOT_MARKER_ID, false, IResource.DEPTH_ZERO);
+			for (IMarker marker : markers) {
+				if (marker.getAttribute(IMarker.CHAR_START, 0) == hotspot.getPosition().getStart()) {
+					deleteChildMarkers(marker);
+					marker.delete();
+				}
 			}
-		} catch (CoreException e) {
+		} 
+		catch (CoreException e) {
 			LOG.exception(e); 
 		}
-		
-		return hotspotMarker;
 	}
 	
 	public static void deleteAlvorMarkers(IResource res) {
