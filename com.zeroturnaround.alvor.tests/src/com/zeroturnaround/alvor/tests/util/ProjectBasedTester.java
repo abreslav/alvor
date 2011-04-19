@@ -132,20 +132,25 @@ public class ProjectBasedTester {
 	}
 
 	private void findAndStoreAlvorMarkers(IPath folder) {
-		findAndStoreMarkers(AlvorGuiPlugin.ERROR_MARKER_ID, folder);
-		findAndStoreMarkers(AlvorGuiPlugin.WARNING_MARKER_ID, folder);
-		findAndStoreMarkers(AlvorGuiPlugin.HOTSPOT_MARKER_ID, folder);
-    }
+		List<String> hotspotMarkers = WorkspaceUtil.getMarkersAsStrings(this.project, AlvorGuiPlugin.HOTSPOT_MARKER_ID);
+		hotspotMarkers.addAll(WorkspaceUtil.getMarkersAsStrings(this.project, AlvorGuiPlugin.UNSUPPORTED_MARKER_ID));
+		findAndStoreMarkers(hotspotMarkers, AlvorGuiPlugin.HOTSPOT_MARKER_ID, folder);
+		
+		findAndStoreMarkers(null, AlvorGuiPlugin.ERROR_MARKER_ID, folder);
+		findAndStoreMarkers(null, AlvorGuiPlugin.WARNING_MARKER_ID, folder);
+	}
 	
 	private void findAndStoreHotspots(IPath folder) {
 		List<HotspotDescriptor> hotspots = (CacheProvider.getCache(this.project.getName()).getPrimaryHotspots());
 		TestUtil.storeFoundHotspotInfo(hotspots, folder);
 	}
     
-    private void findAndStoreMarkers(String markerId, IPath folder) {
-		List<String> markers = WorkspaceUtil.getMarkersAsStrings(this.project, markerId);
-		Collections.sort(markers);
+    private void findAndStoreMarkers(List<String> markers, String markerId, IPath folder) {
+    	if (markers == null) {
+    		markers = WorkspaceUtil.getMarkersAsStrings(this.project, markerId);
+    	}
 		String shortId = markerId.substring(markerId.lastIndexOf('.')+1);
+		Collections.sort(markers);
 		TestUtil.storeFoundTestResults(markers, folder, shortId);
     }
     
