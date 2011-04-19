@@ -27,15 +27,17 @@ public class CleanCheckHandler extends AbstractHandler {
 		final Timer timer = new Timer("Clean check time");
 		try {
 			// first expect right-click in package explorer
-			IJavaElement element = GuiUtil.getSingleSelectedJavaElement();
-			final IProject project;
+//			IJavaElement element = GuiUtil.getSingleSelectedJavaElement();
+//			final IProject project;
+//			
+//			if (element == null) {
+//				project = GuiUtil.getCurrentJavaProject().getProject();
+//			}
+//			else {
+//				project = element.getJavaProject().getProject();
+//			}
 			
-			if (element == null) {
-				project = GuiUtil.getCurrentJavaProject().getProject();
-			}
-			else {
-				project = element.getJavaProject().getProject();
-			}
+			final IProject project = GuiUtil.getSelectedProject();
 			
 			if (JavaModelUtil.projectHasJavaErrors(project)) {
 				GuiUtil.showDialog("Please correct Java errors before checking SQL", "Problem");

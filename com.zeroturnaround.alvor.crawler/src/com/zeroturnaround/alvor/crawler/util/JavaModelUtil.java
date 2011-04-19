@@ -94,6 +94,7 @@ public class JavaModelUtil {
 		}
 	}
 	
+	@Deprecated
 	public static IJavaElement[] scopeToProjectAndRequiredProjectsScope(IJavaElement[] scope) {
 		Set<IJavaProject> projects = new HashSet<IJavaProject>();
 		for (IJavaElement element : scope) {

@@ -22,14 +22,14 @@ public abstract class StringCollectionTest {
 	
 	@Test
 	public void findValidNodeDescriptors() {
+		String projectName = this.getProjectName();
 		try {
-			String projectName = this.getProjectName();
-			CacheProvider.getCache().clearProject(projectName);
+			CacheProvider.getCache(projectName).clearProject();
 			findAndValidateNodeDescriptors(projectName);
 		}
 		finally {
-			CacheProvider.getCache().printDBInfo();
-			CacheProvider.shutdownCache();
+			CacheProvider.getCache(projectName).printDBInfo();
+			CacheProvider.shutdownCaches();
 		}
 	}
 	
@@ -41,9 +41,9 @@ public abstract class StringCollectionTest {
 	}
 	
 	private List<HotspotDescriptor> getNodeDescriptors(IProject project) {
-		Cache cache = CacheProvider.getCache();
-		StringCollector.updateProjectCache(project, cache, null);
-		return cache.getUncheckedPrimaryHotspots(project.getName());
+		Cache cache = CacheProvider.getCache(project.getName());
+		StringCollector.updateProjectCache(project, null);
+		return cache.getUncheckedPrimaryHotspots();
 	}
 
 	private void validateFoundHotspotInfo(IPath folder) {

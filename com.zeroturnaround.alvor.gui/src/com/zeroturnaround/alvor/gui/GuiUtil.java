@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IJavaElement;
@@ -30,6 +31,27 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 public class GuiUtil {
+	public static IProject getSelectedProject() {
+		ISelection selection = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService().getSelection();
+		if (selection instanceof StructuredSelection) {
+			StructuredSelection structSel = (StructuredSelection) selection;
+			if (structSel.size() != 1) {
+				return null;
+			}
+			else {
+				Object sel = structSel.iterator().next();
+				if (sel instanceof IResource) {
+					return ((IResource)sel).getProject();
+				}
+				else {
+					return null;
+				}
+			}
+		}
+		return null;
+		
+	}
+	
 	public static List<IJavaElement> getSelectedJavaElements() {
 		ISelection selection = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getSelectionService().getSelection();
 		List<IJavaElement> result = new ArrayList<IJavaElement>();

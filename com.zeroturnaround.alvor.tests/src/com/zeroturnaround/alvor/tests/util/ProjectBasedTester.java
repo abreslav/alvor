@@ -138,7 +138,7 @@ public class ProjectBasedTester {
     }
 	
 	private void findAndStoreHotspots(IPath folder) {
-		List<HotspotDescriptor> hotspots = (CacheProvider.getCache().getPrimaryHotspots(project.getName()));
+		List<HotspotDescriptor> hotspots = (CacheProvider.getCache(this.project.getName()).getPrimaryHotspots());
 		TestUtil.storeFoundHotspotInfo(hotspots, folder);
 	}
     

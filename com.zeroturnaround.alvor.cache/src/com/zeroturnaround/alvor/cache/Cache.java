@@ -52,7 +52,6 @@ public class Cache {
 	
 	private final static int PATTERN_ROLE_PRIMARY = 1;
 	private final static int PATTERN_ROLE_SECONDARY = 2;
-//	private final static int PATTERN_ROLE_FOREIGN = 3;
 	
 	private interface StringKind {
 		public final static int CONSTANT     = 1;
@@ -67,17 +66,15 @@ public class Cache {
 		public final static int UNSUPPORTED  = 10;
 	}	
 	
-	private DatabaseHelper db;
-	private Map<String, Integer> fileIDs = new HashMap<String, Integer>();
-	private int currentBatchNo;
+	private final DatabaseHelper db;
+	private final String projectName;
+	private final Map<String, Integer> fileIDs = new HashMap<String, Integer>();
+	private int maxPatternBatchNo;
 	
-	private int maxDepth = 0;
-	private int depth;
-	
-	
-	/*package*/ Cache(DatabaseHelper db) {
+	/*package*/ Cache(DatabaseHelper db, String projectName) {
 		this.db = db;
-		this.currentBatchNo = db.queryInt("select coalesce(max(batch_no), 1) from project_patterns");
+		this.projectName = projectName;
+		this.maxPatternBatchNo = db.queryInt("select coalesce(max(batch_no), 0) from project_patterns");
 	}
 	
 	public void removeFile(String fileName) {
@@ -86,27 +83,30 @@ public class Cache {
 		// this cascade-deletes related stuff
 	}
 	
-	public void addFile(String projectName, String fileName) {
-		db.execute("insert into files (name, batch_no) values (?, 0)", 
-				fileName);
+	public void addFile(String fileName, boolean isThisProjectFile) {
+		// in foreign files I don't want to find primary patterns,
+		// therefore I set their batch_no as if I already searched them for primary patterns
+		db.execute("insert into files (name, batch_no) values (?, ?)", 
+				fileName, isThisProjectFile ? 0 : 1);
 	}
 	
-	public void invalidateFile(String fileName) {
+	public void invalidateFile(String fileName, boolean isThisProjectFile) {
 		db.execute("delete from abstract_strings where file_id = " +
 				" (select id from files where name = ?)", fileName);
-		db.execute("update files set batch_no = 0 where name = ?", fileName);
+		db.execute("update files set batch_no = ? where name = ?", 
+				isThisProjectFile ? 0 : 1, fileName);
 	}
 	
-	public List<HotspotDescriptor> getUncheckedPrimaryHotspots(String projectName) {
-		return getPrimaryHotspots(projectName, null, true);		
+	public List<HotspotDescriptor> getUncheckedPrimaryHotspots() {
+		return getPrimaryHotspots(null, true);		
 	}
 	
-	public List<HotspotDescriptor> getPrimaryHotspots(String projectName) {
-		return getPrimaryHotspots(projectName, null, false);		
+	public List<HotspotDescriptor> getPrimaryHotspots() {
+		return getPrimaryHotspots(null, false);		
 	}
 	
 	
-	private List<HotspotDescriptor> getPrimaryHotspots(String projectName, String fileName, boolean onlyUnchecked) {
+	private List<HotspotDescriptor> getPrimaryHotspots(String fileName, boolean onlyUnchecked) {
 		ResultSet rs = null;
 		
 		try {
@@ -172,7 +172,7 @@ public class Cache {
 		
 	}
 	
-	public List<FileRecord> getFilesToUpdate(String projectName) {
+	public List<FileRecord> getFilesToUpdate() {
 		ResultSet rs = db.query (
 				" select f.id, f.name, f.batch_no" +
 				" from files f" +
@@ -195,17 +195,22 @@ public class Cache {
 		}
 	}
 	
-	public void initializeProject(String projectName, Collection<HotspotPattern> primaryPatterns, 
+	public void initializeProject(Collection<HotspotPattern> primaryPatterns, 
 			List<String> projectFiles) {
+		
+		assert (maxPatternBatchNo == 0);
 		
 		for (StringPattern pattern : primaryPatterns) {
 			int kind = getPatternKind(pattern);
 			int patternId = getPatternId(kind, pattern.getClassName(), 
 					pattern.getMethodName(), pattern.getArgumentTypes(), pattern.getArgumentNo());
-			registerPatternForProject(patternId, projectName, PATTERN_ROLE_PRIMARY);
+			registerPatternForProject(patternId, PATTERN_ROLE_PRIMARY, 1);
 		}
+		this.maxPatternBatchNo = 1;
 		
-		this.addFiles(projectName, projectFiles);
+		for (String name : projectFiles) {
+			addFile(name, true);
+		}
 	}
 	
 	private StringPattern createPattern(int id) {
@@ -261,7 +266,7 @@ public class Cache {
 		}
 	}
 	
-	public List<PatternRecord> getNewProjectPatterns(String projectName) {
+	public List<PatternRecord> getNewProjectPatterns() {
 		int minFileBatchNo = db.queryInt(
 				" select coalesce(min(batch_no),0)" +
 				" from files where name like '/' || ? || '/%'", projectName);
@@ -314,13 +319,11 @@ public class Cache {
 	public void addHotspot(PatternRecord pattern, HotspotDescriptor desc) {
 		int id; 
 		if (desc instanceof StringHotspotDescriptor) {
-			String projectName = PositionUtil.getProjectName(desc.getPosition());
-			
 			IAbstractString str = ((StringHotspotDescriptor) desc).getAbstractValue();
 			
 			// TODO should I include item-index? or should i rely on increasing id values ??
 			try {
-				id = addAbstractString(str, pattern.getId(), null, projectName);
+				id = addAbstractString(str, pattern.getId(), null);
 			} catch (IllegalArgumentException e) {
 				System.err.println("RECSTRING: " + str);
 				throw e;
@@ -386,11 +389,6 @@ public class Cache {
 	}
 	
 	private IAbstractString createAbstractString(ResultSet rs, IntegerList context) {
-		this.depth++;
-		if (this.depth > maxDepth) {
-			maxDepth = depth;
-		}
-		
 		try {
 			// recursion check
 			IPosition pos = createPosition(rs);
@@ -427,9 +425,6 @@ public class Cache {
 		}
 		catch (SQLException e) {
 			throw new RuntimeException(e);
-		}
-		finally {
-			this.depth--;
 		}
 	}
 	
@@ -603,7 +598,6 @@ public class Cache {
 			}
 		} 
 		catch (SQLException e) {
-			System.out.println("DEPTH: " + this.depth);
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
@@ -632,8 +626,7 @@ public class Cache {
 		}
 	}
 	
-	private int addAbstractString(IAbstractString str, Integer parentId, Integer itemIndex,
-			String projectName) {
+	private int addAbstractString(IAbstractString str, Integer parentId, Integer itemIndex) {
 		
 		if (str instanceof StringConstant) {
 			StringConstant cnst = (StringConstant)str;
@@ -652,28 +645,28 @@ public class Cache {
 					null, null, str.getPosition());
 		}
 		else if (str instanceof StringRepetition) {
-			return addRepetition((StringRepetition)str, parentId, itemIndex, projectName);
+			return addRepetition((StringRepetition)str, parentId, itemIndex);
 		}
 		else if (str instanceof AbstractStringCollection) {
-			return addStringCollection((AbstractStringCollection)str, parentId, itemIndex, projectName); 
+			return addStringCollection((AbstractStringCollection)str, parentId, itemIndex); 
 		}
 		else if (str instanceof PatternReference) {
-			return addPatternReference((PatternReference)str, parentId, itemIndex, projectName);
+			return addPatternReference((PatternReference)str, parentId, itemIndex);
 		}
 		else {
 			throw new IllegalArgumentException("Unexpected IAbstractString: " + str.getClass());
 		}
 	}
 
-	private int addRepetition(StringRepetition str, Integer parentId, Integer itemIndex, String projectName) {
+	private int addRepetition(StringRepetition str, Integer parentId, Integer itemIndex) {
 		
 		int id = addAbstractStringRecord(StringKind.REPETITION, parentId, itemIndex, 
 				null, null, null, str.getPosition());
-		addAbstractString(str.getBody(), id, null, projectName); 
+		addAbstractString(str.getBody(), id, null); 
 		return id;
 	}
 	
-	private int addPatternReference(PatternReference str, Integer parentId, Integer itemIndex, String projectName) {
+	private int addPatternReference(PatternReference str, Integer parentId, Integer itemIndex) {
 		
 		// prepare pattern and project_pattern (if they don't exist yet)
 		int patternKind = getPatternKind(str);
@@ -682,7 +675,9 @@ public class Cache {
 				str.getPattern().getMethodName(), 
 				str.getPattern().getArgumentTypes(), 
 				str.getPattern().getArgumentNo());
-		registerPatternForProject(patternId, projectName, PATTERN_ROLE_SECONDARY);
+		
+		this.maxPatternBatchNo += 1;
+		registerPatternForProject(patternId, PATTERN_ROLE_SECONDARY, maxPatternBatchNo);
 		
 		// add reference to this pattern
 		int recKind;
@@ -697,7 +692,7 @@ public class Cache {
 		if (str instanceof FunctionPatternReference) {
 			FunctionPatternReference fpr = (FunctionPatternReference)str;
 			for (Map.Entry<Integer, IAbstractString> entry : fpr.getInputArguments().entrySet()) {
-				addAbstractString(entry.getValue(), id, entry.getKey(), projectName);
+				addAbstractString(entry.getValue(), id, entry.getKey());
 			}
 		}
 		
@@ -705,21 +700,21 @@ public class Cache {
 	}
 
 	private int addStringCollection(AbstractStringCollection str,
-			Integer parentId, Integer itemIndex, String projectName) {
+			Integer parentId, Integer itemIndex) {
 		
 		int kind = (str instanceof StringSequence) ? StringKind.SEQUENCE : StringKind.CHOICE; 
 		int id = addAbstractStringRecord(kind, parentId, itemIndex, null, null, null, str.getPosition());
 		
 		int childIndex = 1;
 		for (IAbstractString child: str.getItems()) {
-			addAbstractString(child, id, childIndex, projectName);
+			addAbstractString(child, id, childIndex);
 			childIndex++;
 		}
 		
 		return id;
 	}
 
-	private void registerPatternForProject(int patternId, String projectName, int patternRole) {
+	private void registerPatternForProject(int patternId, int patternRole, int batchNo) {
 		int existing = db.queryInt(
 				" select count(*) from project_patterns " +
 				" where project_name = ?" +
@@ -730,8 +725,7 @@ public class Cache {
 					" insert into project_patterns " +
 					" (project_name, pattern_id, pattern_role, batch_no)" +
 					" values (?, ?, ?, ?)", 
-					projectName, patternId, patternRole, 
-					this.currentBatchNo+1); // will be dealt with in next batch
+					projectName, patternId, patternRole, batchNo);
 		}
 	}
 	
@@ -811,29 +805,14 @@ public class Cache {
 				" and not exists (");
 	}
 
-	public void clearAllProjects() {
-		db.execute("delete from abstract_strings"); 
-		db.execute("delete from patterns"); 
-		db.execute("delete from files"); 
-		fileIDs.clear();
-		db.execute("delete from project_patterns"); // not strictly necessary: deleting patterns cascades 
-		db.execute("delete from hotspots"); // not strictly necessary: deleting abstract_string cascades to hotspots 
-	}
-	
-	public void clearProject(String projectName) {
+	public void clearProject() {
 		db.execute("delete from files where name like ('/' || ? || '/%')", projectName); 
 		fileIDs.clear();
 		// hotspots and abstract strings get deleted by cascade
-		db.execute("delete from project_patterns where project_name = ?", projectName); 
+		db.execute("delete from project_patterns where project_name = ?", projectName);
+		this.maxPatternBatchNo = 0;
 	}
 
-	public void addFiles(String projectName, List<String> compilationUnitNames) {
-		// TODO: may be more efficient to insert in batches
-		for (String name : compilationUnitNames) {
-			addFile(projectName, name);
-		}
-	}
-	
 	private int getFileId(String name) {
 		// first try faster cache
 		Integer id = fileIDs.get(name);
@@ -884,18 +863,14 @@ public class Cache {
 		}
 	}
 	
-	public void startNextBatch() {
-		this.currentBatchNo++;
-	}
-
-	public void markFilesAsCurrent(List<FileRecord> fileRecords) {
+	public void updateFilesBatchNo(List<FileRecord> fileRecords, int batchNo) {
 		for (FileRecord rec : fileRecords) {
 			db.execute("update files set batch_no = ? where id = ?", 
-					this.currentBatchNo, rec.getId());
+					batchNo, rec.getId());
 		}
 	}
 	
-	public boolean projectHasFiles(String projectName) {
+	public boolean projectHasFiles() {
 		int fileCount = db.queryInt(
 			" select count(*) from files" +
 			" where name like '/' || ? || '/%'", projectName);

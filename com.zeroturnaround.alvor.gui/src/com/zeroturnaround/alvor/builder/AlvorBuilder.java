@@ -1,6 +1,7 @@
 package com.zeroturnaround.alvor.builder;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -9,6 +10,7 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.IJavaProject;
 
 import com.zeroturnaround.alvor.cache.Cache;
 import com.zeroturnaround.alvor.cache.CacheProvider;
@@ -20,8 +22,6 @@ import com.zeroturnaround.alvor.gui.GuiUtil;
 public class AlvorBuilder extends IncrementalProjectBuilder {
 	public static final String BUILDER_ID = "com.zeroturnaround.alvor.builder.AlvorBuilder";
 
-	private Cache cache = CacheProvider.getCache();
-	
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected IProject[] build(int kind, Map args, IProgressMonitor monitor) throws CoreException {
@@ -30,9 +30,11 @@ public class AlvorBuilder extends IncrementalProjectBuilder {
 
 		// first invalidate files (all or changed)
 		if (kind == FULL_BUILD || kind == CLEAN_BUILD) {
+			System.err.println("full/clean for: " + this.getProject().getName());
 			this.clean(monitor);
 		}
 		else if (kind == INCREMENTAL_BUILD || kind == AUTO_BUILD) {
+			System.err.println("incremental for: " + this.getProject().getName());
 			this.registerFileChanges(this.getDelta(this.getProject()));
 		}
 		else {
@@ -50,8 +52,7 @@ public class AlvorBuilder extends IncrementalProjectBuilder {
 		
 		timer.printTime();
 		
-		
-		return null; // TODO what's this?
+		return getRequiredProjects(this.getProject());
 	}
 	
 	@Override
@@ -68,7 +69,7 @@ public class AlvorBuilder extends IncrementalProjectBuilder {
 		
 		// TODO if .alvor ends up here then clean cache
 		// (if .alvor change is not detected, then clean cache after changing in gui)
-		
+		final Cache cache = CacheProvider.getCache(this.getProject().getName());
 		delta.accept(new IResourceDeltaVisitor() {
 			@Override
 			public boolean visit(IResourceDelta delta) throws CoreException {
@@ -78,9 +79,10 @@ public class AlvorBuilder extends IncrementalProjectBuilder {
 				IResource resource = delta.getResource();
 				if (JavaModelUtil.isSourceFile(resource)) {
 					String fileName = resource.getFullPath().toPortableString();
+					boolean isSameProjectFile = resource.getProject() == AlvorBuilder.this.getProject();
 					switch (delta.getKind()) {
 					case IResourceDelta.ADDED:
-						cache.addFile(resource.getProject().getName(), fileName);
+						cache.addFile(resource.getProject().getName(), isSameProjectFile);
 						// ADDED could be one step of rename, in this case need to delete markers 
 						// that were carried over from old filename (otherwise they get duplicated)
 						GuiChecker.deleteAlvorMarkers(resource); 
@@ -89,7 +91,7 @@ public class AlvorBuilder extends IncrementalProjectBuilder {
 						cache.removeFile(fileName);
 						break;
 					case IResourceDelta.CHANGED:
-						cache.invalidateFile(fileName);
+						cache.invalidateFile(fileName, isSameProjectFile);
 						GuiChecker.deleteAlvorMarkers(resource);
 						break;
 					default:
@@ -104,5 +106,24 @@ public class AlvorBuilder extends IncrementalProjectBuilder {
 				
 			}
 		});
+	}
+	
+	private IProject[] getRequiredProjects(IProject project) {
+		IJavaProject javaProject = JavaModelUtil.getJavaProjectFromProject(this.getProject());
+		if (javaProject == null) {
+			return null;
+		}
+		Set<IJavaProject> requiredProjects = JavaModelUtil.getAllRequiredProjects(javaProject);
+		if (requiredProjects == null || requiredProjects.size() == 0) {
+			return null;
+		}
+		
+		
+		IProject[] result = new IProject[requiredProjects.size()];
+		int i = 0;
+		for (IJavaProject jp: requiredProjects) {
+			result[i] = jp.getProject();
+		}
+		return result;
 	}
 }
