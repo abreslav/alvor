@@ -12,7 +12,7 @@ public class ClearCacheHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		final IProject project = GuiUtil.getSelectedProject();
+		final IProject project = GuiUtil.getSelectedJavaProject();
 		CacheProvider.getCache(project.getName()).clearProject();
 		GuiChecker.deleteAlvorMarkers(ResourcesPlugin.getWorkspace().getRoot());
 		return null;

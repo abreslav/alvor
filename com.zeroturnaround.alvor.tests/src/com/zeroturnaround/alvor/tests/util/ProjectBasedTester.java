@@ -11,15 +11,12 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 
 import com.zeroturnaround.alvor.builder.AlvorNature;
 import com.zeroturnaround.alvor.cache.CacheProvider;
 import com.zeroturnaround.alvor.common.HotspotDescriptor;
 import com.zeroturnaround.alvor.common.WorkspaceUtil;
-import com.zeroturnaround.alvor.crawler.StringCollector;
 import com.zeroturnaround.alvor.gui.AlvorGuiPlugin;
 import com.zeroturnaround.alvor.gui.GuiChecker;
 
@@ -141,7 +138,7 @@ public class ProjectBasedTester {
 	}
 	
 	private void findAndStoreHotspots(IPath folder) {
-		List<HotspotDescriptor> hotspots = (CacheProvider.getCache(this.project.getName()).getPrimaryHotspots());
+		List<HotspotDescriptor> hotspots = (CacheProvider.getCache(this.project.getName()).getPrimaryHotspots(false));
 		TestUtil.storeFoundHotspotInfo(hotspots, folder);
 	}
     

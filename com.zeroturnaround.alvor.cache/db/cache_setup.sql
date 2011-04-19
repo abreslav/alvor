@@ -1,4 +1,3 @@
-DROP TABLE project_patterns if exists;;;
 DROP TABLE patterns if exists;;;
 DROP TABLE hotspots if exists;;;
 DROP TABLE abstract_strings if exists;;;
@@ -50,19 +49,11 @@ CREATE TABLE patterns
 	class_name varchar(300) not null,
 	method_name varchar(300) not null,
 	argument_types varchar(300) not null,
-	argument_index tinyint not null
-);;;
-
-
-
-CREATE TABLE project_patterns
-(
-	project_name varchar(100) not null,
-	pattern_id INTEGER not null REFERENCES patterns(id) ON DELETE CASCADE,
+	argument_index tinyint not null,
 	pattern_role tinyint not null, /* 1 = primary, 2 = secondary, 3 = foreign */
-	batch_no integer not null, /* shows when this pattern was published for this project */
-	primary key (project_name, pattern_id)
+	batch_no integer not null      /* shows when this pattern was published */
 );;;
+
 
 
 create table hotspots
@@ -71,6 +62,5 @@ create table hotspots
 	file_id integer not null references files(id) on delete cascade,
 	start integer not null,
 	length integer not null,
-	checked boolean default false not null,
-	marker_id bigint default null
+	checked boolean default false not null
 );;;

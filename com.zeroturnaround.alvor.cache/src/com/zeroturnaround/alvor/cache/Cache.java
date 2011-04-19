@@ -67,14 +67,13 @@ public class Cache {
 	}	
 	
 	private final DatabaseHelper db;
-	private final String projectName;
+//	private final String projectName;
 	private final Map<String, Integer> fileIDs = new HashMap<String, Integer>();
 	private int maxPatternBatchNo;
 	
 	/*package*/ Cache(DatabaseHelper db, String projectName) {
 		this.db = db;
-		this.projectName = projectName;
-		this.maxPatternBatchNo = db.queryInt("select coalesce(max(batch_no), 0) from project_patterns");
+		this.maxPatternBatchNo = db.queryInt("select coalesce(max(batch_no), 0) from patterns");
 	}
 	
 	public void removeFile(String fileName) {
@@ -97,66 +96,42 @@ public class Cache {
 				isThisProjectFile ? 0 : 1, fileName);
 	}
 	
-	public List<HotspotDescriptor> getUncheckedPrimaryHotspots() {
-		return getPrimaryHotspots(null, true);		
-	}
-	
-	public List<HotspotDescriptor> getPrimaryHotspots() {
-		return getPrimaryHotspots(null, false);		
-	}
-	
-	
-	private List<HotspotDescriptor> getPrimaryHotspots(String fileName, boolean onlyUnchecked) {
+	public List<HotspotDescriptor> getPrimaryHotspots(boolean onlyUnchecked) {
 		ResultSet rs = null;
 		
 		try {
 			List<HotspotDescriptor> result = new ArrayList<HotspotDescriptor>();
 			
-			// query all strings from this project that are children 
-			// of this project's primary patterns
+			// query all strings that are children of primary patterns
 			
 			String sql = 
 				" select s.*, f.name as file_name," +
 				" hf.name as hotspot_file_name," +
 				" h.start as hotspot_start," +
-				" h.length as hotspot_length," +
-				" h.marker_id as marker_id" +
-				" from files f" +
-				" join abstract_strings s on s.file_id = f.id" +
-				" join project_patterns pp on pp.project_name = ? and pp.pattern_id = s.parent_id " +
+				" h.length as hotspot_length" +
+				" from patterns p" +
+				" join abstract_strings s on s.parent_id = p.id" +
+				" join files f on f.id = s.file_id" +
 				" join hotspots h on h.string_id = s.id" +
-				" join files hf on hf.id = h.file_id";
-			String fileFilter;
-			
-			if (fileName == null) {
-				sql += " where f.name like '/' || ? || '/%'";
-				fileFilter = projectName;
-			}
-			else {
-				sql += " where f.name = ?";
-				fileFilter = fileName;
-			}
+				" join files hf on hf.id = h.file_id" +
+				" where p.pattern_role = " + PATTERN_ROLE_PRIMARY;
 			
 			if (onlyUnchecked) {
-				sql += " and h.checked = false ";
+				sql += " and h.checked = false";
 			}
-			
-			sql += " and pp.pattern_role = " + PATTERN_ROLE_PRIMARY; 
-			
-			rs = db.query(sql, projectName, fileFilter);
+			rs = db.query(sql);
 			
 			while (rs.next()) {
 				
 				IPosition hotspotPos = new Position(rs.getString("hotspot_file_name"), 
 						rs.getInt("hotspot_start"), rs.getInt("hotspot_length"));
-				int markerId = rs.getInt("marker_id");
 				
 				try {
 					IAbstractString str = createAbstractString(rs, null);
-					result.add(new StringHotspotDescriptor(hotspotPos, str, markerId));
+					result.add(new StringHotspotDescriptor(hotspotPos, str));
 				} catch (UnsupportedStringOpEx e) {
 					result.add(new UnsupportedHotspotDescriptor(hotspotPos, 
-							e.getMessage(), e.getPosition(), markerId));
+							e.getMessage(), e.getPosition()));
 				}
 			}
 			
@@ -176,9 +151,7 @@ public class Cache {
 		ResultSet rs = db.query (
 				" select f.id, f.name, f.batch_no" +
 				" from files f" +
-				" where f.name like '/' || ? || '/%'" +
-				" and f.batch_no < (select max(batch_no) from project_patterns where project_name = ?)",
-				projectName, projectName);
+				" where f.batch_no < ?", this.maxPatternBatchNo);
 		
 		List<FileRecord> records = new ArrayList<FileRecord>();
 		try {
@@ -202,9 +175,9 @@ public class Cache {
 		
 		for (StringPattern pattern : primaryPatterns) {
 			int kind = getPatternKind(pattern);
-			int patternId = getPatternId(kind, pattern.getClassName(), 
-					pattern.getMethodName(), pattern.getArgumentTypes(), pattern.getArgumentNo());
-			registerPatternForProject(patternId, PATTERN_ROLE_PRIMARY, 1);
+			createPatternRecord(kind, pattern.getClassName(),pattern.getMethodName(), 
+					pattern.getArgumentTypes(), pattern.getArgumentNo(),
+					PATTERN_ROLE_PRIMARY, 1);
 		}
 		this.maxPatternBatchNo = 1;
 		
@@ -268,8 +241,7 @@ public class Cache {
 	
 	public List<PatternRecord> getNewProjectPatterns() {
 		int minFileBatchNo = db.queryInt(
-				" select coalesce(min(batch_no),0)" +
-				" from files where name like '/' || ? || '/%'", projectName);
+				" select coalesce(min(batch_no),0) from files");
 		
 		ResultSet rs = db.query(
 				" select p.id," +
@@ -278,13 +250,10 @@ public class Cache {
 				" 		 p.method_name," +
 				" 		 p.argument_types," +
 				"        p.argument_index," +
-				"        pp.batch_no," +
-				"        pp.pattern_role" +
-				" from project_patterns pp" +
-				" join patterns p on p.id = pp.pattern_id" +
-				" where pp.project_name = ?" +
-				" and batch_no > ?", 
-				projectName, minFileBatchNo);
+				"        p.batch_no," +
+				"        p.pattern_role" +
+				" from patterns p" +
+				" where p.batch_no > ?", minFileBatchNo);
 		
 		List<PatternRecord> result = new ArrayList<PatternRecord>();
 		try {
@@ -303,17 +272,16 @@ public class Cache {
 		}
 	}
 
-	public void markHotspotAsChecked(HotspotDescriptor hotspot, long newMarkerId) {
+	public void markHotspotAsChecked(HotspotDescriptor hotspot) {
 	
 		IPosition pos = hotspot.getPosition();
 		db.execute(
 			" update hotspots " +
-			" set checked = true, " +
-			"     marker_id = ? " +
+			" set checked = true " +
 			" where file_id = ?" +
 			" and start = ?" +
 			" and length = ?", 
-			newMarkerId, getFileId(pos.getPath()), pos.getStart(), pos.getLength());
+			getFileId(pos.getPath()), pos.getStart(), pos.getLength());
 	}
 	
 	public void addHotspot(PatternRecord pattern, HotspotDescriptor desc) {
@@ -321,7 +289,6 @@ public class Cache {
 		if (desc instanceof StringHotspotDescriptor) {
 			IAbstractString str = ((StringHotspotDescriptor) desc).getAbstractValue();
 			
-			// TODO should I include item-index? or should i rely on increasing id values ??
 			try {
 				id = addAbstractString(str, pattern.getId(), null);
 			} catch (IllegalArgumentException e) {
@@ -447,7 +414,6 @@ public class Cache {
 				db.checkCloseResult(argRs);
 			}
 			
-			// TODO isn't there wrong position for resulting string?
 			return ArgumentApplier.applyArgumentsMap(template, args);
 		} 
 		catch (SQLException e) {
@@ -668,16 +634,23 @@ public class Cache {
 	
 	private int addPatternReference(PatternReference str, Integer parentId, Integer itemIndex) {
 		
-		// prepare pattern and project_pattern (if they don't exist yet)
+		// publish pattern (if it doesn't exist yet)
 		int patternKind = getPatternKind(str);
-		int patternId = getPatternId(patternKind, 
+		Integer patternId = getPatternId(patternKind, 
 				str.getPattern().getClassName(), 
 				str.getPattern().getMethodName(), 
 				str.getPattern().getArgumentTypes(), 
 				str.getPattern().getArgumentNo());
-		
-		this.maxPatternBatchNo += 1;
-		registerPatternForProject(patternId, PATTERN_ROLE_SECONDARY, maxPatternBatchNo);
+		if (patternId == null) {
+			this.maxPatternBatchNo += 1;
+			patternId = createPatternRecord(patternKind, 
+					str.getPattern().getClassName(), 
+					str.getPattern().getMethodName(), 
+					str.getPattern().getArgumentTypes(), 
+					str.getPattern().getArgumentNo(),
+					PATTERN_ROLE_SECONDARY, 
+					maxPatternBatchNo);
+		}
 		
 		// add reference to this pattern
 		int recKind;
@@ -713,23 +686,8 @@ public class Cache {
 		
 		return id;
 	}
-
-	private void registerPatternForProject(int patternId, int patternRole, int batchNo) {
-		int existing = db.queryInt(
-				" select count(*) from project_patterns " +
-				" where project_name = ?" +
-				" and pattern_id = ?", projectName, patternId);
-		
-		if (existing == 0) {
-			db.execute (
-					" insert into project_patterns " +
-					" (project_name, pattern_id, pattern_role, batch_no)" +
-					" values (?, ?, ?, ?)", 
-					projectName, patternId, patternRole, batchNo);
-		}
-	}
 	
-	private int getPatternId(int kind, String className, String methodName, String argumentTypes, int argumentIndex) {
+	private Integer getPatternId(int kind, String className, String methodName, String argumentTypes, int argumentIndex) {
 		Integer id = db.queryMaybeInteger(
 				" select id from patterns " +
 				" where kind = ?" +
@@ -739,19 +697,22 @@ public class Cache {
 				" and argument_index = ?",
 				kind, className, methodName, argumentTypes, argumentIndex);
 
-		if (id == null) {
-			// create empty choice for pattern options
-			id = db.insertAndGetId("insert into abstract_strings (kind) " +
-					" values (" + StringKind.CHOICE + ")");
-			
-			// pattern uses same id
-			db.execute (
-					" insert into patterns (id, kind, class_name, method_name, argument_types, argument_index)" +
-					" values (?, ?, ?, ?, ?, ?)", 
-					id, kind, className, methodName, argumentTypes, argumentIndex);
-		}
-
 		return id;		
+	}
+	
+	private int createPatternRecord(int kind, String className, String methodName, String argumentTypes, int argumentIndex,
+			int patternRole, int batchNo) {
+		// create empty choice for pattern options
+		int id = db.insertAndGetId("insert into abstract_strings (kind) " +
+				" values (" + StringKind.CHOICE + ")");
+		
+		// pattern uses same id
+		db.execute (
+				" insert into patterns (id, kind, class_name, method_name, argument_types, " +
+				"     argument_index, pattern_role, batch_no)" +
+				" values (?, ?, ?, ?, ?, ?, ?, ?)", 
+				id, kind, className, methodName, argumentTypes, argumentIndex, patternRole, batchNo);
+		return id;
 	}
 
 	private int addUnsupported(String msg, IPosition pos, Integer parentId) {
@@ -806,10 +767,10 @@ public class Cache {
 	}
 
 	public void clearProject() {
-		db.execute("delete from files where name like ('/' || ? || '/%')", projectName); 
+		db.execute("delete from files"); 
 		fileIDs.clear();
 		// hotspots and abstract strings get deleted by cascade
-		db.execute("delete from project_patterns where project_name = ?", projectName);
+		db.execute("delete from patterns");
 		this.maxPatternBatchNo = 0;
 	}
 
@@ -871,9 +832,7 @@ public class Cache {
 	}
 	
 	public boolean projectHasFiles() {
-		int fileCount = db.queryInt(
-			" select count(*) from files" +
-			" where name like '/' || ? || '/%'", projectName);
+		int fileCount = db.queryInt("select count(*) from files");
 		
 		return fileCount > 0;
 	}

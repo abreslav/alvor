@@ -13,6 +13,7 @@ public class ProgressUtil {
 	public static void beginTask(IProgressMonitor monitor, String name, int totalWork) {
 		if (monitor != null) {
 			monitor.beginTask(name, totalWork);
+			monitor.setTaskName(name); // is it necessary?
 		}
 	}
 	
