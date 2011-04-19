@@ -51,14 +51,14 @@ public class GuiChecker {
 	private static final int MAX_MARKER_MESSAGE_LENGTH = 500;
 	private static final String CHILDREN_ATT_NAME = "children";
 	private ComplexChecker checker = new ComplexChecker();
-	private Cache cache = CacheProvider.getCache();
+	//private Cache cache = CacheProvider.getCache();
 	
 	private GuiChecker() {}
 	
 	public void cleanUpdateProjectMarkers(IProject project, IProgressMonitor monitor) {
 		try {
 			ProgressUtil.beginTask(monitor, "Full SQL check for " + project.getName(), 100);
-			cache.clearProject(project.getName());
+			CacheProvider.getCache(project.getName()).clearProject();
 			deleteAlvorMarkers(project);
 			ProgressUtil.worked(monitor, 3);
 			updateProjectMarkers(project, ProgressUtil.subMonitor(monitor, 97));
@@ -72,14 +72,14 @@ public class GuiChecker {
 		// assumes that markers of invalidated files are already deleted
 		// TODO clear project markers (about checking exceptions)
 		ProgressUtil.beginTask(monitor, "Full SQL check for " + project.getName(), 100);
-		
+		Cache cache = CacheProvider.getCache(project.getName());
 		try {
-			StringCollector.updateProjectCache(project, cache, ProgressUtil.subMonitor(monitor, 90));
+			StringCollector.updateProjectCache(project, ProgressUtil.subMonitor(monitor, 90));
 			
 			ProgressUtil.checkAbort(monitor);
 			ProjectConfiguration conf = ConfigurationManager.readProjectConfiguration(project, true);
 			Collection<HotspotDescriptor> hotspots = 
-				cache.getUncheckedPrimaryHotspots(project.getName());
+				cache.getUncheckedPrimaryHotspots();
 			
 			ProgressUtil.checkAbort(monitor);
 			createMarkersForHotspots(hotspots, conf, project, ProgressUtil.subMonitor(monitor, 10));
@@ -98,7 +98,7 @@ public class GuiChecker {
 			for (HotspotDescriptor hotspot : hotspots) {
 				ProgressUtil.checkAbort(monitor);
 				IMarker hotspotMarker = createMarkersForHotspot(hotspot, conf, project);
-				cache.markHotspotAsChecked(hotspot, hotspotMarker.getId());
+				CacheProvider.getCache(project.getName()).markHotspotAsChecked(hotspot, hotspotMarker.getId());
 				ProgressUtil.worked(monitor, 1);
 			}
 		} 
@@ -360,7 +360,7 @@ public class GuiChecker {
 
 	public void clearProject(IProject project) {
 		deleteAlvorMarkers(project);
-		cache.clearProject(project.getName());
+		CacheProvider.getCache(project.getName()).clearProject();
 	}
 	
 }

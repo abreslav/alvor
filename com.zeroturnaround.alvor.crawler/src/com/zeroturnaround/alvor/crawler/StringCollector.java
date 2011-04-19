@@ -75,10 +75,10 @@ public class StringCollector {
 	private Map<StringPattern, SearchPattern> searchPatterns = new HashMap<StringPattern, SearchPattern>();
 	private SearchEngine searchEngine = new SearchEngine();
 	private Map<ICompilationUnit, ASTNode> astCache = new WeakHashMap<ICompilationUnit, ASTNode>();
-	private Cache cache = CacheProvider.getCache();
+	private final Cache cache;
 	
-	public static void updateProjectCache(IProject project, Cache cache, IProgressMonitor monitor) {
-		StringCollector collector = new StringCollector(cache);
+	public static void updateProjectCache(IProject project, IProgressMonitor monitor) {
+		StringCollector collector = new StringCollector(CacheProvider.getCache(project.getName()));
 		collector.doUpdateProjectCache(project, monitor);
 	}
 	
@@ -94,7 +94,7 @@ public class StringCollector {
 			
 			// 0) FIXME update inter-project stuff (import patterns)
 			
-			if (!cache.projectHasFiles(project.getName())) {
+			if (!cache.projectHasFiles()) {
 				initializeProject(project);
 				work = 2;
 				ProgressUtil.worked(monitor, work); 
@@ -106,8 +106,7 @@ public class StringCollector {
 			while (i < MAX_ITERATIONS_FOR_FINDING_FIXPOINT) {
 				ProgressUtil.checkAbort(monitor);
 				
-				cache.startNextBatch();
-				List<PatternRecord> patternRecords = cache.getNewProjectPatterns(project.getName());
+				List<PatternRecord> patternRecords = cache.getNewProjectPatterns();
 				if (patternRecords.isEmpty()) { // found fixpoint
 					break; 
 				}
@@ -124,7 +123,7 @@ public class StringCollector {
 				i++;
 			}
 			if (i == MAX_ITERATIONS_FOR_FINDING_FIXPOINT
-					&& ! cache.getNewProjectPatterns(project.getName()).isEmpty()) {
+					&& ! cache.getNewProjectPatterns().isEmpty()) {
 				LOG.error("Fixpoint not found while updating cache");
 			}
 			timer.printTime();
@@ -140,13 +139,13 @@ public class StringCollector {
 		List<String> files = JavaModelUtil.getCompilationUnitNames(units);
 		
 		ProjectConfiguration conf = ConfigurationManager.readProjectConfiguration(project, true);
-		cache.initializeProject(project.getName(), conf.getHotspotPatterns(), files);
+		cache.initializeProject(conf.getHotspotPatterns(), files);
 	}
 	
 	private void updateProjectCacheForNewPatterns(IJavaProject javaProject, 
 			final Collection<PatternRecord> patternRecords, final IProgressMonitor monitor) {
 		
-		List<FileRecord> fileRecords = cache.getFilesToUpdate(javaProject.getProject().getName());
+		List<FileRecord> fileRecords = cache.getFilesToUpdate();
 		
 		// group files into batches and search each batch separately according to their needed patterns
 		Map<Integer, Set<ICompilationUnit>> fileGroups = groupFiles(fileRecords);
@@ -176,7 +175,15 @@ public class StringCollector {
 		}
 		
 		// FIXME should be more granular
-		cache.markFilesAsCurrent(fileRecords);
+		cache.updateFilesBatchNo(fileRecords, getMaxPatternBatchNo(patternRecords));
+	}
+	
+	private int getMaxPatternBatchNo(Collection<PatternRecord> patternRecords) {
+		int batchNo = 0;
+		for (PatternRecord rec : patternRecords) {
+			batchNo = Math.max(rec.getBatchNo(), batchNo);			
+		}
+		return batchNo;
 	}
 	
 	private void processNodeForPatterns(ASTNode node, Collection<PatternRecord> patterns) {
