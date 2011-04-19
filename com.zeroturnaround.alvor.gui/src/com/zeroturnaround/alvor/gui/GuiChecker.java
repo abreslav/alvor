@@ -150,7 +150,7 @@ public class GuiChecker {
 			//markConstants(sh.getAbstractValue(), hotspotMarker, project);
 		}
 		
-		// if there exists previous marker for this same hotspot, then delete it
+		// if there exists previous markers for this same hotspot, then delete them
 		try {
 			IMarker oldMarker = hotspotMarker.getResource().findMarker(hotspot.getMarkerId());
 			if (oldMarker != null) {
