@@ -57,20 +57,26 @@
          point="org.eclipse.ui.commands">
       <command
             categoryId="com.zeroturnaround.alvor.gui.AlvorCategory"
-            defaultHandler="com.zeroturnaround.alvor.gui.ClearCacheHandler"
-            id="com.zeroturnaround.alvor.gui.clearCache"
-            name="Clear SQL checker results">
+            defaultHandler="com.zeroturnaround.alvor.gui.ManualCheckHandler"
+            id="com.zeroturnaround.alvor.plugin.manualCheck"
+            name="Perform manual SQL check">
       </command>
       <command
             categoryId="com.zeroturnaround.alvor.gui.AlvorCategory"
-            defaultHandler="com.zeroturnaround.alvor.gui.CleanCheckHandler"
-            id="com.zeroturnaround.alvor.plugin.CleanCheck"
-            name="Check SQL">
+            defaultHandler="com.zeroturnaround.alvor.gui.ManualClearHandler"
+            id="com.zeroturnaround.alvor.gui.manualClear"
+            name="Clear manual check results">
       </command>
       <category
             id="com.zeroturnaround.alvor.gui.AlvorCategory"
             name="Alvor SQL checker">
       </category>
+      <command
+            categoryId="com.zeroturnaround.alvor.gui.AlvorCategory"
+            defaultHandler="com.zeroturnaround.alvor.gui.CleanBuildHandler"
+            id="com.zeroturnaround.alvor.plugin.cleanBuild"
+            name="Clean Alvor build">
+      </command>
    </extension>
    
    <extension
@@ -81,11 +87,10 @@
          id="com.zeroturnaround.alvor.projectcontextmenu"
          label="Alvor SQL checker">
       <command
-            commandId="com.zeroturnaround.alvor.plugin.CleanCheck"
-            label="Check SQL"
+            commandId="com.zeroturnaround.alvor.plugin.manualCheck"
             style="push">
          <visibleWhen
-               checkEnabled="false">
+               checkEnabled="true">
             <iterate>
                <adapt
                      type="org.eclipse.jdt.core.IJavaProject">
@@ -94,11 +99,22 @@
          </visibleWhen>
       </command>
       <command
-            commandId="com.zeroturnaround.alvor.gui.clearCache"
-            label="Clear results"
+            commandId="com.zeroturnaround.alvor.gui.manualClear"
             style="push">
          <visibleWhen
-               checkEnabled="false">
+               checkEnabled="true">
+            <iterate>
+               <adapt
+                     type="org.eclipse.jdt.core.IJavaProject">
+               </adapt>
+            </iterate>
+         </visibleWhen>
+      </command>
+      <command
+            commandId="com.zeroturnaround.alvor.plugin.cleanBuild"
+            style="push">
+         <visibleWhen
+               checkEnabled="true">
             <iterate>
                <adapt
                      type="org.eclipse.jdt.core.IJavaProject">

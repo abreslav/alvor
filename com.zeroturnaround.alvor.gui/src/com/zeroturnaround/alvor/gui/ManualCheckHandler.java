@@ -11,19 +11,23 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 
+import com.zeroturnaround.alvor.builder.AlvorBuilder;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.common.logging.Timer;
 import com.zeroturnaround.alvor.crawler.util.JavaModelUtil;
 
-public class CleanCheckHandler extends AbstractHandler {
-	private static final ILog LOG = Logs.getLog(CleanCheckHandler.class);
-	
+public class ManualCheckHandler extends AbstractHandler {
+	private static final ILog LOG = Logs.getLog(ManualCheckHandler.class);
 
+	
+	/** 
+	 * Meant for calling when builder is not enabled
+	 */
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		
-		final Timer timer = new Timer("Clean check time");
+		final Timer timer = new Timer("Manual check time");
 		try {
 			final IProject project = GuiUtil.getSelectedJavaProject();
 			
@@ -57,6 +61,10 @@ public class CleanCheckHandler extends AbstractHandler {
 		return null;
 	}
 	
-	
-
+	@Override
+	public boolean isEnabled() {
+		IProject project = GuiUtil.getSelectedJavaProject();
+		return project != null && AlvorBuilder.getAlvorBuilder(project) == null;
+		
+	}
 }

@@ -50,7 +50,7 @@ CREATE TABLE patterns
 	method_name varchar(300) not null,
 	argument_types varchar(300) not null,
 	argument_index tinyint not null,
-	pattern_role tinyint not null, /* 1 = primary, 2 = secondary, 3 = foreign */
+	pattern_role tinyint not null, /* 1 = primary, 2 = secondary */
 	batch_no integer not null      /* shows when this pattern was published */
 );;;
 

@@ -9,10 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -92,18 +90,14 @@ public class StringCollector {
 			int work;
 			ProgressUtil.beginTask(monitor, "Collecting strings", workLeft);
 			
-			// 0) FIXME update inter-project stuff (import patterns)
-			
 			if (!cache.projectHasFiles()) {
 				initializeProject(project);
-				work = 2;
-				ProgressUtil.worked(monitor, work); 
-				workLeft -= work;
 			}
 			
-			Timer timer = new Timer("loop");
+			Timer timer = new Timer("Cache updating time");
 			int i = 0;
 			while (i < MAX_ITERATIONS_FOR_FINDING_FIXPOINT) {
+				LOG.message("ITERATION " + i);
 				ProgressUtil.checkAbort(monitor);
 				
 				List<PatternRecord> patternRecords = cache.getNewProjectPatterns();
@@ -134,16 +128,23 @@ public class StringCollector {
 	}
 	
 	private void initializeProject(IProject project) {
-		Collection<ICompilationUnit> units = JavaModelUtil.getAllCompilationUnits
-		(JavaModelUtil.getJavaProjectFromProject(project), false);
+		IJavaProject javaProject = JavaModelUtil.getJavaProjectFromProject(project); 
+		Collection<ICompilationUnit> units = JavaModelUtil.getAllCompilationUnits(javaProject, false);
 		List<String> files = JavaModelUtil.getCompilationUnitNames(units);
+		
+		// add also files from required projects
+		Set<IJavaProject> reqProjects = JavaModelUtil.getAllRequiredProjects(javaProject);
+		for (IJavaProject p : reqProjects) {
+			units = JavaModelUtil.getAllCompilationUnits(p, false);
+			files.addAll(JavaModelUtil.getCompilationUnitNames(units));
+		}
 		
 		ProjectConfiguration conf = ConfigurationManager.readProjectConfiguration(project, true);
 		cache.initializeProject(conf.getHotspotPatterns(), files);
 	}
 	
 	private void updateProjectCacheForNewPatterns(IJavaProject javaProject, 
-			final Collection<PatternRecord> patternRecords, final IProgressMonitor monitor) {
+			final List<PatternRecord> patternRecords, final IProgressMonitor monitor) {
 		
 		List<FileRecord> fileRecords = cache.getFilesToUpdate();
 		
@@ -151,30 +152,27 @@ public class StringCollector {
 		Map<Integer, Set<ICompilationUnit>> fileGroups = groupFiles(fileRecords);
 		
 		for (Map.Entry<Integer, Set<ICompilationUnit>> group : fileGroups.entrySet()) {
-			SearchPattern searchPattern = createCombinedSearchPattern(javaProject, patternRecords, group.getKey());
-			Timer searchTimer = new Timer("Search");
-			final Collection<IResource> files = new HashSet<IResource>();
-			final AtomicInteger count = new AtomicInteger(0);
-			performSearch(group.getValue(), searchPattern, new SearchRequestor() {
-				@Override
-				public void acceptSearchMatch(SearchMatch match) throws CoreException {
-					ProgressUtil.checkAbort(monitor);
-					
-					files.add(match.getResource());
-					// TODO parse everything together
-					ASTNode node = getASTNode(match);
-					count.incrementAndGet();
-					processNodeForPatterns(node, patternRecords);
-				}
-			}, monitor);
+			List<PatternRecord> groupPatterns = filterPatternRecords(patternRecords, group.getKey());
+			LOG.message("SEARCH " + group.getValue().size() 
+					+ " files with batch_no=" + group.getKey() 
+					+ " for " + groupPatterns.size() + " patterns");
+			SearchPattern searchPattern = createCombinedSearchPattern(javaProject, groupPatterns);
 			
-			searchTimer.printTime();
-			System.out.println("Match count=" + count);
-			System.out.println(files);
-			System.out.println("File count=" + files.size());
+			if (searchPattern != null) { // can be null after code renames (when old patterns don't apply anymore, but aren't cleaned yet)  
+				Timer searchTimer = new Timer("Search time");
+				performSearch(group.getValue(), searchPattern, new SearchRequestor() {
+					@Override
+					public void acceptSearchMatch(SearchMatch match) throws CoreException {
+						ProgressUtil.checkAbort(monitor);
+						ASTNode node = getASTNode(match);
+						processNodeForPatterns(node, patternRecords);
+					}
+				}, monitor);
+				
+				searchTimer.printTime();
+			}
 		}
 		
-		// FIXME should be more granular
 		cache.updateFilesBatchNo(fileRecords, getMaxPatternBatchNo(patternRecords));
 	}
 	
@@ -287,27 +285,24 @@ public class StringCollector {
 		
 		cache.addHotspot(patternRecord, desc);
 		
-		// TODO temporary
 		if (desc instanceof StringHotspotDescriptor) {
-			assert LOG.message(((StringHotspotDescriptor)desc).getAbstractValue());
+			assert LOG.message("processHotspot: " + ((StringHotspotDescriptor)desc).getAbstractValue());
 		}
 		else if (desc instanceof UnsupportedHotspotDescriptor) {
-			assert LOG.message(((UnsupportedHotspotDescriptor)desc).getProblemMessage());
-		}
-		else {
-			throw new IllegalArgumentException();
+			assert LOG.message("processHotspot: " + ((UnsupportedHotspotDescriptor)desc).getProblemMessage());
 		}
 	}
 
 	private void performSearch(Collection<ICompilationUnit> units, SearchPattern pattern, 
 			SearchRequestor requestor, IProgressMonitor monitor) {
 		
+		assert pattern != null;
+		
 		try {
 			IJavaElement[] elements = units.toArray(new ICompilationUnit[units.size()]);
 			IJavaSearchScope scope = SearchEngine.createJavaSearchScope(elements, IJavaSearchScope.SOURCES);
 			SearchParticipant[] participants = { SearchEngine.getDefaultSearchParticipant()};
 			
-			// TODO do I want to use monitor?
 			searchEngine.search(pattern, participants, scope, requestor, monitor);
 		}
 		catch (CoreException e) {
@@ -315,31 +310,40 @@ public class StringCollector {
 		}
 	}
 	
-	private SearchPattern createCombinedSearchPattern(IJavaProject javaProject,
-			Collection<PatternRecord> patternRecords, int baseBatchNo) {
-		SearchPattern resultPattern = null; 
+	private List<PatternRecord> filterPatternRecords(List<PatternRecord> patternRecords, int baseBatchNo) {
+		List<PatternRecord> result = new ArrayList<PatternRecord>();
 		for (PatternRecord rec : patternRecords) {
 			if (rec.getBatchNo() > baseBatchNo) {
-				
-				try {
-					SearchPattern subPattern = getSearchPattern(javaProject, rec.getPattern());
-					if (subPattern == null) {
-						// probably the class or method is deleted or renamed
-						if (rec.isPrimaryPattern()) {
-							LOG.error("Primary hotspot pattern (" + rec.getPattern() + ") is not valid");
-						}
+				result.add(rec);
+			}
+		}
+		return result;
+	}
+	
+	private SearchPattern createCombinedSearchPattern(IJavaProject javaProject,
+			List<PatternRecord> patternRecords) {
+		SearchPattern resultPattern = null; 
+		for (PatternRecord rec : patternRecords) {
+			try {
+				SearchPattern subPattern = getSearchPattern(javaProject, rec.getPattern());
+				if (subPattern == null) {
+					// probably the class or method is deleted or renamed
+					if (rec.isPrimaryPattern()) {
+						LOG.error("Primary hotspot pattern (" + rec.getPattern() + ") is not valid");
 					}
-					else if (resultPattern == null) {
+				}
+				else {
+					if (resultPattern == null) {
 						resultPattern = subPattern;
 					}
 					else {
 						resultPattern = SearchPattern.createOrPattern(subPattern, resultPattern);
 					}
 				}
-				catch (RuntimeException e) {
-					LOG.error("Failed creating search pattern for: " + rec.getPattern(), e);
-					throw e;
-				}
+			}
+			catch (RuntimeException e) {
+				LOG.error("Failed creating search pattern for: " + rec.getPattern(), e);
+				throw e;
 			}
 		}
 		return resultPattern;
@@ -362,6 +366,7 @@ public class StringCollector {
 	
 	private SearchPattern getSearchPattern(IJavaProject javaProject, StringPattern stringPattern) {
 		
+		// TODO maybe shouldn't cache patterns, because after renames the methods are not there anymore
 		SearchPattern searchPattern = searchPatterns.get(stringPattern);
 		
 		if (searchPattern == null) {
