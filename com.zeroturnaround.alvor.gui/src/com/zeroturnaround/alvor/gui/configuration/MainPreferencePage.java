@@ -15,8 +15,8 @@ public class MainPreferencePage extends PreferencePage implements IWorkbenchPref
 		noDefaultAndApplyButton();
 		
 		Label label = new Label(parent, SWT.WRAP);
-		label.setText("Alvor is configured project-wise. Right-click on project and" +
-				" select 'Properties' -> 'Alvor SQL Checker'");
+		label.setText("\nAlvor is configured project-wise.\n" +
+				"Right-click on project and select 'Properties' -> 'Alvor SQL Checker'");
 		return null;
 	}
 

@@ -1,56 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-
    <extension
-         point="org.eclipse.ui.popupMenus">
-      <viewerContribution
-            id="com.zeroturnaround.alvor.gui.ShowAbstractValueContribution"
-            targetID="#CompilationUnitEditorContext">
-      	<action
-               class="com.zeroturnaround.alvor.gui.AbstractStringPrinter"
-               menubarPath="ContextMenu"
-               id="com.zeroturnaround.alvor.ShowAbstractValue"
-               label="Show abstract value">
-         </action>
-      </viewerContribution>
-      <viewerContribution
-            id="com.zeroturnaround.alvor.gui.ShowConnSourceContribution"
-            targetID="#CompilationUnitEditorContext_">
-         <action
-               class="com.zeroturnaround.alvor.gui.ConnectionSourceFinder"
-               id="com.zeroturnaround.alvor.ShowConnSource"
-               label="Show connection source"
-               menubarPath="_ContextMenu">
-         </action>
-      </viewerContribution>
-   </extension>
-
-   <extension
-         id="sqlwarning"
-         name="SQL warning marker"
-         point="org.eclipse.core.resources.markers">
-      <super type="org.eclipse.core.resources.problemmarker" />
-      <super type="org.eclipse.core.resources.textmarker" />
-      <persistent value="true"/>
-   </extension>
-   
-   <extension
-         id="sqlerror"
-         name="SQL error marker" 
-         point="org.eclipse.core.resources.markers">
-      <super type="org.eclipse.core.resources.problemmarker" />
-      <super type="org.eclipse.core.resources.textmarker" />
-      <persistent value="true"/>
-   </extension>
-    
-	<extension 
-         point="org.eclipse.ui.editors.annotationTypes">
-         <type
-             name="unsupported"
-             super="org.eclipse.ui.workbench.texteditor.info"
-             markerType="com.zeroturnaround.alvor.gui.unsupported">
-         </type>
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="com.zeroturnaround.alvor.gui.AlvorPropertyTester"
+            id="com.zeroturnaround.alvor.gui.AlvorPropertyTester"
+            namespace="com.zeroturnaround.alvor.gui"
+            properties="isSingleJavaProject"
+            type="java.lang.Object">
+      </propertyTester>
    </extension>
    
    <extension
@@ -89,55 +48,107 @@
       <command
             commandId="com.zeroturnaround.alvor.plugin.manualCheck"
             style="push">
-         <visibleWhen
-               checkEnabled="true">
-            <iterate>
-               <adapt
-                     type="org.eclipse.jdt.core.IJavaProject">
-               </adapt>
-            </iterate>
+         <visibleWhen>
+            <test
+                  forcePluginActivation="true"
+                  property="com.zeroturnaround.alvor.gui.isSingleJavaProject"
+                  value="doesntHaveAlvorBuilder">
+            </test>
          </visibleWhen>
       </command>
       <command
             commandId="com.zeroturnaround.alvor.gui.manualClear"
             style="push">
-         <visibleWhen
-               checkEnabled="true">
-            <iterate>
-               <adapt
-                     type="org.eclipse.jdt.core.IJavaProject">
-               </adapt>
-            </iterate>
+         <visibleWhen>
+            <test
+                  forcePluginActivation="true"
+                  property="com.zeroturnaround.alvor.gui.isSingleJavaProject"
+                  value="doesntHaveAlvorBuilder">
+            </test>
          </visibleWhen>
       </command>
       <command
             commandId="com.zeroturnaround.alvor.plugin.cleanBuild"
             style="push">
-         <visibleWhen
-               checkEnabled="true">
-            <iterate>
-               <adapt
-                     type="org.eclipse.jdt.core.IJavaProject">
-               </adapt>
-            </iterate>
+         <visibleWhen>
+            <test
+                  forcePluginActivation="true"
+                  property="com.zeroturnaround.alvor.gui.isSingleJavaProject"
+                  value="hasAlvorBuilder">
+            </test>
          </visibleWhen>
       </command>
+      <visibleWhen>
+         <test
+               forcePluginActivation="true"
+               property="com.zeroturnaround.alvor.gui.isSingleJavaProject">
+         </test>
+      </visibleWhen>
    </menu>
       </menuContribution>
    </extension>
+
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <viewerContribution
+            id="com.zeroturnaround.alvor.gui.ShowAbstractValueContribution"
+            targetID="#CompilationUnitEditorContext">
+      	<action
+               class="com.zeroturnaround.alvor.gui.AbstractStringPrinter"
+               menubarPath="ContextMenu"
+               id="com.zeroturnaround.alvor.ShowAbstractValue"
+               label="Show abstract value">
+         </action>
+      </viewerContribution>
+      <viewerContribution
+            id="com.zeroturnaround.alvor.gui.ShowConnSourceContribution"
+            targetID="#CompilationUnitEditorContext_">
+         <action
+               class="com.zeroturnaround.alvor.gui.ConnectionSourceFinder"
+               id="com.zeroturnaround.alvor.ShowConnSource"
+               label="Show connection source"
+               menubarPath="_ContextMenu">
+         </action>
+      </viewerContribution>
+   </extension>
    
    <extension
-         point="org.eclipse.core.expressions.definitions">
-      <definition
-            id="javaFileSelected">
-         <with
-               variable="selection">
-            <instanceof
-                  value="org.eclipse.jdt.core.ICompilationUnit">
-            </instanceof>
-         </with>
-      </definition>
+         id="sqlwarning"
+         name="SQL warning marker"
+         point="org.eclipse.core.resources.markers">
+      <super type="org.eclipse.core.resources.problemmarker" />
+      <super type="org.eclipse.core.resources.textmarker" />
+      <persistent value="true"/>
    </extension>
+   
+   <extension
+         id="sqlerror"
+         name="SQL error marker" 
+         point="org.eclipse.core.resources.markers">
+      <super type="org.eclipse.core.resources.problemmarker" />
+      <super type="org.eclipse.core.resources.textmarker" />
+      <persistent value="true"/>
+   </extension>
+
+   <extension
+         id="sqlstring"
+         name="SQL string marker"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+      <persistent value="true"/>
+    </extension>
+
+   <extension
+         id="unsupported"
+         name="SQL unsupported marker"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+      <persistent value="true"/>
+    </extension>
    
    <extension
          id="sqlhotspot"
@@ -160,87 +171,87 @@
                markerType="com.zeroturnaround.alvor.gui.sqlstring"
                name="sqlstring">
          </type>
+         <type
+             name="unsupported"
+             super="org.eclipse.ui.workbench.texteditor.info"
+             markerType="com.zeroturnaround.alvor.gui.unsupported">
+         </type>
    </extension>
-
-   <extension
-         point="org.eclipse.ui.editors.markerAnnotationSpecification">
-         <specification
-             annotationType="sqlhotspot"
-             verticalRulerPreferenceKey="highlight.rulers.vertical"
-             textPreferenceKey="highlight.text"
-            colorPreferenceKey="highlight.color"
-            highlightPreferenceKey="highlight.background"
-            textPreferenceValue="true"
-            textStylePreferenceValue="BOX"
-            overviewRulerPreferenceKey="highlight.rulers.overview"
-            presentationLayer="4"
-            highlightPreferenceValue="true"
-            label="sqlhotspot"
-            colorPreferenceValue="255,240,200"
-            verticalRulerPreferenceValue="true"
-            overviewRulerPreferenceValue="true"
-            textStylePreferenceKey="highlight.text.style" >
-        </specification >
-<!--               colorPreferenceKey="highlight.color-2"
-               colorPreferenceValue="255,120,120"-->
-         <specification
-               annotationType="unsupported"
-               highlightPreferenceKey="highlight.background"
-               highlightPreferenceValue="true"
-               label="unsupported"
-               overviewRulerPreferenceKey="highlight.rulers.overview"
-               overviewRulerPreferenceValue="true"
-               presentationLayer="4"
-               textPreferenceKey="highlight.text"
-               textPreferenceValue="true"
-               textStylePreferenceKey="highlight.text.style"
-               textStylePreferenceValue="BOX"
-               verticalRulerPreferenceKey="highlight.rulers.vertical"
-               verticalRulerPreferenceValue="true">
-         </specification>
-    </extension>
    
    <extension
          point="org.eclipse.ui.editors.markerAnnotationSpecification">
          <specification
-               annotationType="sqlstring"
-               colorPreferenceKey="highlight.color-1"
-               colorPreferenceValue="255,240,200"
-               highlightPreferenceKey="highlight.background"
+               annotationType="sqlhotspot"
+               colorPreferenceKey="highlight.color_sqlhotspot"
+               colorPreferenceValue="255,245,208"
+               contributesToHeader="false"
+               highlightPreferenceKey="highlight.background_sqlhotspot"
                highlightPreferenceValue="true"
+               includeOnPreferencePage="false"
+               isGoToNextNavigationTarget="false"
+               isGoToNextNavigationTargetKey="navigationTarget_sqlhotspot"
+               isGoToPreviousNavigationTarget="false"
+               isGoToPreviousNavigationTargetKey="prevNaviTarget_sqlhotspot"
+               label="sqlhotspot"
+               overviewRulerPreferenceKey="highlight.rulers.overview_sqlhotspot"
+               overviewRulerPreferenceValue="false"
+               presentationLayer="4"
+               showInNextPrevDropdownToolbarAction="false"
+               showInNextPrevDropdownToolbarActionKey="toolbarAction_sqlhotspot"
+               textPreferenceKey="highlight.text_sqlhotspot"
+               textPreferenceValue="true"
+               textStylePreferenceKey="highlight.text.style_hotspot"
+               textStylePreferenceValue="BOX"
+               verticalRulerPreferenceKey="highlight.rulers.vertical_sqlhotspot"
+               verticalRulerPreferenceValue="false">
+        </specification >
+         <specification
+               annotationType="unsupported"
+               colorPreferenceKey="highlight.color_unsupported"
+               colorPreferenceValue="255,243,240"
+               contributesToHeader="false"
+               highlightPreferenceKey="highlight.background_unsupported"
+               highlightPreferenceValue="true"
+               includeOnPreferencePage="false"
+               isGoToNextNavigationTarget="false"
+               isGoToNextNavigationTargetKey="nextNavi_unsupported"
+               isGoToPreviousNavigationTarget="false"
+               isGoToPreviousNavigationTargetKey="prevNavi_unsupported"
+               label="unsupported"
+               overviewRulerPreferenceKey="highlight.rulers.overview_unsupported"
+               overviewRulerPreferenceValue="true"
+               presentationLayer="4"
+               showInNextPrevDropdownToolbarAction="false"
+               showInNextPrevDropdownToolbarActionKey="toolbarAction_unsupported"
+               symbolicIcon="warning"
+               textPreferenceKey="highlight.text_unsupported"
+               textPreferenceValue="true"
+               textStylePreferenceKey="highlight.text.style_unsupported"
+               textStylePreferenceValue="BOX"
+               verticalRulerPreferenceKey="highlight.rulers.vertical_unsupported"
+               verticalRulerPreferenceValue="true">
+         </specification>
+         <specification
+               annotationType="sqlstring"
+               colorPreferenceKey="highlight.color_string"
+               colorPreferenceValue="255,240,200"
+               highlightPreferenceKey="highlight.background_string"
+               highlightPreferenceValue="true"
+               isGoToNextNavigationTargetKey="nextNavi_string"
+               isGoToPreviousNavigationTargetKey="prevNavi_string"
                label="sqlstring"
-               overviewRulerPreferenceKey="highlight.rulers.overview-1"
+               overviewRulerPreferenceKey="highlight.rulers.overview_string"
                overviewRulerPreferenceValue="false"
                presentationLayer="0"
-               textPreferenceKey="highlight.text"
+               showInNextPrevDropdownToolbarActionKey="action_string"
+               textPreferenceKey="highlight.text_string"
                textPreferenceValue="true"
                textStylePreferenceKey="highlight.text.style"
                textStylePreferenceValue="BOX"
-               verticalRulerPreferenceKey="highlight.rulers.vertical-1"
+               verticalRulerPreferenceKey="highlight.rulers.vertical_string"
                verticalRulerPreferenceValue="false">
          </specification>
     </extension>
-   
-   <extension
-         id="sqlstring"
-         name="SQL string marker"
-         point="org.eclipse.core.resources.markers">
-      <super
-            type="org.eclipse.core.resources.textmarker">
-      </super>
-      <persistent value="true"/>
-    </extension>
-
-   <extension
-         id="unsupported"
-         name="SQL unsupported marker"
-         point="org.eclipse.core.resources.markers">
-      <super
-            type="org.eclipse.core.resources.textmarker">
-      </super>
-      <persistent value="true"/>
-    </extension>
-   
    
    <extension
          point="org.eclipse.help.toc">
@@ -267,6 +278,12 @@
             >
          <filter name="nature" value="org.eclipse.jdt.core.javanature">
          </filter>
+         <enabledWhen>
+            <test
+                  forcePluginActivation="true"
+                  property="com.zeroturnaround.alvor.gui.isSingleJavaProject">
+            </test>
+         </enabledWhen>
       </page>
       <page
             category="com.zeroturnaround.alvor.gui.configuration.MainPropertyPage"
@@ -275,6 +292,12 @@
             name="Hotspots">
          <filter name="nature" value="org.eclipse.jdt.core.javanature">
          </filter>
+         <enabledWhen>
+            <test
+                  forcePluginActivation="true"
+                  property="com.zeroturnaround.alvor.gui.isSingleJavaProject">
+            </test>
+         </enabledWhen>
       </page>
       <page
             category="com.zeroturnaround.alvor.gui.configuration.MainPropertyPage"
@@ -283,6 +306,12 @@
             name="Databases">
          <filter name="nature" value="org.eclipse.jdt.core.javanature">
          </filter>
+         <enabledWhen>
+            <test
+                  forcePluginActivation="true"
+                  property="com.zeroturnaround.alvor.gui.isSingleJavaProject">
+            </test>
+         </enabledWhen>
       </page>
    </extension>
    <extension

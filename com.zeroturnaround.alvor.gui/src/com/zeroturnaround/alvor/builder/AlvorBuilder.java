@@ -41,8 +41,11 @@ public class AlvorBuilder extends IncrementalProjectBuilder {
 		else if (kind == INCREMENTAL_BUILD || kind == AUTO_BUILD) {
 			System.err.println("INCREMENTAL BUILD for: " + this.getProject().getName());
 			this.registerFileChanges(this.getDelta(this.getProject()));
-			for (IProject p: requiredProjects) {
-				this.registerFileChanges(this.getDelta(p));
+			
+			if (requiredProjects != null) {
+				for (IProject p: requiredProjects) {
+					this.registerFileChanges(this.getDelta(p));
+				}
 			}
 		}
 		else {
@@ -146,6 +149,10 @@ public class AlvorBuilder extends IncrementalProjectBuilder {
 	}
 	
 	public static ICommand getAlvorBuilder(IProject project) {
+		if (!project.isOpen()) {
+			return null;
+		}
+		
 		IProjectDescription desc;
 		try {
 			desc = project.getDescription();
@@ -161,5 +168,10 @@ public class AlvorBuilder extends IncrementalProjectBuilder {
 		catch (CoreException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	public static boolean projectHasAlvorBuilderEnabled(IProject project) {
+		ICommand builder = getAlvorBuilder(project);
+		return builder != null;
 	}
 }
