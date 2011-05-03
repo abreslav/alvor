@@ -96,16 +96,22 @@ public class GuiChecker {
 		ProgressUtil.beginTask(monitor, "Checking strings", hotspots.size());
 		try {
 			for (HotspotDescriptor hotspot : hotspots) {
-				ProgressUtil.checkAbort(monitor);
-				createMarkersForHotspot(hotspot, conf, project);
-				CacheProvider.getCache(project.getName()).markHotspotAsChecked(hotspot);
-				ProgressUtil.worked(monitor, 1);
+				try {
+					ProgressUtil.checkAbort(monitor);
+					createMarkersForHotspot(hotspot, conf, project);
+					CacheProvider.getCache(project.getName()).markHotspotAsChecked(hotspot);
+					ProgressUtil.worked(monitor, 1);
+				}
+				catch (CheckerException e) {
+					createMarker("Checker exception: " + e.getMessage(), AlvorGuiPlugin.ERROR_MARKER_ID,
+							IMarker.SEVERITY_ERROR, e.getPosition(), null, project);
+					break;
+				}
+				catch (Exception e) {
+					LOG.exception(e);
+				}
 			}
 		} 
-		catch (CheckerException e) {
-			createMarker("Checker exception: " + e.getMessage(), AlvorGuiPlugin.ERROR_MARKER_ID,
-					IMarker.SEVERITY_ERROR, e.getPosition(), null, project);
-		}
 		finally {
 			ProgressUtil.done(monitor);
 		}

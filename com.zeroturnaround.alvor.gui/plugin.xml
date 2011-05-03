@@ -91,16 +91,6 @@
    <extension
          point="org.eclipse.ui.popupMenus">
       <viewerContribution
-            id="com.zeroturnaround.alvor.gui.ShowAbstractValueContribution"
-            targetID="#CompilationUnitEditorContext">
-      	<action
-               class="com.zeroturnaround.alvor.gui.AbstractStringPrinter"
-               menubarPath="ContextMenu"
-               id="com.zeroturnaround.alvor.ShowAbstractValue"
-               label="Show abstract value">
-         </action>
-      </viewerContribution>
-      <viewerContribution
             id="com.zeroturnaround.alvor.gui.ShowConnSourceContribution"
             targetID="#CompilationUnitEditorContext_">
          <action
@@ -154,17 +144,16 @@
          id="sqlhotspot"
          name="SQL hot spot marker"
          point="org.eclipse.core.resources.markers">
+      <persistent value="true"/>
       <super
             type="org.eclipse.core.resources.textmarker">
       </super>
-      <persistent value="true"/>
     </extension>
     
 	<extension 
          point="org.eclipse.ui.editors.annotationTypes">
          <type
              name="sqlhotspot"
-             super="org.eclipse.ui.workbench.texteditor.info"
              markerType="com.zeroturnaround.alvor.gui.sqlhotspot">
          </type>
          <type
@@ -173,7 +162,6 @@
          </type>
          <type
              name="unsupported"
-             super="org.eclipse.ui.workbench.texteditor.info"
              markerType="com.zeroturnaround.alvor.gui.unsupported">
          </type>
    </extension>
@@ -187,23 +175,24 @@
                contributesToHeader="false"
                highlightPreferenceKey="highlight.background_sqlhotspot"
                highlightPreferenceValue="true"
-               includeOnPreferencePage="false"
+               includeOnPreferencePage="true"
                isGoToNextNavigationTarget="false"
                isGoToNextNavigationTargetKey="navigationTarget_sqlhotspot"
                isGoToPreviousNavigationTarget="false"
                isGoToPreviousNavigationTargetKey="prevNaviTarget_sqlhotspot"
                label="sqlhotspot"
-               overviewRulerPreferenceKey="highlight.rulers.overview_sqlhotspot"
+               overviewRulerPreferenceKey="highlight.rulers.overview_sqlhotspot33"
                overviewRulerPreferenceValue="false"
                presentationLayer="4"
                showInNextPrevDropdownToolbarAction="false"
                showInNextPrevDropdownToolbarActionKey="toolbarAction_sqlhotspot"
+               symbolicIcon="info"
                textPreferenceKey="highlight.text_sqlhotspot"
                textPreferenceValue="true"
                textStylePreferenceKey="highlight.text.style_hotspot"
                textStylePreferenceValue="BOX"
-               verticalRulerPreferenceKey="highlight.rulers.vertical_sqlhotspot"
-               verticalRulerPreferenceValue="false">
+               verticalRulerPreferenceKey="highlight.rulers.vertical_sqlhotspot33"
+               verticalRulerPreferenceValue="true">
         </specification >
          <specification
                annotationType="unsupported"
@@ -212,7 +201,7 @@
                contributesToHeader="false"
                highlightPreferenceKey="highlight.background_unsupported"
                highlightPreferenceValue="true"
-               includeOnPreferencePage="false"
+               includeOnPreferencePage="true"
                isGoToNextNavigationTarget="false"
                isGoToNextNavigationTargetKey="nextNavi_unsupported"
                isGoToPreviousNavigationTarget="false"
@@ -237,6 +226,7 @@
                colorPreferenceValue="255,240,200"
                highlightPreferenceKey="highlight.background_string"
                highlightPreferenceValue="true"
+               includeOnPreferencePage="true"
                isGoToNextNavigationTargetKey="nextNavi_string"
                isGoToPreviousNavigationTargetKey="prevNavi_string"
                label="sqlstring"

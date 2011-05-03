@@ -165,7 +165,11 @@ public class StringCollector {
 					public void acceptSearchMatch(SearchMatch match) throws CoreException {
 						ProgressUtil.checkAbort(monitor);
 						ASTNode node = getASTNode(match);
-						processNodeForPatterns(node, patternRecords);
+						try {
+							processNodeForPatterns(node, patternRecords);
+						} catch (Exception e) {
+							LOG.exception(e);
+						}
 					}
 				}, monitor);
 				

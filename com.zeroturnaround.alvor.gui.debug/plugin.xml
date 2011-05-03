@@ -21,5 +21,24 @@
          </command>
       </menuContribution>
    </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <viewerContribution
+            id="com.zeroturnaround.alvor.gui.ShowAbstractValueContribution"
+            targetID="#CompilationUnitEditorContext">
+         <action
+               class="com.zeroturnaround.alvor.gui.debug.AbstractStringPrinter"
+               id="com.zeroturnaround.alvor.ShowAbstractValue"
+               label="Show abstract value"
+               menubarPath="ContextMenu">
+         </action>
+         <action
+               class="com.zeroturnaround.alvor.gui.debug.ShowValueFromCacheHandler"
+               id="com.zeroturnaround.alvor.ShowValueFromCache"
+               label="Show value from Cache"
+               menubarPath="ContextMenu">
+         </action>
+      </viewerContribution>
+   </extension>
 
 </plugin>
