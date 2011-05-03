@@ -408,8 +408,11 @@ public class StringExpressionEvaluator {
 			elseStr = this.evalVarAfter(var, uc.getElseUsage(), newContext, mode);
 		}
 		
-		StringChoice result = new StringChoice(ASTUtil.getPosition(uc.getCommonParentNode()),
-				thenStr, elseStr); 
+		IPosition pos = null;
+		if (uc.getCommonParentNode() != null) {
+			pos = ASTUtil.getPosition(uc.getCommonParentNode());
+		}
+		StringChoice result = new StringChoice(pos, thenStr, elseStr); 
 		
 		if (optimizeChoice) {
 			return StringConverter.optimizeChoice(result);

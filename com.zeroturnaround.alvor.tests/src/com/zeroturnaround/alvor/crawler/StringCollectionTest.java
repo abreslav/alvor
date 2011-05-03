@@ -49,7 +49,7 @@ public abstract class StringCollectionTest {
 	private void validateFoundHotspotInfo(IPath folder) {
 		boolean concreteResult = foundFilesAreExpected(folder, "concrete_strings");
 		boolean sortedAbstractResult = foundFilesAreExpected(folder, "node_descriptors_sorted");
-		boolean abstractResult = foundFilesAreExpected(folder, "node_descriptors");
+//		boolean abstractResult = foundFilesAreExpected(folder, "node_descriptors");
 		boolean positionResult = foundFilesAreExpected(folder, "node_positions");
 		
 		if (!positionResult) {
@@ -61,9 +61,9 @@ public abstract class StringCollectionTest {
 		else if (!sortedAbstractResult) {
 			throw new AssertionError("Abstract are different, but concretes are same");
 		}
-		else if (!abstractResult) {
-			throw new AssertionError("Abstract result is in different order");
-		}
+//		else if (!abstractResult) {
+//			throw new AssertionError("Abstract result is in different order");
+//		}
 		else {
 			// all OK
 		}

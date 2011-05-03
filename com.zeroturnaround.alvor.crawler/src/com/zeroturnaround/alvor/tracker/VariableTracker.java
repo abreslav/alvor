@@ -4,6 +4,7 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ArrayAccess;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.BreakStatement;
 import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -19,8 +20,11 @@ import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.PostfixExpression;
+import org.eclipse.jdt.core.dom.PrefixExpression;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.Statement;
+import org.eclipse.jdt.core.dom.SwitchCase;
+import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.ThrowStatement;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
@@ -132,8 +136,14 @@ public class VariableTracker {
 		else if (scope instanceof MethodDeclaration) {
 			return getLastReachingModInMethodDecl(var, target, (MethodDeclaration)scope);
 		}
+		else if (scope instanceof PrefixExpression) {
+			return getLastReachingModInPrefixExp(var, target, (PrefixExpression)scope);
+		}
 		else if (scope instanceof PostfixExpression) {
 			return getLastReachingModInPostfixExp(var, target, (PostfixExpression)scope);
+		}
+		else if (scope instanceof SwitchStatement) {
+			return getLastReachingModInSwitch(var, target, (SwitchStatement)scope);
 		}
 		else if (scope instanceof ClassInstanceCreation) { // constructor call
 			// TODO it's possible to modify smth in arguments (or expression?)
@@ -148,6 +158,9 @@ public class VariableTracker {
 		}
 		else if (scope instanceof InfixExpression) {
 			return getLastReachingModInInfix(var, target, (InfixExpression)scope);
+		}
+		else if (scope instanceof BreakStatement) {
+			return null;
 		}
 		else if (scope instanceof ReturnStatement) {
 			return getLastReachingModInReturn(var, target, (ReturnStatement)scope);
@@ -191,6 +204,102 @@ public class VariableTracker {
 		else {
 			throw new UnsupportedStringOpExAtNode("getLastReachingModIn " + scope.getClass(), scope);
 		}
+	}
+
+	private static NameUsage getLastReachingModInSwitch(IVariableBinding var,
+			ASTNode target, SwitchStatement scope) {
+		
+		if (target == null) {
+			// Locate all breaks plus last case (ie. exit points from switch).
+			// From each start moving upwards (until preceding break or start of the switch)
+			// Put all results in a choice
+			NameUsage totalUsage = null;
+			
+			for (int i=0; i < scope.statements().size(); i++) {
+				Statement stmt = (Statement)scope.statements().get(i);
+				if (stmt instanceof SwitchCase) {
+					continue;
+				}
+				Statement nextStmt = null;
+				if (i+1 < scope.statements().size()) {
+					nextStmt = (Statement)scope.statements().get(i+1);
+				}
+				if (nextStmt == null || nextStmt instanceof BreakStatement) {
+					NameUsage usage = getLastReachingModIn(var, null, stmt); // search in that statement
+					if (usage == null) {
+						usage = getLastReachingModInSwitch(var, stmt, scope); // search before that 
+					}
+					if (usage != null) {
+						if (totalUsage == null) {
+							totalUsage = usage;
+						}
+						else {
+							totalUsage = new NameUsageChoice(null, totalUsage, usage);
+						}
+					}
+				}
+			}
+			return totalUsage;
+		}
+		else {
+			// target must be some statement inside switch
+			assert target.getParent() == scope;
+			// move upwards until break statement
+			if (target instanceof BreakStatement) {
+				return null;				
+			}
+			else {
+				Statement prevStmt = getPrecedingSwitchStatement(scope, target);
+				if (prevStmt == null) {
+					return null;
+				}
+				while (prevStmt instanceof SwitchCase) {
+					prevStmt = getPrecedingSwitchStatement(scope, prevStmt);
+					if (prevStmt == null) {
+						return null;
+					}
+				}
+				NameUsage usage = getLastReachingModIn(var, null, prevStmt);
+				if (usage == null) {
+					return getLastReachingModInSwitch(var, prevStmt, scope);
+				}
+				else {
+					return usage;
+				}
+			}
+		}
+	}
+	
+	private static Statement getPrecedingSwitchStatement(SwitchStatement switchStmt, ASTNode stmt) {
+		int i = switchStmt.statements().indexOf(stmt);
+		assert i > -1;
+		if (i == 0) {
+			return null;
+		}
+		
+		Statement prev = (Statement)switchStmt.statements().get(i-1);
+		if (prev instanceof BreakStatement) {
+			return null;
+		}
+		
+		if (prev instanceof SwitchCase) {
+			// look upwards into previous case, if this doesn't end with break, then it's last statement is preceding
+			return getPrecedingSwitchStatement(switchStmt, prev);
+		}
+		else {
+			return prev;
+		}
+	}
+
+	private static NameUsage getLastReachingModInPrefixExp(
+			IVariableBinding var, ASTNode target, PrefixExpression scope) {
+		// !, ~, +, -, ++, --
+		if (target == null) {
+			if (ASTUtil.sameBinding(scope.getOperand(), var)) {
+				throw new UnsupportedStringOpExAtNode("Prefix operand", scope);
+			}
+		}
+		return null;
 	}
 
 	private static NameUsage getLastReachingModInCondExpr(IVariableBinding var,
@@ -246,7 +355,7 @@ public class VariableTracker {
 				throw new UnsupportedStringOpExAtNode("Postfix operand", postfix);
 			}
 		}
-		return getLastReachingModIn(var, target, postfix.getOperand());
+		return null;
 	}
 
 	private static NameUsage getLastReachingModInTry(IVariableBinding var,

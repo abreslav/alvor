@@ -11,6 +11,10 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.resources,
  com.zeroturnaround.alvor.tests,
  org.eclipse.jdt.core,
- com.zeroturnaround.alvor.crawler;bundle-version="1.0.0"
+ com.zeroturnaround.alvor.crawler;bundle-version="1.0.0",
+ com.zeroturnaround.alvor.common;bundle-version="1.0.0",
+ com.zeroturnaround.alvor.model;bundle-version="1.0.0",
+ org.eclipse.jface.text,
+ com.zeroturnaround.alvor.cache;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy

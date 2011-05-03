@@ -1,4 +1,4 @@
-package com.zeroturnaround.alvor.gui;
+package com.zeroturnaround.alvor.gui.debug;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -14,6 +14,7 @@ import org.eclipse.ui.IEditorPart;
 
 import com.zeroturnaround.alvor.common.HotspotDescriptor;
 import com.zeroturnaround.alvor.common.StringHotspotDescriptor;
+import com.zeroturnaround.alvor.common.UnsupportedHotspotDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.crawler.StringExpressionEvaluator;
@@ -26,10 +27,6 @@ public class AbstractStringPrinter implements IEditorActionDelegate{
 	
 	private ISelection selection;
 	private IEditorPart targetEditor;
-
-	public AbstractStringPrinter() {
-		// TODO Auto-generated constructor stub
-	}
 
 	public void run(IAction action) {
 		try {
@@ -66,8 +63,8 @@ public class AbstractStringPrinter implements IEditorActionDelegate{
 				IAbstractString abstr = ((StringHotspotDescriptor)desc).getAbstractValue();
 				LOG.message("Abstract value is: " + abstr.toString());
 			}
-			else {
-				LOG.message("Error: ...");
+			else if (desc instanceof UnsupportedHotspotDescriptor) {
+				LOG.message("Error: " + ((UnsupportedHotspotDescriptor)desc).getProblemMessage());
 			}
 		} 
 		else {

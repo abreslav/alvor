@@ -96,6 +96,31 @@ public class Cache {
 				isThisProjectFile ? 0 : 1, fileName);
 	}
 	
+	// for debugging
+	public IAbstractString getAbstractString(IPosition pos) {
+		Integer id = db.queryMaybeInteger(
+				" select a.id" +
+				" from files f " +
+				" join abstract_strings a on a.file_id = f.id" +
+				" where f.name = ?" +
+				" and a.start = ?", pos.getPath(), pos.getStart());
+		if (id == null) {
+			id = db.queryMaybeInteger(
+					" select h.string_id" +
+					" from files f " +
+					" join hotspots h on h.file_id = f.id" +
+					" where f.name = ?" +
+					" and h.start = ?", pos.getPath(), pos.getStart());
+		}
+		if (id == null) {
+			throw new IllegalArgumentException("can't find string with this position: path="
+					+ pos.getPath() + ", start=" + pos.getStart());
+		}
+		else {
+			return createAbstractString(id, null);
+		}
+	}
+	
 	public List<HotspotDescriptor> getPrimaryHotspots(boolean onlyUnchecked) {
 		ResultSet rs = null;
 		
@@ -132,6 +157,9 @@ public class Cache {
 				} catch (UnsupportedStringOpEx e) {
 					result.add(new UnsupportedHotspotDescriptor(hotspotPos, 
 							e.getMessage(), e.getPosition()));
+//				} catch (Exception e) {
+//					result.add(new UnsupportedHotspotDescriptor(hotspotPos, 
+//							"Internal error: " + e.getMessage(), null));
 				}
 			}
 			
@@ -201,7 +229,9 @@ public class Cache {
 				" where p.id = ?", 
 				id);
 			boolean found = rs.next();
-			assert found;
+			if (!found) {
+				return null;
+			}
 			return createPattern(rs);
 		}
 		catch (SQLException e) {
@@ -360,7 +390,7 @@ public class Cache {
 			// recursion check
 			IPosition pos = createPosition(rs);
 			if (context != null && pos != null && context.contains(pos.hashCode())) {
-				throw new UnsupportedStringOpEx("Cache recursion at: " + PositionUtil.getLineString(pos), pos); 
+				throw new UnsupportedStringOpEx("Cache recursion", pos); 
 			}
 				
 			int kind = rs.getInt("kind");
@@ -573,7 +603,7 @@ public class Cache {
 		return db.query(
 				" select s.*, f.name as file_name" +
 				" from abstract_strings s" +
-				" join files f on f.id = s.file_id" +
+				" left join files f on f.id = s.file_id" +
 				" where s.parent_id = ?" +
 				" order by s.item_index asc, s.id asc", parentId);
 	}
