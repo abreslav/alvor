@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.NullLiteral;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.PostfixExpression;
 import org.eclipse.jdt.core.dom.PrefixExpression;
@@ -32,6 +33,8 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
+import com.zeroturnaround.alvor.common.logging.ILog;
+import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.crawler.util.ASTUtil;
 import com.zeroturnaround.alvor.crawler.util.UnsupportedStringOpExAtNode;
 import com.zeroturnaround.alvor.string.IPosition;
@@ -42,6 +45,7 @@ import com.zeroturnaround.alvor.string.IPosition;
  */
 
 public class VariableTracker {
+	private static final ILog LOG = Logs.getLog(VariableTracker.class);
 	public static NameUsage getLastMod(Name name) {
 		IVariableBinding var = (IVariableBinding)name.resolveBinding();
 		return getLastReachingMod(var, name);
@@ -88,11 +92,38 @@ public class VariableTracker {
 					precedingUsage = new NameUsageChoice(parent, precedingUsage, loopUsage);
 				}
 			} 
+			
+			/*
+			 * TODO Another special case: if parent is if-statement, then check whether
+			 * this var was mentioned in the condition and mention that condition in the usage,
+			 * so that StringEvaluator can filter result
+			 */
+			
+			else if (parent instanceof IfStatement
+					&& conditionRequiresNonNullVariable(((IfStatement)parent).getExpression(), var)) {
+				precedingUsage = new UsageFilter(precedingUsage, true);
+			}
 
 			return precedingUsage;			
 		}
 	}
 	
+	private static boolean conditionRequiresNonNullVariable(Expression condition, IVariableBinding var) {
+		assert (condition.resolveTypeBinding().getName().equals("boolean"));
+		// TODO yes, it's gross simplification
+		if (condition instanceof InfixExpression) {
+			InfixExpression infix = (InfixExpression)condition;
+			Expression left = infix.getLeftOperand();
+			Expression right = infix.getRightOperand();
+			if (infix.getOperator() == InfixExpression.Operator.NOT_EQUALS
+					&& left instanceof Name
+					&& ((Name)left).resolveBinding().isEqualTo(var)
+					&& right instanceof NullLiteral) {
+				return true;
+			}
+		}
+		return false;
+	}
 	
 	public static NameUsage getLastModIn(IVariableBinding var, ASTNode scope) {
 		if (var.isField()) {

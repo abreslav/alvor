@@ -63,21 +63,21 @@ import com.zeroturnaround.alvor.string.StringSequence;
  */
 public class RecursionConverter {
 	
-	public static IAbstractString checkRecursionToRepetition(IAbstractString str) {
-		if (str.containsRecursion()) {
-			throw new UnsupportedStringOpEx("Unsupported modification scheme in loop", str.getPosition());
-			
-			// TODO put back when path-sensitivity is done
-//			IAbstractString result = recursionToRepetition(str);
-//			if (result instanceof StringChoice) {
-//				result = StringConverter.optimizeChoice((StringChoice) result);
-//			}
-//			return StringConverter.flattenStringCollections(result);
-		}
-		else {
-			return str;
-		}
-	}
+//	public static IAbstractString checkRecursionToRepetition(IAbstractString str) {
+//		if (str.containsRecursion()) {
+//			throw new UnsupportedStringOpEx("Unsupported modification scheme in loop", str.getPosition());
+//			
+//			// TODO put back when path-sensitivity is done
+////			IAbstractString result = recursionToRepetition(str);
+////			if (result instanceof StringChoice) {
+////				result = StringConverter.optimizeChoice((StringChoice) result);
+////			}
+////			return StringConverter.flattenStringCollections(result);
+//		}
+//		else {
+//			return str;
+//		}
+//	}
 	
 	/**
 	 * It's assumed, that abstract string is constructed so that all refursive references are descendants

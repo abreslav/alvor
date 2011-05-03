@@ -19,5 +19,7 @@ abstract public class NameUsage {
 //		// TODO if nodes are from different parses, then they don't equal
 //		&& ((NameUsage)obj).getNodeDescribingUsage() == this.getNodeDescribingUsage();
 //	}
+	
+	
 }
 

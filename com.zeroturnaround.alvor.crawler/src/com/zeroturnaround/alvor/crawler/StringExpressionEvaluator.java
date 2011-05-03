@@ -41,6 +41,7 @@ import com.zeroturnaround.alvor.common.HotspotDescriptor;
 import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.common.HotspotPatternReference;
 import com.zeroturnaround.alvor.common.IntegerList;
+import com.zeroturnaround.alvor.common.RecursionConverter;
 import com.zeroturnaround.alvor.common.StringConverter;
 import com.zeroturnaround.alvor.common.StringHotspotDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedHotspotDescriptor;
@@ -64,6 +65,7 @@ import com.zeroturnaround.alvor.tracker.NameInMethodCallExpression;
 import com.zeroturnaround.alvor.tracker.NameInParameter;
 import com.zeroturnaround.alvor.tracker.NameUsage;
 import com.zeroturnaround.alvor.tracker.NameUsageChoice;
+import com.zeroturnaround.alvor.tracker.UsageFilter;
 import com.zeroturnaround.alvor.tracker.VariableTracker;
 
 public class StringExpressionEvaluator {
@@ -350,6 +352,16 @@ public class StringExpressionEvaluator {
 		else if (usage instanceof NameInMethodCallExpression) {
 			return evalVarAfterCallingItsMethod(var, (NameInMethodCallExpression)usage, context, mode);
 		}
+		else if (usage instanceof UsageFilter) {
+			UsageFilter filter = (UsageFilter)usage;
+			IAbstractString result = evalVarAfter(var, filter.getMainUsage(), context, mode);
+			LOG.message("TODO: Filter variable: " + var.getName());
+			// TODO filter fullString according to filter
+			if (filter.hasNotNullCondition()) {
+				result = StringConverter.removeNullChoice(result);
+			}
+			return result; 
+		}
 		else {
 			throw new IllegalArgumentException();
 		}
@@ -622,8 +634,12 @@ public class StringExpressionEvaluator {
 			System.out.println("FOUND RECURSION");
 			
 			throw new UnsupportedStringOpEx("Unsupported modification scheme in loop", str.getPosition());
-//			TODO put back when path-sens is done				
-//			return RecursionConverter.recursionToRepetition(str);
+//			TODO put back when path-sens is done
+			//IAbstractString repStr = RecursionConverter.recursionToRepetition(str);
+//			if (repStr instanceof StringChoice) {
+//				repStr = StringConverter.optimizeChoice((StringChoice)repStr);
+//			}
+			//return repStr;
 //			assert ! result.containsRecursion();
 		}
 		else {
