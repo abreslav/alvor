@@ -174,6 +174,31 @@ public class StringConverter {
 			return null;
 		}
 	}
+	public static IAbstractString removeNullChoice(IAbstractString str) {
+		IAbstractString result = flattenStringCollections(str);
+		if (result instanceof StringChoice) {
+			List<IAbstractString> newOptions = new ArrayList<IAbstractString>();
+			for (IAbstractString option : ((StringChoice)result).getItems()) {
+				// TODO should distinguish between actual "null" string and null
+				if (option instanceof StringConstant && ((StringConstant)option).getConstant().equals("null")) {
+					// do nothing
+				}
+				else {
+					newOptions.add(option);
+				}
+			}
+			
+			if (newOptions.size() == 1) {
+				return newOptions.get(0);
+			}
+			else { 
+				return new StringChoice(str.getPosition(), newOptions);
+			}
+		}
+		else {
+			return result;
+		}
+	}
 	
 	
 }

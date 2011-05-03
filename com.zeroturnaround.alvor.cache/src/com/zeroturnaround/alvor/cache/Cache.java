@@ -498,7 +498,11 @@ public class Cache {
 			try {
 				boolean found = childRs.next();
 				assert found;
-				IAbstractString body = createAbstractString(childRs, new IntegerList(pos.hashCode(), context));
+				IntegerList newContext = context;
+				if (pos != null) {
+					newContext = new IntegerList(pos.hashCode(), context);
+				}
+				IAbstractString body = createAbstractString(childRs, newContext);
 				assert (!childRs.next());
 				return new StringRepetition(pos, body);
 			}
