@@ -94,7 +94,6 @@ public class TestUtil {
 		
 		storeFoundTestResults(positionLines, folder, "node_positions");
 		storeFoundTestResults(concreteLines, folder, "concrete_strings");
-		storeFoundTestResults(descriptorLines, folder, "node_descriptors");
 		storeFoundTestResults(sortedDescriptorLines, folder, "node_descriptors_sorted");
 	}
 	

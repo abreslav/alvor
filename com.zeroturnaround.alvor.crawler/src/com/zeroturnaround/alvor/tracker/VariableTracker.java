@@ -405,7 +405,7 @@ public class VariableTracker {
 	private static NameUsage getLastReachingModInReturn(IVariableBinding var,
 			ASTNode target, ReturnStatement ret) {
 		if (target == null && ret.getExpression() != null) {
-			return getLastReachingMod(var, ret.getExpression());
+			return getLastReachingModIn(var, null, ret.getExpression());
 		}
 		else {
 			return null;

@@ -41,6 +41,7 @@ import com.zeroturnaround.alvor.common.HotspotDescriptor;
 import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.common.HotspotPatternReference;
 import com.zeroturnaround.alvor.common.IntegerList;
+import com.zeroturnaround.alvor.common.PositionUtil;
 import com.zeroturnaround.alvor.common.RecursionConverter;
 import com.zeroturnaround.alvor.common.StringConverter;
 import com.zeroturnaround.alvor.common.StringHotspotDescriptor;
@@ -300,6 +301,8 @@ public class StringExpressionEvaluator {
 	}
 
 	private IAbstractString evalName(Name name, IntegerList context, ParamEvalMode mode) {
+		LOG.message("EVAL NAME: " + name.getFullyQualifiedName() + " at: " + 
+				PositionUtil.getLineString(ASTUtil.getPosition(name)));
 		ITypeBinding type = name.resolveTypeBinding();
 		if (!ASTUtil.isStringOrStringBuilderOrBuffer(type)) {
 			throw new UnsupportedStringOpExAtNode("Unsupported type of Name: " + type.getQualifiedName(), name);
@@ -633,14 +636,14 @@ public class StringExpressionEvaluator {
 		if (str.containsRecursion()) {
 			System.out.println("FOUND RECURSION");
 			
-			throw new UnsupportedStringOpEx("Unsupported modification scheme in loop", str.getPosition());
+			//throw new UnsupportedStringOpEx("Unsupported modification scheme in loop", str.getPosition());
 //			TODO put back when path-sens is done
-			//IAbstractString repStr = RecursionConverter.recursionToRepetition(str);
+			IAbstractString repStr = RecursionConverter.recursionToRepetition(str);
 //			if (repStr instanceof StringChoice) {
 //				repStr = StringConverter.optimizeChoice((StringChoice)repStr);
 //			}
-			//return repStr;
-//			assert ! result.containsRecursion();
+//			assert ! repStr.containsRecursion();
+			return repStr;
 		}
 		else {
 			return str;
