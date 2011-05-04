@@ -23,4 +23,13 @@ public class IntegerList {
 	public IntegerList getPrev() {
 		return prev;
 	}
+	
+	public int getLength() {
+		if (prev == null) {
+			return 1;
+		}
+		else {
+			return prev.getLength() + 1;
+		}
+	}
 }

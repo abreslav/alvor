@@ -57,6 +57,7 @@ public class GuiChecker {
 	
 	public void cleanUpdateProjectMarkers(IProject project, IProgressMonitor monitor) {
 		try {
+			CacheProvider.tryDeleteCache(project.getName());
 			ProgressUtil.beginTask(monitor, "Full SQL check for " + project.getName(), 100);
 			CacheProvider.getCache(project.getName()).clearProject();
 			deleteAlvorMarkers(project);
@@ -374,7 +375,7 @@ public class GuiChecker {
 
 	public void clearProject(IProject project) {
 		deleteAlvorMarkers(project);
-		CacheProvider.getCache(project.getName()).clearProject();
+		CacheProvider.tryDeleteCache(project.getName());
 	}
 	
 }
