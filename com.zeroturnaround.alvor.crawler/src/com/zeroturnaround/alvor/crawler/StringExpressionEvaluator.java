@@ -76,7 +76,8 @@ public class StringExpressionEvaluator {
 	public static enum ParamEvalMode {AS_HOTSPOT, AS_PARAM};
 	
 	public final static StringExpressionEvaluator INSTANCE = new StringExpressionEvaluator();
-	private static final int MAX_CONTEXT_DEPTH = 20;
+	private static final int MAX_CONTEXT_DEPTH = 100;
+	private static final int MAX_BRANCHING_COUNT = 7;
 	
 	public HotspotDescriptor evaluateFinalField(VariableDeclarationFragment decl) {
 		try {
@@ -90,7 +91,7 @@ public class StringExpressionEvaluator {
 				throw new UnsupportedStringOpExAtNode("Non-final fields are not supported: "
 						+ var.getDeclaringClass().getName() + '.' + var.getName(), decl);
 			}
-			IAbstractString str = removeRecursion(eval(init, null, ParamEvalMode.AS_HOTSPOT));
+			IAbstractString str = removeRecursion(eval(init, null, ParamEvalMode.AS_HOTSPOT, 0));
 			
 			return new StringHotspotDescriptor(ASTUtil.getPosition(decl), str);
 		} catch (UnsupportedStringOpEx e) {
@@ -101,7 +102,7 @@ public class StringExpressionEvaluator {
 
 	public HotspotDescriptor evaluate(Expression node, ParamEvalMode mode) {
 		try {
-			IAbstractString str = removeRecursion(eval(node, null, mode));
+			IAbstractString str = removeRecursion(eval(node, null, mode, 0));
 			
 			return new StringHotspotDescriptor(ASTUtil.getPosition(node), str);
 		} catch (UnsupportedStringOpEx e) {
@@ -110,9 +111,13 @@ public class StringExpressionEvaluator {
 		}
 	}
 
-	private IAbstractString eval(Expression node, IntegerList context, ParamEvalMode mode) {
+	private IAbstractString eval(Expression node, IntegerList context, ParamEvalMode mode, int branchingCount) {
 		if (context != null && context.getLength() > MAX_CONTEXT_DEPTH) {
 			throw new UnsupportedStringOpExAtNode("String analysis too deep", node);
+		}
+		
+		if (branchingCount > MAX_BRANCHING_COUNT) {
+			throw new UnsupportedStringOpExAtNode("Branching is too deep", node);
 		}
 		
 		// recursion check
@@ -167,19 +172,19 @@ public class StringExpressionEvaluator {
 					bStr, "\"" + bStr + "\"");
 		}
 		else if (node instanceof Name) {
-			return evalName((Name)node, context, mode);
+			return evalName((Name)node, context, mode, branchingCount);
 		}
 		else if (node instanceof CastExpression) {
 			CastExpression cExp = (CastExpression)node;
 			LOG.message("CAST expression: " + cExp + ", cast type=" + cExp.getType()
 					+ ", exp type=" + cExp.getExpression().resolveTypeBinding().getQualifiedName());
 			// try evaluating content
-			return eval(cExp.getExpression(), context, mode);
+			return eval(cExp.getExpression(), context, mode, branchingCount);
 		}
 		else if (node instanceof ConditionalExpression) {
 			StringChoice choice = new StringChoice(ASTUtil.getPosition(node),
-					eval(((ConditionalExpression)node).getThenExpression(), contextOf(node, context), mode),
-					eval(((ConditionalExpression)node).getElseExpression(), contextOf(node, context), mode));
+					eval(((ConditionalExpression)node).getThenExpression(), contextOf(node, context), mode, branchingCount+1),
+					eval(((ConditionalExpression)node).getElseExpression(), contextOf(node, context), mode, branchingCount+1));
 
 			if (optimizeChoice /*&& !choice.containsRecursion()*/) {
 				// Recursion removal procedure assumes certain structure
@@ -190,16 +195,16 @@ public class StringExpressionEvaluator {
 			}
 		}
 		else if (node instanceof ParenthesizedExpression) {
-			return eval(((ParenthesizedExpression)node).getExpression(), context, mode);
+			return eval(((ParenthesizedExpression)node).getExpression(), context, mode, branchingCount);
 		}
 		else if (node instanceof InfixExpression) {
-			return evalInfix((InfixExpression)node, context, mode);
+			return evalInfix((InfixExpression)node, context, mode, branchingCount);
 		}
 		else if (node instanceof MethodInvocation) {
-			return evalInvocationResult((MethodInvocation)node, context, mode);
+			return evalInvocationResult((MethodInvocation)node, context, mode, branchingCount);
 		}
 		else if (node instanceof ClassInstanceCreation) {
-			return evalClassInstanceCreation((ClassInstanceCreation)node, context, mode);
+			return evalClassInstanceCreation((ClassInstanceCreation)node, context, mode, branchingCount);
 		}
 		else {
 			throw new UnsupportedStringOpExAtNode("getValOf(" + node.getClass().getName() + ")", node);
@@ -208,7 +213,7 @@ public class StringExpressionEvaluator {
 	
 
 	private IAbstractString evalInvocationArgOut(MethodInvocation inv,
-			int argumentNo, IntegerList context, ParamEvalMode mode) {
+			int argumentNo, IntegerList context, ParamEvalMode mode, int branchingCount) {
 		
 		IMethodBinding binding = inv.resolveMethodBinding(); 
 		String className = binding.getDeclaringClass().getErasure().getQualifiedName();
@@ -220,10 +225,11 @@ public class StringExpressionEvaluator {
 				className, methodName,
 				ASTUtil.getSimpleArgumentTypesAsString(binding),
 				argumentNo
-		), evaluateStringArguments(inv, context, mode));
+		), evaluateStringArguments(inv, context, mode, branchingCount));
 	}
 
-	private IAbstractString evalInvocationResult(MethodInvocation inv, IntegerList context, ParamEvalMode mode) {
+	private IAbstractString evalInvocationResult(MethodInvocation inv, IntegerList context, ParamEvalMode mode,
+			int branchingCount) {
 		//return evalInvocationResultOrArgOut(inv, -1, context);
 		// First handle special methods
 		
@@ -235,17 +241,17 @@ public class StringExpressionEvaluator {
 		if (inv.getExpression() != null
 				&& ASTUtil.isStringOrStringBuilderOrBuffer(inv.getExpression().resolveTypeBinding())) {
 			if (inv.getName().getIdentifier().equals("toString")) {
-				return eval(inv.getExpression(), invContext, mode);
+				return eval(inv.getExpression(), invContext, mode, branchingCount);
 			}
 			else if (inv.getName().getIdentifier().equals("append")) {
 				return new StringSequence(
 						ASTUtil.getPosition(inv), 
-						eval(inv.getExpression(), invContext, mode),
-						eval((Expression)inv.arguments().get(0), invContext, mode));
+						eval(inv.getExpression(), invContext, mode, branchingCount),
+						eval((Expression)inv.arguments().get(0), invContext, mode, branchingCount));
 			}
 			else if (inv.getName().getIdentifier().equals("valueOf")) {
 				assert (ASTUtil.isString(inv.getExpression().resolveTypeBinding()));
-				return eval((Expression)inv.arguments().get(0), invContext, mode);
+				return eval((Expression)inv.arguments().get(0), invContext, mode, branchingCount);
 			}
 			else {
 				throw new UnsupportedStringOpExAtNode("String/Builder/Buffer, method=" 
@@ -286,12 +292,12 @@ public class StringExpressionEvaluator {
 					className, methodName, 
 					ASTUtil.getSimpleArgumentTypesAsString(binding),
 					-1
-			), evaluateStringArguments(inv, context, mode));
+			), evaluateStringArguments(inv, context, mode, branchingCount));
 		}			
 	}
 	
 	private Map<Integer, IAbstractString> evaluateStringArguments(MethodInvocation inv, 
-			IntegerList context, ParamEvalMode mode) {
+			IntegerList context, ParamEvalMode mode, int branchingCount) {
 		Map<Integer, IAbstractString> inputArguments = new HashMap<Integer, IAbstractString>();
 		
 		for (int i = 0; i < inv.arguments().size(); i++) {
@@ -299,13 +305,13 @@ public class StringExpressionEvaluator {
 			ITypeBinding typ = arg.resolveTypeBinding();
 			if (ASTUtil.isStringOrStringBuilderOrBuffer(typ)) {
 				// using 1-based indexing
-				inputArguments.put(i+1, this.eval(arg, contextOf(inv, context), mode));
+				inputArguments.put(i+1, this.eval(arg, contextOf(inv, context), mode, branchingCount));
 			}
 		}
 		return inputArguments;
 	}
 
-	private IAbstractString evalName(Name name, IntegerList context, ParamEvalMode mode) {
+	private IAbstractString evalName(Name name, IntegerList context, ParamEvalMode mode, int branchingCount) {
 //		LOG.message("EVAL NAME: " + name.getFullyQualifiedName() + " at: " + 
 //				PositionUtil.getLineString(ASTUtil.getPosition(name)));
 		ITypeBinding type = name.resolveTypeBinding();
@@ -320,22 +326,23 @@ public class StringExpressionEvaluator {
 		}
 		else {
 			
-			return evalVarBefore((IVariableBinding)name.resolveBinding(), name, context, mode);
+			return evalVarBefore((IVariableBinding)name.resolveBinding(), name, context, mode, branchingCount);
 		}
 	}
 
 	private IAbstractString evalVarBefore(IVariableBinding var, ASTNode target, 
-			IntegerList context, ParamEvalMode mode) {
+			IntegerList context, ParamEvalMode mode, int branchingCount) {
 		
 		NameUsage usage = VariableTracker.getLastReachingMod(var, target);
 		if (usage == null) {
 			throw new UnsupportedStringOpEx("internal error: Can't find definition for '" + var + "'", null);
 		}
 		
-		return evalVarAfter(var, usage, context, mode); 
+		return evalVarAfter(var, usage, context, mode, branchingCount); 
 	}
 
-	private IAbstractString evalVarAfter(IVariableBinding var, NameUsage usage, IntegerList context, ParamEvalMode mode) {
+	private IAbstractString evalVarAfter(IVariableBinding var, NameUsage usage, IntegerList context, 
+			ParamEvalMode mode, int branchingCount) {
 		
 		// recursion check
 		if (context != null && context.contains(usage.hashCode())) { 
@@ -346,23 +353,23 @@ public class StringExpressionEvaluator {
 		
 		
 		if (usage instanceof NameUsageChoice) {
-			return evalVarAfterUsageChoice(var, (NameUsageChoice)usage, context, mode);
+			return evalVarAfterUsageChoice(var, (NameUsageChoice)usage, context, mode, branchingCount);
 		}
 		else if (usage instanceof NameAssignment) {
-			return evalVarAfterAssignment(var, (NameAssignment)usage, context, mode);
+			return evalVarAfterAssignment(var, (NameAssignment)usage, context, mode, branchingCount);
 		}
 		else if (usage instanceof NameInParameter) {
-			return evalVarInParameter(var, (NameInParameter)usage, context, mode);
+			return evalVarInParameter(var, (NameInParameter)usage, context, mode, branchingCount);
 		}
 		else if (usage instanceof NameInArgument) {
-			return evalVarAfterBeingArgument(var, (NameInArgument)usage, context, mode);
+			return evalVarAfterBeingArgument(var, (NameInArgument)usage, context, mode, branchingCount);
 		}
 		else if (usage instanceof NameInMethodCallExpression) {
-			return evalVarAfterCallingItsMethod(var, (NameInMethodCallExpression)usage, context, mode);
+			return evalVarAfterCallingItsMethod(var, (NameInMethodCallExpression)usage, context, mode, branchingCount);
 		}
 		else if (usage instanceof UsageFilter) {
 			UsageFilter filter = (UsageFilter)usage;
-			IAbstractString result = evalVarAfter(var, filter.getMainUsage(), context, mode);
+			IAbstractString result = evalVarAfter(var, filter.getMainUsage(), context, mode, branchingCount);
 			LOG.message("TODO: Filter variable: " + var.getName());
 			// TODO filter fullString according to filter
 			if (filter.hasNotNullCondition()) {
@@ -377,7 +384,7 @@ public class StringExpressionEvaluator {
 	
 	
 	private IAbstractString evalVarInParameter(IVariableBinding var, NameInParameter usage, 
-			IntegerList context, ParamEvalMode mode) {
+			IntegerList context, ParamEvalMode mode, int branchingCount) {
 		
 		IPosition pos = ASTUtil.getPosition(usage.getParameterNode());
 		
@@ -395,37 +402,40 @@ public class StringExpressionEvaluator {
 		}
 	}
 
-	private IAbstractString evalVarAfterBeingArgument(IVariableBinding var, NameInArgument usage, IntegerList context, ParamEvalMode mode) {
+	private IAbstractString evalVarAfterBeingArgument(IVariableBinding var, NameInArgument usage, 
+			IntegerList context, ParamEvalMode mode, int branchingCount) {
 		if (ASTUtil.isString(var.getType())) {
 			// this usage doesn't affect it, keep looking
-			return evalVarBefore(var, usage.getInvocation(), context, mode);
+			return evalVarBefore(var, usage.getInvocation(), context, mode, branchingCount);
 		}
 		else {
 			assert ASTUtil.isStringBuilderOrBuffer(var.getType());
 			
 			// TODO does it need new context ?
-			return evalInvocationArgOut(usage.getInvocation(), usage.getArgumentNo(), contextOf(usage, context), mode); 
+			return evalInvocationArgOut(usage.getInvocation(), usage.getArgumentNo(), 
+					contextOf(usage, context), mode, branchingCount); 
 		}
 	}
 
-	private IAbstractString evalVarAfterUsageChoice(IVariableBinding var, NameUsageChoice uc, IntegerList context, ParamEvalMode mode) {
+	private IAbstractString evalVarAfterUsageChoice(IVariableBinding var, NameUsageChoice uc, 
+			IntegerList context, ParamEvalMode mode, int branchingCount) {
 		
 		IntegerList newContext = contextOf(uc, context);
 		
 		IAbstractString thenStr;
 		if (uc.getThenUsage() == null) {
-			thenStr = this.evalVarBefore(var, uc.getCommonParentNode(), newContext, mode); // eval before if statement
+			thenStr = this.evalVarBefore(var, uc.getCommonParentNode(), newContext, mode, branchingCount+1); // eval before if statement
 		}
 		else {
-			 thenStr = this.evalVarAfter(var, uc.getThenUsage(), newContext, mode);
+			 thenStr = this.evalVarAfter(var, uc.getThenUsage(), newContext, mode, branchingCount+1);
 		}
 		
 		IAbstractString elseStr;
 		if (uc.getElseUsage() == null) {
-			elseStr = this.evalVarBefore(var, uc.getCommonParentNode(), newContext, mode); // eval before if statement
+			elseStr = this.evalVarBefore(var, uc.getCommonParentNode(), newContext, mode, branchingCount+1); // eval before if statement
 		}
 		else {
-			elseStr = this.evalVarAfter(var, uc.getElseUsage(), newContext, mode);
+			elseStr = this.evalVarAfter(var, uc.getElseUsage(), newContext, mode, branchingCount+1);
 		}
 		
 		IPosition pos = null;
@@ -442,13 +452,13 @@ public class StringExpressionEvaluator {
 	}
 	
 
-	private IAbstractString evalInfix(InfixExpression expr, IntegerList context, ParamEvalMode mode) {
+	private IAbstractString evalInfix(InfixExpression expr, IntegerList context, ParamEvalMode mode, int branchingCount) {
 		if (expr.getOperator() == InfixExpression.Operator.PLUS) {
 			List<IAbstractString> ops = new ArrayList<IAbstractString>();
-			ops.add(eval(expr.getLeftOperand(), contextOf(expr, context), mode));
-			ops.add(eval(expr.getRightOperand(), contextOf(expr, context), mode));
+			ops.add(eval(expr.getLeftOperand(), contextOf(expr, context), mode, branchingCount));
+			ops.add(eval(expr.getRightOperand(), contextOf(expr, context), mode, branchingCount));
 			for (Object operand: expr.extendedOperands()) {
-				ops.add(eval((Expression)operand, contextOf(expr, context), mode));
+				ops.add(eval((Expression)operand, contextOf(expr, context), mode, branchingCount));
 			}
 			return new StringSequence(ASTUtil.getPosition(expr), ops);
 		}
@@ -457,7 +467,8 @@ public class StringExpressionEvaluator {
 		}
 	}
 	
-	private IAbstractString evalClassInstanceCreation(ClassInstanceCreation node, IntegerList context, ParamEvalMode mode) {
+	private IAbstractString evalClassInstanceCreation(ClassInstanceCreation node, IntegerList context, 
+			ParamEvalMode mode, int branchingCount) {
 		if (!ASTUtil.isStringOrStringBuilderOrBuffer(node.resolveTypeBinding())) {
 			throw new UnsupportedStringOpExAtNode("Unsupported type in class instance creation: "
 					+ node.resolveTypeBinding().getQualifiedName(), node);
@@ -466,7 +477,7 @@ public class StringExpressionEvaluator {
 			Expression arg = (Expression)node.arguments().get(0);
 			// string initializer
 			if (arg.resolveTypeBinding().getName().equals("String")) {
-				return eval(arg, context, mode);
+				return eval(arg, context, mode, branchingCount);
 			}
 			else if (arg.resolveTypeBinding().getName().equals("int")) {
 				return new EmptyStringConstant(ASTUtil.getPosition(node));
@@ -482,18 +493,19 @@ public class StringExpressionEvaluator {
 		}
 	}
 
-	private IAbstractString evalVarAfterAssignment(IVariableBinding var, NameAssignment usage, IntegerList context, ParamEvalMode mode) {
+	private IAbstractString evalVarAfterAssignment(IVariableBinding var, NameAssignment usage, 
+			IntegerList context, ParamEvalMode mode, int branchingCount) {
 		
 		IntegerList assContext = contextOf(usage, context);
 		
 		if (usage.getOperator() == Assignment.Operator.ASSIGN) {
-			return eval(usage.getRightHandSide(), assContext, mode);
+			return eval(usage.getRightHandSide(), assContext, mode, branchingCount);
 		}
 		else if (usage.getOperator() == Assignment.Operator.PLUS_ASSIGN) {
 			return new StringSequence(
 					ASTUtil.getPosition(usage.getAssignmentOrDeclaration()),
-					eval(usage.getLeftHandSide(), assContext, mode),
-					eval(usage.getRightHandSide(), assContext, mode));
+					eval(usage.getLeftHandSide(), assContext, mode, branchingCount),
+					eval(usage.getRightHandSide(), assContext, mode, branchingCount));
 		}
 		else {
 			throw new UnsupportedStringOpExAtNode("Unknown assignment operator: " + usage.getOperator(), usage.getAssignmentOrDeclaration());
@@ -504,12 +516,12 @@ public class StringExpressionEvaluator {
 	 * Meant for analyzing mutating method calls on name
 	 */
 	private IAbstractString evalVarAfterCallingItsMethod(IVariableBinding var, 
-			NameInMethodCallExpression usage, IntegerList context, ParamEvalMode mode) {
+			NameInMethodCallExpression usage, IntegerList context, ParamEvalMode mode, int branchingCount) {
 		IntegerList newContext = contextOf(usage, context);
 		
 		if (ASTUtil.isString(var.getType())) {
 			// this usage doesn't affect it
-			return evalVarBefore(var, usage.getInvocation(), newContext, mode);
+			return evalVarBefore(var, usage.getInvocation(), newContext, mode, branchingCount);
 		}
 		
 		else {
@@ -520,8 +532,8 @@ public class StringExpressionEvaluator {
 			if (methodName.equals("append")) {
 				return new StringSequence(
 						ASTUtil.getPosition(inv),
-						eval(inv.getExpression(), newContext, mode),
-						eval((Expression)inv.arguments().get(0), newContext, mode));
+						eval(inv.getExpression(), newContext, mode, branchingCount),
+						eval((Expression)inv.arguments().get(0), newContext, mode, branchingCount));
 			}
 			// non-modifying method calls
 			else if (methodName.equals("toString")
@@ -540,7 +552,7 @@ public class StringExpressionEvaluator {
 					|| methodName.equals("substring")
 					|| methodName.equals("trimToSize")
 					) {
-				return eval(inv.getExpression(), newContext, mode);
+				return eval(inv.getExpression(), newContext, mode, branchingCount);
 			}
 			else {
 				throw new UnsupportedStringOpExAtNode("Unknown method called on StringBuilder: " 
@@ -593,7 +605,7 @@ public class StringExpressionEvaluator {
 		// get choice out of different return expressions
 		List<IAbstractString> options = new ArrayList<IAbstractString>();
 		for (ReturnStatement ret: returnStmts) {
-			options.add(eval(ret.getExpression(), null, ParamEvalMode.AS_PARAM));
+			options.add(eval(ret.getExpression(), null, ParamEvalMode.AS_PARAM, 0));
 		}
 		if (options.size() == 1) {
 			return options.get(0);
@@ -611,7 +623,7 @@ public class StringExpressionEvaluator {
 		IVariableBinding var = (IVariableBinding)paramName.resolveBinding();
 		NameUsage lastMod = VariableTracker.getLastModIn(var, decl);
 
-		return evalVarAfter(var, lastMod, null, ParamEvalMode.AS_PARAM);
+		return evalVarAfter(var, lastMod, null, ParamEvalMode.AS_PARAM, 0);
 	}
 
 	private IAbstractString getMethodReturnValueFromJavadoc(MethodDeclaration decl) {
@@ -657,16 +669,12 @@ public class StringExpressionEvaluator {
 		}
 	}
 	
-	private IntegerList contextOf(IPosition pos, IntegerList prevContext) {
-		return new IntegerList(pos.hashCode(), prevContext);
-	}
-	
 	private IntegerList contextOf(NameUsage usage, IntegerList prevContext) {
 		return new IntegerList(usage.hashCode(), prevContext);
 	}
 	
 	private IntegerList contextOf(ASTNode node, IntegerList prevContext) {
-		return contextOf(ASTUtil.getPosition(node), prevContext);
+		return new IntegerList(ASTUtil.getPosition(node).hashCode(), prevContext);
 	}
 	
 }
