@@ -197,7 +197,7 @@ public class Cache {
 	}
 	
 	public void initializeProject(Collection<HotspotPattern> primaryPatterns, 
-			List<String> projectFiles) {
+			List<String> projectFiles, List<String> requiredProjectFiles) {
 		
 		assert (maxPatternBatchNo == 0);
 		
@@ -211,6 +211,10 @@ public class Cache {
 		
 		for (String name : projectFiles) {
 			addFile(name, true);
+		}
+		
+		for (String name : requiredProjectFiles) {
+			addFile(name, false);
 		}
 	}
 	

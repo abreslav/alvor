@@ -1,5 +1,6 @@
 package com.zeroturnaround.alvor.crawler;
 
+import java.io.File;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
@@ -24,7 +25,7 @@ public abstract class StringCollectionTest {
 	public void findValidNodeDescriptors() {
 		String projectName = this.getProjectName();
 		try {
-			CacheProvider.getCache(projectName).clearProject();
+			CacheProvider.tryDeleteCache(projectName);
 			findAndValidateNodeDescriptors(projectName);
 		}
 		finally {
@@ -70,8 +71,14 @@ public abstract class StringCollectionTest {
 	}
 
 	private boolean foundFilesAreExpected(IPath folder, String topic) {
-		return TestUtil.filesAreEqual(folder.append(topic + "_found.txt").toFile(), 
-				folder.append(topic + "_expected.txt").toFile());
+		File found = folder.append(topic + "_found.txt").toFile();
+		File expected = folder.append(topic + "_expected.txt").toFile();
+		if (!found.exists() || !expected.exists()) {
+			return false;
+		}
+		else {
+			return TestUtil.filesAreEqual(found, expected);
+		}
 	}
 	
 }

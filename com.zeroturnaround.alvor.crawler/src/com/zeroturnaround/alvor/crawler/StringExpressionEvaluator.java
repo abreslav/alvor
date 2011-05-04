@@ -41,7 +41,6 @@ import com.zeroturnaround.alvor.common.HotspotDescriptor;
 import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.common.HotspotPatternReference;
 import com.zeroturnaround.alvor.common.IntegerList;
-import com.zeroturnaround.alvor.common.PositionUtil;
 import com.zeroturnaround.alvor.common.RecursionConverter;
 import com.zeroturnaround.alvor.common.StringConverter;
 import com.zeroturnaround.alvor.common.StringHotspotDescriptor;
@@ -73,9 +72,11 @@ public class StringExpressionEvaluator {
 	private static final ILog LOG = Logs.getLog(StringExpressionEvaluator.class);
 	private static final String RESULT_FOR_SQL_CHECKER = "@ResultForSQLChecker";
 	private static boolean optimizeChoice = false;
+	private static boolean supportRepetition = false;
 	public static enum ParamEvalMode {AS_HOTSPOT, AS_PARAM};
 	
 	public final static StringExpressionEvaluator INSTANCE = new StringExpressionEvaluator();
+	private static final int MAX_CONTEXT_DEPTH = 20;
 	
 	public HotspotDescriptor evaluateFinalField(VariableDeclarationFragment decl) {
 		try {
@@ -110,6 +111,10 @@ public class StringExpressionEvaluator {
 	}
 
 	private IAbstractString eval(Expression node, IntegerList context, ParamEvalMode mode) {
+		if (context != null && context.getLength() > MAX_CONTEXT_DEPTH) {
+			throw new UnsupportedStringOpExAtNode("String analysis too deep", node);
+		}
+		
 		// recursion check
 		IPosition pos = ASTUtil.getPosition(node);
 		if (context != null && pos != null && context.contains(pos.hashCode())) { 
@@ -301,8 +306,8 @@ public class StringExpressionEvaluator {
 	}
 
 	private IAbstractString evalName(Name name, IntegerList context, ParamEvalMode mode) {
-		LOG.message("EVAL NAME: " + name.getFullyQualifiedName() + " at: " + 
-				PositionUtil.getLineString(ASTUtil.getPosition(name)));
+//		LOG.message("EVAL NAME: " + name.getFullyQualifiedName() + " at: " + 
+//				PositionUtil.getLineString(ASTUtil.getPosition(name)));
 		ITypeBinding type = name.resolveTypeBinding();
 		if (!ASTUtil.isStringOrStringBuilderOrBuffer(type)) {
 			throw new UnsupportedStringOpExAtNode("Unsupported type of Name: " + type.getQualifiedName(), name);
@@ -636,14 +641,16 @@ public class StringExpressionEvaluator {
 		if (str.containsRecursion()) {
 			System.out.println("FOUND RECURSION");
 			
-			//throw new UnsupportedStringOpEx("Unsupported modification scheme in loop", str.getPosition());
-//			TODO put back when path-sens is done
-			IAbstractString repStr = RecursionConverter.recursionToRepetition(str);
-//			if (repStr instanceof StringChoice) {
-//				repStr = StringConverter.optimizeChoice((StringChoice)repStr);
-//			}
-//			assert ! repStr.containsRecursion();
-			return repStr;
+			if (supportRepetition) {
+				IAbstractString repStr = RecursionConverter.recursionToRepetition(str);
+				// TODO optimize string
+				assert ! repStr.containsRecursion();
+				return repStr;
+				
+			}
+			else {
+				throw new UnsupportedStringOpEx("Unsupported modification scheme in loop", str.getPosition());
+			}
 		}
 		else {
 			return str;

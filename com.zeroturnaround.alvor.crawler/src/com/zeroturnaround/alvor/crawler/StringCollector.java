@@ -69,7 +69,7 @@ import com.zeroturnaround.alvor.crawler.util.JavaModelUtil;
  */
 public class StringCollector {
 	private static final ILog LOG = Logs.getLog(StringCollector.class);
-	private static final int MAX_ITERATIONS_FOR_FINDING_FIXPOINT = 7;
+	private static final int MAX_ITERATIONS_FOR_FINDING_FIXPOINT = 5;
 	private Map<StringPattern, SearchPattern> searchPatterns = new HashMap<StringPattern, SearchPattern>();
 	private SearchEngine searchEngine = new SearchEngine();
 	private Map<ICompilationUnit, ASTNode> astCache = new WeakHashMap<ICompilationUnit, ASTNode>();
@@ -133,14 +133,15 @@ public class StringCollector {
 		List<String> files = JavaModelUtil.getCompilationUnitNames(units);
 		
 		// add also files from required projects
+		List<String> requiredFiles = new ArrayList<String>();
 		Set<IJavaProject> reqProjects = JavaModelUtil.getAllRequiredProjects(javaProject);
 		for (IJavaProject p : reqProjects) {
 			units = JavaModelUtil.getAllCompilationUnits(p, false);
-			files.addAll(JavaModelUtil.getCompilationUnitNames(units));
+			requiredFiles.addAll(JavaModelUtil.getCompilationUnitNames(units));
 		}
 		
 		ProjectConfiguration conf = ConfigurationManager.readProjectConfiguration(project, true);
-		cache.initializeProject(conf.getHotspotPatterns(), files);
+		cache.initializeProject(conf.getHotspotPatterns(), files, requiredFiles);
 	}
 	
 	private void updateProjectCacheForNewPatterns(IJavaProject javaProject, 

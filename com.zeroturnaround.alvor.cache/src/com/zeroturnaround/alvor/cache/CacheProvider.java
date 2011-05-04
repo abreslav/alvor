@@ -1,5 +1,6 @@
 package com.zeroturnaround.alvor.cache;
 
+import java.io.File;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -12,8 +13,8 @@ import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
 
 public class CacheProvider {
-	private static Map<String, Cache> caches = new HashMap<String, Cache>();
-	private static boolean USE_SERVER = false; 
+	private static final Map<String, Cache> caches = new HashMap<String, Cache>();
+	private static final boolean USE_SERVER = false; 
 	
 	private final static ILog LOG = Logs.getLog(CacheProvider.class);
 	
@@ -39,39 +40,59 @@ public class CacheProvider {
 		return cache;
 	}
 	
-//	private static Connection connectToHSQLDB() throws SQLException, ClassNotFoundException {
-//		Class.forName("org.hsqldb.jdbc.JDBCDriver");
-//		String path = AlvorCachePlugin.getDefault().getStateLocation().append("/cache_hsqldb").toPortableString();
-//		String fileUrl = "jdbc:hsqldb:file:" + path + ";shutdown=true;hsqldb.log_data=false;hsqldb.default_table_type=cached";
-//		
-//		String serverUrl = "jdbc:hsqldb:hsql://localhost/xdb";
-//		
-//		// if db is locked, then assume that server is running and connect in server mode (this is debugging mode)
-//		if (new File(path + ".lck").exists()) {
-//			try {
-//				return DriverManager.getConnection(serverUrl, "SA", "");
-//			} catch (SQLException e) {
-//				// Seems that server is not running after all, probably the lock is leftover from a crash
-//				// HSQL is now supposed to do some repair on connect
-//				return DriverManager.getConnection(fileUrl, "SA", "");
-//			}
-//		}
-//		else {
-//			return DriverManager.getConnection(fileUrl, "SA", "");
-//		}
-//	}
+	
+	public static void tryDeleteCache(String projectName) {
+		if (!USE_SERVER) {
+			deleteCache(projectName);
+		}
+		else {
+			getCache(projectName).clearProject();
+		}
+	}
+	
+	public static void deleteCache(String projectName) {
+		// deletes and recreates database tables
+		// can be useful when database gets corrupted
+		
+		if (USE_SERVER) {
+			throw new IllegalStateException("Database can't be rebuilt in server mode");
+		}
+		
+		if (caches.get(projectName) != null) {
+			Cache cache = getCache(projectName);
+			cache.shutdown();
+		}
+		
+		File h2 = new File(getBasePath(projectName) + ".h2.db");
+		File trace = new File(getBasePath(projectName) + ".trace.db");
+		
+		boolean success;
+		if (h2.exists()) {
+			success = h2.delete();
+			assert success;
+		}
+		if (trace.exists()) {
+			success = trace.delete();
+			assert success;
+		}
+		
+		caches.remove(projectName);
+	}
+	
+	private static String getBasePath(String projectName) {
+		return AlvorCachePlugin.getDefault().getStateLocation().append(projectName).toPortableString();
+	}
 	
 	private static Connection connect(String projectName) throws SQLException, ClassNotFoundException {
 		System.setProperty("h2.serverCachedObjects", "1000"); 
 		Class.forName("org.h2.Driver");
-		String path = AlvorCachePlugin.getDefault().getStateLocation().append(projectName).toPortableString();
 		String url;
 		
 		if (USE_SERVER) {
-			url = "jdbc:h2:tcp://localhost/" + path;
+			url = "jdbc:h2:tcp://localhost/" + getBasePath(projectName);
 		}
 		else {
-			url = "jdbc:h2:" + path + ";LOG=0;CACHE_SIZE=25536;LOCK_MODE=0;UNDO_LOG=0";
+			url = "jdbc:h2:" + getBasePath(projectName) + ";LOG=0;CACHE_SIZE=25536;LOCK_MODE=0;UNDO_LOG=0";
 		}
 		return DriverManager.getConnection(url, "SA", "");
 	}
