@@ -20,15 +20,19 @@ import com.zeroturnaround.alvor.tests.util.TestUtil;
  */
 public abstract class StringCollectionTest {
 	protected abstract String getProjectName();
+	private boolean oldAutoBuilding;
 	
 	@Test
 	public void findValidNodeDescriptors() {
 		String projectName = this.getProjectName();
 		try {
+			this.oldAutoBuilding = WorkspaceUtil.getAutoBuilding();
+			WorkspaceUtil.setAutoBuilding(false); // don't want it to mess up with manual checking
 			CacheProvider.tryDeleteCache(projectName);
 			findAndValidateNodeDescriptors(projectName);
 		}
 		finally {
+			WorkspaceUtil.setAutoBuilding(oldAutoBuilding);
 			CacheProvider.getCache(projectName).printDBInfo();
 			CacheProvider.shutdownCaches();
 		}

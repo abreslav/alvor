@@ -17,7 +17,6 @@ import com.zeroturnaround.alvor.common.HotspotPattern;
 import com.zeroturnaround.alvor.common.HotspotPatternReference;
 import com.zeroturnaround.alvor.common.IntegerList;
 import com.zeroturnaround.alvor.common.PatternReference;
-import com.zeroturnaround.alvor.common.PositionUtil;
 import com.zeroturnaround.alvor.common.StringConverter;
 import com.zeroturnaround.alvor.common.StringHotspotDescriptor;
 import com.zeroturnaround.alvor.common.StringPattern;
