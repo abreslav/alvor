@@ -9,6 +9,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -102,6 +104,25 @@ public class WorkspaceUtil {
 		}
 		catch (CoreException e) {
 			throw new RuntimeException(e);
+		}
+	}
+	
+	public static boolean getAutoBuilding() {
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IWorkspaceDescription description = workspace.getDescription();
+		return description.isAutoBuilding();
+	}
+	
+	public static void setAutoBuilding(boolean value) {
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IWorkspaceDescription description = workspace.getDescription();
+		if (description.isAutoBuilding() != value) {
+			description.setAutoBuilding(value);
+			try {
+				workspace.setDescription(description);
+			} catch (CoreException e) {
+				throw new RuntimeException(e);
+			}
 		}
 	}
 	

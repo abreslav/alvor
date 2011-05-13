@@ -89,20 +89,6 @@
    </extension>
 
    <extension
-         point="org.eclipse.ui.popupMenus">
-      <viewerContribution
-            id="com.zeroturnaround.alvor.gui.ShowConnSourceContribution"
-            targetID="#CompilationUnitEditorContext_">
-         <action
-               class="com.zeroturnaround.alvor.gui.ConnectionSourceFinder"
-               id="com.zeroturnaround.alvor.ShowConnSource"
-               label="Show connection source"
-               menubarPath="_ContextMenu">
-         </action>
-      </viewerContribution>
-   </extension>
-   
-   <extension
          id="sqlwarning"
          name="SQL warning marker"
          point="org.eclipse.core.resources.markers">

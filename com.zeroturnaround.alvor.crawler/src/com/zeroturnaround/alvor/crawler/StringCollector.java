@@ -54,6 +54,7 @@ import com.zeroturnaround.alvor.common.logging.Logs;
 import com.zeroturnaround.alvor.common.logging.Timer;
 import com.zeroturnaround.alvor.configuration.ConfigurationManager;
 import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
+import com.zeroturnaround.alvor.conntracker.ConnectionTracker;
 import com.zeroturnaround.alvor.crawler.util.ASTUtil;
 import com.zeroturnaround.alvor.crawler.util.JavaModelUtil;
 
@@ -288,6 +289,10 @@ public class StringCollector {
 		Expression node = (Expression)inv.arguments().get(argOffset);
 		HotspotDescriptor desc = StringExpressionEvaluator.INSTANCE.evaluate(node, StringExpressionEvaluator.ParamEvalMode.AS_HOTSPOT);
 		
+		if (patternRecord.isPrimaryPattern()) {
+			// TODO add connection info to descriptor
+			ConnectionTracker.getConnectionDescriptor(inv.getExpression());
+		}
 		cache.addHotspot(patternRecord, desc);
 		
 		if (desc instanceof StringHotspotDescriptor) {
