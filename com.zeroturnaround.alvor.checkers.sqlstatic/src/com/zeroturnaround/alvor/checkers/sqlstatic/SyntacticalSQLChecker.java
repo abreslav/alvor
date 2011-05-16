@@ -7,8 +7,8 @@ import java.util.List;
 import com.zeroturnaround.alvor.checkers.CheckerException;
 import com.zeroturnaround.alvor.checkers.HotspotCheckingResult;
 import com.zeroturnaround.alvor.checkers.HotspotError;
-import com.zeroturnaround.alvor.checkers.HotspotInfo;
 import com.zeroturnaround.alvor.checkers.HotspotWarning;
+import com.zeroturnaround.alvor.checkers.HotspotWarningUnsupported;
 import com.zeroturnaround.alvor.checkers.IAbstractStringChecker;
 import com.zeroturnaround.alvor.common.StringHotspotDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
@@ -131,7 +131,7 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 					}
 				}
 				if (hasBigSubstrings) {
-					results.add(new HotspotWarning("SQL syntax checker: SQL string has too many possible variations" 
+					results.add(new HotspotWarningUnsupported("SQL syntax checker: SQL string has too many possible variations" 
 							+ (hasSmallSubstrings ? ". Only some are checked" : ""), descriptor.getPosition()));
 				}
 			} else {
@@ -148,11 +148,6 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 			}
 		}
 		
-		if (results.isEmpty()) {
-			results.add(new HotspotInfo("SQL syntax check passed", descriptor.getPosition()));
-		}
-		
-
 		return results;
 	}
 }

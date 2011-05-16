@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import com.zeroturnaround.alvor.checkers.CheckerException;
 import com.zeroturnaround.alvor.checkers.HotspotCheckingResult;
 import com.zeroturnaround.alvor.checkers.HotspotError;
+import com.zeroturnaround.alvor.checkers.HotspotWarningUnsupported;
 import com.zeroturnaround.alvor.checkers.IAbstractStringChecker;
 import com.zeroturnaround.alvor.common.StringHotspotDescriptor;
 import com.zeroturnaround.alvor.common.logging.ILog;
@@ -37,7 +38,7 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 			ProjectConfiguration configuration) throws CheckerException {
 		
 		if (AbstractStringSizeCounter.size(descriptor.getAbstractValue()) > SIZE_LIMIT) {
-			HotspotCheckingResult result = new HotspotError
+			HotspotCheckingResult result = new HotspotWarningUnsupported
 				("Dynamic SQL checker: SQL string has too many possible variations", descriptor.getPosition());
 			return Collections.singletonList(result);
 		}
