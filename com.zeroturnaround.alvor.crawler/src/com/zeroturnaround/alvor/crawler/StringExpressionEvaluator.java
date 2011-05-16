@@ -48,6 +48,7 @@ import com.zeroturnaround.alvor.common.UnsupportedHotspotDescriptor;
 import com.zeroturnaround.alvor.common.UnsupportedStringOpEx;
 import com.zeroturnaround.alvor.common.logging.ILog;
 import com.zeroturnaround.alvor.common.logging.Logs;
+import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
 import com.zeroturnaround.alvor.crawler.util.ASTUtil;
 import com.zeroturnaround.alvor.crawler.util.UnsupportedStringOpExAtNode;
 import com.zeroturnaround.alvor.string.IAbstractString;
@@ -75,10 +76,24 @@ public class StringExpressionEvaluator {
 	private static boolean supportRepetition = false;
 	public static enum ParamEvalMode {AS_HOTSPOT, AS_PARAM};
 	
-	public final static StringExpressionEvaluator INSTANCE = new StringExpressionEvaluator();
-	private static final int MAX_CONTEXT_DEPTH = 100;
-	private static final int MAX_BRANCHING_COUNT = 7;
+	private final int MAX_CONTEXT_DEPTH;
+	private final int MAX_BRANCHING_COUNT;
 	
+	public StringExpressionEvaluator(ProjectConfiguration conf) {
+		if (conf.getEffortLevel() < ProjectConfiguration.DEFAULT_EFFORT_LEVEL) {
+			this.MAX_CONTEXT_DEPTH = 80;
+			this.MAX_BRANCHING_COUNT = 4;
+		}
+		else if (conf.getEffortLevel() == ProjectConfiguration.DEFAULT_EFFORT_LEVEL) {
+			this.MAX_CONTEXT_DEPTH = 100;
+			this.MAX_BRANCHING_COUNT = 7;
+		}
+		else { // > ProjectConfiguration.DEFAULT_EFFORT_LEVEL
+			this.MAX_CONTEXT_DEPTH = 200;
+			this.MAX_BRANCHING_COUNT = 12;
+		}
+	}
+
 	public HotspotDescriptor evaluateFinalField(VariableDeclarationFragment decl) {
 		try {
 			Expression init = decl.getInitializer();

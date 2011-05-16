@@ -7,7 +7,9 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -18,6 +20,7 @@ import com.zeroturnaround.alvor.configuration.ProjectConfiguration;
 
 public class MainPropertyPage extends CommonPropertyPage {
 	private Button natureCheckbox; 
+	private Combo effortCombo;
 	@Override
 	protected Control createContents(Composite parent) {
 		noDefaultAndApplyButton();
@@ -44,10 +47,40 @@ public class MainPropertyPage extends CommonPropertyPage {
 		Label natureLabel = new Label(composite, SWT.WRAP);
 		natureLabel.setText("This gives automatic incremental checking on each save, " +
 				"and full checking on 'Clean'.\n" +
-				"NB! First checking can take several minutes for big projects.\n\n\n" +
+				"NB! First checking can take several minutes for big projects.\n\n" +
 				"Altenatively, you can always right-click your project in Package Explorer\n" +
-				"and select 'Check SQL' menu item.");
+				"and select 'Check SQL' menu item.\n\n");
 		
+		Label separator = new Label(composite, SWT.HORIZONTAL | SWT.SEPARATOR);
+	    separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		// effort
+	    ProjectConfiguration conf = this.readConfiguration();
+	    GridLayout effortLayout = new GridLayout(2, false);
+		effortLayout.marginTop = 10;
+		Composite effortComposite = new Composite(composite, SWT.NONE);
+		effortComposite.setLayout(effortLayout);
+		Label effortLabel = new Label(effortComposite, SWT.NONE);
+		effortLabel.setText("Analysis effort: ");
+		this.effortCombo = new Combo(effortComposite, SWT.READ_ONLY);
+		effortCombo.add("easy");
+		effortCombo.add("normal");
+		effortCombo.add("hard");
+		if (conf.getEffortLevel() == 1) {
+			effortCombo.select(0);
+		}
+		else if (conf.getEffortLevel() == 3) {
+			effortCombo.select(2);
+		}
+		else {
+			effortCombo.select(1);
+		}
+		effortCombo.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				hasChanges = true;
+			}
+		});
 		return composite;
 	}
 	
@@ -72,7 +105,7 @@ public class MainPropertyPage extends CommonPropertyPage {
 	
 	@Override
 	protected void mergeChanges(ProjectConfiguration base) {
-		// this page doesn't affect configuration in ProjectConfiguration
+		base.setProperty("effortLevel", String.valueOf(this.effortCombo.getSelectionIndex()+1));
 	}
 	
 	private boolean builderAndNatureAreInstalled() {
@@ -97,4 +130,5 @@ public class MainPropertyPage extends CommonPropertyPage {
 			throw new RuntimeException(e);
 		}
 	}
+	
 }

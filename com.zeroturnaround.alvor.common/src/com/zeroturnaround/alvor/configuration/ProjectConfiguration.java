@@ -1,12 +1,14 @@
 package com.zeroturnaround.alvor.configuration;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.zeroturnaround.alvor.common.HotspotPattern;
 
 public class ProjectConfiguration {
+	public static final int DEFAULT_EFFORT_LEVEL = 2; 
 	public enum CheckingStrategy {PREFER_STATIC, PREFER_DYNAMIC, ALL_CHECKERS}
 	
 	private List<HotspotPattern> hotspotPatterns = new ArrayList<HotspotPattern>();
@@ -112,5 +114,32 @@ public class ProjectConfiguration {
 		result = result * 31 + hotspotPatterns.hashCode();
 		result = result * 31 + properties.hashCode();
 		return result;
+	}
+	
+	public int getEffortLevel() {
+		 if (this.properties != null) {
+			 String levelStr = this.properties.get("effortLevel");
+			 if (levelStr != null) {
+				 try {
+					 return Integer.parseInt(levelStr);
+				 } 
+				 catch (NumberFormatException e) {
+					 return DEFAULT_EFFORT_LEVEL;
+				 }
+			 }
+			 else {
+				 return DEFAULT_EFFORT_LEVEL; 
+			 }
+		 }
+		 else {
+			 return DEFAULT_EFFORT_LEVEL;
+		 }
+	}
+	
+	public void setProperty(String name, String value) {
+		if (properties == null) {
+			properties = new HashMap<String, String>();
+		}
+		properties.put(name, value);
 	}
 }
