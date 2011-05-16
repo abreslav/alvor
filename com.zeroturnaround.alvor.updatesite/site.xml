@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<site>
-   <feature url="features/com.zeroturnaround.alvor.feature_0.3.7.201103301052.jar" id="com.zeroturnaround.alvor.feature" version="0.3.7.201103301052">
-      <category name="Alvor"/>
-   </feature>
-   <category-def name="Alvor" label="Alvor"/>
-</site>
