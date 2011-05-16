@@ -1,6 +1,7 @@
 package com.zeroturnaround.alvor.conntracker;
 
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
@@ -17,17 +18,22 @@ public class ConnectionTracker {
 		}
 		else if (node instanceof Name) {
 			Name name = (Name)node;
-			IVariableBinding var = (IVariableBinding)name.resolveBinding();
-			if (var.isField()) {
-				System.err.println("CONN FIELD: " + var);
-			}
-			else if (var.isParameter()) {
-				System.err.println("CONN PARAM: " + var);
-			}
-			else {
-				return "?"; // will be checked against all databases
-				// TODO try to track down assignments
-				//NameUsage usage = VariableTracker.getLastMod((Name)node);
+			IBinding binding = name.resolveBinding();
+			if (binding instanceof IVariableBinding) {
+				IVariableBinding var = (IVariableBinding)name.resolveBinding();
+				if (var.isField()) {
+					System.err.println("CONN FIELD: " + var);
+				}
+				else if (var.isParameter()) {
+					System.err.println("CONN PARAM: " + var);
+				}
+				else {
+					return "?"; // will be checked against all databases
+				// 	TODO try to track down assignments
+				//	NameUsage usage = VariableTracker.getLastMod((Name)node);
+				}
+			} else {
+				System.err.println("NONVAR name binding: " + binding);
 			}
 		}
 		
