@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -98,11 +99,43 @@ public class CacheProvider {
 	}
 	
 	private static void checkCreateTables(DatabaseHelper db) throws SQLException {
-		ResultSet res = db.getConnection().getMetaData().getTables(null, null, "FILES", null);
-		if (!res.next()) {
+		if (shouldRecreateDatabase(db.getConnection())) {
 			String scriptName = "db/cache_setup.sql";
 			InputStream script = CacheProvider.class.getClassLoader().getResourceAsStream(scriptName);
 			db.runScript(script);
+		}
+	}
+	
+	private static boolean shouldRecreateDatabase(Connection conn) throws SQLException {
+		ResultSet rs1 = conn.getMetaData().getTables(null, null, "FILES", null);
+		if (!rs1.next()) {
+			return true;
+		}
+		
+		// version check:
+		PreparedStatement stmt = null;
+		ResultSet rs2 = null;
+		try {
+			stmt = conn.prepareStatement("select * from hotspots");
+			rs2 = stmt.executeQuery();
+			try {
+				rs2.findColumn("conn_descriptor"); // a new field
+				return false;
+			}
+			catch (SQLException e) { // if conn_descriptor doesn't exist
+				return true;
+			}
+		}			
+		finally {
+			if (stmt != null) {
+				stmt.close();
+			}
+			if (rs1 != null) {
+				rs1.close();
+			}
+			if (rs2 != null) {
+				rs2.close();
+			}
 		}
 	}
 	

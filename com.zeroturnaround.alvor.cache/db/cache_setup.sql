@@ -62,5 +62,6 @@ create table hotspots
 	file_id integer not null references files(id) on delete cascade,
 	start integer not null,
 	length integer not null,
+	conn_descriptor varchar(300) default null,
 	checked boolean default false not null
 );;;
