@@ -82,7 +82,7 @@ public class StringExpressionEvaluator {
 	public StringExpressionEvaluator(ProjectConfiguration conf) {
 		if (conf.getEffortLevel() < ProjectConfiguration.DEFAULT_EFFORT_LEVEL) {
 			this.MAX_CONTEXT_DEPTH = 80;
-			this.MAX_BRANCHING_COUNT = 4;
+			this.MAX_BRANCHING_COUNT = 2;
 		}
 		else if (conf.getEffortLevel() == ProjectConfiguration.DEFAULT_EFFORT_LEVEL) {
 			this.MAX_CONTEXT_DEPTH = 100;
