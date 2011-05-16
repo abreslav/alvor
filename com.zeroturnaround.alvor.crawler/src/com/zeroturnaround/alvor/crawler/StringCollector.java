@@ -70,19 +70,32 @@ import com.zeroturnaround.alvor.crawler.util.JavaModelUtil;
  */
 public class StringCollector {
 	private static final ILog LOG = Logs.getLog(StringCollector.class);
-	private static final int MAX_ITERATIONS_FOR_FINDING_FIXPOINT = 5;
+	private final int MAX_ITERATIONS_FOR_FINDING_FIXPOINT;
 	private Map<StringPattern, SearchPattern> searchPatterns = new HashMap<StringPattern, SearchPattern>();
 	private SearchEngine searchEngine = new SearchEngine();
 	private Map<ICompilationUnit, ASTNode> astCache = new WeakHashMap<ICompilationUnit, ASTNode>();
 	private final Cache cache;
+	private StringExpressionEvaluator evaluator;
+	private ProjectConfiguration conf;
 	
 	public static void updateProjectCache(IProject project, IProgressMonitor monitor) {
-		StringCollector collector = new StringCollector(CacheProvider.getCache(project.getName()));
+		StringCollector collector = new StringCollector(project);
 		collector.doUpdateProjectCache(project, monitor);
 	}
 	
-	private StringCollector(Cache cache) {
-		this.cache = cache;		
+	private StringCollector(IProject project) {
+		this.conf = ConfigurationManager.readProjectConfiguration(project, true);
+		this.cache = CacheProvider.getCache(project.getName());
+		this.evaluator = new StringExpressionEvaluator(conf);
+		if (this.conf.getEffortLevel() < ProjectConfiguration.DEFAULT_EFFORT_LEVEL) {
+			this.MAX_ITERATIONS_FOR_FINDING_FIXPOINT = 5;
+		}
+		else if (this.conf.getEffortLevel() == ProjectConfiguration.DEFAULT_EFFORT_LEVEL) {
+			this.MAX_ITERATIONS_FOR_FINDING_FIXPOINT = 7;
+		}
+		else {
+			this.MAX_ITERATIONS_FOR_FINDING_FIXPOINT = 10;
+		}
 	}
 	
 	private void doUpdateProjectCache(IProject project, IProgressMonitor monitor) {
@@ -141,7 +154,6 @@ public class StringCollector {
 			requiredFiles.addAll(JavaModelUtil.getCompilationUnitNames(units));
 		}
 		
-		ProjectConfiguration conf = ConfigurationManager.readProjectConfiguration(project, true);
 		cache.initializeProject(conf.getHotspotPatterns(), files, requiredFiles);
 	}
 	
@@ -227,7 +239,7 @@ public class StringCollector {
 					&& pattern.getClassName().equals(className)
 					&& ((FieldPattern)pattern).getFieldName().equals(name.getIdentifier())) {
 				foundMatch = true;
-				HotspotDescriptor desc = StringExpressionEvaluator.INSTANCE.evaluateFinalField(decl);
+				HotspotDescriptor desc = evaluator.evaluateFinalField(decl);
 				cache.addHotspot(rec, desc);
 			}
 		}
@@ -273,7 +285,7 @@ public class StringCollector {
 					&& pattern.getClassName().equals(className)
 					&& pattern.getArgumentTypes().equals(argumentTypes)) {
 				foundMatch = true;
-				HotspotDescriptor desc = StringExpressionEvaluator.INSTANCE.getMethodTemplateDescriptor
+				HotspotDescriptor desc = evaluator.getMethodTemplateDescriptor
 					(decl, rec.getPattern().getArgumentNo());
 				cache.addHotspot(rec, desc);
 			}
@@ -287,7 +299,7 @@ public class StringCollector {
 	private void processHotspot(MethodInvocation inv, PatternRecord patternRecord) {
 		int argOffset = patternRecord.getPattern().getArgumentNo()-1;
 		Expression node = (Expression)inv.arguments().get(argOffset);
-		HotspotDescriptor desc = StringExpressionEvaluator.INSTANCE.evaluate(node, StringExpressionEvaluator.ParamEvalMode.AS_HOTSPOT);
+		HotspotDescriptor desc = evaluator.evaluate(node, StringExpressionEvaluator.ParamEvalMode.AS_HOTSPOT);
 		
 		if (patternRecord.isPrimaryPattern()) {
 			// TODO add connection info to descriptor
