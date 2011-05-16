@@ -33,7 +33,7 @@ public class ConnectionTracker {
 				//	NameUsage usage = VariableTracker.getLastMod((Name)node);
 				}
 			} else {
-				System.err.println("NONVAR name binding: " + binding);
+				System.err.println("NONVAR name binding: " + binding.getName());
 			}
 		}
 		

@@ -11,6 +11,7 @@ import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.Annotation;
+import org.eclipse.jdt.core.dom.ArrayAccess;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BooleanLiteral;
 import org.eclipse.jdt.core.dom.BreakStatement;
@@ -115,6 +116,10 @@ public class ASTUtil {
 		else if (expr instanceof StringLiteral 
 				|| expr instanceof NumberLiteral
 				|| expr instanceof BooleanLiteral) {
+			return false;
+		}
+		else if (expr instanceof ArrayAccess) {
+			// not exactly sound, but hopefully there is no modification 
 			return false;
 		}
 		else {

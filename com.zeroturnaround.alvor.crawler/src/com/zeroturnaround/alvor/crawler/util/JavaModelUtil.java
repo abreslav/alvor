@@ -31,7 +31,8 @@ public class JavaModelUtil {
 		Set<IJavaProject> reqs = new HashSet<IJavaProject>();
 		try {
 			for (String reqName : project.getRequiredProjectNames()) {
-				IJavaProject reqProject = getJavaProjectByName(reqName); 
+				IJavaProject reqProject = getJavaProjectByName(reqName);
+				assert reqProject != null;
 				reqs.add(reqProject);
 				// also add recursive requirements
 				reqs.addAll(getAllRequiredProjects(reqProject));
