@@ -144,6 +144,8 @@ public class AlvorBuilder extends IncrementalProjectBuilder {
 		int i = 0;
 		for (IJavaProject jp: requiredProjects) {
 			result[i] = jp.getProject();
+			assert result[i] != null;
+			i++;
 		}
 		return result;
 	}

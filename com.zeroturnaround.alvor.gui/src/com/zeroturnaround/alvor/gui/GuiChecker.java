@@ -19,6 +19,7 @@ import com.zeroturnaround.alvor.checkers.HotspotCheckingResult;
 import com.zeroturnaround.alvor.checkers.HotspotError;
 import com.zeroturnaround.alvor.checkers.HotspotInfo;
 import com.zeroturnaround.alvor.checkers.HotspotWarning;
+import com.zeroturnaround.alvor.checkers.HotspotWarningUnsupported;
 import com.zeroturnaround.alvor.checkers.complex.ComplexChecker;
 import com.zeroturnaround.alvor.common.HotspotDescriptor;
 import com.zeroturnaround.alvor.common.PositionUtil;
@@ -230,6 +231,10 @@ public class GuiChecker {
 		if (checkingResult instanceof HotspotError) {
 			markerId = AlvorGuiPlugin.ERROR_MARKER_ID;
 			severity = IMarker.SEVERITY_ERROR;  
+		}
+		else if (checkingResult instanceof HotspotWarningUnsupported) {
+			markerId = AlvorGuiPlugin.UNSUPPORTED_MARKER_ID;
+			severity = IMarker.SEVERITY_INFO;  
 		}
 		else if (checkingResult instanceof HotspotWarning) {
 			markerId = AlvorGuiPlugin.WARNING_MARKER_ID;
