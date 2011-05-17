@@ -266,6 +266,14 @@ id
 	| CONVERT
 	| SUBSTRING
 	| DESC
+	| CURRENT_TIMESTAMP
+	| CURRENT_DATE
+	| CHAR
+	| FALSE
+	| TRUE
+	| USER
+	| UPPER
+	| LOWER
 	;
 update
 	: UPDATE alias SET assignList where
