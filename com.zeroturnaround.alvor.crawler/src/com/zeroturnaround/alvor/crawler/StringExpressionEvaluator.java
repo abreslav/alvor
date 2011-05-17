@@ -19,6 +19,7 @@ import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.Javadoc;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
@@ -72,6 +73,7 @@ import com.zeroturnaround.alvor.tracker.VariableTracker;
 public class StringExpressionEvaluator {
 	private static final ILog LOG = Logs.getLog(StringExpressionEvaluator.class);
 	private static final String RESULT_FOR_SQL_CHECKER = "@ResultForSQLChecker";
+	private static final String SUPPRESS_SQL_CHECKER = "@SuppressSQLChecker";
 	private static boolean optimizeChoice = false;
 	private static boolean supportRepetition = false;
 	public static enum ParamEvalMode {AS_HOTSPOT, AS_PARAM};
@@ -116,6 +118,10 @@ public class StringExpressionEvaluator {
 	}
 
 	public HotspotDescriptor evaluate(Expression node, ParamEvalMode mode) {
+		if (shouldSuppressThisExpression(node)) {
+			return new UnsupportedHotspotDescriptor(ASTUtil.getPosition(node), 
+					"Checking is suppressed for containing method", ASTUtil.getPosition(node));
+		}
 		try {
 			IAbstractString str = removeRecursion(eval(node, null, mode, 0));
 			
@@ -123,6 +129,20 @@ public class StringExpressionEvaluator {
 		} catch (UnsupportedStringOpEx e) {
 			return new UnsupportedHotspotDescriptor(ASTUtil.getPosition(node), 
 					e.getMessage(), e.getPosition());
+		}
+	}
+	
+	private boolean shouldSuppressThisExpression(Expression node) {
+		MethodDeclaration methodDecl = ASTUtil.getContainingMethodDeclaration(node);
+		Javadoc javadoc = methodDecl.getJavadoc();
+		if (javadoc == null) {
+			return false;
+		}
+		if (ASTUtil.getJavadocTag(javadoc, SUPPRESS_SQL_CHECKER) != null) {
+			return true;
+		}
+		else {
+			return false;
 		}
 	}
 

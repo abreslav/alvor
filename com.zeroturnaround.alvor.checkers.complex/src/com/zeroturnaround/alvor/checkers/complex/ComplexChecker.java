@@ -74,9 +74,9 @@ public class ComplexChecker implements IAbstractStringChecker {
 			try {
 				nodeResults.addAll(dynamicChecker.checkAbstractString(descriptor, configuration));
 			} finally {
-				if (!nodeResults.isEmpty()) {
-					nodeResults.addAll(staticChecker.checkAbstractString(descriptor, configuration));
-				}
+//				if (!nodeResults.isEmpty()) {
+//					nodeResults.addAll(staticChecker.checkAbstractString(descriptor, configuration));
+//				}
 			}
 		} catch (Exception e) {
 			LOG.exception(e);
