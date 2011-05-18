@@ -10,6 +10,6 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.5.0",
  com.zeroturnaround.alvor.model;bundle-version="1.0.0",
  com.zeroturnaround.alvor.common;bundle-version="1.0.0",
  com.zeroturnaround.alvor.cache;bundle-version="1.0.0"
-Export-Package: com.zeroturnaround.alvor.conntracker,
- com.zeroturnaround.alvor.crawler,
- com.zeroturnaround.alvor.crawler.util
+Export-Package: com.googlecode.alvor.conntracker,
+ com.googlecode.alvor.crawler,
+ com.googlecode.alvor.crawler.util

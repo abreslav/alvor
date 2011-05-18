@@ -6,6 +6,6 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: com.zeroturnaround.alvor.model;bundle-version="1.0.0",
  com.zeroturnaround.alvor.common;bundle-version="1.0.0"
-Export-Package: com.zeroturnaround.alvor.lexer.alphabet,
- com.zeroturnaround.alvor.lexer.automata,
- com.zeroturnaround.alvor.lexer.sql
+Export-Package: com.googlecode.alvor.lexer.alphabet,
+ com.googlecode.alvor.lexer.automata,
+ com.googlecode.alvor.lexer.sql

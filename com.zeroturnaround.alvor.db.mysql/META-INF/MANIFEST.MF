@@ -5,7 +5,7 @@ Bundle-SymbolicName: com.zeroturnaround.alvor.db.mysql;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: ZEROTURNAROUND
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: com.zeroturnaround.alvor.db.mysql
+Export-Package: com.googlecode.alvor.db.mysql
 Require-Bundle: com.zeroturnaround.alvor.db;bundle-version="1.0.0"
 Bundle-ClassPath: .,
  lib/mysql-connector-java-5.1.13-bin.jar

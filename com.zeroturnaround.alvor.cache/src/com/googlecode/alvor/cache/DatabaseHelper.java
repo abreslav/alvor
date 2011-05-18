@@ -11,8 +11,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 
-import com.zeroturnaround.alvor.common.logging.ILog;
-import com.zeroturnaround.alvor.common.logging.Logs;
+import com.googlecode.alvor.common.logging.ILog;
+import com.googlecode.alvor.common.logging.Logs;
 
 public class DatabaseHelper {
 	private final static ILog LOG = Logs.getLog(DatabaseHelper.class);

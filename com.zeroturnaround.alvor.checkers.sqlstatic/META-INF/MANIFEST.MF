@@ -9,4 +9,4 @@ Require-Bundle: com.zeroturnaround.alvor.sqllexer;bundle-version="1.0.0",
  com.zeroturnaround.alvor.checkers;bundle-version="1.0.0",
  com.zeroturnaround.alvor.model;bundle-version="1.0.0",
  com.zeroturnaround.alvor.common;bundle-version="1.0.0"
-Export-Package: com.zeroturnaround.alvor.checkers.sqlstatic
+Export-Package: com.googlecode.alvor.checkers.sqlstatic

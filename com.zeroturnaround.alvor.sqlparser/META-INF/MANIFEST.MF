@@ -6,6 +6,6 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: com.zeroturnaround.alvor.sqllexer;bundle-version="1.0.0",
  com.zeroturnaround.alvor.model;bundle-version="1.0.0"
-Export-Package: com.zeroturnaround.alvor.sqlparser
+Export-Package: com.googlecode.alvor.sqlparser
 Bundle-ClassPath: lib/jdom.jar,
  .

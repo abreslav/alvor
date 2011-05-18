@@ -5,7 +5,7 @@
          point="org.eclipse.ui.commands">
       <command
             categoryId="com.zeroturnaround.alvor.gui.AlvorCategory"
-            defaultHandler="com.zeroturnaround.alvor.gui.debug.RunTestsHandler"
+            defaultHandler="com.googlecode.alvor.gui.debug.RunTestsHandler"
             id="com.zeroturnaround.alvor.gui.debug.RunTests"
             name="Run tests">
       </command>
@@ -27,13 +27,13 @@
             id="com.zeroturnaround.alvor.gui.ShowAbstractValueContribution"
             targetID="#CompilationUnitEditorContext">
          <action
-               class="com.zeroturnaround.alvor.gui.debug.AbstractStringPrinter"
+               class="com.googlecode.alvor.gui.debug.AbstractStringPrinter"
                id="com.zeroturnaround.alvor.ShowAbstractValue"
                label="Show abstract value"
                menubarPath="ContextMenu">
          </action>
          <action
-               class="com.zeroturnaround.alvor.gui.debug.ShowValueFromCacheHandler"
+               class="com.googlecode.alvor.gui.debug.ShowValueFromCacheHandler"
                id="com.zeroturnaround.alvor.ShowValueFromCache"
                label="Show value from Cache"
                menubarPath="ContextMenu">

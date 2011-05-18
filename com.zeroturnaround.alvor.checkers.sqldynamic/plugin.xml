@@ -4,7 +4,7 @@
    <extension
          point="com.zeroturnaround.alvor.checkers.checkers">
       <checker
-            class="com.zeroturnaround.alvor.checkers.sqldynamic.DynamicSQLChecker">
+            class="com.googlecode.alvor.checkers.sqldynamic.DynamicSQLChecker">
       </checker>
    </extension>
 

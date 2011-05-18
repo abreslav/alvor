@@ -8,4 +8,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: com.zeroturnaround.alvor.db;bundle-version="1.0.0"
 Bundle-ClassPath: .,
  lib/ojdbc6.jar
-Export-Package: com.zeroturnaround.alvor.db.oracle
+Export-Package: com.googlecode.alvor.db.oracle

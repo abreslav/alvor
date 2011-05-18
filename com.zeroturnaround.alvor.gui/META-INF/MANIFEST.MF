@@ -18,8 +18,8 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.5.0",
  com.zeroturnaround.alvor.checkers.complex;bundle-version="1.0.0",
  org.eclipse.jface.text;bundle-version="3.5.0",
  org.eclipse.core.expressions
-Export-Package: com.zeroturnaround.alvor.builder,
- com.zeroturnaround.alvor.gui;
+Export-Package: com.googlecode.alvor.builder,
+ com.googlecode.alvor.gui;
   uses:="org.eclipse.jface.text,
    org.eclipse.core.runtime,
    org.eclipse.ui,
@@ -35,4 +35,4 @@ Export-Package: com.zeroturnaround.alvor.builder,
    com.zeroturnaround.alvor.checkers,
    org.eclipse.swt.widgets,
    org.eclipse.ui.editors.text"
-Bundle-Activator: com.zeroturnaround.alvor.gui.AlvorGuiPlugin
+Bundle-Activator: com.googlecode.alvor.gui.AlvorGuiPlugin
