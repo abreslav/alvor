@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Complex
+Bundle-SymbolicName: com.googlecode.alvor.checkers.complex
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: ALVOR
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: com.googlecode.alvor.model;bundle-version="1.0.0",
+ com.googlecode.alvor.common;bundle-version="1.0.0",
+ com.googlecode.alvor.checkers;bundle-version="1.0.0",
+ com.googlecode.alvor.checkers.sqldynamic;bundle-version="1.0.0",
+ com.googlecode.alvor.checkers.sqlstatic;bundle-version="1.0.0",
+ org.eclipse.core.runtime;bundle-version="3.5.0"
+Export-Package: com.googlecode.alvor.checkers.complex

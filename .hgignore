@@ -6,14 +6,14 @@ bin
 
 
 syntax: regexp
-^com\.zeroturnaround\.alvor\.updatesite/features$
+^com\.googlecode\.alvor\.updatesite/features$
 syntax: regexp
-^com\.zeroturnaround\.alvor\.updatesite/plugins$
+^com\.googlecode\.alvor\.updatesite/plugins$
 syntax: regexp
-^com\.zeroturnaround\.alvor\.updatesite/artifacts\.jar$
+^com\.googlecode\.alvor\.updatesite/artifacts\.jar$
 syntax: regexp
-^com\.zeroturnaround\.alvor\.updatesite/content\.jar$
+^com\.googlecode\.alvor\.updatesite/content\.jar$
 syntax: regexp
 ^External Plug-in Libraries$
 syntax: regexp
-^com\.zeroturnaround\.alvor\.updatesite/logs\.zip$
+^com\.googlecode\.alvor\.updatesite/logs\.zip$

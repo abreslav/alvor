@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Generic
+Bundle-SymbolicName: com.googlecode.alvor.db.generic
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: ALVOR
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: com.googlecode.alvor.db;bundle-version="1.0.0"
+Bundle-ClassPath: .,
+ lib/hsqldb.jar,
+ lib/postgresql-8.4-701.jdbc4.jar
+Export-Package: com.googlecode.alvor.db.generic
