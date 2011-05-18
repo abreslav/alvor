@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="com.googlecode.alvor.gui.AlvorCategory"
+            defaultHandler="com.googlecode.alvor.gui.debug.RunTestsHandler"
+            id="com.googlecode.alvor.gui.debug.RunTests"
+            name="Run tests">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:com.googlecode.alvor.projectcontextmenu?after=additions">
+         <command
+               commandId="com.googlecode.alvor.gui.debug.RunTests"
+               style="push">
+         </command>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <viewerContribution
+            id="com.googlecode.alvor.gui.ShowAbstractValueContribution"
+            targetID="#CompilationUnitEditorContext">
+         <action
+               class="com.googlecode.alvor.gui.debug.AbstractStringPrinter"
+               id="com.googlecode.alvor.ShowAbstractValue"
+               label="Show abstract value"
+               menubarPath="ContextMenu">
+         </action>
+         <action
+               class="com.googlecode.alvor.gui.debug.ShowValueFromCacheHandler"
+               id="com.googlecode.alvor.ShowValueFromCache"
+               label="Show value from Cache"
+               menubarPath="ContextMenu">
+         </action>
+      </viewerContribution>
+   </extension>
+
+</plugin>

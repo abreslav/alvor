@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Sqldynamic
+Bundle-SymbolicName: com.googlecode.alvor.checkers.sqldynamic;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: com.googlecode.alvor.checkers;bundle-version="1.0.0",
+ com.googlecode.alvor.model;bundle-version="1.0.0",
+ com.googlecode.alvor.common;bundle-version="1.0.0",
+ com.googlecode.alvor.db;bundle-version="1.0.0",
+ com.googlecode.alvor.db.mysql;bundle-version="1.0.0",
+ com.googlecode.alvor.db.oracle;bundle-version="1.0.0",
+ com.googlecode.alvor.db.generic;bundle-version="1.0.0"
+Export-Package: com.googlecode.alvor.checkers.sqldynamic
+Bundle-ClassPath: .

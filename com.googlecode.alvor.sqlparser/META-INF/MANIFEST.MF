@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Sqlparser
+Bundle-SymbolicName: com.googlecode.alvor.sqlparser;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: com.googlecode.alvor.sqllexer;bundle-version="1.0.0",
+ com.googlecode.alvor.model;bundle-version="1.0.0"
+Export-Package: com.googlecode.alvor.sqlparser
+Bundle-ClassPath: lib/jdom.jar,
+ .

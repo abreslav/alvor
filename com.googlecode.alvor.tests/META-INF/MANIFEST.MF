@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Tests
+Bundle-SymbolicName: com.googlecode.alvor.tests
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: ALVOR
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.eclipse.core.runtime;bundle-version="3.5.0",
+ org.junit4,
+ org.eclipse.core.resources;bundle-version="3.5.0",
+ com.googlecode.alvor.common;bundle-version="1.0.0",
+ com.googlecode.alvor.gui;bundle-version="1.0.0",
+ com.googlecode.alvor.crawler;bundle-version="1.0.0",
+ com.googlecode.alvor.cache;bundle-version="1.0.0",
+ com.googlecode.alvor.model;bundle-version="1.0.0"
+Export-Package: com.googlecode.alvor.tests.util

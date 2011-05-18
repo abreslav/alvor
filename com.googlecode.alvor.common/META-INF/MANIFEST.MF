@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Common
+Bundle-SymbolicName: com.googlecode.alvor.common;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: com.googlecode.alvor.common,
+ com.googlecode.alvor.common.logging,
+ com.googlecode.alvor.configuration
+Require-Bundle: org.eclipse.core.resources;bundle-version="3.5.0",
+ org.eclipse.core.runtime;bundle-version="3.5.0",
+ com.googlecode.alvor.model;bundle-version="1.0.0"
+Bundle-ActivationPolicy: lazy
+Bundle-Activator: com.googlecode.alvor.common.AlvorCommonPlugin

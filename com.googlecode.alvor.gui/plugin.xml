@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="com.googlecode.alvor.gui.AlvorPropertyTester"
+            id="com.googlecode.alvor.gui.AlvorPropertyTester"
+            namespace="com.googlecode.alvor.gui"
+            properties="isSingleJavaProject"
+            type="java.lang.Object">
+      </propertyTester>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="com.googlecode.alvor.gui.AlvorCategory"
+            defaultHandler="com.googlecode.alvor.gui.ManualCheckHandler"
+            id="com.googlecode.alvor.plugin.manualCheck"
+            name="Perform manual SQL check">
+      </command>
+      <command
+            categoryId="com.googlecode.alvor.gui.AlvorCategory"
+            defaultHandler="com.googlecode.alvor.gui.ManualClearHandler"
+            id="com.googlecode.alvor.gui.manualClear"
+            name="Clear manual check results">
+      </command>
+      <category
+            id="com.googlecode.alvor.gui.AlvorCategory"
+            name="Alvor SQL checker">
+      </category>
+      <command
+            categoryId="com.googlecode.alvor.gui.AlvorCategory"
+            defaultHandler="com.googlecode.alvor.gui.CleanBuildHandler"
+            id="com.googlecode.alvor.plugin.cleanBuild"
+            name="Clean Alvor build">
+      </command>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="popup:org.eclipse.jdt.ui.PackageExplorer?after=additions">
+   <menu
+         id="com.googlecode.alvor.projectcontextmenu"
+         label="Alvor SQL checker">
+      <command
+            commandId="com.googlecode.alvor.plugin.manualCheck"
+            style="push">
+         <visibleWhen>
+            <test
+                  forcePluginActivation="true"
+                  property="com.googlecode.alvor.gui.isSingleJavaProject"
+                  value="doesntHaveAlvorBuilder">
+            </test>
+         </visibleWhen>
+      </command>
+      <command
+            commandId="com.googlecode.alvor.gui.manualClear"
+            style="push">
+         <visibleWhen>
+            <test
+                  forcePluginActivation="true"
+                  property="com.googlecode.alvor.gui.isSingleJavaProject"
+                  value="doesntHaveAlvorBuilder">
+            </test>
+         </visibleWhen>
+      </command>
+      <command
+            commandId="com.googlecode.alvor.plugin.cleanBuild"
+            style="push">
+         <visibleWhen>
+            <test
+                  forcePluginActivation="true"
+                  property="com.googlecode.alvor.gui.isSingleJavaProject"
+                  value="hasAlvorBuilder">
+            </test>
+         </visibleWhen>
+      </command>
+      <visibleWhen>
+         <test
+               forcePluginActivation="true"
+               property="com.googlecode.alvor.gui.isSingleJavaProject">
+         </test>
+      </visibleWhen>
+   </menu>
+      </menuContribution>
+   </extension>
+
+   <extension
+         id="sqlwarning"
+         name="SQL warning marker"
+         point="org.eclipse.core.resources.markers">
+      <super type="org.eclipse.core.resources.problemmarker" />
+      <super type="org.eclipse.core.resources.textmarker" />
+      <persistent value="true"/>
+   </extension>
+   
+   <extension
+         id="sqlerror"
+         name="SQL error marker" 
+         point="org.eclipse.core.resources.markers">
+      <super type="org.eclipse.core.resources.problemmarker" />
+      <super type="org.eclipse.core.resources.textmarker" />
+      <persistent value="true"/>
+   </extension>
+
+   <extension
+         id="sqlstring"
+         name="SQL string marker"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+      <persistent value="true"/>
+    </extension>
+
+   <extension
+         id="unsupported"
+         name="SQL unsupported marker"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+      <persistent value="true"/>
+    </extension>
+   
+   <extension
+         id="sqlhotspot"
+         name="SQL hot spot marker"
+         point="org.eclipse.core.resources.markers">
+      <persistent value="true"/>
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+    </extension>
+    
+	<extension 
+         point="org.eclipse.ui.editors.annotationTypes">
+         <type
+             name="sqlhotspot"
+             markerType="com.googlecode.alvor.gui.sqlhotspot">
+         </type>
+         <type
+               markerType="com.googlecode.alvor.gui.sqlstring"
+               name="sqlstring">
+         </type>
+         <type
+             name="unsupported"
+             markerType="com.googlecode.alvor.gui.unsupported">
+         </type>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.editors.markerAnnotationSpecification">
+         <specification
+               annotationType="sqlhotspot"
+               colorPreferenceKey="highlight.color_sqlhotspot"
+               colorPreferenceValue="255,245,208"
+               contributesToHeader="false"
+               highlightPreferenceKey="highlight.background_sqlhotspot"
+               highlightPreferenceValue="true"
+               includeOnPreferencePage="true"
+               isGoToNextNavigationTarget="false"
+               isGoToNextNavigationTargetKey="navigationTarget_sqlhotspot"
+               isGoToPreviousNavigationTarget="false"
+               isGoToPreviousNavigationTargetKey="prevNaviTarget_sqlhotspot"
+               label="sqlhotspot"
+               overviewRulerPreferenceKey="highlight.rulers.overview_sqlhotspot33"
+               overviewRulerPreferenceValue="false"
+               presentationLayer="4"
+               showInNextPrevDropdownToolbarAction="false"
+               showInNextPrevDropdownToolbarActionKey="toolbarAction_sqlhotspot"
+               symbolicIcon="info"
+               textPreferenceKey="highlight.text_sqlhotspot"
+               textPreferenceValue="true"
+               textStylePreferenceKey="highlight.text.style_hotspot"
+               textStylePreferenceValue="BOX"
+               verticalRulerPreferenceKey="highlight.rulers.vertical_sqlhotspot33"
+               verticalRulerPreferenceValue="true">
+        </specification >
+         <specification
+               annotationType="unsupported"
+               colorPreferenceKey="highlight.color_unsupported"
+               colorPreferenceValue="255,243,240"
+               contributesToHeader="false"
+               highlightPreferenceKey="highlight.background_unsupported"
+               highlightPreferenceValue="true"
+               includeOnPreferencePage="true"
+               isGoToNextNavigationTarget="false"
+               isGoToNextNavigationTargetKey="nextNavi_unsupported"
+               isGoToPreviousNavigationTarget="false"
+               isGoToPreviousNavigationTargetKey="prevNavi_unsupported"
+               label="unsupported"
+               overviewRulerPreferenceKey="highlight.rulers.overview_unsupported"
+               overviewRulerPreferenceValue="true"
+               presentationLayer="4"
+               showInNextPrevDropdownToolbarAction="false"
+               showInNextPrevDropdownToolbarActionKey="toolbarAction_unsupported"
+               symbolicIcon="warning"
+               textPreferenceKey="highlight.text_unsupported"
+               textPreferenceValue="true"
+               textStylePreferenceKey="highlight.text.style_unsupported"
+               textStylePreferenceValue="BOX"
+               verticalRulerPreferenceKey="highlight.rulers.vertical_unsupported"
+               verticalRulerPreferenceValue="true">
+         </specification>
+         <specification
+               annotationType="sqlstring"
+               colorPreferenceKey="highlight.color_string"
+               colorPreferenceValue="255,240,200"
+               highlightPreferenceKey="highlight.background_string"
+               highlightPreferenceValue="true"
+               includeOnPreferencePage="true"
+               isGoToNextNavigationTargetKey="nextNavi_string"
+               isGoToPreviousNavigationTargetKey="prevNavi_string"
+               label="sqlstring"
+               overviewRulerPreferenceKey="highlight.rulers.overview_string"
+               overviewRulerPreferenceValue="false"
+               presentationLayer="0"
+               showInNextPrevDropdownToolbarActionKey="action_string"
+               textPreferenceKey="highlight.text_string"
+               textPreferenceValue="true"
+               textStylePreferenceKey="highlight.text.style"
+               textStylePreferenceValue="BOX"
+               verticalRulerPreferenceKey="highlight.rulers.vertical_string"
+               verticalRulerPreferenceValue="false">
+         </specification>
+    </extension>
+   
+   <extension
+         point="org.eclipse.help.toc">
+      <toc
+            file="help/toc.xml"
+            primary="true">
+      </toc>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="com.googlecode.alvor.gui.configuration.MainPreferencePage"
+            id="com.googlecode.alvor.gui.configuration.AlvorPreferencePage"
+            name="Alvor SQL checker">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.propertyPages">
+      <page
+            class="com.googlecode.alvor.gui.configuration.MainPropertyPage"
+            id="com.googlecode.alvor.gui.configuration.MainPropertyPage"
+            name="Alvor SQL Checker"
+            nameFilter="*"
+            >
+         <filter name="nature" value="org.eclipse.jdt.core.javanature">
+         </filter>
+         <enabledWhen>
+            <test
+                  forcePluginActivation="true"
+                  property="com.googlecode.alvor.gui.isSingleJavaProject">
+            </test>
+         </enabledWhen>
+      </page>
+      <page
+            category="com.googlecode.alvor.gui.configuration.MainPropertyPage"
+            class="com.googlecode.alvor.gui.configuration.HotspotsPropertyPage"
+            id="com.googlecode.alvor.gui.configuration.HotspotsPropertyPage"
+            name="Hotspots">
+         <filter name="nature" value="org.eclipse.jdt.core.javanature">
+         </filter>
+         <enabledWhen>
+            <test
+                  forcePluginActivation="true"
+                  property="com.googlecode.alvor.gui.isSingleJavaProject">
+            </test>
+         </enabledWhen>
+      </page>
+      <page
+            category="com.googlecode.alvor.gui.configuration.MainPropertyPage"
+            class="com.googlecode.alvor.gui.configuration.DatabasesPropertyPage"
+            id="com.googlecode.alvor.gui.configuration.DatabasesPropertyPage"
+            name="Databases">
+         <filter name="nature" value="org.eclipse.jdt.core.javanature">
+         </filter>
+         <enabledWhen>
+            <test
+                  forcePluginActivation="true"
+                  property="com.googlecode.alvor.gui.isSingleJavaProject">
+            </test>
+         </enabledWhen>
+      </page>
+   </extension>
+   <extension
+         id="com.googlecode.alvor.builder.AlvorBuilder"
+         name="Alvor SQL Checker"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            callOnEmptyDelta="false"
+            hasNature="true"
+            isConfigurable="true">
+         <run
+               class="com.googlecode.alvor.builder.AlvorBuilder">
+         </run>
+      </builder>
+   </extension>
+   <extension
+         id="com.googlecode.alvor.builder.AlvorNature"
+         name="Alvor nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="com.googlecode.alvor.builder.AlvorNature">
+         </run>
+      </runtime>
+      <requires-nature
+            id="org.eclipse.jdt.core.javanature">
+      </requires-nature>
+      <builder
+            id="com.googlecode.alvor.builder.AlvorBuilder">
+      </builder>
+   </extension>
+</plugin>
+
