@@ -206,7 +206,8 @@ public class DatabasesPropertyPage extends CommonPropertyPage {
 	@Override
 	protected Label createDescriptionLabel(Composite parent) {
 		Label desc = new Label(parent, SWT.WRAP);
-		desc.setText("Here you can specify database connections for testing SQL validity");
+		desc.setText("Here you can specify database connections for testing SQL validity.\n\n" +
+				"NB! Currently Alvor supports only single connection (Oracle or MySQL)");
 		return desc;
 	}
 	
@@ -279,6 +280,9 @@ public class DatabasesPropertyPage extends CommonPropertyPage {
 	}
 	
 	private void addNewDataSource() {
+		if (dataSources.size() >= 1) {
+			return; // TODO temporary
+		}
 		DataSourceProperties prop = new DataSourceProperties("", "", "", "", "");
 		dataSources.add(prop);
 		tableViewer.refresh();
