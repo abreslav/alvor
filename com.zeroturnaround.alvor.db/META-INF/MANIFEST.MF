@@ -5,4 +5,4 @@ Bundle-SymbolicName: com.zeroturnaround.alvor.db;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: ZEROTURNAROUND
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: com.zeroturnaround.alvor.db
+Export-Package: com.googlecode.alvor.db

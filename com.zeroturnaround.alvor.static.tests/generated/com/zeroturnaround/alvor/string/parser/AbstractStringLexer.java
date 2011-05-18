@@ -2,7 +2,9 @@
 
 package com.zeroturnaround.alvor.string.parser;
 
-import static com.zeroturnaround.alvor.string.parser.TokenType.*;
+import static com.googlecode.alvor.string.parser.TokenType.*;
+
+import com.googlecode.alvor.string.parser.Token;
 
 @SuppressWarnings("unused")
 

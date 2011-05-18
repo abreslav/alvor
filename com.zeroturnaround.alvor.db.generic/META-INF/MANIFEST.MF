@@ -9,4 +9,4 @@ Require-Bundle: com.zeroturnaround.alvor.db;bundle-version="1.0.0"
 Bundle-ClassPath: .,
  lib/hsqldb.jar,
  lib/postgresql-8.4-701.jdbc4.jar
-Export-Package: com.zeroturnaround.alvor.db.generic
+Export-Package: com.googlecode.alvor.db.generic

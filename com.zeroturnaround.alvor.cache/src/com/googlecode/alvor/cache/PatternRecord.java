@@ -1,6 +1,6 @@
 package com.googlecode.alvor.cache;
 
-import com.zeroturnaround.alvor.common.StringPattern;
+import com.googlecode.alvor.common.StringPattern;
 
 public class PatternRecord {
 	private final StringPattern pattern;

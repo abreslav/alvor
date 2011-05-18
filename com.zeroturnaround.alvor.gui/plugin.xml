@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
-            class="com.zeroturnaround.alvor.gui.AlvorPropertyTester"
+            class="com.googlecode.alvor.gui.AlvorPropertyTester"
             id="com.zeroturnaround.alvor.gui.AlvorPropertyTester"
             namespace="com.zeroturnaround.alvor.gui"
             properties="isSingleJavaProject"
@@ -16,13 +16,13 @@
          point="org.eclipse.ui.commands">
       <command
             categoryId="com.zeroturnaround.alvor.gui.AlvorCategory"
-            defaultHandler="com.zeroturnaround.alvor.gui.ManualCheckHandler"
+            defaultHandler="com.googlecode.alvor.gui.ManualCheckHandler"
             id="com.zeroturnaround.alvor.plugin.manualCheck"
             name="Perform manual SQL check">
       </command>
       <command
             categoryId="com.zeroturnaround.alvor.gui.AlvorCategory"
-            defaultHandler="com.zeroturnaround.alvor.gui.ManualClearHandler"
+            defaultHandler="com.googlecode.alvor.gui.ManualClearHandler"
             id="com.zeroturnaround.alvor.gui.manualClear"
             name="Clear manual check results">
       </command>
@@ -32,7 +32,7 @@
       </category>
       <command
             categoryId="com.zeroturnaround.alvor.gui.AlvorCategory"
-            defaultHandler="com.zeroturnaround.alvor.gui.CleanBuildHandler"
+            defaultHandler="com.googlecode.alvor.gui.CleanBuildHandler"
             id="com.zeroturnaround.alvor.plugin.cleanBuild"
             name="Clean Alvor build">
       </command>
@@ -239,7 +239,7 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="com.zeroturnaround.alvor.gui.configuration.MainPreferencePage"
+            class="com.googlecode.alvor.gui.configuration.MainPreferencePage"
             id="com.zeroturnaround.alvor.gui.configuration.AlvorPreferencePage"
             name="Alvor SQL checker">
       </page>
@@ -247,7 +247,7 @@
    <extension
          point="org.eclipse.ui.propertyPages">
       <page
-            class="com.zeroturnaround.alvor.gui.configuration.MainPropertyPage"
+            class="com.googlecode.alvor.gui.configuration.MainPropertyPage"
             id="com.zeroturnaround.alvor.gui.configuration.MainPropertyPage"
             name="Alvor SQL Checker"
             nameFilter="*"
@@ -263,7 +263,7 @@
       </page>
       <page
             category="com.zeroturnaround.alvor.gui.configuration.MainPropertyPage"
-            class="com.zeroturnaround.alvor.gui.configuration.HotspotsPropertyPage"
+            class="com.googlecode.alvor.gui.configuration.HotspotsPropertyPage"
             id="com.zeroturnaround.alvor.gui.configuration.HotspotsPropertyPage"
             name="Hotspots">
          <filter name="nature" value="org.eclipse.jdt.core.javanature">
@@ -277,7 +277,7 @@
       </page>
       <page
             category="com.zeroturnaround.alvor.gui.configuration.MainPropertyPage"
-            class="com.zeroturnaround.alvor.gui.configuration.DatabasesPropertyPage"
+            class="com.googlecode.alvor.gui.configuration.DatabasesPropertyPage"
             id="com.zeroturnaround.alvor.gui.configuration.DatabasesPropertyPage"
             name="Databases">
          <filter name="nature" value="org.eclipse.jdt.core.javanature">
@@ -299,7 +299,7 @@
             hasNature="true"
             isConfigurable="true">
          <run
-               class="com.zeroturnaround.alvor.builder.AlvorBuilder">
+               class="com.googlecode.alvor.builder.AlvorBuilder">
          </run>
       </builder>
    </extension>
@@ -309,7 +309,7 @@
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
-               class="com.zeroturnaround.alvor.builder.AlvorNature">
+               class="com.googlecode.alvor.builder.AlvorNature">
          </run>
       </runtime>
       <requires-nature

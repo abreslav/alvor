@@ -4,7 +4,7 @@
    <extension
          point="com.zeroturnaround.alvor.checkers.checkers">
       <checker
-            class="com.zeroturnaround.alvor.checkers.sqlstatic.SyntacticalSQLChecker">
+            class="com.googlecode.alvor.checkers.sqlstatic.SyntacticalSQLChecker">
       </checker>
    </extension>
 

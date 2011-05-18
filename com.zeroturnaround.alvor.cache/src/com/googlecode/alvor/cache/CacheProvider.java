@@ -10,8 +10,8 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.zeroturnaround.alvor.common.logging.ILog;
-import com.zeroturnaround.alvor.common.logging.Logs;
+import com.googlecode.alvor.common.logging.ILog;
+import com.googlecode.alvor.common.logging.Logs;
 
 public class CacheProvider {
 	private static final Map<String, Cache> caches = new HashMap<String, Cache>();

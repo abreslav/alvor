@@ -11,5 +11,5 @@ Require-Bundle: com.zeroturnaround.alvor.checkers;bundle-version="1.0.0",
  com.zeroturnaround.alvor.db.mysql;bundle-version="1.0.0",
  com.zeroturnaround.alvor.db.oracle;bundle-version="1.0.0",
  com.zeroturnaround.alvor.db.generic;bundle-version="1.0.0"
-Export-Package: com.zeroturnaround.alvor.checkers.sqldynamic
+Export-Package: com.googlecode.alvor.checkers.sqldynamic
 Bundle-ClassPath: .
