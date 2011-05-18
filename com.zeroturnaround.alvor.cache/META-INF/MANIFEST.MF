@@ -9,6 +9,6 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="3.5.0",
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: lib/h2.jar,
  .
-Export-Package: com.zeroturnaround.alvor.cache
-Bundle-Activator: com.zeroturnaround.alvor.cache.AlvorCachePlugin
+Export-Package: com.googlecode.alvor.cache
+Bundle-Activator: com.googlecode.alvor.cache.AlvorCachePlugin
 Bundle-ActivationPolicy: lazy

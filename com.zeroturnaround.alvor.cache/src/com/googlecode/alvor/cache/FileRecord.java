@@ -1,4 +1,4 @@
-package com.zeroturnaround.alvor.cache;
+package com.googlecode.alvor.cache;
 
 public class FileRecord {
 	private final String name;

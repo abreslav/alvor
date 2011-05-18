@@ -1,4 +1,4 @@
-package com.zeroturnaround.alvor.cache;
+package com.googlecode.alvor.cache;
 
 import com.zeroturnaround.alvor.common.StringPattern;
 
