@@ -1,4 +1,4 @@
-package com.zeroturnaround.alvor.cache;
+package com.googlecode.alvor.cache;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -1,4 +1,4 @@
-package com.zeroturnaround.alvor.cache;
+package com.googlecode.alvor.cache;
 
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
