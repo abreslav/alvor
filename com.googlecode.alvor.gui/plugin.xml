@@ -279,7 +279,7 @@
             category="com.googlecode.alvor.gui.configuration.MainPropertyPage"
             class="com.googlecode.alvor.gui.configuration.DatabasesPropertyPage"
             id="com.googlecode.alvor.gui.configuration.DatabasesPropertyPage"
-            name="Databases">
+            name="Checking">
          <filter name="nature" value="org.eclipse.jdt.core.javanature">
          </filter>
          <enabledWhen>

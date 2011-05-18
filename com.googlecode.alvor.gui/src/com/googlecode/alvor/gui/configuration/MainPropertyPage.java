@@ -7,7 +7,6 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -61,11 +60,11 @@ public class MainPropertyPage extends CommonPropertyPage {
 		Composite effortComposite = new Composite(composite, SWT.NONE);
 		effortComposite.setLayout(effortLayout);
 		Label effortLabel = new Label(effortComposite, SWT.NONE);
-		effortLabel.setText("Analysis effort: ");
+		effortLabel.setText("Analysis mode: ");
 		this.effortCombo = new Combo(effortComposite, SWT.READ_ONLY);
-		effortCombo.add("easy");
-		effortCombo.add("normal");
-		effortCombo.add("hard");
+		effortCombo.add("fastest (skips complex cases of SQL construction)");
+		effortCombo.add("normal (recommended for most projects)");
+		effortCombo.add("thorough (may be too slow in some cases)");
 		if (conf.getEffortLevel() == 1) {
 			effortCombo.select(0);
 		}
