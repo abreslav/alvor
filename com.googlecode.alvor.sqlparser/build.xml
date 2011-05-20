@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?> 
 <project name="project" default="default">
 	<property name="lexerProject" value="../com.googlecode.alvor.sqllexer"></property>
 	<taskdef classname="JFlex.anttask.JFlexTask" name="jflex" classpath="${lexerProject}/lib/JFlex.jar"/>
