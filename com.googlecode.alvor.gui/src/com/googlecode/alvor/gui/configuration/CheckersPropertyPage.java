@@ -28,10 +28,10 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 
-import com.googlecode.alvor.configuration.DataSourceProperties;
+import com.googlecode.alvor.configuration.CheckerConfiguration;
 import com.googlecode.alvor.configuration.ProjectConfiguration;
 
-public class DatabasesPropertyPage extends CommonPropertyPage {
+public class CheckersPropertyPage extends CommonPropertyPage {
 	private Table table;
 	private TableViewer tableViewer;
 	//private Text patternText;
@@ -39,7 +39,7 @@ public class DatabasesPropertyPage extends CommonPropertyPage {
 	private Text urlText;
 	private Text usernameText;
 	private Text passwordText;
-	private List<DataSourceProperties> dataSources;
+	private List<CheckerConfiguration> checkers;
 	
 	private ModifyListener modifyListener; 
 
@@ -49,7 +49,7 @@ public class DatabasesPropertyPage extends CommonPropertyPage {
 		noDefaultAndApplyButton();
 		
 		ProjectConfiguration conf = readConfiguration();
-		this.dataSources = conf.getDataSources();
+		this.checkers = conf.getCheckers();
 		
 		
 		Composite body = new Composite(parent, SWT.NONE);
@@ -89,7 +89,7 @@ public class DatabasesPropertyPage extends CommonPropertyPage {
 		addButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				addNewDataSource();
+				addNewChecker();
 			}
 		});
 		
@@ -99,13 +99,13 @@ public class DatabasesPropertyPage extends CommonPropertyPage {
 		removeButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				removeSelectedDataSource();
+				removeSelectedChecker();
 			}
 		});
 		
 		// create viewer and populate with data
 		this.tableViewer = createTableViewer(table); // TableViewer manages Table's data
-		tableViewer.setInput(this.dataSources);
+		tableViewer.setInput(this.checkers);
 		
 	}
 	
@@ -172,7 +172,7 @@ public class DatabasesPropertyPage extends CommonPropertyPage {
 //		col.setLabelProvider(new CellLabelProvider() {
 //			@Override
 //			public void update(ViewerCell cell) {
-//				String text = ((DataSourceProperties)cell.getElement()).getPattern();
+//				String text = ((CheckerConfiguration)cell.getElement()).getPattern();
 //				if (text.trim().isEmpty()) {
 //					text = "<new pattern>";
 //				}
@@ -184,7 +184,7 @@ public class DatabasesPropertyPage extends CommonPropertyPage {
 		col.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(ViewerCell cell) {
-				String text = ((DataSourceProperties)cell.getElement()).getUrl();
+				String text = ((CheckerConfiguration)cell.getElement()).getUrl();
 				if (text.trim().isEmpty()) {
 					text = "<new url>";
 				}
@@ -222,8 +222,8 @@ public class DatabasesPropertyPage extends CommonPropertyPage {
 
 	private void updateForm() {
 		int i = table.getSelectionIndex();
-		if (i > -1 && this.dataSources.size() > i) {
-			DataSourceProperties prop = this.dataSources.get(i);
+		if (i > -1 && this.checkers.size() > i) {
+			CheckerConfiguration prop = this.checkers.get(i);
 	//		updateText(patternText, prop.getPattern());
 			updateText(driverText, prop.getDriverName());
 			updateText(urlText, prop.getUrl());
@@ -241,17 +241,17 @@ public class DatabasesPropertyPage extends CommonPropertyPage {
 	
 	private void storeFormField(Text text) {
 		
-		// prepare new place, if there are no dataSources yet (and nothing can be selected)
+		// prepare new place, if there are no checkers yet (and nothing can be selected)
 		// and users starts editing before pressing "Add"
-		if (dataSources.size() == 0) {
-			dataSources.add(new DataSourceProperties("", "", "", "", ""));
+		if (checkers.size() == 0) {
+			checkers.add(new CheckerConfiguration("", "", "", "", "", null));
 		}
 		int i = table.getSelectionIndex();
 		if (i == -1) {
 			i = 0;
 		}
 		
-		DataSourceProperties prop = this.dataSources.get(i);
+		CheckerConfiguration prop = this.checkers.get(i);
 		//if (text == patternText) { prop.setPattern(text.getText()); }
 		if (text == driverText) { prop.setDriverName(text.getText()); }
 		if (text == urlText) { prop.setUrl(text.getText()); }
@@ -264,14 +264,14 @@ public class DatabasesPropertyPage extends CommonPropertyPage {
 	
 	@Override
 	protected void mergeChanges(ProjectConfiguration base) {
-		base.setDataSources(this.dataSources);
+		base.setCheckers(this.checkers);
 	}
 	
-	private void removeSelectedDataSource() {
+	private void removeSelectedChecker() {
 		
 		int i = table.getSelectionIndex();
 		if (i >= 0) {
-			dataSources.remove(i);
+			checkers.remove(i);
 		}
 		
 		tryToSelectRow(0);
@@ -279,14 +279,14 @@ public class DatabasesPropertyPage extends CommonPropertyPage {
 		updateForm();
 	}
 	
-	private void addNewDataSource() {
-		if (dataSources.size() >= 1) {
+	private void addNewChecker() {
+		if (checkers.size() >= 1) {
 			return; // TODO temporary
 		}
-		DataSourceProperties prop = new DataSourceProperties("", "", "", "", "");
-		dataSources.add(prop);
+		CheckerConfiguration prop = new CheckerConfiguration("", "", "", "", "", null);
+		checkers.add(prop);
 		tableViewer.refresh();
-		tryToSelectRow(dataSources.size()-1);
+		tryToSelectRow(checkers.size()-1);
 		
 	}
 	

@@ -277,9 +277,9 @@
       </page>
       <page
             category="com.googlecode.alvor.gui.configuration.MainPropertyPage"
-            class="com.googlecode.alvor.gui.configuration.DatabasesPropertyPage"
-            id="com.googlecode.alvor.gui.configuration.DatabasesPropertyPage"
-            name="Checking">
+            class="com.googlecode.alvor.gui.configuration.CheckersPropertyPage"
+            id="com.googlecode.alvor.gui.configuration.CheckersPropertyPage"
+            name="Checkers">
          <filter name="nature" value="org.eclipse.jdt.core.javanature">
          </filter>
          <enabledWhen>

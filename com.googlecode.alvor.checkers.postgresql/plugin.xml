@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="com.googlecode.alvor.checkers.checkers">
+      <checker
+            class="com.googlecode.alvor.checkers.postgresql.DynamicSQLCheckerPostgreSQL"
+            defaultDriver="org.postgresql.Driver"
+            defaultUrl="jdbc:postgresql:dbname"
+            name="PostgreSQL-DB"
+            usesDatabase="true">
+      </checker>
+   </extension>
+
+</plugin>

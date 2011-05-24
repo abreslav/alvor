@@ -20,13 +20,11 @@ public class ParserPerformanceTest {
 		Set<String> strings = new HashSet<String>();
 		
 		BufferedReader reader = new BufferedReader(new FileReader("data/earved_all.txt"));
-		int count = 0;
 		do {
 			String readLine = reader.readLine();
 			if (readLine == null) {
 				 break;
 			}
-			count++;
 			if (!strings.add(readLine)) {
 				System.out.println(readLine);
 			}

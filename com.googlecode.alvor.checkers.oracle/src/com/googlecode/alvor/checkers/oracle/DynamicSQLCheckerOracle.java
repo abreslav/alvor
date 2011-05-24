@@ -1,6 +1,7 @@
 package com.googlecode.alvor.checkers.oracle;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
@@ -8,6 +9,14 @@ import com.googlecode.alvor.checkers.sqldynamic.DynamicSQLChecker;
 
 public class DynamicSQLCheckerOracle extends DynamicSQLChecker {
 	// TODO: test whether you get "too many open cursors" 
+
+	@Override
+	protected Connection createConnection(String driverName, String url, String userName, String password) throws ClassNotFoundException, SQLException {
+		Class.forName(driverName);
+		return DriverManager.getConnection(url, userName, password);
+	}
+	
+
 	
 	@Override
 	protected void testSql(String sql, Connection conn) throws SQLException {

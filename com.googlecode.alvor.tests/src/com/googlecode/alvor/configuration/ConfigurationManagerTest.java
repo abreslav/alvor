@@ -2,6 +2,7 @@ package com.googlecode.alvor.configuration;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +12,7 @@ import org.junit.Test;
 
 import com.googlecode.alvor.common.HotspotPattern;
 import com.googlecode.alvor.configuration.ConfigurationManager;
-import com.googlecode.alvor.configuration.DataSourceProperties;
+import com.googlecode.alvor.configuration.CheckerConfiguration;
 import com.googlecode.alvor.configuration.ProjectConfiguration;
 import com.googlecode.alvor.tests.util.TestUtil;
 
@@ -53,15 +54,17 @@ public class ConfigurationManagerTest {
 		hotspots.add(new HotspotPattern("ClassName1", "MethodName1", "*", 1));
 		hotspots.add(new HotspotPattern("ClassName2", "MethodName2", "*", 2));
 		
-		List<DataSourceProperties> dataSources = new ArrayList<DataSourceProperties>();
-		dataSources.add(new DataSourceProperties("*", "DriverName1", "URL1", "userName1", "password1"));
-		dataSources.add(new DataSourceProperties("Pattern2", "DriverName2", "URL2", "userName2", "password2"));
+		List<CheckerConfiguration> checkers = new ArrayList<CheckerConfiguration>();
+		checkers.add(new CheckerConfiguration("OracleDB", "DriverName1", "URL1", "userName1", "password1",
+				Collections.singletonList("*")));
+		checkers.add(new CheckerConfiguration("OracleDB", "DriverName2", "URL2", "userName2", "password2",
+				Collections.singletonList("Pattern2")));
 		
 		Map<String, String> props = new HashMap<String, String>();
 		props.put("prop1", "value1");
 		props.put("prop2", "value2");
 		
-		return new ProjectConfiguration(hotspots, dataSources, props);
+		return new ProjectConfiguration(hotspots, checkers, props);
 	}
 	
 }

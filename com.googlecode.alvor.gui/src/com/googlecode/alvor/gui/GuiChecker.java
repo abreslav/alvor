@@ -15,12 +15,13 @@ import org.eclipse.ui.texteditor.MarkerUtilities;
 import com.googlecode.alvor.cache.Cache;
 import com.googlecode.alvor.cache.CacheProvider;
 import com.googlecode.alvor.checkers.CheckerException;
+import com.googlecode.alvor.checkers.FrontChecker;
 import com.googlecode.alvor.checkers.HotspotCheckingResult;
 import com.googlecode.alvor.checkers.HotspotError;
 import com.googlecode.alvor.checkers.HotspotInfo;
 import com.googlecode.alvor.checkers.HotspotWarning;
 import com.googlecode.alvor.checkers.HotspotWarningUnsupported;
-import com.googlecode.alvor.checkers.complex.ComplexChecker;
+import com.googlecode.alvor.checkers.IAbstractStringChecker;
 import com.googlecode.alvor.common.HotspotDescriptor;
 import com.googlecode.alvor.common.PositionUtil;
 import com.googlecode.alvor.common.ProgressUtil;
@@ -33,17 +34,8 @@ import com.googlecode.alvor.configuration.ConfigurationManager;
 import com.googlecode.alvor.configuration.ProjectConfiguration;
 import com.googlecode.alvor.crawler.StringCollector;
 import com.googlecode.alvor.string.DummyPosition;
-import com.googlecode.alvor.string.IAbstractString;
-import com.googlecode.alvor.string.IAbstractStringVisitor;
 import com.googlecode.alvor.string.IPosition;
 import com.googlecode.alvor.string.Position;
-import com.googlecode.alvor.string.StringCharacterSet;
-import com.googlecode.alvor.string.StringChoice;
-import com.googlecode.alvor.string.StringConstant;
-import com.googlecode.alvor.string.StringParameter;
-import com.googlecode.alvor.string.StringRecursion;
-import com.googlecode.alvor.string.StringRepetition;
-import com.googlecode.alvor.string.StringSequence;
 import com.googlecode.alvor.string.util.AbstractStringOptimizer;
 
 public class GuiChecker {
@@ -51,7 +43,7 @@ public class GuiChecker {
 	private static final ILog LOG = Logs.getLog(GuiChecker.class);
 	private static final int MAX_MARKER_MESSAGE_LENGTH = 500;
 	private static final String CHILDREN_ATT_NAME = "children";
-	private ComplexChecker checker = new ComplexChecker();
+	private FrontChecker checker = new FrontChecker();
 	//private Cache cache = CacheProvider.getCache();
 	
 	private GuiChecker() {}
@@ -59,6 +51,7 @@ public class GuiChecker {
 	public void cleanUpdateProjectMarkers(IProject project, IProgressMonitor monitor) {
 		try {
 			CacheProvider.tryDeleteCache(project.getName());
+			checker.resetCheckers();
 			ProgressUtil.beginTask(monitor, "Full SQL check for " + project.getName(), 100);
 			CacheProvider.getCache(project.getName()).clearProject();
 			deleteAlvorMarkers(project);
@@ -248,66 +241,66 @@ public class GuiChecker {
 				checkingResult.getPosition(), parentMarker, project); 
 	}
 
-	/*
-	 * This method makes things slow on big projects, although on small ones the markers look nice
-	 */
-	private void markConstants(IAbstractString abstractValue, final IMarker parentMarker, final IProject project) {
-		IAbstractStringVisitor<Void, Void> visitor = new IAbstractStringVisitor<Void, Void>() {
-
-			@Override
-			public Void visitStringCharacterSet(
-					StringCharacterSet characterSet, Void data) {
-				createMarker("", AlvorGuiPlugin.STRING_MARKER_ID, null, 
-						characterSet.getPosition(), parentMarker, project);
-				return null;
-			}
-
-			@Override
-			public Void visitStringChoice(StringChoice stringChoice, Void data) {
-				for (IAbstractString s : stringChoice.getItems()) {
-					s.accept(this, null);
-				}
-				return null;
-			}
-
-			@Override
-			public Void visitStringConstant(StringConstant stringConstant,
-					Void data) {
-				createMarker("", AlvorGuiPlugin.STRING_MARKER_ID, null, 
-						stringConstant.getPosition(), parentMarker, project);
-				return null;
-			}
-
-			@Override
-			public Void visitStringParameter(StringParameter stringParameter,
-					Void data) {
-				return null;
-			}
-
-			@Override
-			public Void visitStringRepetition(
-					StringRepetition stringRepetition, Void data) {
-				stringRepetition.getBody().accept(this, null);
-				return null;
-			}
-
-			@Override
-			public Void visitStringSequence(StringSequence stringSequence,
-					Void data) {
-				for (IAbstractString s : stringSequence.getItems()) {
-					s.accept(this, null);
-				}
-				return null;
-			}
-
-			@Override
-			public Void visitStringRecursion(StringRecursion stringRecursion,
-					Void data) {
-				return null;
-			}
-		};
-		abstractValue.accept(visitor, null);
-	}
+//	/*
+//	 * This method makes things slow on big projects, although on small ones the markers look nice
+//	 */
+//	private void markConstants(IAbstractString abstractValue, final IMarker parentMarker, final IProject project) {
+//		IAbstractStringVisitor<Void, Void> visitor = new IAbstractStringVisitor<Void, Void>() {
+//
+//			@Override
+//			public Void visitStringCharacterSet(
+//					StringCharacterSet characterSet, Void data) {
+//				createMarker("", AlvorGuiPlugin.STRING_MARKER_ID, null, 
+//						characterSet.getPosition(), parentMarker, project);
+//				return null;
+//			}
+//
+//			@Override
+//			public Void visitStringChoice(StringChoice stringChoice, Void data) {
+//				for (IAbstractString s : stringChoice.getItems()) {
+//					s.accept(this, null);
+//				}
+//				return null;
+//			}
+//
+//			@Override
+//			public Void visitStringConstant(StringConstant stringConstant,
+//					Void data) {
+//				createMarker("", AlvorGuiPlugin.STRING_MARKER_ID, null, 
+//						stringConstant.getPosition(), parentMarker, project);
+//				return null;
+//			}
+//
+//			@Override
+//			public Void visitStringParameter(StringParameter stringParameter,
+//					Void data) {
+//				return null;
+//			}
+//
+//			@Override
+//			public Void visitStringRepetition(
+//					StringRepetition stringRepetition, Void data) {
+//				stringRepetition.getBody().accept(this, null);
+//				return null;
+//			}
+//
+//			@Override
+//			public Void visitStringSequence(StringSequence stringSequence,
+//					Void data) {
+//				for (IAbstractString s : stringSequence.getItems()) {
+//					s.accept(this, null);
+//				}
+//				return null;
+//			}
+//
+//			@Override
+//			public Void visitStringRecursion(StringRecursion stringRecursion,
+//					Void data) {
+//				return null;
+//			}
+//		};
+//		abstractValue.accept(visitor, null);
+//	}
 
 	private static IMarker createMarker(String message, String markerType, Integer severity, IPosition pos,
 			IMarker parentMarker, IProject project) {

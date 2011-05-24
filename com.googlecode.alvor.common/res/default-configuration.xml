@@ -7,14 +7,10 @@
     	<hotspot className="java.sql.Statement" methodName="executeQuery" argumentTypes="*" argumentIndex="1" />
     </hotspotPatterns>
     
-    <dataSources>
-    	<!-- 
-        <dataSource 
-            pattern="*" 
-            driverName="driver:name"
-            url="url:asdfaf"
-            userName="juuser neim"
-            password="passwöörd"/>
-        -->
-    </dataSources>
+    <checkers>
+        <checker checkerName="GenericSqlSyntax" pattern="*">
+            <pattern>*</pattern>
+        </checker>
+           
+    </checkers>
 </alvor>

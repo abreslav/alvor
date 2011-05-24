@@ -49,6 +49,7 @@ public class BoundedStackTest {
 
 		// Stack: t -> S1 -> b
 		IParserStack pop = res.pop(1);
+		assert pop != null;
 
 		res = res.push(S2);
 		assertSame(S2, res.top());

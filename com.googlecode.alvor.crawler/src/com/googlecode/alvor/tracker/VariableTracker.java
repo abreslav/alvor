@@ -33,8 +33,6 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import com.googlecode.alvor.common.UnsupportedStringOpEx;
-import com.googlecode.alvor.common.logging.ILog;
-import com.googlecode.alvor.common.logging.Logs;
 import com.googlecode.alvor.crawler.util.ASTUtil;
 import com.googlecode.alvor.crawler.util.UnsupportedStringOpExAtNode;
 import com.googlecode.alvor.string.IPosition;
@@ -45,7 +43,6 @@ import com.googlecode.alvor.string.IPosition;
  */
 
 public class VariableTracker {
-	private static final ILog LOG = Logs.getLog(VariableTracker.class);
 	public static NameUsage getLastMod(Name name) {
 		IVariableBinding var = (IVariableBinding)name.resolveBinding();
 		return getLastReachingMod(var, name);

@@ -49,6 +49,13 @@
 
    <element name="checker">
       <complexType>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Used in project configuration
+               </documentation>
+            </annotation>
+         </attribute>
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
@@ -57,6 +64,34 @@
                <appinfo>
                   <meta.attribute kind="java" basedOn=":com.googlecode.alvor.checkers.IAbstractStringChecker"/>
                </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="usesDatabase" type="boolean" use="default" value="false">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="description" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="defaultDriver" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="defaultUrl" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
             </annotation>
          </attribute>
       </complexType>

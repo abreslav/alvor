@@ -4,7 +4,10 @@
    <extension
          point="com.googlecode.alvor.checkers.checkers">
       <checker
-            class="com.googlecode.alvor.checkers.sqldynamic.DynamicSQLChecker">
+            class="com.googlecode.alvor.checkers.mysql.DynamicSQLCheckerMySQL"
+            defaultDriver="com.mysql.jdbc.Driver"
+            name="MySQL-DB"
+            usesDatabase="true">
       </checker>
    </extension>
 
