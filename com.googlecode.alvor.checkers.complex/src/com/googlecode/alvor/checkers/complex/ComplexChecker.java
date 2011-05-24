@@ -12,7 +12,7 @@ import com.googlecode.alvor.checkers.sqlstatic.SyntacticalSQLChecker;
 import com.googlecode.alvor.common.StringHotspotDescriptor;
 import com.googlecode.alvor.common.logging.ILog;
 import com.googlecode.alvor.common.logging.Logs;
-import com.googlecode.alvor.configuration.DataSourceProperties;
+import com.googlecode.alvor.configuration.CheckerConfiguration;
 import com.googlecode.alvor.configuration.ProjectConfiguration;
 
 /**
@@ -24,7 +24,7 @@ public class ComplexChecker implements IAbstractStringChecker {
 	private static final ILog LOG = Logs.getLog(ComplexChecker.class);
 //	private static final ILog HOTSPOTS_LOG = Logs.getLog("Hotspots");
 	
-	private DynamicSQLChecker dynamicChecker = new DynamicSQLChecker();
+	private DynamicSQLChecker dynamicChecker = null; //new DynamicSQLChecker();
 	private SyntacticalSQLChecker staticChecker = new SyntacticalSQLChecker();
 
 	@Override
@@ -60,7 +60,7 @@ public class ComplexChecker implements IAbstractStringChecker {
 	}
 	
 	private boolean dynamicCheckerIsConfigured(ProjectConfiguration configuration) {
-		DataSourceProperties props = configuration.getDefaultDataSource();
+		CheckerConfiguration props = configuration.getDefaultChecker();
 		return props != null && props.getUrl() != null && !props.getUrl().trim().isEmpty()
 			&& props.getDriverName() != null && !props.getDriverName().trim().isEmpty();
 	}
