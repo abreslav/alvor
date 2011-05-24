@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Set;
 
 import com.googlecode.alvor.checkers.CheckerException;
 import com.googlecode.alvor.checkers.HotspotCheckingResult;
@@ -46,46 +46,20 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 		SqlTester tester = this.getTester(configuration);
 		
 		List<HotspotCheckingResult> results = new ArrayList<HotspotCheckingResult>();
-		Map<String, Integer> concretes = new HashMap<String, Integer>();
-		Map<String, String> errorMap = new HashMap<String, String>();
-		List<String> concreteStrings = null;
-		
-		concreteStrings = SampleGenerator.getConcreteStrings(descriptor.getAbstractValue());
-		int duplicates = 0;
-		// maps error msg to all concrete strings that cause this message
-
+		Set<String> concreteStrings = SampleGenerator.getConcreteStrings(descriptor.getAbstractValue());
 		for (String s: concreteStrings) {
-			Integer countSoFar = concretes.get(s);
-			duplicates = 0;
-			if (countSoFar == null) {
-				assert LOG.message("CON: " + s);
-				try {
-					tester.testSql(s);
-				} catch (SQLException e) {
-					assert LOG.message("    ERR: " + e.getMessage());
-
-					String errStrings = errorMap.get(e.getMessage());
-					if (errStrings == null) {
-						errStrings = s; 
-					} else {
-						errStrings += ";;;\n" + s;
-					}
-					errorMap.put(e.getMessage(), errStrings);
-				}
-				concretes.put(s, 1);
-			}
-			else {
-				concretes.put(s, countSoFar+1);
-				duplicates++;
+			assert LOG.message("CON: " + s);
+			try {
+				tester.testSql(s);
+			} catch (SQLException e) {
+				assert LOG.message("    ERR: " + e.getMessage());
+				String message = e.getMessage().trim() + "\nSQL: \n" + s;
+				results.add(new HotspotError("SQL test failed  - " + message, descriptor.getPosition()));
+				break;
 			}
 		}
 
-		for (Entry<String, String> entry : errorMap.entrySet()) {
-			String message = entry.getKey().trim() + "\nSQL: \n" + entry.getValue();
-			results.add(new HotspotError("SQL test failed  - " + message, descriptor.getPosition()));
-		}
-
-		assert LOG.message("DUPLICATES: " + duplicates);
+		assert LOG.message("CONCRETE COUNT: " + concreteStrings.size());
 		assert LOG.message("____________________________________________");
 
 		return results;

@@ -1,7 +1,7 @@
 package com.googlecode.alvor.string.samplegen;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import com.googlecode.alvor.string.IAbstractString;
 import com.googlecode.alvor.string.StringCharacterSet;
@@ -15,8 +15,8 @@ public class SampleGenerator {
 //	private static Set<Character> intCharset = 
 //		new HashSet<Character>(Arrays.asList('0', '1', '2', '3', '4', '5', '6', '7', '8', '9'));
 	
-	public static List<String> getConcreteStrings(IAbstractString aStr) {
-		List<String> result = new ArrayList<String>();
+	public static Set<String> getConcreteStrings(IAbstractString aStr) {
+		Set<String> result = new LinkedHashSet<String>();
 		
 		if (aStr instanceof StringConstant) {
 			result.add(((StringConstant)aStr).getConstant());
@@ -33,8 +33,8 @@ public class SampleGenerator {
 					result.addAll(getConcreteStrings(item));
 				}
 				else { // later parts should be multiplied by existing strings
-					List<String> options = getConcreteStrings(item);
-					List<String> tempList = new ArrayList<String>();
+					Set<String> options = getConcreteStrings(item);
+					Set<String> tempList = new LinkedHashSet<String>();
 					for (String resultItem: result) {
 						for (String option: options) {
 							tempList.add(resultItem + option);
