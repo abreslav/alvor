@@ -12,18 +12,18 @@ public class ProjectConfiguration {
 	public enum CheckingStrategy {PREFER_STATIC, PREFER_DYNAMIC, ALL_CHECKERS}
 	
 	private List<HotspotPattern> hotspotPatterns = new ArrayList<HotspotPattern>();
-	private List<DataSourceProperties> dataSources = new ArrayList<DataSourceProperties>();
+	private List<CheckerConfiguration> checkers = new ArrayList<CheckerConfiguration>();
 	private Map<String, String> properties;
 
-	public ProjectConfiguration(List<HotspotPattern> hotspots, List<DataSourceProperties> dataSources,
+	public ProjectConfiguration(List<HotspotPattern> hotspots, List<CheckerConfiguration> checkers,
 			Map<String, String> properties) {
 		this.hotspotPatterns = hotspots;
-		this.dataSources = dataSources;
+		this.checkers = checkers;
 		this.properties = properties;
 	}
 	
-	public List<DataSourceProperties> getDataSources() {
-		return dataSources;
+	public List<CheckerConfiguration> getCheckers() {
+		return checkers;
 	}
 	
 	public List<HotspotPattern> getHotspotPatterns() {
@@ -34,8 +34,8 @@ public class ProjectConfiguration {
 		this.hotspotPatterns = hotspots;
 	}
 
-	public void setDataSources(List<DataSourceProperties> dataSources) {
-		this.dataSources = dataSources;
+	public void setCheckers(List<CheckerConfiguration> checkers) {
+		this.checkers = checkers;
 	}
 	
 	public CheckingStrategy getCheckingStrategy() {
@@ -74,26 +74,9 @@ public class ProjectConfiguration {
 		}
 	}
 	
-//	public String getProperty(String key) {
-//		String value = this.properties.get(key);
-//		if (value != null) {
-//			return value;
-//		} else {
-//			return "";
-//		}
-//	}
-//	
-	public DataSourceProperties getDefaultDataSource() {
-//		for (DataSourceProperties props : this.getDataSources()) {
-//			if (props.getPattern().equals("*")) {
-//				return props;
-//			}
-//		}
-//		return null;
-		
-		// temporary: give first one
-		if (dataSources.size() > 0) {
-			return dataSources.get(0);
+	public CheckerConfiguration getDefaultChecker() {
+		if (checkers.size() > 0) {
+			return checkers.get(0);
 		}
 		else {
 			return null;
@@ -102,15 +85,20 @@ public class ProjectConfiguration {
 	
 	@Override
 	public boolean equals(Object obj) {
-		return obj != null 
-			&& obj instanceof ProjectConfiguration 
-			&& this.hashCode() == obj.hashCode();
+		if (obj == null || ! (obj instanceof ProjectConfiguration)) {
+			return false;
+		}
+		
+		ProjectConfiguration that = (ProjectConfiguration)obj;
+		return this.properties.equals(that.properties)
+				&& this.checkers.equals(that.checkers)
+				&& this.hotspotPatterns.equals(that.hotspotPatterns);
 	}
 	
 	@Override
 	public int hashCode() {
 		int result = 17;
-		result = result * 31 + dataSources.hashCode();
+		result = result * 31 + checkers.hashCode();
 		result = result * 31 + hotspotPatterns.hashCode();
 		result = result * 31 + properties.hashCode();
 		return result;

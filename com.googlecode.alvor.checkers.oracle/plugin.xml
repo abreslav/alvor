@@ -4,7 +4,10 @@
    <extension
          point="com.googlecode.alvor.checkers.checkers">
       <checker
-            class="com.googlecode.alvor.checkers.oracle.DynamicSQLCheckerOracle">
+            class="com.googlecode.alvor.checkers.oracle.DynamicSQLCheckerOracle"
+            defaultDriver="oracle.jdbc.OracleDriver"
+            name="Oracle-DB"
+            usesDatabase="true">
       </checker>
    </extension>
 

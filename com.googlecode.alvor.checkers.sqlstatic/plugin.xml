@@ -4,7 +4,9 @@
    <extension
          point="com.googlecode.alvor.checkers.checkers">
       <checker
-            class="com.googlecode.alvor.checkers.sqlstatic.SyntacticalSQLChecker">
+            class="com.googlecode.alvor.checkers.sqlstatic.SyntacticalSQLChecker"
+            name="Generic-Syntax"
+            usesDatabase="false">
       </checker>
    </extension>
 

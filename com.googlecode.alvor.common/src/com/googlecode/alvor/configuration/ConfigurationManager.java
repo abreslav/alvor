@@ -101,7 +101,7 @@ public class ConfigurationManager {
 	private static ProjectConfiguration readFromStream(InputStream stream) throws ParserConfigurationException, 
 		SAXException, IOException {
 		
-		List<DataSourceProperties> dataSources = new ArrayList<DataSourceProperties>();
+		List<CheckerConfiguration> checkers = new ArrayList<CheckerConfiguration>();
 		List<HotspotPattern> hotspotPatterns = new ArrayList<HotspotPattern>();
 		
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -120,15 +120,37 @@ public class ConfigurationManager {
 					Integer.valueOf(node.getAttribute("argumentIndex"))));
 		}
 
-		NodeList dataSourceNodes = doc.getElementsByTagName("dataSource");
-		for (int i = 0; i < dataSourceNodes.getLength(); i++) {
-			Element node = (Element)dataSourceNodes.item(i);
-			dataSources.add (new DataSourceProperties(
-					node.getAttribute("pattern"), 
-					node.getAttribute("driverName"), 
-					node.getAttribute("url"), 
-					node.getAttribute("userName"), 
-					node.getAttribute("password")));
+		NodeList checkerNodes = doc.getElementsByTagName("checker");
+		
+		// old configuration files may have "dataSource" elements instead of "checker" TODO remove
+		if (checkerNodes.getLength() == 0) {
+			checkerNodes = doc.getElementsByTagName("dataSource");
+		}
+		
+		for (int i = 0; i < checkerNodes.getLength(); i++) {
+			Element checkerNode = (Element)checkerNodes.item(i);
+			
+			// collect patterns
+			NodeList patternNodes = checkerNode.getElementsByTagName("pattern");
+			List<String> patterns = new ArrayList<String>();
+			for (int j = 0; j < patternNodes.getLength(); j++) {
+				String pattern = patternNodes.item(j).getTextContent().trim();
+				if (!pattern.isEmpty()) {
+					patterns.add(pattern);
+				}
+			}
+			// old configuration may have pattern as attribute // TODO remove at some point
+			if (!checkerNode.getAttribute("pattern").isEmpty()) {
+				patterns.add(checkerNode.getAttribute("pattern"));
+			}
+			
+			checkers.add (new CheckerConfiguration(
+					checkerNode.getAttribute("checkerName"), 
+					checkerNode.getAttribute("driverName"), 
+					checkerNode.getAttribute("url"), 
+					checkerNode.getAttribute("userName"), 
+					checkerNode.getAttribute("password"),
+					patterns));
 		}
 		
 		// get attributes
@@ -138,7 +160,7 @@ public class ConfigurationManager {
 			attributes.put(nnm.item(i).getNodeName(), nnm.item(i).getNodeValue());
 		}
 
-		return new ProjectConfiguration(hotspotPatterns, dataSources, attributes);
+		return new ProjectConfiguration(hotspotPatterns, checkers, attributes);
 	}
 
 	public static void saveProjectConfiguration(ProjectConfiguration conf, IProject project) {
@@ -169,16 +191,23 @@ public class ConfigurationManager {
 			hotspotNodes.appendChild(node);
 		}
 
-		Element dataSourceNodes = doc.createElement("dataSources");
-		docElement.appendChild(dataSourceNodes);
-		for (DataSourceProperties dataSource : conf.getDataSources()) {
-			Element node = doc.createElement("dataSource");
-			node.setAttribute("pattern", dataSource.getPattern());
-			node.setAttribute("driverName", dataSource.getDriverName());
-			node.setAttribute("url", dataSource.getUrl());
-			node.setAttribute("userName", dataSource.getUserName());
-			node.setAttribute("password", dataSource.getPassword());
-			dataSourceNodes.appendChild(node);
+		Element checkerNodes = doc.createElement("checkers");
+		docElement.appendChild(checkerNodes);
+		for (CheckerConfiguration checker : conf.getCheckers()) {
+			Element checkerNode = doc.createElement("checker");
+			checkerNode.setAttribute("checkerName", checker.getCheckerName());
+			checkerNode.setAttribute("driverName", checker.getDriverName());
+			checkerNode.setAttribute("url", checker.getUrl());
+			checkerNode.setAttribute("userName", checker.getUserName());
+			checkerNode.setAttribute("password", checker.getPassword());
+			
+			for (String pattern : checker.getPatterns()) {
+				Element patternNode = doc.createElement("pattern");
+				patternNode.setTextContent(pattern);
+				checkerNode.appendChild(patternNode);
+			}
+			
+			checkerNodes.appendChild(checkerNode);
 		}
 		
 		for (Map.Entry<String, String> entry : conf.getProperties().entrySet()) {

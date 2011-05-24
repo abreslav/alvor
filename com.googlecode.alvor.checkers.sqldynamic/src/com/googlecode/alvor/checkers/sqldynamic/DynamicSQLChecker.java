@@ -1,7 +1,6 @@
 package com.googlecode.alvor.checkers.sqldynamic;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -19,18 +18,18 @@ import com.googlecode.alvor.checkers.IAbstractStringChecker;
 import com.googlecode.alvor.common.StringHotspotDescriptor;
 import com.googlecode.alvor.common.logging.ILog;
 import com.googlecode.alvor.common.logging.Logs;
-import com.googlecode.alvor.configuration.DataSourceProperties;
+import com.googlecode.alvor.configuration.CheckerConfiguration;
 import com.googlecode.alvor.configuration.ProjectConfiguration;
 import com.googlecode.alvor.string.samplegen.SampleGenerator;
 import com.googlecode.alvor.string.util.AbstractStringSizeCounter;
 
-public class DynamicSQLChecker implements IAbstractStringChecker {
+public abstract class DynamicSQLChecker implements IAbstractStringChecker {
 	private static final ILog LOG = Logs.getLog(DynamicSQLChecker.class);
 	private static final int SIZE_LIMIT = 10000;
 	private int connectionErrorCount = 0;
 	
 	// connections indexed by hash-code of checker conf
-	protected Map<DataSourceProperties, Connection> connections = new HashMap<DataSourceProperties, Connection>();
+	protected Map<CheckerConfiguration, Connection> connections = new HashMap<CheckerConfiguration, Connection>();
 
 	@Override
 	public Collection<HotspotCheckingResult> checkAbstractString(StringHotspotDescriptor descriptor,
@@ -46,7 +45,7 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 		
 		Connection conn;
 		try {
-			conn = this.getConnection(configuration.getDefaultDataSource());
+			conn = this.getConnection(configuration.getDefaultChecker());
 		} catch (SQLException e) {
 			results.add(new HotspotError("SQL tester connection error: " + e.getMessage(), 
 					descriptor.getPosition()));
@@ -77,20 +76,21 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 		PreparedStatement stmt = null;
 		try {
 			stmt = conn.prepareStatement(sql);
+			stmt.getMetaData();
 		}
 		finally {
 			stmt.close();
 		}
 	}
 
-	protected Connection createConnection(DataSourceProperties options) throws SQLException {
-		if (this.connectionErrorCount > 2) {
+	protected Connection createConnectionWithErrorCheck(CheckerConfiguration options) throws SQLException { 
+		if (this.connectionErrorCount > 1) {
 			// don't waste time for trying to connect anymore
 			throw new SQLException("Had several connection errors, not trying anymore");
 		}
+		
 		try {
-			Class.forName(options.getDriverName());
-			return DriverManager.getConnection(options.getUrl(), options.getUserName(), options.getPassword());
+			return this.createConnection(options.getDriverName(), options.getUrl(), options.getUserName(), options.getPassword());
 		}
 		catch (ClassNotFoundException e) {
 			this.connectionErrorCount++;
@@ -102,7 +102,14 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 		}
 	}
 	
-	protected Connection getConnection(DataSourceProperties options) throws CheckerException, SQLException {
+	/**
+	 * Can't load right driver in this bundle, because driver library is not available
+	 * Each subclass should do "Class.forName(driverName);"
+	 * @param driverName
+	 */
+	protected abstract Connection createConnection(String driverName, String url, String userName, String password) throws ClassNotFoundException, SQLException;
+	
+	protected Connection getConnection(CheckerConfiguration options) throws CheckerException, SQLException {
 		Connection conn = this.connections.get(options);
 		if (conn == null) {
 			if (options.getDriverName() == null || options.getUrl() == null
@@ -111,7 +118,7 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 				throw new CheckerException("SQL checker: Test database configuration is not complete", null);
 			}
 			
-			conn = this.createConnection(options);
+			conn = this.createConnectionWithErrorCheck(options);
 			this.connections.put(options, conn);
 			
 		}

@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Postgresql
+Bundle-SymbolicName: com.googlecode.alvor.checkers.postgresql;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: ALVOR
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: com.googlecode.alvor.common;bundle-version="1.0.0",
+ com.googlecode.alvor.checkers;bundle-version="1.0.0",
+ com.googlecode.alvor.checkers.sqldynamic;bundle-version="1.0.0"
+Bundle-ClassPath: lib/postgresql-8.4-701.jdbc4.jar,
+ .

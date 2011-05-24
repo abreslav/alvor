@@ -950,35 +950,21 @@ Public License instead of this License.  But first, please read
          unpack="false"/>
 
    <plugin
-         id="com.googlecode.alvor.db.mysql"
+         id="com.googlecode.alvor.checkers.mysql"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="com.googlecode.alvor.db"
+         id="com.googlecode.alvor.checkers.oracle"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="com.googlecode.alvor.db.generic"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="com.googlecode.alvor.db.oracle"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="com.googlecode.alvor.checkers.complex"
+         id="com.googlecode.alvor.checkers.postgresql"
          download-size="0"
          install-size="0"
          version="0.0.0"
