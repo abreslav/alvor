@@ -1,9 +1,11 @@
 package com.googlecode.alvor.checkers.sqldynamic;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,38 +21,43 @@ import com.googlecode.alvor.common.logging.ILog;
 import com.googlecode.alvor.common.logging.Logs;
 import com.googlecode.alvor.configuration.DataSourceProperties;
 import com.googlecode.alvor.configuration.ProjectConfiguration;
-import com.googlecode.alvor.db.SqlTester;
-import com.googlecode.alvor.db.generic.GenericSqlTester;
-import com.googlecode.alvor.db.mysql.MySqlSqlTester;
-import com.googlecode.alvor.db.oracle.OracleSqlTester;
 import com.googlecode.alvor.string.samplegen.SampleGenerator;
 import com.googlecode.alvor.string.util.AbstractStringSizeCounter;
 
 public class DynamicSQLChecker implements IAbstractStringChecker {
 	private static final ILog LOG = Logs.getLog(DynamicSQLChecker.class);
 	private static final int SIZE_LIMIT = 10000;
+	private int connectionErrorCount = 0;
 	
-	// testers indexed by hash-code of options map
-	private Map<Integer, SqlTester> testers = new HashMap<Integer, SqlTester>();
+	// connections indexed by hash-code of checker conf
+	protected Map<DataSourceProperties, Connection> connections = new HashMap<DataSourceProperties, Connection>();
 
 	@Override
 	public Collection<HotspotCheckingResult> checkAbstractString(StringHotspotDescriptor descriptor,
 			ProjectConfiguration configuration) throws CheckerException {
 		
+		List<HotspotCheckingResult> results = new ArrayList<HotspotCheckingResult>();
+		
 		if (AbstractStringSizeCounter.size(descriptor.getAbstractValue()) > SIZE_LIMIT) {
-			HotspotCheckingResult result = new HotspotWarningUnsupported
-				("Dynamic SQL checker: SQL string has too many possible variations", descriptor.getPosition());
-			return Collections.singletonList(result);
+			results.add(new HotspotWarningUnsupported
+				("Dynamic SQL checker: SQL string has too many possible variations", descriptor.getPosition()));
+			return results;
 		}
 		
-		SqlTester tester = this.getTester(configuration);
+		Connection conn;
+		try {
+			conn = this.getConnection(configuration.getDefaultDataSource());
+		} catch (SQLException e) {
+			results.add(new HotspotError("SQL tester connection error: " + e.getMessage(), 
+					descriptor.getPosition()));
+			return results;
+		}
 		
-		List<HotspotCheckingResult> results = new ArrayList<HotspotCheckingResult>();
 		Set<String> concreteStrings = SampleGenerator.getConcreteStrings(descriptor.getAbstractValue());
 		for (String s: concreteStrings) {
 			assert LOG.message("CON: " + s);
 			try {
-				tester.testSql(s);
+				this.testSql(s, conn);
 			} catch (SQLException e) {
 				assert LOG.message("    ERR: " + e.getMessage());
 				String message = e.getMessage().trim() + "\nSQL: \n" + s;
@@ -66,55 +73,52 @@ public class DynamicSQLChecker implements IAbstractStringChecker {
 	}
 	
 	
+	protected void testSql(String sql, Connection conn) throws SQLException {
+		PreparedStatement stmt = null;
+		try {
+			stmt = conn.prepareStatement(sql);
+		}
+		finally {
+			stmt.close();
+		}
+	}
 
-	private SqlTester getTester(ProjectConfiguration configuration) throws CheckerException {
-		// give different analyzer for different options
-		// first search for cached version
-		
-		DataSourceProperties options = configuration.getDefaultDataSource();
-		
-		SqlTester tester = this.testers.get(options.hashCode());
-		
-		
-		if (tester == null) {
+	protected Connection createConnection(DataSourceProperties options) throws SQLException {
+		if (this.connectionErrorCount > 2) {
+			// don't waste time for trying to connect anymore
+			throw new SQLException("Had several connection errors, not trying anymore");
+		}
+		try {
+			Class.forName(options.getDriverName());
+			return DriverManager.getConnection(options.getUrl(), options.getUserName(), options.getPassword());
+		}
+		catch (ClassNotFoundException e) {
+			this.connectionErrorCount++;
+			throw new SQLException(e);
+		}
+		catch (SQLException e) {
+			this.connectionErrorCount++;
+			throw e;
+		}
+	}
+	
+	protected Connection getConnection(DataSourceProperties options) throws CheckerException, SQLException {
+		Connection conn = this.connections.get(options);
+		if (conn == null) {
 			if (options.getDriverName() == null || options.getUrl() == null
 					|| options.getUserName() == null || options.getPassword() == null
 					|| options.getDriverName().toString().isEmpty()) {
-				throw new CheckerException("SQL checker: Test database configuration is not complete", 
-						null);
+				throw new CheckerException("SQL checker: Test database configuration is not complete", null);
 			}
 			
-			try {
-				if (options.getDriverName().contains("oracle")) {
-					tester = new OracleSqlTester(				
-							options.getDriverName().toString(),
-							options.getUrl().toString(),
-							options.getUserName().toString(),
-							options.getPassword().toString());
-				}
-				else if (options.getDriverName().contains("mysql")) {
-					tester = new MySqlSqlTester(				
-							options.getDriverName().toString(),
-							options.getUrl().toString(),
-							options.getUserName().toString(),
-							options.getPassword().toString());
-				}
-				else {
-					tester = new GenericSqlTester(				
-							options.getDriverName().toString(),
-							options.getUrl().toString(),
-							options.getUserName().toString(),
-							options.getPassword().toString());
-				}
-			} catch (Exception e) {
-				LOG.exception(e);
-				throw new CheckerException("SQL checker: can't connect with test database: "
-						+ e.getMessage(), null);
-			}
+			conn = this.createConnection(options);
+			this.connections.put(options, conn);
 			
-			this.testers.put(options.hashCode(), tester);
 		}
-		
-		return tester;
+		return conn;
+	}
+
+	protected boolean isSelectStatement(String sql) {
+		return sql.trim().length() >= 6 && sql.trim().substring(0, 6).toLowerCase().equals("select");
 	}
 }

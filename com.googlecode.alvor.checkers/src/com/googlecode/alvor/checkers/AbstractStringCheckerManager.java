@@ -20,6 +20,24 @@ public class AbstractStringCheckerManager {
 	
 	private AbstractStringCheckerManager() {}
 	
+//	public IAbstractStringChecker getCheckerById() {
+//		try {
+//			IConfigurationElement[] config = Platform.getExtensionRegistry()
+//					.getConfigurationElementsFor(CHECKERS_ID);
+//			for (IConfigurationElement e : config) {
+//				final Object o = e.createExecutableExtension("class");
+//				if (o instanceof IAbstractStringChecker) {
+//					IAbstractStringChecker checker = (IAbstractStringChecker)o;
+//					checkers.add((IAbstractStringChecker) o);
+//					assert LOG.message(o);
+//				}
+//			}
+//		} catch (CoreException e) {
+//			LOG.exception(e);
+//			throw new IllegalArgumentException(e);
+//		}
+//	}
+	
 	public List<IAbstractStringChecker> getCheckers() {
 		if (checkers == null) {
 			checkers = new ArrayList<IAbstractStringChecker>();			
@@ -41,24 +59,4 @@ public class AbstractStringCheckerManager {
 		return checkers;
 	}
 	
-//	public IAbstractStringChecker getStaticChecker() {
-//		// TODO yes, using instanceof would be more reliable but I don't want that dependency here
-//		// maybe should reorganize whole stuff and get rid of the extension point 
-//		// and use 
-//		return getChecker("Syntactical");
-//	}
-//	
-//	public IAbstractStringChecker getDynamicChecker() {
-//		return getChecker("Dynamic");
-//	}
-//	
-//	private IAbstractStringChecker getChecker(String namePart) {
-//		List<IAbstractStringChecker> checkers = this.getCheckers();
-//		for (IAbstractStringChecker checker : checkers) {
-//			if (checker.getClass().getName().contains(namePart)) {
-//				return checker;
-//			}
-//		}
-//		throw new IllegalArgumentException("Can't find checker '"+namePart+"'");
-//	}
 }
