@@ -91,7 +91,7 @@ public class CheckerConfiguration {
 	}
 
 	/**
-	 * Default checker is used when no other checker matches 
+	 * default checker is used when no other checker matches 
 	 * @return
 	 */
 	public boolean isDefaultChecker() {

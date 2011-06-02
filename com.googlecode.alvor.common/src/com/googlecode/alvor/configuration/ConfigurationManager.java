@@ -122,7 +122,8 @@ public class ConfigurationManager {
 
 		NodeList checkerNodes = doc.getElementsByTagName("checker");
 		
-		// old configuration files may have "dataSource" elements instead of "checker" TODO remove
+		// old configuration files may have "dataSource" elements instead of "checker" 
+		// TODO remove if not needed anymore
 		if (checkerNodes.getLength() == 0) {
 			checkerNodes = doc.getElementsByTagName("dataSource");
 		}
@@ -139,8 +140,10 @@ public class ConfigurationManager {
 					patterns.add(pattern);
 				}
 			}
-			// old configuration may have pattern as attribute // TODO remove at some point
-			if (!checkerNode.getAttribute("pattern").isEmpty()) {
+			// old configuration may have pattern as attribute 
+			// TODO remove if not necessary anymore
+			if (!checkerNode.getAttribute("pattern").isEmpty() 
+					&& !(checkerNode.getAttribute("pattern").equals("*"))) {
 				patterns.add(checkerNode.getAttribute("pattern"));
 			}
 			
