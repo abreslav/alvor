@@ -28,8 +28,8 @@ public abstract class DynamicSQLChecker implements IAbstractStringChecker {
 	private static final int SIZE_LIMIT = 10000;
 	private int connectionErrorCount = 0;
 	
-	// connections indexed by hash-code of checker conf
-	protected Map<CheckerConfiguration, Connection> connections = new HashMap<CheckerConfiguration, Connection>();
+	// connections indexed by connection patterns
+	protected Map<String, Connection> connections = new HashMap<String, Connection>();
 
 	@Override
 	public Collection<HotspotCheckingResult> checkAbstractString(StringHotspotDescriptor descriptor,
@@ -39,13 +39,14 @@ public abstract class DynamicSQLChecker implements IAbstractStringChecker {
 		
 		if (AbstractStringSizeCounter.size(descriptor.getAbstractValue()) > SIZE_LIMIT) {
 			results.add(new HotspotWarningUnsupported
-				("Dynamic SQL checker: SQL string has too many possible variations", descriptor.getPosition()));
+				("SQL string has too many possible variations", descriptor.getPosition()));
 			return results;
 		}
 		
 		Connection conn;
 		try {
-			conn = this.getConnection(configuration.getDefaultChecker());
+			String connectionPattern = descriptor.getConnectionPattern();
+			conn = this.getConnection(connectionPattern, configuration);
 		} catch (SQLException e) {
 			results.add(new HotspotError("SQL tester connection error: " + e.getMessage(), 
 					descriptor.getPosition()));
@@ -104,14 +105,19 @@ public abstract class DynamicSQLChecker implements IAbstractStringChecker {
 	
 	/**
 	 * Can't load right driver in this bundle, because driver library is not available
-	 * Each subclass should do "Class.forName(driverName);"
+	 * Each subclass overload this method (should do "Class.forName(driverName); ...") 
 	 * @param driverName
 	 */
 	protected abstract Connection createConnection(String driverName, String url, String userName, String password) throws ClassNotFoundException, SQLException;
 	
-	protected Connection getConnection(CheckerConfiguration options) throws CheckerException, SQLException {
-		Connection conn = this.connections.get(options);
+	
+	protected Connection getConnection(String connPattern, ProjectConfiguration projectConfiguration) throws CheckerException, SQLException {
+		Connection conn = this.connections.get(connPattern);
 		if (conn == null) {
+			CheckerConfiguration options = projectConfiguration.getCheckerConfiguration(connPattern);
+			if (options == null) {
+				throw new CheckerException("Configuration problem: can't find suitable checker", null);
+			}
 			if (options.getDriverName() == null || options.getUrl() == null
 					|| options.getUserName() == null || options.getPassword() == null
 					|| options.getDriverName().toString().isEmpty()) {
@@ -119,7 +125,7 @@ public abstract class DynamicSQLChecker implements IAbstractStringChecker {
 			}
 			
 			conn = this.createConnectionWithErrorCheck(options);
-			this.connections.put(options, conn);
+			this.connections.put(connPattern, conn);
 			
 		}
 		return conn;
@@ -127,5 +133,18 @@ public abstract class DynamicSQLChecker implements IAbstractStringChecker {
 
 	protected boolean isSelectStatement(String sql) {
 		return sql.trim().length() >= 6 && sql.trim().substring(0, 6).toLowerCase().equals("select");
+	}
+	
+	@Override
+	protected void finalize() throws Throwable {
+		for (Connection conn : connections.values()) {
+			try {
+				conn.close();
+			} 
+			catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		super.finalize();
 	}
 }

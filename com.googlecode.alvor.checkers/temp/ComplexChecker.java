@@ -54,7 +54,7 @@ public class ComplexChecker implements IAbstractStringChecker {
 			results.addAll(dynamicChecker.checkAbstractString(hotspot, configuration));
 		}
 		else {
-			results.add(new HotspotInfo("SQL checker: testing database is not configured", null));
+			results.add(new HotspotInfo("Testing database is not configured", null));
 		}
 		return results;
 	}

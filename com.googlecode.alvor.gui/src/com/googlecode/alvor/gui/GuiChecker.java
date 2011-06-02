@@ -21,7 +21,6 @@ import com.googlecode.alvor.checkers.HotspotError;
 import com.googlecode.alvor.checkers.HotspotInfo;
 import com.googlecode.alvor.checkers.HotspotWarning;
 import com.googlecode.alvor.checkers.HotspotWarningUnsupported;
-import com.googlecode.alvor.checkers.IAbstractStringChecker;
 import com.googlecode.alvor.common.HotspotDescriptor;
 import com.googlecode.alvor.common.PositionUtil;
 import com.googlecode.alvor.common.ProgressUtil;

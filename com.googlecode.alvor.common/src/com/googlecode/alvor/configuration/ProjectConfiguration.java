@@ -74,15 +74,6 @@ public class ProjectConfiguration {
 		}
 	}
 	
-	public CheckerConfiguration getDefaultChecker() {
-		if (checkers.size() > 0) {
-			return checkers.get(0);
-		}
-		else {
-			return null;
-		}
-	}
-	
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null || ! (obj instanceof ProjectConfiguration)) {
@@ -129,5 +120,27 @@ public class ProjectConfiguration {
 			properties = new HashMap<String, String>();
 		}
 		properties.put(name, value);
+	}
+	
+	public CheckerConfiguration getCheckerConfiguration(String connectionPattern) {
+		if (connectionPattern != null) {
+			for (CheckerConfiguration checkerConf : this.getCheckers()) {
+				if (checkerConf.matchesPattern(connectionPattern)) {
+					return checkerConf;
+				}
+			}
+		}
+		// none matched
+		return getDefaultCheckerConfiguration();
+	}
+	
+	private CheckerConfiguration getDefaultCheckerConfiguration() {
+		for (CheckerConfiguration conf : this.getCheckers()) {
+			if (conf.getPatterns().isEmpty()) {
+				return conf;
+			}
+		}
+		
+		return null;
 	}
 }
