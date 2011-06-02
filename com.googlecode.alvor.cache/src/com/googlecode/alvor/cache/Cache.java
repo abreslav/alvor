@@ -788,20 +788,20 @@ public class Cache {
 				DatabaseHelper.encodeNull(length));
 	}
 	
-	// TODO should be called, when cache is up-to-date
-	// otherwise you delete a pattern but later realize it was still needed
-	private void removeOrphanedSecondaryPatterns() {
-		// when I delete corresponding abstract string (choice) then pattern and project_pattern
-		// records get deleted automatically
-		
-		// delete those patterns, whose
-		
-		db.execute(
-				" delete from abstract_strings s" +
-				" where parent_id is null " + // ie. it's a pattern
-				" and not exists (select " +
-				" and not exists (");
-	}
+//	// TODO should be called, when cache is up-to-date
+//	// otherwise you delete a pattern but later realize it was still needed
+//	private void removeOrphanedSecondaryPatterns() {
+//		// when I delete corresponding abstract string (choice) then pattern and project_pattern
+//		// records get deleted automatically
+//		
+//		// delete those patterns, whose
+//		
+//		db.execute(
+//				" delete from abstract_strings s" +
+//				" where parent_id is null " + // ie. it's a pattern
+//				" and not exists (select " +
+//				" and not exists (");
+//	}
 
 	public void clearProject() {
 		db.execute("delete from files"); 
