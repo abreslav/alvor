@@ -1,0 +1,1890 @@
+%{
+import java.io.IOException;
+%}
+
+%code {
+	public static void main(String[] args) throws IOException {
+		SQLParser parser = new SQLParser(new Lexer() {
+
+			int tokens[] = {258,260,259,260,0,0,};
+			int current;
+			
+			@Override
+			public Object getLVal() {
+				return "";
+			}
+
+			@Override
+			public void yyerror(String s) {
+				
+			}
+
+			@Override
+			public int yylex() throws IOException {
+				return tokens[current++];
+			}
+			
+		});
+		parser.yyDebugStream = System.out;
+		parser.yydebug = 1;
+		
+		System.out.println(parser.parse());
+	}
+}
+//%define parser_class_name "SQLParser"
+
+%lex-keyword PARTITION
+%lex-keyword IMMEDIATE
+%lex-keyword DISTINCT
+%lex-keyword EXECUTE
+%lex-keyword BETWEEN
+%lex-keyword DECLARE
+%lex-keyword VALUES
+%lex-keyword SELECT
+%lex-keyword DELETE
+%lex-keyword INSERT
+%lex-keyword ESCAPE
+%lex-keyword OVER
+%lex-keyword UPDATE
+%lex-keyword EXISTS
+%lex-keyword HAVING
+%lex-keyword COMMIT
+%lex-keyword WHERE
+%lex-keyword BEGIN
+%lex-keyword TABLE
+%lex-keyword ORDER
+%lex-keyword OR
+%lex-keyword GROUP
+%lex-keyword RIGHT
+%lex-keyword INNER
+%lex-keyword OUTER
+%lex-keyword UNION
+%lex-keyword FROM
+%lex-keyword WHEN
+%lex-keyword THEN
+%lex-keyword CASE
+%lex-keyword CAST
+%lex-keyword CALL
+%lex-keyword ELSE
+%lex-keyword DESC
+%lex-keyword LIKE
+%lex-keyword JOIN
+%lex-keyword LEFT
+%lex-keyword NULL
+%lex-keyword FULL
+%lex-keyword INTO
+%lex-keyword AND
+%lex-keyword SET
+%lex-keyword END
+%lex-keyword ASC
+%lex-keyword XOR
+%lex-keyword FOR
+%lex-keyword NOT
+%lex-keyword ON
+%lex-keyword BY
+%lex-keyword AS
+%lex-keyword IN
+%lex-keyword IS
+
+%lex-keyword UNKNOWN
+%lex-keyword UNKNOWN_BODY
+%lex-keyword UNKNOWN_LEX
+
+
+%lex-keyword REAL
+%lex-keyword ACTION
+%lex-keyword MIN
+%lex-keyword LOCAL
+%lex-keyword SECOND
+%lex-keyword BIT
+%lex-keyword OCTET_LENGTH
+%lex-keyword PRECISION
+%lex-keyword BOTH
+%lex-keyword SOME
+%lex-keyword MINUTE
+%lex-keyword CROSS
+%lex-keyword DEFERRED
+%lex-keyword DEFERRABLE
+%lex-keyword MONTH
+%lex-keyword SMALLINT
+%lex-keyword WITH
+%lex-keyword NCHAR
+%lex-keyword ZONE
+%lex-keyword NO
+%lex-keyword INTERSECT
+%lex-keyword COUNT
+%lex-keyword SESSION_USER
+%lex-keyword NATURAL
+%lex-keyword DATE
+%lex-keyword ALL
+%lex-keyword DOUBLE
+%lex-keyword NULLIF
+%lex-keyword CURRENT_DATE
+%lex-keyword SUM
+%lex-keyword CORRESPONDING
+%lex-keyword UNIQUE
+%lex-keyword ANY
+%lex-keyword COLLATE
+%lex-keyword KEY
+%lex-keyword AVG
+%lex-keyword INITIALLY
+%lex-keyword UPPER
+%lex-keyword TIMESTAMP
+%lex-keyword CONSTRAINT
+%lex-keyword LEADING
+%lex-keyword NUMERIC
+%lex-keyword DAY
+%lex-keyword DECIMAL
+%lex-keyword DEC
+%lex-keyword EXCEPT
+%lex-keyword TRUE
+%lex-keyword MODULE
+%lex-keyword EXTRACT
+%lex-keyword CHAR_LENGTH
+%lex-keyword TIME
+%lex-keyword SYSTEM_USER
+%lex-keyword SUBSTRING
+%lex-keyword INTEGER
+%lex-keyword CURRENT_TIME
+%lex-keyword CREATE
+%lex-keyword PARTIAL
+%lex-keyword PRIMARY
+%lex-keyword CHECK
+%lex-keyword CHARACTER
+%lex-keyword USER
+%lex-keyword CHAR
+%lex-keyword TIMEZONE_HOUR
+%lex-keyword REFERENCES
+%lex-keyword MAX
+%lex-keyword CURRENT_TIMESTAMP
+%lex-keyword GLOBAL
+%lex-keyword LOWER
+%lex-keyword USING
+%lex-keyword ROWS
+%lex-keyword TO
+%lex-keyword CASCADE
+%lex-keyword TRAILING
+%lex-keyword TEMPORARY
+%lex-keyword HOUR
+%lex-keyword BIT_LENGTH
+%lex-keyword INDICATOR
+%lex-keyword FALSE
+%lex-keyword FOREIGN
+%lex-keyword YEAR
+%lex-keyword OVERLAPS
+%lex-keyword CHARACTER_LENGTH
+%lex-keyword MATCH
+%lex-keyword INT
+%lex-keyword CONVERT
+%lex-keyword NATIONAL
+%lex-keyword FLOAT
+%lex-keyword CURRENT_USER
+%lex-keyword TRANSLATE
+%lex-keyword INTERVAL
+%lex-keyword VARCHAR
+%lex-keyword DEFAULT
+%lex-keyword VARYING
+%lex-keyword PRESERVE
+%lex-keyword POSITION
+%lex-keyword COALESCE
+%lex-keyword TRIM
+%lex-keyword TIMEZONE_MINUTE
+%lex-keyword AT
+
+%lex-whitespace {NONNEWLINE_WHITE_SPACE_CHAR}+ 
+%lex-whitespace \/\*{COMMENT_TEXT}\*\/ 
+%lex-whitespace --[^\n]* 
+
+%lex-token OUTERJ = "(+)"
+%lex-token NE = "<>" | "!="
+%lex-token LE = "<="
+%lex-token GE = ">="
+%lex-token CONCAT = "||"
+%lex-token COLONEQUALS = ":="
+%lex-token EQUALSGT = "=>"
+%lex-literal ","
+%lex-literal "("
+%lex-literal ")"
+%lex-literal "{"
+%lex-literal "}"
+%lex-literal "."
+%lex-literal "+"
+%lex-literal "-"
+%lex-literal "*"
+%lex-literal "/"
+%lex-literal "="
+%lex-literal "<"
+%lex-literal ">"
+%lex-literal "?"
+%lex-literal ";"
+%lex-literal ":"
+%lex-literal "%"
+
+%lex-helper ALPHA=[A-Za-z]
+%lex-helper DIGIT=[0-9]
+%lex-helper NONNEWLINE_WHITE_SPACE_CHAR=[\ \t\b\012]
+%lex-helper NEWLINE=\r|\n|\r\n
+%lex-helper WHITE_SPACE_CHAR=[\n\r\ \t\b\012]
+%lex-helper SQ_STRING_TEXT=(\'\' | [^\n\r\'] | \")*
+%lex-helper COMMENT_TEXT=([^*/\n]|[^*\n]"/"[^*\n]|[^/\n]"*"[^/\n]|"*"[^/\n]|"/"[^*\n])*
+%lex-helper Ident = {ALPHA}({ALPHA}|{DIGIT}|_)*
+
+%lex-token DIGAL_ERR = {DIGIT}+{ALPHA}({DIGIT}|{ALPHA})*
+%lex-token STRING_SQ = N?\'{SQ_STRING_TEXT}\'
+%lex-token STRING_SQ_ERR = N?\'{SQ_STRING_TEXT} 
+%lex-token MULTILINE_COMMENT_ERR = \/\*{COMMENT_TEXT} 
+%lex-token NUMBER = {DIGIT}+(\.{DIGIT}+)?  
+%lex-token ID = {Ident}
+%lex-token UNKNOWN_CHARACTER_ERR = .
+
+%left OVER
+%left OR XOR
+%left AND
+%right NOT
+%left UNION
+%left '=' NE LE GE '>' '<'
+%left LIKE
+%left '-' '+'  
+%left '/' '*' CONCAT OUTERJ
+
+%glr-parser
+
+%%
+query
+	: bracketedSelect
+	| delete
+	| insert
+	| update
+	| COMMIT
+	| tableDefinition
+	| beginEndBlock
+	| declareBeginEndBlock
+	| callStatement
+	;
+id 
+	: ID
+	| ACTION
+	| ASC
+	| PRESERVE
+	| KEY
+	| NUMBER
+	| TRANSLATE
+	| TRIM
+	| LOWER
+	| SUM
+	| CHAR_LENGTH
+	| POSITION
+	| ZONE 
+	| AVG
+	| DEFERRABLE
+	| CHARACTER_LENGTH
+	| MIN
+	| COUNT
+	| CASCADE
+	| COALESCE
+	| TEMPORARY
+	| UPPER
+	| NULLIF
+	| MAX
+	| DEFERRED
+	| OCTET_LENGTH
+	| EXTRACT
+	| PARTIAL
+	| INITIALLY
+	| CONVERT
+	| SUBSTRING
+	| DESC
+	| CURRENT_TIMESTAMP
+	| CURRENT_DATE
+	| CHAR
+	| FALSE
+	| TRUE
+	| USER
+	| UPPER
+	| LOWER
+	;
+update
+	: UPDATE alias SET assignList where
+	;
+assignList
+	: assign
+	| assignList ',' assign
+	;
+assign
+	: ident '=' simpleExpr
+	| '(' idList ')' '=' simpleExpr
+	;
+delete
+	: DELETE optFrom alias where
+	;
+callStatement
+	: '{' CALL ident identRest  '}'
+declareBeginEndBlock
+	: DECLARE declarationList beginEndBlock
+	;
+declaration
+	: ID ident identRestEx declInitializer ';'
+	| ID identEx declInitializer ';' 
+	;
+declarationList
+	: declaration 
+	| declaration declarationList
+	| /* empty */
+	;
+declInitializer
+	: COLONEQUALS simpleExpr
+	| /*Empty*/
+	;
+beginEndBlock
+	: BEGIN plSqlStatementList END ';'
+	;
+plSqlStatementList
+	: plSqlStatement
+	| plSqlStatement plSqlStatementList
+	;
+plSqlStatement
+	: assignTarget COLONEQUALS simpleExpr ';'
+	| ident identRestEx ';'
+	| selectInto ';'
+	| delete ';'
+	| update ';'
+	| insert ';'
+	| EXECUTE STRING_SQ ';'
+	| EXECUTE IMMEDIATE STRING_SQ ';'
+	;
+assignTarget
+	: '?'
+	| ident
+	;
+optFrom
+	: FROM
+	| /*empty*/
+	;
+insert
+	: INSERT INTO alias optIdList insertRest
+	;
+insertRest
+	: VALUES identRest
+	| select
+	;
+optIdList
+	: /*empty*/
+	| '(' idList ')'
+	;
+idList
+	: id
+	| idList ',' id 
+	;
+bracketedSelect
+	: select
+	| '(' select ')'
+	;
+select 
+	: basicSelect where byClauses forUpdate 
+	| select UNION select
+	;
+basicSelect
+	: SELECT optDist whatToSelect FROM tableList
+	;
+selectInto 
+	: basicSelectInto where byClauses 
+	;
+basicSelectInto
+	: SELECT optDist whatToSelect INTO intoList FROM tableList
+	;
+intoList
+	: intoId 
+	| intoId ',' intoList 
+	;
+intoId
+	: ID
+	| ':' ID
+	;
+where
+	: WHERE whereCond
+	| /*empty*/
+	;
+forUpdate
+	: FOR UPDATE
+	| /*empty*/
+	;
+groupBy
+	: GROUP BY simExList having
+	// GROUP BY identList having
+	;
+optGroupBy
+	: groupBy 	
+	| /*empty*/
+	;
+/*
+identList
+	: ident
+	| identList ',' ident
+	;*/
+having 
+	: HAVING condition
+	| /*empty*/
+	;
+orderBy
+	: ORDER BY directionList 
+	;
+optOrderBy
+	: orderBy 
+	| /*empty*/
+	;
+byClauses
+	: orderBy optGroupBy
+	| groupBy optOrderBy
+	| /* empty */
+	;
+directionList
+	: direction
+	| directionList ',' direction
+	;
+direction
+	: simpleExpr orderDirection
+	;
+orderDirection
+	: ASC
+	| DESC
+	| /*empty*/
+	;
+optDist
+	: DISTINCT
+	| /*empty*/
+	;
+whatToSelect
+	: selectExpressionList
+	;
+selectExpression
+	: expression
+	| selectExpression AS id
+	| selectExpression id
+	;
+expression
+	: condition
+	| simpleExpr
+	;
+selectExpressionList
+	: selectExpression
+	| selectExpressionList ',' selectExpression
+	;
+tableList 
+	: table
+	| tableList ',' table 
+	;
+table
+	: alias
+	| table join alias ON condition
+	;
+join
+	: JOIN
+	| LEFT JOIN
+	| outerType OUTER JOIN
+	| INNER JOIN
+	;
+outerType
+	: LEFT
+	| RIGHT
+	| FULL
+	;
+alias
+	: tableExpr
+	| tableExpr id
+	; 
+tableExpr
+	: ident
+	| TABLE '(' simpleExpr ')'
+	| '(' select ')'
+	;
+ident 
+	: id 
+	| id '.' id
+	| id '.' id '.' id
+	;
+identEx 
+	: ident 
+	| ident '%' id
+	;
+whereCond
+	: condition;
+condition
+	: condition AND condition
+	| condition OR condition
+	| condition XOR condition
+	| NOT condition
+	| '(' condition ')'
+	| comparison
+	| simpleExpr inExpr '(' simExList ')'
+	| simpleExpr inExpr '(' select ')'
+	| '(' idList2 ')' inExpr '(' simExList ')'
+	| '(' idList2 ')' inExpr '(' select ')'
+	| simpleExpr IS optNot NULL
+	| simpleExpr optNot LIKE simpleExpr escape
+	| EXISTS '(' select ')' 
+	| simpleExpr optNot BETWEEN simpleExpr AND simpleExpr
+	;
+idList2
+	: id ',' id
+	| idList2 ',' id
+	;
+comparison 
+	: simpleExpr '=' simpleExpr 
+	| simpleExpr '>' simpleExpr 
+	| simpleExpr '<' simpleExpr 
+	| simpleExpr LE simpleExpr 
+	| simpleExpr NE simpleExpr 
+	| simpleExpr GE simpleExpr 
+    ;
+escape
+	: ESCAPE STRING_SQ
+	| /*empty*/
+	;
+inExpr
+	: optNot IN
+	;
+optNot
+	: NOT
+	| /*empty*/
+	;
+simpleExpr
+	: NUMBER
+	| simpleExpr OUTERJ
+	| '-' simpleExpr
+	| CASE whenList else END
+	| STRING_SQ
+	| ident identRestEx
+	| '(' simpleExpr ')'
+	| simpleExpr '-' simpleExpr
+	| simpleExpr '+' simpleExpr
+	| simpleExpr '*' simpleExpr
+	| simpleExpr '/' simpleExpr
+	| simpleExpr CONCAT simpleExpr
+	| simpleExpr OVER partition
+	| CAST '(' simpleExpr AS id optSize ')'
+	| '(' select ')'
+	| id '.' '*'
+	| '*'
+	| '?'
+	| NULL
+	;	
+optSize
+	: /*empty*/
+	| '(' NUMBER ')'
+	;
+identRest
+	: '(' simExList ')'
+	| /*empty*/
+	;
+identRestEx
+	: identRest
+	| '(' namedArgList ')'
+	;
+namedArgList 
+	: namedArg
+	| namedArg ',' namedArgList
+	| /* empty */
+	;
+namedArg
+	: simpleExpr
+	| ID EQUALSGT simpleExpr
+	;
+whenList
+	: when
+	| when whenList
+	;
+when
+	: WHEN condition THEN simpleExpr
+	;
+else
+	: ELSE simpleExpr
+	| /*empty*/
+	;
+simExList
+    : /*empty*/
+    | nonemptySimExList
+    ;	
+nonemptySimExList
+	: simpleExpr
+	| nonemptySimExList ',' simpleExpr
+   ;
+partition
+	: '(' PARTITION BY ident orderBy ')'
+	;
+	
+	
+	
+	
+	
+// CREATE TABLE
+tableDefinition
+    : CREATE tableDefinition1 TABLE tableName tableElementList tableDefinition2
+    ;
+tableDefinition1
+    : /* empty */
+    | GLOBAL | LOCAL TEMPORARY
+    ;
+tableDefinition2
+    : /* empty */
+    | ON COMMIT DELETE | PRESERVE ROWS
+    ;
+tableName
+    : qualifiedName | qualifiedLocalTableName
+    ;
+qualifiedName
+    : qualifiedName1 qualifiedIdentifier
+    ;
+qualifiedName1
+    : /* empty */
+    | schemaName period
+    ;
+schemaName
+    : UNKNOWN_LEX
+    ;
+period
+    : UNKNOWN_LEX
+    ;
+qualifiedIdentifier
+    : identifier
+    ;
+identifier
+    : id
+    ;
+qualifiedLocalTableName
+    : MODULE period localTableName
+    ;
+localTableName
+    : qualifiedIdentifier
+    ;
+tableElementList
+    : leftParen tableElement tableElementList1 rightParen
+    ;
+tableElementList1
+    : /* empty */
+    | tableElementList1 comma tableElement
+    ;
+leftParen
+    : '('
+    ;
+tableElement
+    : columnDefinition | tableConstraintDefinition
+    ;
+columnDefinition
+    : columnName dataType | domainName columnDefinition1 columnDefinition2 columnDefinition3
+    ;
+columnDefinition1
+    : /* empty */
+    | defaultClause
+    ;
+columnDefinition2
+    : /* empty */
+    | columnDefinition2 columnConstraintDefinition
+    ;
+columnDefinition3
+    : /* empty */
+    | collateClause
+    ;
+columnName
+    : identifier
+    ;
+dataType
+    : characterStringType dataType1 | nationalCharacterStringType | bitStringType | numericType | datetimeType | intervalType
+    ;
+dataType1
+    : /* empty */
+    | CHARACTER SET characterSetSpecification
+    ;
+characterStringType
+    : CHARACTER characterStringType1 | CHAR characterStringType2 | CHARACTER VARYING characterStringType3 | CHAR VARYING characterStringType4 | VARCHAR characterStringType5
+    ;
+characterStringType1
+    : /* empty */
+    | leftParen length rightParen
+    ;
+characterStringType2
+    : /* empty */
+    | leftParen length rightParen
+    ;
+characterStringType3
+    : /* empty */
+    | leftParen length rightParen
+    ;
+characterStringType4
+    : /* empty */
+    | leftParen length rightParen
+    ;
+characterStringType5
+    : /* empty */
+    | leftParen length rightParen
+    ;
+length
+    : unsignedInteger
+    ;
+unsignedInteger
+    : NUMBER
+    ;
+rightParen
+    : ')'
+    ;
+characterSetSpecification
+    : UNKNOWN_LEX
+    ;
+nationalCharacterStringType
+    : NATIONAL CHARACTER nationalCharacterStringType1 | NATIONAL CHAR nationalCharacterStringType2 | NCHAR nationalCharacterStringType3 | NATIONAL CHARACTER VARYING nationalCharacterStringType4 | NATIONAL CHAR VARYING nationalCharacterStringType5 | NCHAR VARYING nationalCharacterStringType6
+    ;
+nationalCharacterStringType1
+    : /* empty */
+    | leftParen length rightParen
+    ;
+nationalCharacterStringType2
+    : /* empty */
+    | leftParen length rightParen
+    ;
+nationalCharacterStringType3
+    : /* empty */
+    | leftParen length rightParen
+    ;
+nationalCharacterStringType4
+    : /* empty */
+    | leftParen length rightParen
+    ;
+nationalCharacterStringType5
+    : /* empty */
+    | leftParen length rightParen
+    ;
+nationalCharacterStringType6
+    : /* empty */
+    | leftParen length rightParen
+    ;
+bitStringType
+    : BIT bitStringType1 | BIT VARYING bitStringType2
+    ;
+bitStringType1
+    : /* empty */
+    | leftParen length rightParen
+    ;
+bitStringType2
+    : /* empty */
+    | leftParen length rightParen
+    ;
+numericType
+    : exactNumericType | approximateNumericType
+    ;
+exactNumericType
+    : NUMERIC exactNumericType2 | DECIMAL exactNumericType4 | DEC exactNumericType6 | INTEGER | INT | SMALLINT
+    ;
+exactNumericType2
+    : /* empty */
+    | leftParen precision exactNumericType1 rightParen
+    ;
+exactNumericType1
+    : /* empty */
+    | comma scale
+    ;
+exactNumericType4
+    : /* empty */
+    | leftParen precision exactNumericType3 rightParen
+    ;
+exactNumericType3
+    : /* empty */
+    | comma scale
+    ;
+exactNumericType6
+    : /* empty */
+    | leftParen precision exactNumericType5 rightParen
+    ;
+exactNumericType5
+    : /* empty */
+    | comma scale
+    ;
+precision
+    : unsignedInteger
+    ;
+comma
+    : ','
+    ;
+scale
+    : unsignedInteger
+    ;
+approximateNumericType
+    : FLOAT approximateNumericType1 | REAL | DOUBLE PRECISION
+    ;
+approximateNumericType1
+    : /* empty */
+    | leftParen precision rightParen
+    ;
+datetimeType
+    : DATE | TIME datetimeType1 datetimeType2 | TIMESTAMP datetimeType3 datetimeType4
+    ;
+datetimeType1
+    : /* empty */
+    | leftParen timePrecision rightParen
+    ;
+datetimeType2
+    : /* empty */
+    | WITH TIME ZONE
+    ;
+datetimeType3
+    : /* empty */
+    | leftParen timestampPrecision rightParen
+    ;
+datetimeType4
+    : /* empty */
+    | WITH TIME ZONE
+    ;
+timePrecision
+    : timeFractionalSecondsPrecision
+    ;
+timeFractionalSecondsPrecision
+    : unsignedInteger
+    ;
+timestampPrecision
+    : timeFractionalSecondsPrecision
+    ;
+intervalType
+    : INTERVAL intervalQualifier
+    ;
+intervalQualifier
+    : startField TO endField | singleDatetimeField
+    ;
+startField
+    : nonsecondDatetimeField startField1
+    ;
+startField1
+    : /* empty */
+    | leftParen intervalLeadingFieldPrecision rightParen
+    ;
+nonsecondDatetimeField
+    : YEAR | MONTH | DAY | HOUR | MINUTE
+    ;
+intervalLeadingFieldPrecision
+    : unsignedInteger
+    ;
+endField
+    : nonsecondDatetimeField | SECOND endField1
+    ;
+endField1
+    : /* empty */
+    | leftParen intervalFractionalSecondsPrecision rightParen
+    ;
+intervalFractionalSecondsPrecision
+    : unsignedInteger
+    ;
+singleDatetimeField
+    : nonsecondDatetimeField singleDatetimeField1 | SECOND singleDatetimeField3
+    ;
+singleDatetimeField1
+    : /* empty */
+    | leftParen intervalLeadingFieldPrecision rightParen
+    ;
+singleDatetimeField3
+    : /* empty */
+    | leftParen intervalLeadingFieldPrecision singleDatetimeField2 rightParen
+    ;
+singleDatetimeField2
+    : /* empty */
+    | comma leftParen intervalFractionalSecondsPrecision
+    ;
+domainName
+    : qualifiedName
+    ;
+defaultClause
+    : DEFAULT defaultOption
+    ;
+defaultOption
+    : literal | datetimeValueFunction | USER | CURRENT_USER | SESSION_USER | SYSTEM_USER | NULL
+    ;
+literal
+    : signedNumericLiteral | generalLiteral
+    ;
+signedNumericLiteral
+    : signedNumericLiteral1 unsignedNumericLiteral
+    ;
+signedNumericLiteral1
+    : /* empty */
+    | sign
+    ;
+sign
+    : UNKNOWN_LEX
+    ;
+unsignedNumericLiteral
+    : UNKNOWN_LEX
+    ;
+generalLiteral
+    : characterStringLiteral | nationalCharacterStringLiteral | bitStringLiteral | hexStringLiteral | datetimeLiteral | intervalLiteral
+    ;
+characterStringLiteral
+    : UNKNOWN_LEX
+    ;
+nationalCharacterStringLiteral
+    : UNKNOWN_LEX
+    ;
+bitStringLiteral
+    : UNKNOWN_LEX
+    ;
+hexStringLiteral
+    : UNKNOWN_LEX
+    ;
+datetimeLiteral
+    : dateLiteral | timeLiteral | timestampLiteral
+    ;
+dateLiteral
+    : DATE dateString
+    ;
+dateString
+    : UNKNOWN_LEX
+    ;
+timeLiteral
+    : TIME timeString
+    ;
+timeString
+    : UNKNOWN_LEX
+    ;
+timestampLiteral
+    : TIMESTAMP timestampString
+    ;
+timestampString
+    : UNKNOWN_LEX
+    ;
+intervalLiteral
+    : INTERVAL intervalLiteral1 intervalString intervalQualifier
+    ;
+intervalLiteral1
+    : /* empty */
+    | sign
+    ;
+intervalString
+    : UNKNOWN_LEX
+    ;
+datetimeValueFunction
+    : currentDateValueFunction | currentTimeValueFunction | currentTimestampValueFunction
+    ;
+currentDateValueFunction
+    : CURRENT_DATE
+    ;
+currentTimeValueFunction
+    : CURRENT_TIME currentTimeValueFunction1
+    ;
+currentTimeValueFunction1
+    : /* empty */
+    | leftParen timePrecision rightParen
+    ;
+currentTimestampValueFunction
+    : CURRENT_TIMESTAMP currentTimestampValueFunction1
+    ;
+currentTimestampValueFunction1
+    : /* empty */
+    | leftParen timestampPrecision rightParen
+    ;
+columnConstraintDefinition
+    : columnConstraintDefinition1 columnConstraint columnConstraintDefinition2
+    ;
+columnConstraintDefinition1
+    : /* empty */
+    | constraintNameDefinition
+    ;
+columnConstraintDefinition2
+    : /* empty */
+    | constraintAttributes
+    ;
+constraintNameDefinition
+    : CONSTRAINT constraintName
+    ;
+constraintName
+    : qualifiedName
+    ;
+columnConstraint
+    : NOT NULL | uniqueSpecification | referencesSpecification | checkConstraintDefinition
+    ;
+uniqueSpecification
+    : UNIQUE | PRIMARY KEY
+    ;
+referencesSpecification
+    : REFERENCES referencedTableAndColumns referencesSpecification1 referencesSpecification2
+    ;
+referencesSpecification1
+    : /* empty */
+    | MATCH matchType
+    ;
+referencesSpecification2
+    : /* empty */
+    | referentialTriggeredAction
+    ;
+referencedTableAndColumns
+    : tableName referencedTableAndColumns1
+    ;
+referencedTableAndColumns1
+    : /* empty */
+    | leftParen referenceColumnList rightParen
+    ;
+referenceColumnList
+    : columnNameList
+    ;
+columnNameList
+    : columnName columnNameList1
+    ;
+columnNameList1
+    : /* empty */
+    | columnNameList1 comma columnName
+    ;
+matchType
+    : FULL | PARTIAL
+    ;
+referentialTriggeredAction
+    : updateRule referentialTriggeredAction1 | deleteRule referentialTriggeredAction2
+    ;
+referentialTriggeredAction1
+    : /* empty */
+    | deleteRule
+    ;
+referentialTriggeredAction2
+    : /* empty */
+    | updateRule
+    ;
+updateRule
+    : ON UPDATE referentialAction
+    ;
+referentialAction
+    : CASCADE | SET NULL | SET DEFAULT | NO ACTION
+    ;
+deleteRule
+    : ON DELETE referentialAction
+    ;
+checkConstraintDefinition
+    : CHECK leftParen searchCondition rightParen
+    ;
+searchCondition
+    : booleanTerm | searchCondition OR booleanTerm
+    ;
+booleanTerm
+    : booleanFactor | booleanTerm AND booleanFactor
+    ;
+booleanFactor
+    : booleanFactor1 booleanTest
+    ;
+booleanFactor1
+    : /* empty */
+    | NOT
+    ;
+booleanTest
+    : booleanPrimary booleanTest2
+    ;
+booleanTest2
+    : /* empty */
+    | IS booleanTest1 truthValue
+    ;
+booleanTest1
+    : /* empty */
+    | NOT
+    ;
+booleanPrimary
+    : predicate | leftParen searchCondition rightParen
+    ;
+predicate
+    : comparisonPredicate | betweenPredicate | inPredicate | likePredicate | nullPredicate | quantifiedComparisonPredicate | existsPredicate | matchPredicate | overlapsPredicate
+    ;
+comparisonPredicate
+    : rowValueConstructor compOp rowValueConstructor
+    ;
+rowValueConstructor
+    : rowValueConstructorElement | leftParen rowValueConstructorList rightParen | rowSubquery
+    ;
+rowValueConstructorElement
+    : valueExpression | nullSpecification | defaultSpecification
+    ;
+valueExpression
+    : numericValueExpression | stringValueExpression | datetimeValueExpression | intervalValueExpression
+    ;
+numericValueExpression
+    : term | numericValueExpression plusSign term | numericValueExpression minusSign term
+    ;
+term
+    : factor | term asterisk factor | term solidus factor
+    ;
+factor
+    : factor1 numericPrimary
+    ;
+factor1
+    : /* empty */
+    | sign
+    ;
+numericPrimary
+    : valueExpressionPrimary | numericValueFunction
+    ;
+valueExpressionPrimary
+    : unsignedValueSpecification | columnReference | setFunctionSpecification | scalarSubquery | caseExpression | leftParen valueExpression rightParen | castSpecification
+    ;
+unsignedValueSpecification
+    : unsignedLiteral | generalValueSpecification
+    ;
+unsignedLiteral
+    : unsignedNumericLiteral | generalLiteral
+    ;
+generalValueSpecification
+    : parameterSpecification | dynamicParameterSpecification | variableSpecification | USER | CURRENT_USER | SESSION_USER | SYSTEM_USER /* | VALUE */
+    ;
+parameterSpecification
+    : parameterName parameterSpecification1
+    ;
+parameterSpecification1
+    : /* empty */
+    | indicatorParameter
+    ;
+parameterName
+    : colon identifier
+    ;
+colon
+    : UNKNOWN_LEX
+    ;
+indicatorParameter
+    : indicatorParameter1 parameterName
+    ;
+indicatorParameter1
+    : /* empty */
+    | INDICATOR
+    ;
+dynamicParameterSpecification
+    : questionMark
+    ;
+questionMark
+    : UNKNOWN_LEX
+    ;
+variableSpecification
+    : embeddedVariableName variableSpecification1
+    ;
+variableSpecification1
+    : /* empty */
+    | indicatorVariable
+    ;
+embeddedVariableName
+    : colon hostIdentifier
+    ;
+hostIdentifier
+    : AdaHostIdentifier | CHostIdentifier | CobolHostIdentifier | FortranHostIdentifier | MUMPSHostIdentifier | PascalHostIdentifier | PLIHostIdentifier
+    ;
+AdaHostIdentifier
+    : UNKNOWN_BODY
+    ;
+CHostIdentifier
+    : UNKNOWN_BODY
+    ;
+CobolHostIdentifier
+    : UNKNOWN_BODY
+    ;
+FortranHostIdentifier
+    : UNKNOWN_BODY
+    ;
+MUMPSHostIdentifier
+    : UNKNOWN_BODY
+    ;
+PascalHostIdentifier
+    : UNKNOWN_BODY
+    ;
+PLIHostIdentifier
+    : UNKNOWN_BODY
+    ;
+indicatorVariable
+    : indicatorVariable1 embeddedVariableName
+    ;
+indicatorVariable1
+    : /* empty */
+    | INDICATOR
+    ;
+columnReference
+    : columnReference1 columnName
+    ;
+columnReference1
+    : /* empty */
+    | qualifier period
+    ;
+qualifier
+    : tableName | correlationName
+    ;
+correlationName
+    : identifier
+    ;
+setFunctionSpecification
+    : COUNT leftParen asterisk rightParen | generalSetFunction
+    ;
+asterisk
+    : UNKNOWN_LEX
+    ;
+generalSetFunction
+    : setFunctionType leftParen generalSetFunction1 valueExpression rightParen
+    ;
+generalSetFunction1
+    : /* empty */
+    | setQuantifier
+    ;
+setFunctionType
+    : AVG | MAX | MIN | SUM | COUNT
+    ;
+setQuantifier
+    : DISTINCT | ALL
+    ;
+scalarSubquery
+    : subquery
+    ;
+subquery
+    : leftParen queryExpression rightParen
+    ;
+queryExpression
+    : nonjoinQueryExpression | joinedTable
+    ;
+nonjoinQueryExpression
+    : nonjoinQueryTerm | queryExpression UNION nonjoinQueryExpression1 nonjoinQueryExpression2 queryTerm | queryExpression EXCEPT nonjoinQueryExpression3 nonjoinQueryExpression4 queryTerm
+    ;
+nonjoinQueryExpression1
+    : /* empty */
+    | ALL
+    ;
+nonjoinQueryExpression2
+    : /* empty */
+    | correspondingSpec
+    ;
+nonjoinQueryExpression3
+    : /* empty */
+    | ALL
+    ;
+nonjoinQueryExpression4
+    : /* empty */
+    | correspondingSpec
+    ;
+nonjoinQueryTerm
+    : nonjoinQueryPrimary | queryTerm INTERSECT nonjoinQueryTerm1 nonjoinQueryTerm2 queryPrimary
+    ;
+nonjoinQueryTerm1
+    : /* empty */
+    | ALL
+    ;
+nonjoinQueryTerm2
+    : /* empty */
+    | correspondingSpec
+    ;
+nonjoinQueryPrimary
+    : simpleTable | leftParen nonjoinQueryExpression rightParen
+    ;
+simpleTable
+    : querySpecification | tableValueConstructor | explicitTable
+    ;
+querySpecification
+    : SELECT querySpecification1 selectList tableExpression
+    ;
+querySpecification1
+    : /* empty */
+    | setQuantifier
+    ;
+selectList
+    : asterisk | selectSublist selectList1
+    ;
+selectList1
+    : /* empty */
+    | selectList1 comma selectSublist
+    ;
+selectSublist
+    : derivedColumn | qualifier period asterisk
+    ;
+derivedColumn
+    : valueExpression derivedColumn1
+    ;
+derivedColumn1
+    : /* empty */
+    | asClause
+    ;
+asClause
+    : asClause1 columnName
+    ;
+asClause1
+    : /* empty */
+    | AS
+    ;
+tableExpression
+    : fromClause tableExpression1 tableExpression2 tableExpression3
+    ;
+tableExpression1
+    : /* empty */
+    | whereClause
+    ;
+tableExpression2
+    : /* empty */
+    | groupByClause
+    ;
+tableExpression3
+    : /* empty */
+    | havingClause
+    ;
+fromClause
+    : FROM tableReference fromClause1
+    ;
+fromClause1
+    : /* empty */
+    | fromClause1 comma tableReference
+    ;
+tableReference
+    : tableName tableReference1 | derivedTable correlationSpecification | joinedTable
+    ;
+tableReference1
+    : /* empty */
+    | correlationSpecification
+    ;
+correlationSpecification
+    : correlationSpecification1 correlationName correlationSpecification2
+    ;
+correlationSpecification1
+    : /* empty */
+    | AS
+    ;
+correlationSpecification2
+    : /* empty */
+    | leftParen derivedColumnList rightParen
+    ;
+derivedColumnList
+    : columnNameList
+    ;
+derivedTable
+    : tableSubquery
+    ;
+tableSubquery
+    : subquery
+    ;
+joinedTable
+    : crossJoin | qualifiedJoin | leftParen joinedTable rightParen
+    ;
+crossJoin
+    : tableReference CROSS JOIN tableReference
+    ;
+qualifiedJoin
+    : tableReference qualifiedJoin1 qualifiedJoin2 JOIN tableReference qualifiedJoin3
+    ;
+qualifiedJoin1
+    : /* empty */
+    | NATURAL
+    ;
+qualifiedJoin2
+    : /* empty */
+    | joinType
+    ;
+qualifiedJoin3
+    : /* empty */
+    | joinSpecification
+    ;
+joinType
+    : INNER | outerJoinType joinType1 | UNION
+    ;
+joinType1
+    : /* empty */
+    | OUTER
+    ;
+outerJoinType
+    : LEFT | RIGHT | FULL
+    ;
+joinSpecification
+    : joinCondition | namedColumnsJoin
+    ;
+joinCondition
+    : ON searchCondition
+    ;
+namedColumnsJoin
+    : USING leftParen joinColumnList rightParen
+    ;
+joinColumnList
+    : columnNameList
+    ;
+whereClause
+    : WHERE searchCondition
+    ;
+groupByClause
+    : GROUP BY groupingColumnReferenceList
+    ;
+groupingColumnReferenceList
+    : groupingColumnReference groupingColumnReferenceList1
+    ;
+groupingColumnReferenceList1
+    : /* empty */
+    | groupingColumnReferenceList1 comma groupingColumnReference
+    ;
+groupingColumnReference
+    : columnReference groupingColumnReference1
+    ;
+groupingColumnReference1
+    : /* empty */
+    | collateClause
+    ;
+collateClause
+    : COLLATE collationName
+    ;
+collationName
+    : qualifiedName
+    ;
+havingClause
+    : HAVING searchCondition
+    ;
+tableValueConstructor
+    : VALUES tableValueConstructorList
+    ;
+tableValueConstructorList
+    : rowValueConstructor tableValueConstructorList1
+    ;
+tableValueConstructorList1
+    : /* empty */
+    | tableValueConstructorList1 comma rowValueConstructor
+    ;
+explicitTable
+    : TABLE tableName
+    ;
+queryTerm
+    : nonjoinQueryTerm | joinedTable
+    ;
+correspondingSpec
+    : CORRESPONDING correspondingSpec1
+    ;
+correspondingSpec1
+    : /* empty */
+    | BY leftParen correspondingColumnList rightParen
+    ;
+correspondingColumnList
+    : columnNameList
+    ;
+queryPrimary
+    : nonjoinQueryPrimary | joinedTable
+    ;
+caseExpression
+    : caseAbbreviation | caseSpecification
+    ;
+caseAbbreviation
+    : NULLIF leftParen valueExpression comma valueExpression rightParen | COALESCE leftParen valueExpression caseAbbreviation1 rightParen
+    ;
+caseAbbreviation1
+    : comma valueExpression
+    | caseAbbreviation1 comma valueExpression
+    ;
+caseSpecification
+    : simpleCase | searchedCase
+    ;
+simpleCase
+    : CASE caseOperand simpleCase1 simpleCase2 END
+    ;
+simpleCase1
+    : simpleWhenClause
+    | simpleCase1 simpleWhenClause
+    ;
+simpleCase2
+    : /* empty */
+    | elseClause
+    ;
+caseOperand
+    : valueExpression
+    ;
+simpleWhenClause
+    : WHEN whenOperand THEN result
+    ;
+whenOperand
+    : valueExpression
+    ;
+result
+    : resultExpression | NULL
+    ;
+resultExpression
+    : valueExpression
+    ;
+elseClause
+    : ELSE result
+    ;
+searchedCase
+    : CASE searchedCase1 searchedCase2 END
+    ;
+searchedCase1
+    : searchedWhenClause
+    | searchedCase1 searchedWhenClause
+    ;
+searchedCase2
+    : /* empty */
+    | elseClause
+    ;
+searchedWhenClause
+    : WHEN searchCondition THEN result
+    ;
+castSpecification
+    : CAST leftParen castOperand AS castTarget rightParen
+    ;
+castOperand
+    : valueExpression | NULL
+    ;
+castTarget
+    : domainName | typeName
+    ;
+typeName
+    : UNKNOWN_BODY
+    ;
+numericValueFunction
+    : positionExpression | extractExpression | lengthExpression
+    ;
+positionExpression
+    : POSITION leftParen characterValueExpression IN characterValueExpression rightParen
+    ;
+characterValueExpression
+    : concatenation | characterFactor
+    ;
+concatenation
+    : characterValueExpression concatenationOperator characterFactor
+    ;
+concatenationOperator
+    : UNKNOWN_LEX
+    ;
+characterFactor
+    : characterPrimary characterFactor1
+    ;
+characterFactor1
+    : /* empty */
+    | collateClause
+    ;
+characterPrimary
+    : valueExpressionPrimary | stringValueFunction
+    ;
+stringValueFunction
+    : characterValueFunction | bitValueFunction
+    ;
+characterValueFunction
+    : characterSubstringFunction | fold | formofuseConversion | characterTranslation | trimFunction
+    ;
+characterSubstringFunction
+    : SUBSTRING leftParen characterValueExpression FROM startPosition characterSubstringFunction1 rightParen
+    ;
+characterSubstringFunction1
+    : /* empty */
+    | FOR stringLength
+    ;
+startPosition
+    : numericValueExpression
+    ;
+stringLength
+    : numericValueExpression
+    ;
+fold
+    : UPPER | LOWER leftParen characterValueExpression rightParen
+    ;
+formofuseConversion
+    : CONVERT leftParen characterValueExpression USING formofuseConversionName rightParen
+    ;
+formofuseConversionName
+    : qualifiedName
+    ;
+characterTranslation
+    : TRANSLATE leftParen characterValueExpression USING translationName rightParen
+    ;
+translationName
+    : qualifiedName
+    ;
+trimFunction
+    : TRIM leftParen trimOperands rightParen
+    ;
+trimOperands
+    : trimOperands3 trimSource
+    ;
+trimOperands3
+    : /* empty */
+    | trimOperands1 trimOperands2 FROM
+    ;
+trimOperands1
+    : /* empty */
+    | trimSpecification
+    ;
+trimOperands2
+    : /* empty */
+    | trimCharacter
+    ;
+trimSpecification
+    : LEADING | TRAILING | BOTH
+    ;
+trimCharacter
+    : characterValueExpression
+    ;
+trimSource
+    : characterValueExpression
+    ;
+bitValueFunction
+    : bitSubstringFunction
+    ;
+bitSubstringFunction
+    : SUBSTRING leftParen bitValueExpression FROM startPosition bitSubstringFunction1 rightParen
+    ;
+bitSubstringFunction1
+    : /* empty */
+    | FOR stringLength
+    ;
+bitValueExpression
+    : bitConcatenation | bitFactor
+    ;
+bitConcatenation
+    : bitValueExpression concatenationOperator bitFactor
+    ;
+bitFactor
+    : bitPrimary
+    ;
+bitPrimary
+    : valueExpressionPrimary | stringValueFunction
+    ;
+extractExpression
+    : EXTRACT leftParen extractField FROM extractSource rightParen
+    ;
+extractField
+    : datetimeField | timeZoneField
+    ;
+datetimeField
+    : nonsecondDatetimeField | SECOND
+    ;
+timeZoneField
+    : TIMEZONE_HOUR | TIMEZONE_MINUTE
+    ;
+extractSource
+    : datetimeValueExpression | intervalValueExpression
+    ;
+datetimeValueExpression
+    : datetimeTerm | intervalValueExpression plusSign datetimeTerm | datetimeValueExpression plusSign intervalTerm | datetimeValueExpression minusSign intervalTerm
+    ;
+datetimeTerm
+    : datetimeFactor
+    ;
+datetimeFactor
+    : datetimePrimary datetimeFactor1
+    ;
+datetimeFactor1
+    : /* empty */
+    | timeZone
+    ;
+datetimePrimary
+    : valueExpressionPrimary | datetimeValueFunction
+    ;
+timeZone
+    : AT timeZoneSpecifier
+    ;
+timeZoneSpecifier
+    : LOCAL | TIME ZONE intervalValueExpression
+    ;
+intervalValueExpression
+    : intervalTerm | intervalValueExpression1 plusSign intervalTerm1 | intervalValueExpression1 minusSign intervalTerm1 | leftParen datetimeValueExpression minusSign datetimeTerm rightParen intervalQualifier
+    ;
+intervalTerm
+    : intervalFactor | intervalTerm2 asterisk factor | intervalTerm2 solidus factor | term asterisk intervalFactor
+    ;
+intervalFactor
+    : intervalFactor1 intervalPrimary
+    ;
+intervalFactor1
+    : /* empty */
+    | sign
+    ;
+intervalPrimary
+    : valueExpressionPrimary intervalPrimary1
+    ;
+intervalPrimary1
+    : /* empty */
+    | intervalQualifier
+    ;
+intervalTerm2
+    : intervalTerm
+    ;
+solidus
+    : UNKNOWN_LEX
+    ;
+intervalValueExpression1
+    : intervalValueExpression
+    ;
+plusSign
+    : UNKNOWN_LEX
+    ;
+intervalTerm1
+    : intervalTerm
+    ;
+minusSign
+    : UNKNOWN_LEX
+    ;
+lengthExpression
+    : charLengthExpression | octetLengthExpression | bitLengthExpression
+    ;
+charLengthExpression
+    : CHAR_LENGTH | CHARACTER_LENGTH leftParen stringValueExpression rightParen
+    ;
+stringValueExpression
+    : characterValueExpression | bitValueExpression
+    ;
+octetLengthExpression
+    : OCTET_LENGTH leftParen stringValueExpression rightParen
+    ;
+bitLengthExpression
+    : BIT_LENGTH leftParen stringValueExpression rightParen
+    ;
+nullSpecification
+    : NULL
+    ;
+defaultSpecification
+    : DEFAULT
+    ;
+rowValueConstructorList
+    : rowValueConstructorElement rowValueConstructorList1
+    ;
+rowValueConstructorList1
+    : /* empty */
+    | rowValueConstructorList1 comma rowValueConstructorElement
+    ;
+rowSubquery
+    : subquery
+    ;
+compOp
+    : equalsOperator | notEqualsOperator | lessThanOperator | greaterThanOperator | lessThanOrEqualsOperator | greaterThanOrEqualsOperator
+    ;
+equalsOperator
+    : UNKNOWN_LEX
+    ;
+notEqualsOperator
+    : UNKNOWN_LEX
+    ;
+lessThanOperator
+    : UNKNOWN_LEX
+    ;
+greaterThanOperator
+    : UNKNOWN_LEX
+    ;
+lessThanOrEqualsOperator
+    : UNKNOWN_LEX
+    ;
+greaterThanOrEqualsOperator
+    : UNKNOWN_LEX
+    ;
+betweenPredicate
+    : rowValueConstructor betweenPredicate1 BETWEEN rowValueConstructor AND rowValueConstructor
+    ;
+betweenPredicate1
+    : /* empty */
+    | NOT
+    ;
+inPredicate
+    : rowValueConstructor inPredicate1 IN inPredicateValue
+    ;
+inPredicate1
+    : /* empty */
+    | NOT
+    ;
+inPredicateValue
+    : tableSubquery | leftParen inValueList rightParen
+    ;
+inValueList
+    : valueExpression inValueList1
+    ;
+inValueList1
+    : comma valueExpression
+    | inValueList1 comma valueExpression
+    ;
+likePredicate
+    : matchValue likePredicate1 LIKE pattern likePredicate2
+    ;
+likePredicate1
+    : /* empty */
+    | NOT
+    ;
+likePredicate2
+    : /* empty */
+    | ESCAPE escapeCharacter
+    ;
+matchValue
+    : characterValueExpression
+    ;
+pattern
+    : characterValueExpression
+    ;
+escapeCharacter
+    : characterValueExpression
+    ;
+nullPredicate
+    : IS nullPredicate1 NULL
+    ;
+nullPredicate1
+    : /* empty */
+    | NOT
+    ;
+quantifiedComparisonPredicate
+    : rowValueConstructor compOp quantifier tableSubquery
+    ;
+quantifier
+    : all | some
+    ;
+all
+    : ALL
+    ;
+some
+    : SOME | ANY
+    ;
+existsPredicate
+    : EXISTS tableSubquery
+    ;
+matchPredicate
+    : rowValueConstructor MATCH matchPredicate1 matchPredicate2 tableSubquery
+    ;
+matchPredicate1
+    : /* empty */
+    | UNIQUE
+    ;
+matchPredicate2
+    : /* empty */
+    | PARTIAL | FULL
+    ;
+overlapsPredicate
+    : rowValueConstructor1 OVERLAPS rowValueConstructor2
+    ;
+rowValueConstructor1
+    : rowValueConstructor
+    ;
+rowValueConstructor2
+    : rowValueConstructor
+    ;
+truthValue
+    : TRUE | FALSE | UNKNOWN
+    ;
+constraintAttributes
+    : constraintCheckTime constraintAttributes2 | constraintAttributes3 DEFERRABLE constraintAttributes4
+    ;
+constraintAttributes2
+    : /* empty */
+    | constraintAttributes1 DEFERRABLE
+    ;
+constraintAttributes1
+    : /* empty */
+    | NOT
+    ;
+constraintAttributes3
+    : /* empty */
+    | NOT
+    ;
+constraintAttributes4
+    : /* empty */
+    | constraintCheckTime
+    ;
+constraintCheckTime
+    : INITIALLY DEFERRED | INITIALLY IMMEDIATE
+    ;
+tableConstraintDefinition
+    : tableConstraintDefinition1 tableConstraint tableConstraintDefinition2
+    ;
+tableConstraintDefinition1
+    : /* empty */
+    | constraintNameDefinition
+    ;
+tableConstraintDefinition2
+    : /* empty */
+    | constraintCheckTime
+    ;
+tableConstraint
+    : uniqueConstraintDefinition | referentialConstraintDefinition | checkConstraintDefinition
+    ;
+uniqueConstraintDefinition
+    : uniqueSpecification leftParen uniqueColumnList rightParen
+    ;
+uniqueColumnList
+    : columnNameList
+    ;
+referentialConstraintDefinition
+    : FOREIGN KEY leftParen referencingColumns rightParen referencesSpecification
+    ;
+referencingColumns
+    : referenceColumnList
+    ;

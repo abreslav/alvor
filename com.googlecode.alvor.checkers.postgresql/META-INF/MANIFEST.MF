@@ -7,6 +7,9 @@ Bundle-Vendor: ALVOR
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: com.googlecode.alvor.common;bundle-version="1.0.0",
  com.googlecode.alvor.checkers;bundle-version="1.0.0",
- com.googlecode.alvor.checkers.sqldynamic;bundle-version="1.0.0"
+ com.googlecode.alvor.checkers.sqldynamic;bundle-version="1.0.0",
+ com.googlecode.alvor.checkers.sqlstatic;bundle-version="1.0.0",
+ com.googlecode.alvor.sqlparser;bundle-version="1.0.0"
 Bundle-ClassPath: lib/postgresql-8.4-701.jdbc4.jar,
  .
+Import-Package: com.googlecode.alvor.lexer.automata

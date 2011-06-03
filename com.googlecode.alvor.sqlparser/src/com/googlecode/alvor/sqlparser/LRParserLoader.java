@@ -12,8 +12,18 @@ import org.jdom.input.SAXBuilder;
 
 public class LRParserLoader {
 
+	public static void load(URL fileName, ILRParserBuilder builder) {
+		try {
+			load_(fileName, builder);
+		} catch (JDOMException e) {
+			throw new RuntimeException(e);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 	@SuppressWarnings("rawtypes")
-	public static void load(URL fileName, ILRParserBuilder builder) throws JDOMException, IOException {
+	private static void load_(URL fileName, ILRParserBuilder builder) throws JDOMException, IOException {
 		Document document = new SAXBuilder().build(fileName);
 		Element root = document.getRootElement();
 		Element grammar = root.getChild("grammar");
