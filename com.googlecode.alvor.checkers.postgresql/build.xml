@@ -15,20 +15,20 @@ This script is meant for building 2 files:
     </target>
 
     <target name="generateParser">
-		<!-- New GLR-parser -->
+		<!-- GLR-parser -->
     	<java 
     		classpath="../com.googlecode.alvor.sqlparser/bin" 
     		classname="com.googlecode.alvor.sqlparser.SpecGeneratorMain"
     	>
     		<arg value="grammar/sql.bgtemplate"/>	<!-- parserTempName -->
     		<arg value="generated/sql.bg"/> 	  	<!-- parserOutName -->
-    		<arg value="grammar/sql.flextemplate"/> <!-- lexerTempName -->
+    		<arg value="${lexerProject}/lexer//sql.flextemplate"/> <!-- lexerTempName -->
     		<arg value="generated/sql.flex"/>       <!-- lexerOutName --> 
     		<arg value="generated/sql.keywords"/>   <!-- keywordsName -->
     	</java>
     			
 		<exec executable="bison" dir="${basedir}">
-			<arg value="--xml=res/grammar.xml"/>
+			<arg value="--xml=src/com/googlecode/alvor/checkers/postgresql/grammar.xml"/>
 			<arg value="--report=state,lookahead,itemset"/>
 			<arg value="--report-file=generated/sql.report"/>
 			<arg value="generated/sql.bg"/>
@@ -63,13 +63,13 @@ This script is meant for building 2 files:
     	</javac>
     			
 		<!-- Run the compiled class and store the results as a *.java file -->
-    	<mkdir dir="src/com/googlecode/alvor/sqllexer"/>
+    	<!-- <mkdir dir="src/com/googlecode/alvor/checkers/sqllexer"/> -->
     	<java 
     		classpath="${lexerProject}/bin" 
     		classname="SQLLexerGen" 
-    		output="src/com/googlecode/alvor/sqllexer/SQLLexerData.java">
-    		<arg value="com.googlecode.alvor.sqllexer"/>
-    		<arg value="SQLLexerData"/>
+    		output="src/com/googlecode/alvor/checkers/postgresql/PostgreSqlLexerData.java">
+    		<arg value="com.googlecode.alvor.checkers.postgresql"/>
+    		<arg value="PostgreSqlLexerData"/>
     	</java>
 	</target>	
 

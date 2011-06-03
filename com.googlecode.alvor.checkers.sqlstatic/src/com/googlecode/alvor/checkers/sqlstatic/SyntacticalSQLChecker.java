@@ -16,9 +16,11 @@ import com.googlecode.alvor.common.logging.Logs;
 import com.googlecode.alvor.configuration.ProjectConfiguration;
 import com.googlecode.alvor.lexer.alphabet.IAbstractInputItem;
 import com.googlecode.alvor.lexer.alphabet.Token;
+import com.googlecode.alvor.lexer.automata.LexerData;
 import com.googlecode.alvor.lexer.automata.State;
+import com.googlecode.alvor.sqlparser.GLRStack;
+import com.googlecode.alvor.sqlparser.ILRParser;
 import com.googlecode.alvor.sqlparser.IParseErrorHandler;
-import com.googlecode.alvor.sqlparser.IParserStackLike;
 import com.googlecode.alvor.sqlparser.ParserSimulator;
 import com.googlecode.alvor.string.IAbstractString;
 import com.googlecode.alvor.string.IPosition;
@@ -34,7 +36,7 @@ import com.googlecode.alvor.string.util.AbstractStringSizeCounter;
 abstract public class SyntacticalSQLChecker implements IAbstractStringChecker {
 
 	private static final ILog LOG = Logs.getLog(SyntacticalSQLChecker.class);
-	private final ParserSimulator<? extends IParserStackLike> parserSimulator;  
+	private final ParserSimulator<GLRStack> parserSimulator;  
 
 	/**
 	 * Maximum size of abstract strings. Bigger strings are likely to cause OutOfMemoryError, 
@@ -43,10 +45,11 @@ abstract public class SyntacticalSQLChecker implements IAbstractStringChecker {
 	private static int SIZE_THRESHOLD = 25000;
 	
 	public SyntacticalSQLChecker() {
-    	parserSimulator = this.createParserSimulator();
+		parserSimulator = new ParserSimulator<GLRStack>(
+				this.provideParser(),
+				GLRStack.FACTORY, 
+				this.provideLexerData());
 	}
-	
-	public abstract ParserSimulator<? extends IParserStackLike> createParserSimulator();
 	
 	private Collection<HotspotCheckingResult> checkStringOfAppropriateSize(
 			final StringHotspotDescriptor descriptor,
@@ -158,5 +161,8 @@ abstract public class SyntacticalSQLChecker implements IAbstractStringChecker {
 		
 		return results;
 	}
+	
+	protected abstract ILRParser<GLRStack> provideParser();
+	protected abstract LexerData provideLexerData();
 	
 }

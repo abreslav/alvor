@@ -10,6 +10,11 @@
             name="PostgreSQL-DB"
             usesDatabase="true">
       </checker>
+      <checker
+            class="com.googlecode.alvor.checkers.postgresql.SyntacticalSQLCheckerPostgreSQL"
+            name="PostgreSQL-Syntax"
+            usesDatabase="false">
+      </checker>
    </extension>
 
 </plugin>

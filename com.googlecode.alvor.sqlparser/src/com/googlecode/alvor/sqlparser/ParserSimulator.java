@@ -48,7 +48,7 @@ public class ParserSimulator<S extends IParserStackLike> {
 	 */
 	public static ParserSimulator<GLRStack> getGenericSqlGLRInstance() {
 		if (GLR_INSTANCE == null) {
-			GLR_INSTANCE = new ParserSimulator<GLRStack>(Parsers.getGLRParserForSQL(), 
+			GLR_INSTANCE = new ParserSimulator<GLRStack>(Parsers.getGenericGLRParserForSQL(), 
 					GLRStack.FACTORY, GenericSQLLexerData.DATA);
 		}
 		return GLR_INSTANCE;

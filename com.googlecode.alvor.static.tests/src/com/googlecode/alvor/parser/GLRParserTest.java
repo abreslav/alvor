@@ -3,11 +3,8 @@ package com.googlecode.alvor.parser;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.List;
 
-import org.jdom.JDOMException;
 import org.junit.Test;
 
 import com.googlecode.alvor.sqllexer.GenericSQLLexerData;
@@ -26,15 +23,7 @@ public class GLRParserTest {
 			GLRStack.FACTORY, GenericSQLLexerData.DATA);
 
 	private static ILRParser<GLRStack> loadParser() {
-		try {
-			return GLRParser.build(GLRParserTest.class.getClassLoader().getResource("glr.xml"));
-		} catch (MalformedURLException e) {
-			throw new AssertionError(e);
-		} catch (JDOMException e) {
-			throw new AssertionError(e);
-		} catch (IOException e) {
-			throw new AssertionError(e);
-		}
+		return GLRParser.build(GLRParserTest.class.getClassLoader().getResource("glr.xml"));
 	}
 	
 	@Test
