@@ -1,6 +1,9 @@
 package com.googlecode.alvor.sqllexer;
 
-public class SQLLexerData{
+import com.googlecode.alvor.lexer.automata.LexerData;
+
+
+public class GenericSQLLexerData{
 /** Char classes (char - class (char)) */
 private static final String CHAR_CLASSES_PACKED = 
 "\10\0\2\3\1\5\2\0\1\4\22\0\1\3\1\31\1\0\2\0\1\30\1\0\1\6\1\13\1\14" + 
@@ -384,4 +387,6 @@ static {
     TOKENS[  28] = "NE";
     TOKENS[  13] = ".";
 }
+public static final LexerData DATA = new LexerData(CHAR_CLASSES_PACKED, STATE_COUNT, CHAR_CLASS_COUNT,TRANSITIONS, ATTRIBUTES, ACTIONS, KEYWORDS, TOKENS);
+
 }

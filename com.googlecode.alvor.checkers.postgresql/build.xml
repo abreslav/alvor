@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+This script is meant for building 2 files:
+ * res/grammar.xml
+ * 
+-->
+ 
+<project name="project" default="default">
+	<property name="lexerProject" value="../com.googlecode.alvor.sqllexer"></property>
+	<taskdef classname="JFlex.anttask.JFlexTask" name="jflex" classpath="${lexerProject}/lib/JFlex.jar"/>
+
+	<target name="default" depends="generateLexer" description="description">
+        
+    </target>
+
+    <target name="generateParser">
+		<!-- New GLR-parser -->
+    	<java 
+    		classpath="../com.googlecode.alvor.sqlparser/bin" 
+    		classname="com.googlecode.alvor.sqlparser.SpecGeneratorMain"
+    	>
+    		<arg value="grammar/sql.bgtemplate"/>	<!-- parserTempName -->
+    		<arg value="generated/sql.bg"/> 	  	<!-- parserOutName -->
+    		<arg value="grammar/sql.flextemplate"/> <!-- lexerTempName -->
+    		<arg value="generated/sql.flex"/>       <!-- lexerOutName --> 
+    		<arg value="generated/sql.keywords"/>   <!-- keywordsName -->
+    	</java>
+    			
+		<exec executable="bison" dir="${basedir}">
+			<arg value="--xml=res/grammar.xml"/>
+			<arg value="--report=state,lookahead,itemset"/>
+			<arg value="--report-file=generated/sql.report"/>
+			<arg value="generated/sql.bg"/>
+		</exec>
+    	<delete file="sql.tab.bg"></delete>
+	</target>
+	
+    <target name="generateLexer" depends="generateParser">  
+		<!-- SQL lexer : SQL transducer is generated from it -->
+		<jflex
+			file="generated/sql.flex"
+    		destdir="generated" 
+			time="on"
+    		nobak="on"
+			pack="off"
+		/>
+    			
+		<!-- Generate a class which will generate the data for a transducer -->
+    	<java classpath="${lexerProject}/bin" classname="Generator">
+    		<arg file="generated/"/>   <!-- inFolder --> 
+    		<arg value="SQLLexer"/>    <!-- inClassName -->
+    		<arg file="generated/"/>   <!-- outFolder -->
+    	    <arg value="SQLLexerGen"/> <!-- outClassName -->
+    		<arg value="generated/sql.keywords"/> <!-- keywordsFileName -->
+    	</java>
+    			
+		<!-- Compile the generated class -->
+    	<javac 
+    		srcdir="generated" 
+    		classpath="generated" 
+    		destdir="bin">
+    	</javac>
+    			
+		<!-- Run the compiled class and store the results as a *.java file -->
+    	<mkdir dir="src/com/googlecode/alvor/sqllexer"/>
+    	<java 
+    		classpath="${lexerProject}/bin" 
+    		classname="SQLLexerGen" 
+    		output="src/com/googlecode/alvor/sqllexer/SQLLexerData.java">
+    		<arg value="com.googlecode.alvor.sqllexer"/>
+    		<arg value="SQLLexerData"/>
+    	</java>
+	</target>	
+
+</project>

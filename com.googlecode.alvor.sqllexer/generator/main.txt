@@ -4,6 +4,8 @@
 		
 		System.out.println("package " + pack + ";");
 		System.out.println();
+		System.out.println("import com.googlecode.alvor.lexer.automata.LexerData;\n");
+		System.out.println();
 		System.out.println("public class " + className + "{");
 		
 		System.out.println("/** Char classes (char - class (char)) */");

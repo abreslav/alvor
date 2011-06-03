@@ -62,7 +62,6 @@ public class Generator {
 			maxToken = Math.max(maxToken, Integer.parseInt(index));
 		}
 		tokens.append("        System.out.println(\"}\");\n");
-		tokens.append("        System.out.println(\"}\");\n");
 		
 		// The beginning of the main function
 		InputStream main = Generator.class.getResourceAsStream("main.txt");
@@ -94,8 +93,20 @@ public class Generator {
 		fileWriter.write(tokens.toString());
 		
 		
-		// Close the main function and the class
-		fileWriter.write("\n    }\n}");
+		// write statement for creating field
+		fileWriter.write("System.out.println(\"public static final LexerData DATA = " +
+				"new LexerData(CHAR_CLASSES_PACKED, STATE_COUNT, CHAR_CLASS_COUNT," +
+				"TRANSITIONS, ATTRIBUTES, ACTIONS, KEYWORDS, TOKENS);\\n\");\n");
+		
+		// write class end }
+		fileWriter.write("System.out.println(\"}\");\n");
+
+		
+		// Close the main function
+		fileWriter.write("\n    }");
+		
+		// close class
+		fileWriter.write("\n}");
 		fileWriter.close();
 		
 		System.out.println("Generation finished");

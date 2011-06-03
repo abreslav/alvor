@@ -8,44 +8,37 @@ import java.util.Set;
 
 import com.googlecode.alvor.lexer.alphabet.IAbstractInputItem;
 import com.googlecode.alvor.lexer.alphabet.SimpleCharacter;
-import com.googlecode.alvor.lexer.alphabet.Token;
-import com.googlecode.alvor.lexer.automata.AutomataDeterminator;
-import com.googlecode.alvor.lexer.automata.EmptyTransitionEliminator;
-import com.googlecode.alvor.lexer.automata.State;
-import com.googlecode.alvor.lexer.automata.Transition;
-import com.googlecode.alvor.lexer.sql.SQLLexer;
-import com.googlecode.alvor.sqllexer.SQLLexerData;
 
 public class AutomataUtils {
 
-	public static final ICharacterMapper SQL_TOKEN_MAPPER = new AbstractCharacterMapper() {
-		@Override
-		public String map(int c) {
-			return SQLLexer.getTokenName(c);
-		}
-	};
+//	public static final ICharacterMapper SQL_TOKEN_MAPPER = new AbstractCharacterMapper() {
+//		@Override
+//		public String map(int c) {
+//			return SQLLexer.getTokenName(c);
+//		}
+//	};
 	
-	public static final ICharacterMapper SQL_IN_MAPPER = new AbstractCharacterMapper() {
-		@Override
-		public String map(int c) {
-			if (c == (char) -1) {
-				return "EOF";
-			}
-			char[] cc = SQLLexerData.CHAR_CLASSES;
-			for (int i = 0; i < cc.length; i++) {
-				if (cc[i] == c) {
-					if (Character.isWhitespace((char) i)) {
-						return "WS";
-					} if (i == 0) {
-						return "'\\0'";
-					} else { 
-						return "'" + ((char) i) + "'";
-					}
-				}
-			}
-			throw new IllegalStateException("Impossible state: '" + c + "'");
-		}
-	};
+//	private static final ICharacterMapper SQL_IN_MAPPER = new AbstractCharacterMapper() {
+//		@Override
+//		public String map(int c) {
+//			if (c == (char) -1) {
+//				return "EOF";
+//			}
+//			char[] cc = SQLLexerData.CHAR_CLASSES;
+//			for (int i = 0; i < cc.length; i++) {
+//				if (cc[i] == c) {
+//					if (Character.isWhitespace((char) i)) {
+//						return "WS";
+//					} if (i == 0) {
+//						return "'\\0'";
+//					} else { 
+//						return "'" + ((char) i) + "'";
+//					}
+//				}
+//			}
+//			throw new IllegalStateException("Impossible state: '" + c + "'");
+//		}
+//	};
 
 	public static final ICharacterMapper ID_MAPPER = new AbstractCharacterMapper() {
 		@Override
@@ -58,14 +51,14 @@ public class AutomataUtils {
 		printAutomaton(initial, ID_MAPPER, ID_MAPPER);
 	}
 	
-	public static void printSQLAutomaton(State initial) {
-		printAutomaton(initial, ID_MAPPER, SQL_TOKEN_MAPPER);
-	}
-	
-	public static void printSQLInputAutomaton(State initial) {
-		printAutomaton(initial, SQL_TOKEN_MAPPER, ID_MAPPER);
-	}
-	
+//	public static void printSQLAutomaton(State initial) {
+//		printAutomaton(initial, ID_MAPPER, SQL_TOKEN_MAPPER);
+//	}
+//	
+//	public static void printSQLInputAutomaton(State initial) {
+//		printAutomaton(initial, SQL_TOKEN_MAPPER, ID_MAPPER);
+//	}
+//	
 	public static void printAutomaton(State initial, ICharacterMapper inMapper, ICharacterMapper outMapper) {
 		LinkedHashSet<State> states = new LinkedHashSet<State>();
 		EmptyTransitionEliminator.INSTANCE.dfs(initial, states);
@@ -200,15 +193,6 @@ public class AutomataUtils {
 		}
 	};
 
-	public static final IInputToString SQL_TOKEN_TO_STRING = new IInputToString() {
-		
-		@Override
-		public String toString(IAbstractInputItem item) {
-			Token token = (Token) item;
-			return SQLLexer.tokenToString(token);
-		}
-	};
-	
 	public static void generate(State state, IInputToString toStr, IOutput output) {
 		Set<Transition> visitedTransitions = new HashSet<Transition>();
 		Iterable<Transition> outgoingTransitions = state.getOutgoingTransitions();

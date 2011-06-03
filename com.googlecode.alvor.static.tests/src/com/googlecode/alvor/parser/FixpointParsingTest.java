@@ -59,7 +59,7 @@ public class FixpointParsingTest {
 
 	private boolean doParse(final ILRParser<IParserStack> parser, State initial) {
 //		return SQLSyntaxChecker.INSTANCE.parseAutomaton(initial, new IAlphabetConverter() {
-		return ParserSimulator.getLALRInstance().parseAutomaton(initial, new IAlphabetConverter() {
+		return ParserSimulator.getGenericSqlLALRInstance().parseAutomaton(initial, new IAlphabetConverter() {
 			
 			@Override
 			public int convert(int c) {
@@ -175,13 +175,13 @@ public class FixpointParsingTest {
 	private void assertParses(String abstractString) {
 		IAbstractString as = AbstractStringParser.parseOneFromString(abstractString);
 //		List<String> errors = SQLSyntaxChecker.INSTANCE.checkAbstractString(as, stackFactory);
-		List<String> errors = ParserSimulator.getGLRInstance().check(as);//, stackFactory);
+		List<String> errors = ParserSimulator.getGenericSqlGLRInstance().check(as);//, stackFactory);
 		assertTrue(errors.toString(), errors.isEmpty());
 	}
 
 	private boolean parseAbstractString(String abstractString) {
 		IAbstractString as = AbstractStringParser.parseOneFromString(abstractString);
 //		return SQLSyntaxChecker.INSTANCE.checkAbstractString(as, stackFactory).isEmpty();
-		return ParserSimulator.getGLRInstance().check(as).isEmpty();//, stackFactory).isEmpty();
+		return ParserSimulator.getGenericSqlGLRInstance().check(as).isEmpty();//, stackFactory).isEmpty();
 	}
 }

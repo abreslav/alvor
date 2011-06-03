@@ -10,17 +10,16 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.junit.Test;
 
 import com.googlecode.alvor.checkers.sqlstatic.SyntacticalSQLChecker;
-import com.googlecode.alvor.lexer.automata.AutomataTransduction;
-import com.googlecode.alvor.lexer.automata.EmptyTransitionEliminator;
-import com.googlecode.alvor.lexer.automata.State;
-import com.googlecode.alvor.lexer.automata.StringToAutomatonConverter;
+import com.googlecode.alvor.lexer.alphabet.IAbstractInputItem;
+import com.googlecode.alvor.lexer.alphabet.Token;
 import com.googlecode.alvor.lexer.sql.SQLLexer;
+import com.googlecode.alvor.sqllexer.GenericSQLLexerData;
 import com.googlecode.alvor.string.IAbstractString;
 import com.googlecode.alvor.string.IAbstractStringVisitor;
 import com.googlecode.alvor.string.StringCharacterSet;
@@ -41,16 +40,32 @@ public class LexerPerformanceTest {
 		List<IAbstractString> strings = AbstractStringParser.parseFile("data/sqls.txt");
 		
 		Map<String, IInputToString> expectedMap = new LinkedHashMap<String, IInputToString>();
-		expectedMap.put("data/sqls.expected", AutomataUtils.SQL_TOKEN_MAPPER);
-		expectedMap.put("data/sqls.tokens.expected", AutomataUtils.SQL_TOKEN_TO_STRING);
+		
+		final SQLLexer lexer = new SQLLexer(GenericSQLLexerData.DATA);
+		AutomataTransduction automataTransduction = new AutomataTransduction(lexer);
+		
+		expectedMap.put("data/sqls.expected", new AbstractCharacterMapper() {
+			@Override
+			public String map(int c) {
+				return lexer.getTokenName(c);
+			}
+		});
+		expectedMap.put("data/sqls.tokens.expected", new IInputToString() {
+			
+			@Override
+			public String toString(IAbstractInputItem item) {
+				Token token = (Token) item;
+				return lexer.tokenToString(token);
+			}
+		});
 		
 		Map<String, Set<String>> generatedMap = new LinkedHashMap<String, Set<String>>();
 
-		State sqlTransducer = SQLLexer.SQL_TRANSDUCER;
+		State sqlTransducer = lexer.SQL_TRANSDUCER;
 		for (IAbstractString string : strings) {
 			string = optimize(string);
 			State initial = StringToAutomatonConverter.INSTANCE.convert(string);
-			State transduction = AutomataTransduction.INSTANCE.getTransduction(sqlTransducer, initial, SQLLexer.SQL_ALPHABET_CONVERTER);
+			State transduction = automataTransduction.getTransduction(sqlTransducer, initial, lexer.SQL_ALPHABET_CONVERTER);
 			transduction = EmptyTransitionEliminator.INSTANCE.eliminateEmptySetTransitions(transduction);
 //			transduction = AutomataDeterminator.determinate(transduction);
 
