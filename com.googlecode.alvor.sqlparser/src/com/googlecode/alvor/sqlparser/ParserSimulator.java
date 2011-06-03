@@ -7,12 +7,14 @@ import com.googlecode.alvor.lexer.alphabet.IAbstractInputItem;
 import com.googlecode.alvor.lexer.alphabet.Token;
 import com.googlecode.alvor.lexer.automata.AutomataTransduction;
 import com.googlecode.alvor.lexer.automata.EmptyTransitionEliminator;
+import com.googlecode.alvor.lexer.automata.EmptyTransitionEliminator.IEmptinessExpert;
 import com.googlecode.alvor.lexer.automata.IAlphabetConverter;
+import com.googlecode.alvor.lexer.automata.LexerData;
 import com.googlecode.alvor.lexer.automata.State;
 import com.googlecode.alvor.lexer.automata.StringToAutomatonConverter;
 import com.googlecode.alvor.lexer.automata.Transition;
-import com.googlecode.alvor.lexer.automata.EmptyTransitionEliminator.IEmptinessExpert;
 import com.googlecode.alvor.lexer.sql.SQLLexer;
+import com.googlecode.alvor.sqllexer.GenericSQLLexerData;
 import com.googlecode.alvor.sqlparser.framework.IError;
 import com.googlecode.alvor.sqlparser.framework.LRParser;
 import com.googlecode.alvor.sqlparser.framework.NaiveAbstractInterpreter;
@@ -29,25 +31,25 @@ import com.googlecode.alvor.string.IAbstractString;
 public class ParserSimulator<S extends IParserStackLike> {
 
 	private static ParserSimulator<IParserStack> LALR_INSTANCE = null;
-	
 	private static ParserSimulator<GLRStack> GLR_INSTANCE = null;
-	
 	/**
 	 * Normal LR-parsing with bounded stacks
 	 */
-	public static ParserSimulator<IParserStack> getLALRInstance() {
+	public static ParserSimulator<IParserStack> getGenericSqlLALRInstance() {
 		if (LALR_INSTANCE == null) {
-			LALR_INSTANCE = new ParserSimulator<IParserStack>(Parsers.getLALRParserForSQL(), BoundedStack.getFactory(100, null));
+			LALR_INSTANCE = new ParserSimulator<IParserStack>
+				(Parsers.getLALRParserForSQL(), BoundedStack.getFactory(100, null),
+						GenericSQLLexerData.DATA);
 		}
 		return LALR_INSTANCE;
 	}
-	
 	/**
 	 * GLR-parsing with bounded stacks (see GLRStack.FACTORY)
 	 */
-	public static ParserSimulator<GLRStack> getGLRInstance() {
+	public static ParserSimulator<GLRStack> getGenericSqlGLRInstance() {
 		if (GLR_INSTANCE == null) {
-			GLR_INSTANCE = new ParserSimulator<GLRStack>(Parsers.getGLRParserForSQL(), GLRStack.FACTORY);
+			GLR_INSTANCE = new ParserSimulator<GLRStack>(Parsers.getGLRParserForSQL(), 
+					GLRStack.FACTORY, GenericSQLLexerData.DATA);
 		}
 		return GLR_INSTANCE;
 	}
@@ -56,10 +58,14 @@ public class ParserSimulator<S extends IParserStackLike> {
 	private final ILRParser<S> parser;
 	// For debugging purposes only
 	public long allTime;
+	private final SQLLexer sqlLexer;
+	private final AutomataTransduction automataTransduction;
 
-	public ParserSimulator(ILRParser<S> parser, IStackFactory<S> factory) {
+	public ParserSimulator(ILRParser<S> parser, IStackFactory<S> factory, LexerData lexerData) {
 		this.stackFactory = factory;
 		this.parser = parser;
+		this.sqlLexer = new SQLLexer(lexerData);
+		this.automataTransduction = new AutomataTransduction(sqlLexer);
 	}
 
 	/**
@@ -78,7 +84,7 @@ public class ParserSimulator<S extends IParserStackLike> {
 					List<? extends IAbstractInputItem> counterExample) {
 				if (item instanceof Token) {
 					Token token = (Token) item;
-					errors.add("Unexpected token: " + SQLLexer.tokenToString(token));
+					errors.add("Unexpected token: " + sqlLexer.tokenToString(token));
 				} else {
 					errors.add("Unexpected token: " + parser.getSymbolNumbersToNames().get(item.getCode()));
 				}
@@ -109,14 +115,14 @@ public class ParserSimulator<S extends IParserStackLike> {
 	}
 
 	private void checkAutomaton(final ILRParser<S> parser, State asAut, IStackFactory<S> stackFactory, IParseErrorHandler errorHandler) {
-		State sqlTransducer = SQLLexer.SQL_TRANSDUCER;
-		State transduction = AutomataTransduction.INSTANCE.getTransduction(sqlTransducer, asAut, SQLLexer.SQL_ALPHABET_CONVERTER);
+		State sqlTransducer = sqlLexer.SQL_TRANSDUCER;
+		State transduction = this.automataTransduction.getTransduction(sqlTransducer, asAut, sqlLexer.SQL_ALPHABET_CONVERTER);
 		long time = System.nanoTime();
 		transduction = EmptyTransitionEliminator.INSTANCE.eliminateEmptySetTransitions(transduction, new IEmptinessExpert() {
 			
 			@Override
 			public boolean isEmpty(Transition transition) {
-				return transition.isEmpty() || SQLLexer.isWhitespace(transition.getInChar().getCode());
+				return transition.isEmpty() || sqlLexer.isWhitespace(transition.getInChar().getCode());
 			}
 		});
 		
@@ -128,7 +134,7 @@ public class ParserSimulator<S extends IParserStackLike> {
 				if (c == -1) {
 					return eofTokenIndex;
 				}
-				String tokenName = SQLLexer.getTokenName(c);
+				String tokenName = sqlLexer.getTokenName(c);
 				if (Character.isLetter(tokenName.charAt(0))) {
 					return parser.getNamesToTokenNumbers().get(tokenName);
 				}

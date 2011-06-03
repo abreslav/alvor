@@ -8,4 +8,5 @@ Require-Bundle: com.googlecode.alvor.model;bundle-version="1.0.0",
  com.googlecode.alvor.common;bundle-version="1.0.0"
 Export-Package: com.googlecode.alvor.lexer.alphabet,
  com.googlecode.alvor.lexer.automata,
- com.googlecode.alvor.lexer.sql
+ com.googlecode.alvor.lexer.sql,
+ com.googlecode.alvor.sqllexer

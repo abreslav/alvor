@@ -92,7 +92,7 @@ public class SQLSyntaxCheckerTest {
 		}
 		assertTrue("String is too big: " + AbstractStringSizeCounter.size(optimized), SyntacticalSQLChecker.hasAcceptableSize(optimized));
 //		List<String> errors = SQLSyntaxChecker.INSTANCE.check(optimized);
-		List<String> errors = ParserSimulator.getGLRInstance().check(optimized);
+		List<String> errors = ParserSimulator.getGenericSqlGLRInstance().check(optimized);
 		assertEquals(errors + "   " + optimized.toString(), expected, errors.isEmpty());
 	}
 	

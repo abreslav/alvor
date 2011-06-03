@@ -15,6 +15,7 @@ import com.googlecode.alvor.lexer.automata.ICharacterMapper;
 import com.googlecode.alvor.lexer.automata.IInputToString;
 import com.googlecode.alvor.lexer.automata.State;
 import com.googlecode.alvor.lexer.automata.AutomataUtils.IOutput;
+import com.googlecode.alvor.lexer.sql.SQLLexer;
 
 public class TestUtil {
 
@@ -30,8 +31,13 @@ public class TestUtil {
 		return result;
 	}
 
-	public static void checkGeneratedSQLStrings(State transduction, String... expected) {
-		checkGeneratedStrings(transduction, AutomataUtils.SQL_TOKEN_MAPPER, expected);
+	public static void checkGeneratedSQLStrings(State transduction, final SQLLexer lexer, String... expected) {
+		checkGeneratedStrings(transduction, new AbstractCharacterMapper() {
+			@Override
+			public String map(int c) {
+				return lexer.getTokenName(c);
+			}
+		}, expected);
 	}
 
 	public static void checkGeneratedcharacterStrings(State transduction, String... expected) {

@@ -13,6 +13,7 @@ import com.googlecode.alvor.lexer.alphabet.BranchingSequence;
 import com.googlecode.alvor.lexer.alphabet.IAbstractInputItem;
 import com.googlecode.alvor.lexer.alphabet.IAbstractOutputItem;
 import com.googlecode.alvor.lexer.alphabet.ISequence;
+import com.googlecode.alvor.lexer.sql.SQLLexer;
 
 /**
  * Performs inclusion checks and transductions
@@ -22,9 +23,12 @@ import com.googlecode.alvor.lexer.alphabet.ISequence;
  */
 public class AutomataTransduction {
 
-	public static final AutomataTransduction INSTANCE = new AutomataTransduction();
+//	public static final AutomataTransduction INSTANCE = new AutomataTransduction();
+	private final PushYieldInterpreterWithKeywords pushYieldInterpreter;
 	
-	private AutomataTransduction() {}
+	public AutomataTransduction(SQLLexer lexer) {
+		pushYieldInterpreter = new PushYieldInterpreterWithKeywords(lexer);
+	}
 	
 	/**
 	 * Check if the first contains the second
@@ -42,7 +46,8 @@ public class AutomataTransduction {
 	 * @return the resulting automaton's initial state
 	 */
 	public State getTransduction(State transducerInitial, State inputInitial, IAlphabetConverter converter) {
-		return getTransduction(transducerInitial, inputInitial, converter, PushYieldInterpreterWithKeywords.INSTANCE);
+		return getTransduction(transducerInitial, inputInitial, converter, 
+				this.pushYieldInterpreter);
 	}
 	
 	public State getTransduction(State transducerInitial, State inputInitial, IAlphabetConverter converter, IOutputItemInterpreter interpreter) {

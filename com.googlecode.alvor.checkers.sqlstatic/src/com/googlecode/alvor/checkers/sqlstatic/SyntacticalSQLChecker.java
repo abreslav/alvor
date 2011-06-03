@@ -18,6 +18,7 @@ import com.googlecode.alvor.lexer.alphabet.IAbstractInputItem;
 import com.googlecode.alvor.lexer.alphabet.Token;
 import com.googlecode.alvor.lexer.automata.State;
 import com.googlecode.alvor.sqlparser.IParseErrorHandler;
+import com.googlecode.alvor.sqlparser.IParserStackLike;
 import com.googlecode.alvor.sqlparser.ParserSimulator;
 import com.googlecode.alvor.string.IAbstractString;
 import com.googlecode.alvor.string.IPosition;
@@ -26,19 +27,26 @@ import com.googlecode.alvor.string.util.AbstractStringSizeCounter;
 
 /**
  * Performs syntax checking for abstract strings containing SQL statements
- * 
+ * Uses "generic" SQL syntax
  * @author abreslav
  *
  */
-public class SyntacticalSQLChecker implements IAbstractStringChecker {
+abstract public class SyntacticalSQLChecker implements IAbstractStringChecker {
 
 	private static final ILog LOG = Logs.getLog(SyntacticalSQLChecker.class);
+	private final ParserSimulator<? extends IParserStackLike> parserSimulator;  
 
 	/**
 	 * Maximum size of abstract strings. Bigger strings are likely to cause OutOfMemoryError, 
 	 * and must be rejected.
 	 */
 	private static int SIZE_THRESHOLD = 25000;
+	
+	public SyntacticalSQLChecker() {
+    	parserSimulator = this.createParserSimulator();
+	}
+	
+	public abstract ParserSimulator<? extends IParserStackLike> createParserSimulator();
 	
 	private Collection<HotspotCheckingResult> checkStringOfAppropriateSize(
 			final StringHotspotDescriptor descriptor,
@@ -49,7 +57,7 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 		try {
 			State automaton = PositionedCharacterUtil.createPositionedAutomaton(abstractString);
 			
-			ParserSimulator.getGLRInstance().checkAutomaton(automaton, new IParseErrorHandler() {
+			parserSimulator.checkAutomaton(automaton, new IParseErrorHandler() {
 				
 				@Override
 				public void unexpectedItem(IAbstractInputItem item,
@@ -150,4 +158,5 @@ public class SyntacticalSQLChecker implements IAbstractStringChecker {
 		
 		return results;
 	}
+	
 }

@@ -106,12 +106,12 @@ public class CounterExampleTest {
 	
 	private void assertParses(String abstractString) {
 		IAbstractString as = AbstractStringParser.parseOneFromString(abstractString);
-		List<String> errors = ParserSimulator.getGLRInstance().check(as);
+		List<String> errors = ParserSimulator.getGenericSqlGLRInstance().check(as);
 		assertTrue(errors.toString(), errors.isEmpty());
 	}
 
 	private boolean parseAbstractString(String abstractString) {
 		IAbstractString as = AbstractStringParser.parseOneFromString(abstractString);
-		return ParserSimulator.getGLRInstance().check(as).isEmpty();
+		return ParserSimulator.getGenericSqlGLRInstance().check(as).isEmpty();
 	}
 }

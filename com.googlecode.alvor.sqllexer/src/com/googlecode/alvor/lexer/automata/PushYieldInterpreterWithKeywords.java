@@ -10,7 +10,6 @@ import com.googlecode.alvor.lexer.alphabet.PushInput;
 import com.googlecode.alvor.lexer.alphabet.Token;
 import com.googlecode.alvor.lexer.alphabet.Yield;
 import com.googlecode.alvor.lexer.sql.SQLLexer;
-import com.googlecode.alvor.sqllexer.SQLLexerData;
 
 /**
  * This interpreter supports {@link PushInput} and {@link Yield}, and creates keyword tokens
@@ -21,9 +20,12 @@ import com.googlecode.alvor.sqllexer.SQLLexerData;
  */
 public class PushYieldInterpreterWithKeywords implements IOutputItemInterpreter {
 
-	public static PushYieldInterpreterWithKeywords INSTANCE = new PushYieldInterpreterWithKeywords();
+	//public static PushYieldInterpreterWithKeywords INSTANCE = new PushYieldInterpreterWithKeywords();
+	private final SQLLexer lexer;
 	
-	private PushYieldInterpreterWithKeywords() {}
+	public PushYieldInterpreterWithKeywords(SQLLexer lexer) {
+		this.lexer = lexer; 
+	}
 	
 	@Override
 	public ISequence<IAbstractInputItem> processOutputCommands(
@@ -34,8 +36,8 @@ public class PushYieldInterpreterWithKeywords implements IOutputItemInterpreter 
 			if (command instanceof Yield) {
 				Yield yield = (Yield) command;
 				int tokenType = yield.getTokenType();
-				if (SQLLexer.isIdentifier(tokenType)) {
-					tokenType = SQLLexer.getIdentifierTokenType(CharacterUtil.toString(result));
+				if (lexer.isIdentifier(tokenType)) {
+					tokenType = lexer.getIdentifierTokenType(CharacterUtil.toString(result));
 				}
 				Token token = Token.create(tokenType, result);
 				effect.add(token);

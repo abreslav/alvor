@@ -79,9 +79,9 @@
     	<java 
     		classpath="${lexerProject}/bin" 
     		classname="SQLLexerGen" 
-    		output="${lexerProject}/src/com/googlecode/alvor/sqllexer/SQLLexerData.java">
+    		output="${lexerProject}/src/com/googlecode/alvor/sqllexer/GenericSQLLexerData.java">
     		<arg value="com.googlecode.alvor.sqllexer"/>
-    		<arg value="SQLLexerData"/>
+    		<arg value="GenericSQLLexerData"/>
     	</java>
 	</target>	
 
