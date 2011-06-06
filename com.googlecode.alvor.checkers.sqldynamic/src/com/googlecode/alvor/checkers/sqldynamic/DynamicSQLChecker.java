@@ -138,7 +138,9 @@ public abstract class DynamicSQLChecker implements IAbstractStringChecker {
 	protected void finalize() throws Throwable {
 		for (Connection conn : connections.values()) {
 			try {
-				conn.close();
+				if (conn != null && !conn.isClosed() && conn.isValid(1)) {
+					conn.close();
+				}
 			} 
 			catch (SQLException e) {
 				e.printStackTrace();

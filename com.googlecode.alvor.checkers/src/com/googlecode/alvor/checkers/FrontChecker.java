@@ -1,9 +1,8 @@
 package com.googlecode.alvor.checkers;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.googlecode.alvor.common.StringHotspotDescriptor;
@@ -16,68 +15,68 @@ import com.googlecode.alvor.configuration.ProjectConfiguration;
  * @author Aivar
  *
  */
-public class FrontChecker implements IAbstractStringChecker {
+public class FrontChecker {
 	private static final String FALLBACK_CHECKER_NAME = "Generic-Syntax";
 	
 	// checkers indexed by (projectName + "$" + connectionPattern)
-	private final Map<String, List<IAbstractStringChecker>> checkers = new HashMap<String, List<IAbstractStringChecker>>();
+	private final Map<String, Map<String, IAbstractStringChecker>> checkers = new HashMap<String, Map<String, IAbstractStringChecker>>();
 
-	@Override
-	public Collection<HotspotProblem> checkAbstractString(
+	public HotspotCheckingReport checkAbstractString (
 			StringHotspotDescriptor descriptor,
 			String projectName, ProjectConfiguration configuration) throws CheckerException {
-		List<IAbstractStringChecker> checkers = getMatchingCheckers(descriptor.getConnectionPattern(), projectName, configuration);
+		Map<String, IAbstractStringChecker> checkers = getMatchingCheckers(descriptor.getConnectionPattern(), projectName, configuration);
 		
-		// if one of the checkers succeeds, then return success
-		// otherwise return messages from last checker who fails
+		if (checkers.size() > 1) {
+			System.err.println("JEAAA: " + checkers.size());
+		}
 		
-		// TODO better approach needed here, trying multiple checkers is not so good solution.
-		// Normally there should be only one matching checker for each hotspot
-		// or several checkers that must ALL pass. 
 		
-		Collection<HotspotProblem> problems = new ArrayList<HotspotProblem>();
-		for (IAbstractStringChecker checker : checkers) {
-			problems = checker.checkAbstractString(descriptor, projectName, configuration);
+		HotspotCheckingReport report = new HotspotCheckingReport();
+		for (Map.Entry<String, IAbstractStringChecker> entry : checkers.entrySet()) {
+			String checkerName = entry.getKey();
+			IAbstractStringChecker checker = entry.getValue();
+			
+			Collection<HotspotProblem> problems = checker.checkAbstractString(descriptor, projectName, configuration);
+			report.addProblems(checkerName, problems);
 			if (problems.isEmpty()) {
-				// found the "right" checker
-				return problems;
+				report.addPassedChecker(checkerName);
 			}
 		}
 		
-		return problems; 
-		
-		// TODO it should be visible, which checker was used for checking
+		return report; 
 	}
 	
-	private List<IAbstractStringChecker> getMatchingCheckers(String connectionPattern, String projectName, 
+	private Map<String, IAbstractStringChecker> getMatchingCheckers(String connectionPattern, String projectName, 
 			ProjectConfiguration projectConfiguration) {
 		
 		String checkerKey = projectName + "$" + connectionPattern;
 		
-		List<IAbstractStringChecker> result = checkers.get(checkerKey);
+		Map<String, IAbstractStringChecker> result = checkers.get(checkerKey);
 		
 		if (result == null) {
-			result = new ArrayList<IAbstractStringChecker>();
+			result = new LinkedHashMap<String, IAbstractStringChecker>();
 			
 			// first search for first checker whose patterns match
 			for (CheckerConfiguration checkerConf : projectConfiguration.getCheckers()) {
+				String checkerName = checkerConf.getCheckerName();
 				if (checkerConf.matchesPattern(connectionPattern)) {
-					result.add(CheckersManager.getCheckerByName(checkerConf.getCheckerName()));
+					result.put(checkerName, CheckersManager.getCheckerByName(checkerName));
 					break;
 				}
 			}
 			
 			// if no match, then add all default checkers
 			for (CheckerConfiguration checkerConf : projectConfiguration.getCheckers()) {
+				String checkerName = checkerConf.getCheckerName();
 				if (checkerConf.isDefaultChecker()) {
-					result.add(CheckersManager.getCheckerByName(checkerConf.getCheckerName()));
+					result.put(checkerName, CheckersManager.getCheckerByName(checkerName));
 					break;
 				}
 			}
 			
 			// if still nothing, then add fall-back checker
 			if (result.isEmpty()) {
-				result.add(CheckersManager.getCheckerByName(FALLBACK_CHECKER_NAME));
+				result.put(FALLBACK_CHECKER_NAME, CheckersManager.getCheckerByName(FALLBACK_CHECKER_NAME));
 			}
 			
 			checkers.put(checkerKey, result);
