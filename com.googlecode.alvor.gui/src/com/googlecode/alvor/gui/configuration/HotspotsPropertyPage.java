@@ -44,7 +44,8 @@ public class HotspotsPropertyPage extends CommonPropertyPage {
 	@Override
 	protected Label createDescriptionLabel(Composite parent) {
 		Label desc = new Label(parent, SWT.NONE);
-		desc.setText("Describe which arguments to which method-calls should Alvor analyze.\n\n" +
+		desc.setText("Here you can specify how to find SQL strings from your program.\n" +
+				"Describe which arguments to which method-calls should Alvor analyze.\n\n" +
 				"On each line give class name, method name and argument index (1-based), eg:\n" +
 				"java.sql.Connection, prepareStatement, 1");
 		return desc;

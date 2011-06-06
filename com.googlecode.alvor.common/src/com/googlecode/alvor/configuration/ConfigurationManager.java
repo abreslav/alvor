@@ -147,9 +147,23 @@ public class ConfigurationManager {
 				patterns.add(checkerNode.getAttribute("pattern"));
 			}
 			
+			String checkerName = checkerNode.getAttribute("checkerName");
+			String driverName = checkerNode.getAttribute("driverName");
+			
+			// old conf didn't have checkerName
+			// TODO remove when not necessary anymore
+			if (checkerName.isEmpty()) {
+				if (driverName.isEmpty()) {
+					checkerName = "Generic-Syntax";
+				}
+				else {
+					checkerName = "Oracle-DB";
+				}
+			}
+			
 			checkers.add (new CheckerConfiguration(
-					checkerNode.getAttribute("checkerName"), 
-					checkerNode.getAttribute("driverName"), 
+					checkerName, 
+					driverName, 
 					checkerNode.getAttribute("url"), 
 					checkerNode.getAttribute("userName"), 
 					checkerNode.getAttribute("password"),

@@ -77,7 +77,6 @@ public class GuiChecker {
 			
 			ProgressUtil.checkAbort(monitor);
 			createMarkersForHotspots(hotspots, conf, project, ProgressUtil.subMonitor(monitor, 10));
-			// FIXME clean orphaned (constant) markers
 		} 
 		finally {
 			ProgressUtil.done(monitor);

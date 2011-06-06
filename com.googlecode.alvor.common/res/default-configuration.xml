@@ -8,9 +8,6 @@
     </hotspotPatterns>
     
     <checkers>
-        <checker checkerName="GenericSqlSyntax" pattern="*">
-            <pattern>*</pattern>
-        </checker>
-           
+        <checker checkerName="Generic-Syntax"/>
     </checkers>
 </alvor>
