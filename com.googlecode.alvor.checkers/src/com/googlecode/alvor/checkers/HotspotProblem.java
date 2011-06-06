@@ -2,13 +2,16 @@ package com.googlecode.alvor.checkers;
 
 import com.googlecode.alvor.string.IPosition;
 
-public abstract class HotspotCheckingResult {
+public class HotspotProblem {
+	public static enum ProblemType {ERROR, UNSUPPORTED};
 	private final String message;
 	private final IPosition pos;
+	private final ProblemType problemType;
 	
-	public HotspotCheckingResult(String message, IPosition pos) {
+	public HotspotProblem(String message, IPosition pos, ProblemType problemType) {
 		this.message = message;
 		this.pos = pos;
+		this.problemType = problemType;
 	}
 	
 	public IPosition getPosition() {
@@ -19,4 +22,7 @@ public abstract class HotspotCheckingResult {
 		return message;
 	}
 
+	public ProblemType getProblemType() {
+		return problemType;
+	}
 }

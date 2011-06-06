@@ -6,5 +6,5 @@ import com.googlecode.alvor.common.StringHotspotDescriptor;
 import com.googlecode.alvor.configuration.ProjectConfiguration;
 
 public interface IAbstractStringChecker {
-	Collection<HotspotCheckingResult> checkAbstractString(StringHotspotDescriptor descriptor, ProjectConfiguration configuration) throws CheckerException;
+	Collection<HotspotProblem> checkAbstractString(StringHotspotDescriptor descriptor, String projectName, ProjectConfiguration configuration) throws CheckerException;
 }

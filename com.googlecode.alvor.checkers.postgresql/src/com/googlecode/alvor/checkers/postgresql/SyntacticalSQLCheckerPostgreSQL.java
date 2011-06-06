@@ -3,7 +3,7 @@ package com.googlecode.alvor.checkers.postgresql;
 import java.util.Collection;
 
 import com.googlecode.alvor.checkers.CheckerException;
-import com.googlecode.alvor.checkers.HotspotCheckingResult;
+import com.googlecode.alvor.checkers.HotspotProblem;
 import com.googlecode.alvor.checkers.sqlstatic.SyntacticalSQLChecker;
 import com.googlecode.alvor.common.StringHotspotDescriptor;
 import com.googlecode.alvor.configuration.ProjectConfiguration;
@@ -26,10 +26,10 @@ public class SyntacticalSQLCheckerPostgreSQL extends SyntacticalSQLChecker {
 	}
 
 	@Override
-	public Collection<HotspotCheckingResult> checkAbstractString(
+	public Collection<HotspotProblem> checkAbstractString(
 			StringHotspotDescriptor descriptor,
-			ProjectConfiguration configuration) throws CheckerException {
-		return super.checkAbstractString(descriptor, configuration);
+			String projectName, ProjectConfiguration configuration) throws CheckerException {
+		return super.checkAbstractString(descriptor, projectName, configuration);
 	}
 
 }

@@ -1,8 +1,9 @@
 package com.googlecode.alvor.checkers;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.googlecode.alvor.common.StringHotspotDescriptor;
@@ -17,51 +18,74 @@ import com.googlecode.alvor.configuration.ProjectConfiguration;
  */
 public class FrontChecker implements IAbstractStringChecker {
 	private static final String FALLBACK_CHECKER_NAME = "Generic-Syntax";
-	private static IAbstractStringChecker fallbackChecker;
-	// checkers indexed by connectionPatterns
-	private final Map<String, IAbstractStringChecker> checkers = new HashMap<String, IAbstractStringChecker>();
+	
+	// checkers indexed by (projectName + "$" + connectionPattern)
+	private final Map<String, List<IAbstractStringChecker>> checkers = new HashMap<String, List<IAbstractStringChecker>>();
 
 	@Override
-	public Collection<HotspotCheckingResult> checkAbstractString(
+	public Collection<HotspotProblem> checkAbstractString(
 			StringHotspotDescriptor descriptor,
-			ProjectConfiguration configuration) throws CheckerException {
-		IAbstractStringChecker checker = getMatchingChecker(descriptor.getConnectionPattern(), configuration);
-		if (checker == null) {
-			HotspotCheckingResult result = new HotspotError("No suitable checker found", descriptor.getPosition());
-			return Collections.singletonList(result);
+			String projectName, ProjectConfiguration configuration) throws CheckerException {
+		List<IAbstractStringChecker> checkers = getMatchingCheckers(descriptor.getConnectionPattern(), projectName, configuration);
+		
+		// if one of the checkers succeeds, then return success
+		// otherwise return messages from last checker who fails
+		
+		// TODO better approach needed here, trying multiple checkers is not so good solution.
+		// Normally there should be only one matching checker for each hotspot
+		// or several checkers that must ALL pass. 
+		
+		Collection<HotspotProblem> problems = new ArrayList<HotspotProblem>();
+		for (IAbstractStringChecker checker : checkers) {
+			problems = checker.checkAbstractString(descriptor, projectName, configuration);
+			if (problems.isEmpty()) {
+				// found the "right" checker
+				return problems;
+			}
 		}
-		else {
-			return checker.checkAbstractString(descriptor, configuration);
-		}
+		
+		return problems; 
+		
+		// TODO it should be visible, which checker was used for checking
 	}
 	
-	private IAbstractStringChecker getMatchingChecker(String connectionPattern, ProjectConfiguration conf) {
-		IAbstractStringChecker result = checkers.get(connectionPattern);
+	private List<IAbstractStringChecker> getMatchingCheckers(String connectionPattern, String projectName, 
+			ProjectConfiguration projectConfiguration) {
+		
+		String checkerKey = projectName + "$" + connectionPattern;
+		
+		List<IAbstractStringChecker> result = checkers.get(checkerKey);
 		
 		if (result == null) {
-			CheckerConfiguration checkerConf = conf.getCheckerConfiguration(connectionPattern);
+			result = new ArrayList<IAbstractStringChecker>();
 			
-			if (checkerConf != null) {
-				result = CheckersManager.getCheckerByName(checkerConf.getCheckerName());
+			// first search for first checker whose patterns match
+			for (CheckerConfiguration checkerConf : projectConfiguration.getCheckers()) {
+				if (checkerConf.matchesPattern(connectionPattern)) {
+					result.add(CheckersManager.getCheckerByName(checkerConf.getCheckerName()));
+					break;
+				}
 			}
 			
-			if (result == null) {
-				result = getFallbackChecker();
+			// if no match, then add all default checkers
+			for (CheckerConfiguration checkerConf : projectConfiguration.getCheckers()) {
+				if (checkerConf.isDefaultChecker()) {
+					result.add(CheckersManager.getCheckerByName(checkerConf.getCheckerName()));
+					break;
+				}
 			}
 			
-			checkers.put(connectionPattern, result);
+			// if still nothing, then add fall-back checker
+			if (result.isEmpty()) {
+				result.add(CheckersManager.getCheckerByName(FALLBACK_CHECKER_NAME));
+			}
+			
+			checkers.put(checkerKey, result);
 		}
 		
 		return result;
 	}
 	
-	public static IAbstractStringChecker getFallbackChecker() {
-		if (fallbackChecker == null) {
-			fallbackChecker = CheckersManager.getCheckerByName(FALLBACK_CHECKER_NAME);
-		}
-		return fallbackChecker;
-	}
-
 	public void resetCheckers() {
 		checkers.clear();
 	}
