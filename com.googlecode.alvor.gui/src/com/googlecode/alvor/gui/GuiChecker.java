@@ -16,6 +16,7 @@ import com.googlecode.alvor.cache.Cache;
 import com.googlecode.alvor.cache.CacheProvider;
 import com.googlecode.alvor.checkers.CheckerException;
 import com.googlecode.alvor.checkers.FrontChecker;
+import com.googlecode.alvor.checkers.HotspotCheckingReport;
 import com.googlecode.alvor.checkers.HotspotProblem;
 import com.googlecode.alvor.common.HotspotDescriptor;
 import com.googlecode.alvor.common.PositionUtil;
@@ -127,24 +128,47 @@ public class GuiChecker {
 			assert hotspot instanceof StringHotspotDescriptor;
 			StringHotspotDescriptor sh = (StringHotspotDescriptor)hotspot;
 			
+			// do checking
+			HotspotCheckingReport report = checker.checkAbstractString(sh, 
+					project.getName(), conf);
+			
 			// create hotspot marker
-			String hotspotMessage = "Value: " + CommonNotationRenderer.render
-				(AbstractStringOptimizer.optimize(sh.getAbstractValue()));
-			if (hotspotMessage.length() > MAX_MARKER_MESSAGE_LENGTH) {
-				hotspotMessage = hotspotMessage.substring(0, MAX_MARKER_MESSAGE_LENGTH - 3) + "...";
+			StringBuilder msgBuilder = new StringBuilder();
+			if (!report.getPassedCheckers().isEmpty()) {
+				msgBuilder.append("Passed: ");
+				for (String checkerName : report.getPassedCheckers()) {
+					msgBuilder.append(checkerName);
+					msgBuilder.append(", ");
+				}
 			}
+			msgBuilder.append("Value: " + CommonNotationRenderer.render
+				(AbstractStringOptimizer.optimize(sh.getAbstractValue())));
+			
+			String hotspotMessage;
+			if (msgBuilder.length() > MAX_MARKER_MESSAGE_LENGTH) {
+				hotspotMessage = msgBuilder.substring(0, MAX_MARKER_MESSAGE_LENGTH - 3) + "...";
+			}
+			else {
+				hotspotMessage = msgBuilder.toString();
+			}
+			
 			hotspotMarker = createMarker(hotspotMessage, AlvorGuiPlugin.HOTSPOT_MARKER_ID, 
 					IMarker.SEVERITY_INFO, sh.getPosition(), null, project);
 
-			// create checking markers
-			Collection<HotspotProblem> checkingResults = checker.checkAbstractString(sh, 
-					project.getName(), conf);
-			for (HotspotProblem checkingResult : checkingResults) { 
-				createCheckingMarker(checkingResult, hotspotMarker, project);
+			// create problem markers if there are no passed checkers
+			if (report.getPassedCheckers().isEmpty()) {
+				// TODO better approach needed here, trying multiple checkers is not so good solution.
+				// Normally there should be only one matching checker for each hotspot
+				// or several checkers that must ALL pass.
+				
+				Collection<HotspotProblem> problems = report.getProblems();
+				for (HotspotProblem problem : problems) { 
+					createCheckingMarker(problem, hotspotMarker, project);
+				}
 			}
 			
 			// create constant markers
-			// TODO
+			// TODO?
 			//markConstants(sh.getAbstractValue(), hotspotMarker, project);
 		}
 		
