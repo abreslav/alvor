@@ -203,7 +203,7 @@ public class VariableTracker {
 			return getLastReachingModInCatchClause(var, target, (CatchClause)scope);
 		}
 		else if (scope instanceof CastExpression) {
-			return null; // FIXME
+			return null; // TODO assuming no mutation
 		}
 		else if (scope instanceof ParenthesizedExpression) {
 			if (target == null) {

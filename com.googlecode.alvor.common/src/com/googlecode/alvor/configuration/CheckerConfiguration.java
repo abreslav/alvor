@@ -1,5 +1,6 @@
 package com.googlecode.alvor.configuration;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CheckerConfiguration {
@@ -39,6 +40,14 @@ public class CheckerConfiguration {
 		return userName;
 	}
 	
+	public void setCheckerName(String checkerName) {
+		this.checkerName = checkerName;
+	}
+	
+	public void setPatterns(List<String> patterns) {
+		this.patterns = patterns;
+	}
+	
 	public void setDriverName(String driverName) {
 		this.driverName = driverName;
 	}
@@ -62,7 +71,7 @@ public class CheckerConfiguration {
 			return false;
 		}
 		CheckerConfiguration that = (CheckerConfiguration)obj;
-		return this.patterns.equals(that.getPatterns())
+		return (this.patterns == null && that.patterns == null) || this.patterns.equals(that.getPatterns())
 				&& this.checkerName.equals(that.getCheckerName())
 				&& this.driverName.equals(that.getDriverName())
 				&& this.url.equals(that.getUrl())
@@ -97,4 +106,26 @@ public class CheckerConfiguration {
 	public boolean isDefaultChecker() {
 		return this.patterns.isEmpty();
 	}
+
+	public void setPatterns(String text) {
+		this.patterns = new ArrayList<String>();
+		for (String line : text.split("\\r?\\n")) {
+			if (!line.trim().isEmpty()) {
+				this.patterns.add(line.trim());
+			}
+		}
+	}
+	
+	public String getPatternsAsString() {
+		if (this.patterns == null) {
+			return "";
+		}
+		StringBuilder sb = new StringBuilder();
+		for (String pattern : this.patterns) {
+			sb.append(pattern);
+			sb.append("\n");
+		}
+		return sb.toString();
+	}
+	
 }

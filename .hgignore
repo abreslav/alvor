@@ -17,3 +17,5 @@ syntax: regexp
 ^External Plug-in Libraries$
 syntax: regexp
 ^com\.googlecode\.alvor\.updatesite/logs\.zip$
+syntax: regexp
+^com\.googlecode\.alvor\.static\.tests/com\.googlecode\.alvor\.checkers\.sqlstatic\.SyntacticalSQLChecker\.log$
