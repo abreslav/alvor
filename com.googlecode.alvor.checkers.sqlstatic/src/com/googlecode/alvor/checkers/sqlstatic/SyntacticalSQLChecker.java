@@ -5,10 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.googlecode.alvor.checkers.CheckerException;
-import com.googlecode.alvor.checkers.HotspotCheckingResult;
-import com.googlecode.alvor.checkers.HotspotError;
-import com.googlecode.alvor.checkers.HotspotWarning;
-import com.googlecode.alvor.checkers.HotspotWarningUnsupported;
+import com.googlecode.alvor.checkers.HotspotProblem;
 import com.googlecode.alvor.checkers.IAbstractStringChecker;
 import com.googlecode.alvor.common.StringHotspotDescriptor;
 import com.googlecode.alvor.common.logging.ILog;
@@ -51,11 +48,11 @@ abstract public class SyntacticalSQLChecker implements IAbstractStringChecker {
 				this.provideLexerData());
 	}
 	
-	private Collection<HotspotCheckingResult> checkStringOfAppropriateSize(
+	private Collection<HotspotProblem> checkStringOfAppropriateSize(
 			final StringHotspotDescriptor descriptor,
 			IAbstractString abstractString) throws CheckerException {
 		
-		final List<HotspotCheckingResult> result = new ArrayList<HotspotCheckingResult>();
+		final List<HotspotProblem> result = new ArrayList<HotspotProblem>();
 		
 		try {
 			State automaton = PositionedCharacterUtil.createPositionedAutomaton(abstractString);
@@ -68,26 +65,26 @@ abstract public class SyntacticalSQLChecker implements IAbstractStringChecker {
 					String counterExample = PositionedCharacterUtil.renderCounterExample(counterExampleList);
 					Collection<IPosition> markerPositions = PositionedCharacterUtil.getMarkerPositions(((Token) item).getText());
 					for (IPosition pos : markerPositions) {
-						result.add(new HotspotError(
+						result.add(new HotspotProblem(
 								"SQL syntax checker: Unexpected token: " + PositionedCharacterUtil.render(item) 
 								+ "\n" + "    Counter example: " + counterExample
 								, 
-								pos));
+								pos, HotspotProblem.ProblemType.ERROR));
 					}
 				}
 
 				@Override
 				public void other(
 						List<? extends IAbstractInputItem> counterExample) {
-					result.add(new HotspotError("SQL syntax checker: Syntax error. Most likely, unfinished query", 
-							descriptor.getPosition()));
+					result.add(new HotspotProblem("SQL syntax checker: Syntax error. Most likely, unfinished query", 
+							descriptor.getPosition(), HotspotProblem.ProblemType.ERROR));
 				}
 
 				@Override
 				public void overabstraction(
 						List<? extends IAbstractInputItem> counterExample) {
-					result.add(new HotspotError("SQL syntax checker: Syntactic analysis failed: nesting is too deep in this sentence", 
-							descriptor.getPosition()));
+					result.add(new HotspotProblem("SQL syntax checker: Syntactic analysis failed: nesting is too deep in this sentence", 
+							descriptor.getPosition(), HotspotProblem.ProblemType.ERROR));
 				}
 			});
 		} catch (MalformedStringLiteralException e) {
@@ -95,8 +92,8 @@ abstract public class SyntacticalSQLChecker implements IAbstractStringChecker {
 			if (errorPosition == null) {
 				errorPosition = descriptor.getPosition(); 
 			}
-			result.add(new HotspotError("SQL syntax checker: Malformed literal: " 
-					+ e.getMessage(), errorPosition));
+			result.add(new HotspotProblem("SQL syntax checker: Malformed literal: " 
+					+ e.getMessage(), errorPosition, HotspotProblem.ProblemType.ERROR));
 		} catch (StackOverflowError e) {  
 			// TODO: This hack is no good (see the method above)
 			throw e;
@@ -116,11 +113,11 @@ abstract public class SyntacticalSQLChecker implements IAbstractStringChecker {
 	}
 
 	@Override
-	public Collection<HotspotCheckingResult> checkAbstractString(StringHotspotDescriptor descriptor,
-			ProjectConfiguration configuration)
+	public Collection<HotspotProblem> checkAbstractString(StringHotspotDescriptor descriptor,
+			String projectName, ProjectConfiguration configuration)
 			throws CheckerException {
 		
-		List<HotspotCheckingResult> results = new ArrayList<HotspotCheckingResult>();
+		List<HotspotProblem> results = new ArrayList<HotspotProblem>();
 		
 		IAbstractString abstractString = descriptor.getAbstractValue();
 		if (!hasAcceptableSize(abstractString)) {
@@ -142,12 +139,14 @@ abstract public class SyntacticalSQLChecker implements IAbstractStringChecker {
 					}
 				}
 				if (hasBigSubstrings) {
-					results.add(new HotspotWarningUnsupported("SQL syntax checker: SQL string has too many possible variations" 
-							+ (hasSmallSubstrings ? ". Only some are checked" : ""), descriptor.getPosition()));
+					results.add(new HotspotProblem("SQL syntax checker: SQL string has too many possible variations" 
+							+ (hasSmallSubstrings ? ". Only some are checked" : ""), 
+							descriptor.getPosition(), HotspotProblem.ProblemType.UNSUPPORTED));
 				}
 			} else {
-				results.add(new HotspotWarning("SQL syntax checker: SQL string has too many possible variations", 
-						descriptor.getPosition()));
+				results.add(new HotspotProblem("SQL syntax checker: SQL string has too many possible variations", 
+						descriptor.getPosition(),
+						HotspotProblem.ProblemType.UNSUPPORTED));
 			}
 		} else {
 			try {
@@ -155,7 +154,8 @@ abstract public class SyntacticalSQLChecker implements IAbstractStringChecker {
 			} catch (StackOverflowError e) {
 				// The analyzer has caused a stack overflow in the dfs-based evaluation procedure.
 				// See FixpointParser class
-				results.add(new HotspotWarning("SQL syntax checker: SQL string has too many possible variations", descriptor.getPosition()));
+				results.add(new HotspotProblem("SQL syntax checker: SQL string has too many possible variations", 
+						descriptor.getPosition(), HotspotProblem.ProblemType.UNSUPPORTED));
 			}
 		}
 		

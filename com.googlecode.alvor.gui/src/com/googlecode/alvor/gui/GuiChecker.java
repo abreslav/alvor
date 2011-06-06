@@ -16,11 +16,7 @@ import com.googlecode.alvor.cache.Cache;
 import com.googlecode.alvor.cache.CacheProvider;
 import com.googlecode.alvor.checkers.CheckerException;
 import com.googlecode.alvor.checkers.FrontChecker;
-import com.googlecode.alvor.checkers.HotspotCheckingResult;
-import com.googlecode.alvor.checkers.HotspotError;
-import com.googlecode.alvor.checkers.HotspotInfo;
-import com.googlecode.alvor.checkers.HotspotWarning;
-import com.googlecode.alvor.checkers.HotspotWarningUnsupported;
+import com.googlecode.alvor.checkers.HotspotProblem;
 import com.googlecode.alvor.common.HotspotDescriptor;
 import com.googlecode.alvor.common.PositionUtil;
 import com.googlecode.alvor.common.ProgressUtil;
@@ -141,8 +137,9 @@ public class GuiChecker {
 					IMarker.SEVERITY_INFO, sh.getPosition(), null, project);
 
 			// create checking markers
-			Collection<HotspotCheckingResult> checkingResults = checker.checkAbstractString(sh, conf);
-			for (HotspotCheckingResult checkingResult : checkingResults) { 
+			Collection<HotspotProblem> checkingResults = checker.checkAbstractString(sh, 
+					project.getName(), conf);
+			for (HotspotProblem checkingResult : checkingResults) { 
 				createCheckingMarker(checkingResult, hotspotMarker, project);
 			}
 			
@@ -215,24 +212,16 @@ public class GuiChecker {
 		}
 	}
 	
-	private void createCheckingMarker(HotspotCheckingResult checkingResult,	IMarker parentMarker, IProject project) {
+	private void createCheckingMarker(HotspotProblem checkingResult,	IMarker parentMarker, IProject project) {
 		String markerId = null; 
 		Integer severity = null;
 
-		if (checkingResult instanceof HotspotError) {
+		if (checkingResult.getProblemType() == HotspotProblem.ProblemType.ERROR) {
 			markerId = AlvorGuiPlugin.ERROR_MARKER_ID;
 			severity = IMarker.SEVERITY_ERROR;  
 		}
-		else if (checkingResult instanceof HotspotWarningUnsupported) {
+		else {
 			markerId = AlvorGuiPlugin.UNSUPPORTED_MARKER_ID;
-			severity = IMarker.SEVERITY_INFO;  
-		}
-		else if (checkingResult instanceof HotspotWarning) {
-			markerId = AlvorGuiPlugin.WARNING_MARKER_ID;
-			severity = IMarker.SEVERITY_WARNING;  
-		}
-		else if (checkingResult instanceof HotspotInfo) {
-			markerId = AlvorGuiPlugin.WARNING_MARKER_ID;
 			severity = IMarker.SEVERITY_INFO;  
 		}
 		createMarker(checkingResult.getMessage(), markerId, severity, 

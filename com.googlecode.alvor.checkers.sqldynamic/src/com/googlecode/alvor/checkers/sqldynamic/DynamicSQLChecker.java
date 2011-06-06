@@ -11,9 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.googlecode.alvor.checkers.CheckerException;
-import com.googlecode.alvor.checkers.HotspotCheckingResult;
-import com.googlecode.alvor.checkers.HotspotError;
-import com.googlecode.alvor.checkers.HotspotWarningUnsupported;
+import com.googlecode.alvor.checkers.HotspotProblem;
 import com.googlecode.alvor.checkers.IAbstractStringChecker;
 import com.googlecode.alvor.common.StringHotspotDescriptor;
 import com.googlecode.alvor.common.logging.ILog;
@@ -32,14 +30,14 @@ public abstract class DynamicSQLChecker implements IAbstractStringChecker {
 	protected Map<String, Connection> connections = new HashMap<String, Connection>();
 
 	@Override
-	public Collection<HotspotCheckingResult> checkAbstractString(StringHotspotDescriptor descriptor,
-			ProjectConfiguration configuration) throws CheckerException {
+	public Collection<HotspotProblem> checkAbstractString(StringHotspotDescriptor descriptor,
+			String projectName, ProjectConfiguration configuration) throws CheckerException {
 		
-		List<HotspotCheckingResult> results = new ArrayList<HotspotCheckingResult>();
+		List<HotspotProblem> results = new ArrayList<HotspotProblem>();
 		
 		if (AbstractStringSizeCounter.size(descriptor.getAbstractValue()) > SIZE_LIMIT) {
-			results.add(new HotspotWarningUnsupported
-				("SQL string has too many possible variations", descriptor.getPosition()));
+			results.add(new HotspotProblem("SQL string has too many possible variations", 
+					descriptor.getPosition(), HotspotProblem.ProblemType.UNSUPPORTED));
 			return results;
 		}
 		
@@ -48,8 +46,8 @@ public abstract class DynamicSQLChecker implements IAbstractStringChecker {
 			String connectionPattern = descriptor.getConnectionPattern();
 			conn = this.getConnection(connectionPattern, configuration);
 		} catch (SQLException e) {
-			results.add(new HotspotError("SQL tester connection error: " + e.getMessage(), 
-					descriptor.getPosition()));
+			results.add(new HotspotProblem("SQL tester connection error: " + e.getMessage(), 
+					descriptor.getPosition(), HotspotProblem.ProblemType.ERROR));
 			return results;
 		}
 		
@@ -61,7 +59,8 @@ public abstract class DynamicSQLChecker implements IAbstractStringChecker {
 			} catch (SQLException e) {
 				assert LOG.message("    ERR: " + e.getMessage());
 				String message = e.getMessage().trim() + "\nSQL: \n" + s;
-				results.add(new HotspotError("SQL test failed  - " + message, descriptor.getPosition()));
+				results.add(new HotspotProblem("SQL test failed  - " + message, descriptor.getPosition(), 
+						HotspotProblem.ProblemType.ERROR));
 				break;
 			}
 		}
