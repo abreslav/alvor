@@ -302,8 +302,8 @@ public class StringCollector {
 		HotspotDescriptor desc = evaluator.evaluate(node, StringExpressionEvaluator.ParamEvalMode.AS_HOTSPOT);
 		
 		if (patternRecord.isPrimaryPattern()) {
-			// TODO add connection info to descriptor
-			ConnectionTracker.getConnectionDescriptor(inv.getExpression());
+			desc.setConnectionPattern(ConnectionTracker.getConnectionDescriptor(inv.getExpression()));
+			System.out.println("CONN PATTERN: " + desc.getConnectionPattern());
 		}
 		cache.addHotspot(patternRecord, desc);
 		
