@@ -66,7 +66,6 @@ public class Cache {
 	}	
 	
 	private final DatabaseHelper db;
-//	private final String projectName;
 	private final Map<String, Integer> fileIDs = new HashMap<String, Integer>();
 	private int maxPatternBatchNo;
 	
