@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import ru.tolmachev.core.IAbstractSymbol;
-import ru.tolmachev.core.State;
+import ru.tolmachev.core.BGState;
 
 import com.googlecode.alvor.sqlparser.IAction;
 import com.googlecode.alvor.sqlparser.IParserState;
@@ -24,7 +24,7 @@ import com.googlecode.alvor.sqlparser.IParserState;
 public class Node implements IParserState {
 
     // state of table
-    private State state;
+    private BGState state;
 
     // position in input string between 0 and |w| - 1 for terminals
     private int position;
@@ -33,7 +33,7 @@ public class Node implements IParserState {
 
     private List<Node> predecessors = new LinkedList<Node>();
 
-    public Node(State state, int position) {
+    public Node(BGState state, int position) {
         this.state = state;
         this.position = position;
     }
@@ -65,7 +65,7 @@ public class Node implements IParserState {
         return predecessors;
     }
 
-    public State getState() {
+    public BGState getState() {
         return state;
     }
 

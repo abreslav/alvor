@@ -52,6 +52,7 @@
 %lex-token _eq         = "="
 %lex-token _lt         = "<"
 %lex-token _gt         = ">"
+%lex-token _space      = " "
 
 
 %glr-parser

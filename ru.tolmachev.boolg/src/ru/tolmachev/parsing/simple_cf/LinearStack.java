@@ -2,7 +2,7 @@ package ru.tolmachev.parsing.simple_cf;
 
 import java.util.Stack;
 
-import ru.tolmachev.core.State;
+import ru.tolmachev.core.BGState;
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,21 +13,21 @@ import ru.tolmachev.core.State;
 
 public class LinearStack {
 
-    private Stack<State> stack = new Stack<State>();
+    private Stack<BGState> stack = new Stack<BGState>();
 
-    public LinearStack(State start) {
+    public LinearStack(BGState start) {
         this.stack.push(start);
     }
 
-    public void push(State state) {
+    public void push(BGState state) {
         stack.push(state);
     }
 
-    public State pop() {
+    public BGState pop() {
         return stack.pop();
     }
 
-    public State peek() {
+    public BGState peek() {
         return stack.peek();
     }
 

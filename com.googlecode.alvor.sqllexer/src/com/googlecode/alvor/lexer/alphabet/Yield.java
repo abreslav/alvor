@@ -26,4 +26,9 @@ public class Yield implements IAbstractOutputItem {
 	public int getTokenType() {
 		return tokenType;
 	}
+	
+	@Override
+	public String toString() {
+		return "Yield(" + tokenType + ")";
+	}
 }

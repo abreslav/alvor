@@ -13,7 +13,7 @@ import ru.tolmachev.core.Conjunct;
 import ru.tolmachev.core.IAbstractSymbol;
 import ru.tolmachev.core.LRParserTable;
 import ru.tolmachev.core.Rule;
-import ru.tolmachev.core.State;
+import ru.tolmachev.core.BGState;
 import ru.tolmachev.core.action.GotoAction;
 import ru.tolmachev.core.action.ReduceAction;
 import ru.tolmachev.core.action.ShiftAction;
@@ -244,26 +244,26 @@ public class TableBuilder {
 
         line = scanner.nextLine();
         while (!LR_TABLE_STOP_TAG.equals(line)) {
-            State state = getLRTableState(scanner, line);
+            BGState state = getLRTableState(scanner, line);
             table.addState(state);
             line = scanner.nextLine();
         }
 
-        State acceptingState = table.calculateAcceptingState();
+        BGState acceptingState = table.calculateAcceptingState();
         table.setAcceptingState(acceptingState);
         return table;
     }
 
-    private State getLRTableState(final Scanner scanner, String line) throws WrongInputFileStructureException {
+    private BGState getLRTableState(final Scanner scanner, String line) throws WrongInputFileStructureException {
         int stateNumber;
         if (line.startsWith(LR_TABLE_STATE_START_TAG)) {
             stateNumber = getStateNumber(line);
         } else {
             throw new WrongInputFileStructureException("no LR table state block start tag");
         }
-        State state = table.getState(stateNumber);
+        BGState state = table.getState(stateNumber);
         if (state == null) {
-            state = new State(stateNumber);
+            state = new BGState(stateNumber);
             table.addState(state);
         }
 
@@ -296,9 +296,9 @@ public class TableBuilder {
         }
 
         int nextStateIndex = Integer.valueOf(m[2]);
-        State nextState = table.getState(nextStateIndex);
+        BGState nextState = table.getState(nextStateIndex);
         if (nextState == null) {
-            nextState = new State(nextStateIndex);
+            nextState = new BGState(nextStateIndex);
             table.addState(nextState);
         }
 
@@ -331,9 +331,9 @@ public class TableBuilder {
         }
 
         int nextStateIndex = Integer.valueOf(m[2]);
-        State nextState = table.getState(nextStateIndex);
+        BGState nextState = table.getState(nextStateIndex);
         if (nextState == null) {
-            nextState = new State(nextStateIndex);
+            nextState = new BGState(nextStateIndex);
             table.addState(nextState);
         }
 

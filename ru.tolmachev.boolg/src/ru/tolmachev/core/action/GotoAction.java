@@ -1,6 +1,6 @@
 package ru.tolmachev.core.action;
 
-import ru.tolmachev.core.State;
+import ru.tolmachev.core.BGState;
 
 import com.googlecode.alvor.lexer.alphabet.IAbstractInputItem;
 import com.googlecode.alvor.sqlparser.IParserStack;
@@ -14,13 +14,13 @@ import com.googlecode.alvor.sqlparser.IParserStack;
 
 public class GotoAction extends AbstractAction {
 
-    private final State nextState;
+    private final BGState nextState;
 
-    public GotoAction(State nextState) {
+    public GotoAction(BGState nextState) {
         this.nextState = nextState;
     }
 
-    public State getNextState() {
+    public BGState getNextState() {
         return nextState;
     }
 

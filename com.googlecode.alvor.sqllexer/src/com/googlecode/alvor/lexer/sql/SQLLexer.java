@@ -42,7 +42,8 @@ public class SQLLexer {
 	public final IAlphabetConverter SQL_ALPHABET_CONVERTER;
 
 	// The code of ID token (needed to support keywords)
-	private final int ID_CODE;
+	// null if ID is absent
+	private final Integer ID_CODE;
 	
 	// The set of keywords (all in upper-case) 
 	private final Set<String> KEYWORDS = new HashSet<String>();
@@ -77,7 +78,7 @@ public class SQLLexer {
 		for (int i = 0; i < this.lexerData.KEYWORDS.length; i++) {
 			TOKEN_NAME_TO_CODE.put(this.lexerData.KEYWORDS[i], nonKeywordCount + i);
 		}
-		ID_CODE = getCodeByName("ID");
+		ID_CODE = TOKEN_NAME_TO_CODE.get("ID");
 		
 	}
 	
@@ -107,9 +108,12 @@ public class SQLLexer {
 	 * Checks if the token is an identifier 
 	 */
 	public boolean isIdentifier(int code) {
+		if (ID_CODE == null) {
+			return false;
+		}
 		return code == ID_CODE;	
 	}
-	
+
 	/**
 	 * Gets token name by code 
 	 */
@@ -228,6 +232,9 @@ public class SQLLexer {
 	 * @return keyword token if id is a keyword or the code for ID token otherwise 
 	 */
 	public int getIdentifierTokenType(String id) {
+		if (ID_CODE == null) {
+			throw new IllegalStateException("Don't call this method if the lexicon contains no ID token");
+		}
 		String upperCase = id.toUpperCase();
 		if (KEYWORDS.contains(upperCase)) {
 			return getCodeByName(upperCase);

@@ -31,7 +31,7 @@ public class LRParserTable {
     private List<Rule> rules = new LinkedList<Rule>();
 
     //private Map<Integer, State> states;
-    private List<State> states;
+    private List<BGState> states;
 
     private Map<String, Integer> namesToSymbolNumbers = new HashMap<String, Integer>();
 
@@ -39,19 +39,19 @@ public class LRParserTable {
 
     private Map<Integer, String> symbolNumbersToNames = new HashMap<Integer, String>();
 
-    private State acceptingState;
+    private BGState acceptingState;
 
     private boolean isSomeRuleContainsNegativeConjunct;
 
     public LRParserTable() {
-        this.states = new ArrayList<State>();
+        this.states = new ArrayList<BGState>();
     }
 
-    public State getStateById(int id) {
+    public BGState getStateById(int id) {
         return states.get(id);
     }
 
-    public List<State> getStates() {
+    public List<BGState> getStates() {
         return states;
     }
 
@@ -68,15 +68,15 @@ public class LRParserTable {
         return rules;
     }
 
-    public State getStartState() {
+    public BGState getStartState() {
         return states.get(0);
     }
 
-    public void setAcceptingState(State acceptingState) {
+    public void setAcceptingState(BGState acceptingState) {
         this.acceptingState = acceptingState;
     }
 
-    public State getAcceptingState() {
+    public BGState getAcceptingState() {
         return acceptingState;
     }
 
@@ -128,11 +128,11 @@ public class LRParserTable {
         return namesToTokens.get(value);
     }
 
-    public void addState(State state) {
+    public void addState(BGState state) {
         addTo(states, state.getIndex(), state);
     }
 
-    public State getState(int number) {
+    public BGState getState(int number) {
         if (states.size() <= number) {
             return null;
         }
@@ -145,14 +145,14 @@ public class LRParserTable {
      *
      * @return - accepting state of LR table
      */
-    public State calculateAcceptingState() {
-        State startState = states.get(0);
+    public BGState calculateAcceptingState() {
+        BGState startState = states.get(0);
         GotoAction gotoAction = startState.getGoto(startNonterminal);
         if (gotoAction == null) {
             throw new RuntimeException("no accepting state");
         }
 
-        State acceptigState = gotoAction.getNextState();
+        BGState acceptigState = gotoAction.getNextState();
         acceptigState.setTerminating(true);
         return acceptigState;
     }
