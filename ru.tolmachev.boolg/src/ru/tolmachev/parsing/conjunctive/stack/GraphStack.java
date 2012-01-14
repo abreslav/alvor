@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import ru.tolmachev.core.IAbstractSymbol;
-import ru.tolmachev.core.State;
+import ru.tolmachev.core.BGState;
 
 import com.googlecode.alvor.sqlparser.IParserStack;
 import com.googlecode.alvor.sqlparser.IParserStackLike;
@@ -33,7 +33,7 @@ public class GraphStack implements IParserStackLike {
 
     private Set<Node> garbageCollection;
 
-    public GraphStack(State start) {
+    public GraphStack(BGState start) {
         startNode = new Node(start, 0);
         stack = new LinkedList<Node>(Collections.singleton(startNode));
         top = new HashSet<Node>(Collections.singleton(startNode));
@@ -63,7 +63,7 @@ public class GraphStack implements IParserStackLike {
 
     public Node findNodeByStateId(Set<Node> set, int stateIndex) {
         for (Node node : set) {
-            State state = node.getState();
+            BGState state = node.getState();
             if (state.getIndex() == stateIndex) {
                 return node;
             }

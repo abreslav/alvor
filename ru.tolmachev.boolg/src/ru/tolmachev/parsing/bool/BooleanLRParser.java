@@ -13,7 +13,7 @@ import ru.tolmachev.core.Conjunct;
 import ru.tolmachev.core.IAbstractSymbol;
 import ru.tolmachev.core.LRParserTable;
 import ru.tolmachev.core.Rule;
-import ru.tolmachev.core.State;
+import ru.tolmachev.core.BGState;
 import ru.tolmachev.core.action.GotoAction;
 import ru.tolmachev.core.action.ReduceAction;
 import ru.tolmachev.core.action.ShiftAction;
@@ -61,7 +61,7 @@ public class BooleanLRParser extends AbstractInterpreter implements ILRParser<Gr
     }
 
     public GraphStack getStack() {
-        State startState = table.getStartState();
+        BGState startState = table.getStartState();
         return new GraphStack(startState);
     }
 
@@ -147,7 +147,7 @@ public class BooleanLRParser extends AbstractInterpreter implements ILRParser<Gr
         Set<Node> top = stack.getTop();
         // for all nodes at the top layer
         for (Node node : top) {
-            State state = node.getState();
+            BGState state = node.getState();
             ShiftAction shift = state.getShift(token);
 
             // if shift available from current node with current terminal
@@ -183,7 +183,7 @@ public class BooleanLRParser extends AbstractInterpreter implements ILRParser<Gr
      */
     private void addNewNodeToTheFutureTopLayerByShift(GraphStack stack, final Node node, final IAbstractSymbol terminal, final ShiftAction shift) {
         //let's make new node in the future top layer
-        State nextState = shift.getNextState();
+        BGState nextState = shift.getNextState();
         Node previouslyCreatedNextNode = stack.findNodeInNextTop(nextState.getIndex());
 
         // if this node was previously created - connect it with current
@@ -219,7 +219,7 @@ public class BooleanLRParser extends AbstractInterpreter implements ILRParser<Gr
 
             Set<Node> topLayer = stack.getTop();
             for (Node topNode : topLayer) {
-                State state = topNode.getState();
+                BGState state = topNode.getState();
 
                 List<ReduceAction> reduceActionList = getReduceActions(state, token);
                 if (reduceActionList == null) {
@@ -255,7 +255,7 @@ public class BooleanLRParser extends AbstractInterpreter implements ILRParser<Gr
                 Set<Node> nodesThatMatchRule = getNodesOfStackMatchingRule(rule, conjunctsObtainedForNodes);
 
                 for (Node node : nodesThatMatchRule) {
-                    State state = node.getState();
+                    BGState state = node.getState();
                     Nonterminal nonterminal = rule.getLeftPart();
 
 
@@ -288,7 +288,7 @@ public class BooleanLRParser extends AbstractInterpreter implements ILRParser<Gr
      * @param token - current symbol in string
      * @return - list of reductions
      */
-    private List<ReduceAction> getReduceActions(final State state, final IAbstractSymbol token) {
+    private List<ReduceAction> getReduceActions(final BGState state, final IAbstractSymbol token) {
         if (token != Terminal.EOF) {
             return state.getReduceAction(token);
         } else {
@@ -345,7 +345,7 @@ public class BooleanLRParser extends AbstractInterpreter implements ILRParser<Gr
      */
     private Collection<Arc> addNewNodeToTheFutureTopLayerByReduction(final GraphStack stack, final Node node, final GotoAction gotoAction, final Nonterminal nonterminal, final Collection<Arc> arcsValidated) {
         Set<Node> top = stack.getTop();
-        State nextState = gotoAction.getNextState();
+        BGState nextState = gotoAction.getNextState();
         Node previouslyCreatedNextNode = stack.findNodeInTop(nextState.getIndex());
         if (previouslyCreatedNextNode != null && stack.isNodesConnected(node, previouslyCreatedNextNode)) {
             if (table.isBooleanGrammar()) {

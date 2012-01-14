@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <project name="project" default="default">
-	<property name="lexerProject" value="../alvor/com.googlecode.alvor.sqllexer"></property>
-	<property name="parserProject" value="../alvor/com.googlecode.alvor.sqlparser"></property>
+	<property name="lexerProject" value="../com.googlecode.alvor.sqllexer"></property>
+	<property name="parserProject" value="../com.googlecode.alvor.sqlparser"></property>
 	<taskdef classname="JFlex.anttask.JFlexTask" name="jflex" classpath="${lexerProject}/lib/JFlex.jar"/>
 
 	<target name="default" depends="generateLexer" description="description">
