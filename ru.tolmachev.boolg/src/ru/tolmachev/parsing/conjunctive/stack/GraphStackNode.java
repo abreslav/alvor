@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import ru.tolmachev.core.IAbstractSymbol;
-import ru.tolmachev.core.BGState;
+import ru.tolmachev.core.BGTableState;
 
 import com.googlecode.alvor.sqlparser.IAction;
 import com.googlecode.alvor.sqlparser.IParserState;
@@ -21,25 +21,25 @@ import com.googlecode.alvor.sqlparser.IParserState;
  * Time: 19:21
  */
 
-public class Node implements IParserState {
+public class GraphStackNode implements IParserState {
 
     // state of table
-    private BGState state;
+    private BGTableState state;
 
     // position in input string between 0 and |w| - 1 for terminals
     private int position;
 
-    private Map<Node, IAbstractSymbol> successors = new HashMap<Node, IAbstractSymbol>();
+    private Map<GraphStackNode, IAbstractSymbol> successors = new HashMap<GraphStackNode, IAbstractSymbol>();
 
-    private List<Node> predecessors = new LinkedList<Node>();
+    private List<GraphStackNode> predecessors = new LinkedList<GraphStackNode>();
 
-    public Node(BGState state, int position) {
+    public GraphStackNode(BGTableState state, int position) {
         this.state = state;
         this.position = position;
     }
 
     public boolean isTerminating() {
-        return state.isTerminating();
+        return state.isAccepting();
     }
 
     public boolean isError() {
@@ -50,14 +50,14 @@ public class Node implements IParserState {
         return state.getActions(symbolNumber);
     }
 
-    public Set<Node> getAllPredecessorsWithGivenStepsBack(int step) {
-        Set<Node> predecessors = new HashSet<Node>();
+    public Set<GraphStackNode> getAllPredecessorsWithGivenStepsBack(int step) {
+        Set<GraphStackNode> predecessors = new HashSet<GraphStackNode>();
         predecessors.add(this);
 
         for (int currentStep = 0; currentStep < step; currentStep++) {
-            Set<Node> oneStepBackNodesSet = new HashSet<Node>();
+            Set<GraphStackNode> oneStepBackNodesSet = new HashSet<GraphStackNode>();
 
-            for (Node n : predecessors) {
+            for (GraphStackNode n : predecessors) {
                 oneStepBackNodesSet.addAll(n.getPredecessors());
             }
             predecessors = oneStepBackNodesSet;
@@ -65,7 +65,7 @@ public class Node implements IParserState {
         return predecessors;
     }
 
-    public BGState getState() {
+    public BGTableState getState() {
         return state;
     }
 
@@ -73,19 +73,19 @@ public class Node implements IParserState {
         return position;
     }
 
-    public void addPredecessor(Node predecessor) {
+    public void addPredecessor(GraphStackNode predecessor) {
         predecessors.add(predecessor);
     }
 
-    public void addSuccessor(IAbstractSymbol grammarElement, Node successor) {
+    public void addSuccessor(IAbstractSymbol grammarElement, GraphStackNode successor) {
         successors.put(successor, grammarElement);
     }
 
-    public void removeSuccessor(Node successor) {
+    public void removeSuccessor(GraphStackNode successor) {
         successors.remove(successor);
     }
 
-    public List<Node> getPredecessors() {
+    public List<GraphStackNode> getPredecessors() {
         return predecessors;
     }
 
@@ -97,7 +97,7 @@ public class Node implements IParserState {
         return predecessors.size();
     }
 
-    public IAbstractSymbol getGrammarElementBySuccessor(Node successor) {
+    public IAbstractSymbol getGrammarElementBySuccessor(GraphStackNode successor) {
         return successors.get(successor);
     }
 }

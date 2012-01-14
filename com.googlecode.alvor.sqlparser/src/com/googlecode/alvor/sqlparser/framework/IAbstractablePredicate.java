@@ -2,16 +2,16 @@ package com.googlecode.alvor.sqlparser.framework;
 
 public interface IAbstractablePredicate<S, C> {
 	
-	S transition(S state, C character);
+	S transition(S stack, C character);
 	
 	/**
 	 * Detects error states
-	 * @param state the state that is examined
+	 * @param stack the state that is examined
 	 * @return an IError object describing the error, 
 	 *         or {@value IError#NO_ERROR} if no error in this state
 	 */
-	IError getError(S state);
+	IError getError(S stack);
 	
-	S getInitialState();	
+	S getInitialStack();	
 }
 

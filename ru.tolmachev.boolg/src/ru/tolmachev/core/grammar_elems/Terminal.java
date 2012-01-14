@@ -12,7 +12,7 @@ public class Terminal extends GrammarElement {
 
 
     public static final Terminal EOF = new Terminal(
-    		"$eof",
+    		"$end",
 //    		IAbstractInputItem.EOF, 
     		-1);
     

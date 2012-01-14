@@ -13,7 +13,7 @@ import ru.tolmachev.core.Conjunct;
 import ru.tolmachev.core.IAbstractSymbol;
 import ru.tolmachev.core.LRParserTable;
 import ru.tolmachev.core.Rule;
-import ru.tolmachev.core.BGState;
+import ru.tolmachev.core.BGTableState;
 import ru.tolmachev.core.action.GotoAction;
 import ru.tolmachev.core.action.ReduceAction;
 import ru.tolmachev.core.action.ShiftAction;
@@ -22,11 +22,13 @@ import ru.tolmachev.core.grammar_elems.Terminal;
 import ru.tolmachev.parsing.AbstractInterpreter;
 import ru.tolmachev.parsing.conjunctive.stack.Arc;
 import ru.tolmachev.parsing.conjunctive.stack.GraphStack;
-import ru.tolmachev.parsing.conjunctive.stack.Node;
+import ru.tolmachev.parsing.conjunctive.stack.GraphStackNode;
+import ru.tolmachev.parsing.conjunctive.stack.GraphStackNode;
 import ru.tolmachev.table.builder.enums.Punctuation;
 import ru.tolmachev.table.builder.exceptions.UndefinedTerminalException;
 
 import com.googlecode.alvor.lexer.alphabet.IAbstractInputItem;
+import com.googlecode.alvor.sqlparser.ErrorState;
 import com.googlecode.alvor.sqlparser.ILRParser;
 import com.googlecode.alvor.sqlparser.IParserState;
 
@@ -60,11 +62,6 @@ public class BooleanLRParser extends AbstractInterpreter implements ILRParser<Gr
         parsingGoesOn = true;
     }
 
-    public GraphStack getStack() {
-        BGState startState = table.getStartState();
-        return new GraphStack(startState);
-    }
-
     public Map<String, Integer> getNamesToTokenNumbers() {
         return table.getNamesToTokenNumbers();
     }
@@ -78,28 +75,41 @@ public class BooleanLRParser extends AbstractInterpreter implements ILRParser<Gr
     }
 
     public IParserState getInitialState() {
-        return (IParserState) table.getStartState();
+        BGTableState startState = table.getStartState();
+        return new GraphStackNode(startState, 0);
     }
 
     @Override
     public GraphStack processToken(IAbstractInputItem token, int tokenIndex, GraphStack stack) {
-    	Terminal terminal = new Terminal("For: " + token.toString() + "[" + token.getCode() + "]", tokenIndex);
-        if (token == Terminal.EOF) {
-            return processEndOfStringToken(terminal, tokenIndex, stack);
+        if (token.getCode() == IAbstractInputItem.EOF.getCode()) {
+            return processEndOfStringToken(Terminal.EOF, tokenIndex, stack);
         } else {
+        	Terminal terminal = new Terminal("For: " + token.toString() + "[" + token.getCode() + "]", tokenIndex);
             boolean reduceActionResult = makeReduceActions(terminal, stack);
             if (!reduceActionResult) {
-                return null;
+            	return createErrorStack(null, token);
             }
 
             boolean shiftActionResult = makeShiftActions(terminal, stack);
             if (!shiftActionResult) {
-                return null;
+                return createErrorStack(null, token);
             }
 
             return stack;
         }
     }
+
+	private GraphStack createErrorStack(final GraphStackNode node, final IAbstractInputItem token) {
+		return new GraphStack(new GraphStackNode(new BGTableState(-2), 0)) {
+			public boolean hasErrorOnTop() {
+				return true;
+			};
+			
+			public IParserState getErrorOnTop() {
+				return new ErrorState(node, token);
+			};
+		};
+	}
 
     private GraphStack processEndOfStringToken(IAbstractSymbol token, int tokenIndex, GraphStack stack) {
         boolean reduceActionResult = makeReduceActions(token, stack);
@@ -144,10 +154,10 @@ public class BooleanLRParser extends AbstractInterpreter implements ILRParser<Gr
         }
         parsingGoesOn = false;
 
-        Set<Node> top = stack.getTop();
+        Set<GraphStackNode> top = stack.getTop();
         // for all nodes at the top layer
-        for (Node node : top) {
-            BGState state = node.getState();
+        for (GraphStackNode node : top) {
+            BGTableState state = node.getState();
             ShiftAction shift = state.getShift(token);
 
             // if shift available from current node with current terminal
@@ -181,10 +191,10 @@ public class BooleanLRParser extends AbstractInterpreter implements ILRParser<Gr
      * @param terminal - current terminal
      * @param shift    - shift for pair (state in LR table, terminal)
      */
-    private void addNewNodeToTheFutureTopLayerByShift(GraphStack stack, final Node node, final IAbstractSymbol terminal, final ShiftAction shift) {
+    private void addNewNodeToTheFutureTopLayerByShift(GraphStack stack, final GraphStackNode node, final IAbstractSymbol terminal, final ShiftAction shift) {
         //let's make new node in the future top layer
-        BGState nextState = shift.getNextState();
-        Node previouslyCreatedNextNode = stack.findNodeInNextTop(nextState.getIndex());
+        BGTableState nextState = shift.getNextState();
+        GraphStackNode previouslyCreatedNextNode = stack.findNodeInNextTop(nextState.getIndex());
 
         // if this node was previously created - connect it with current
         if (previouslyCreatedNextNode != null) {
@@ -192,7 +202,7 @@ public class BooleanLRParser extends AbstractInterpreter implements ILRParser<Gr
             // else create it and connect with current node
         } else {
             int position = node.getPosition();
-            Node nextNode = new Node(nextState, position + 1);
+            GraphStackNode nextNode = new GraphStackNode(nextState, position + 1);
             stack.connectNodes(node, nextNode, terminal);
 
             stack.addNodeToNextTopLayer(nextNode);
@@ -206,8 +216,8 @@ public class BooleanLRParser extends AbstractInterpreter implements ILRParser<Gr
         }
         parsingGoesOn = false;
 
-        Map<Conjunct, Set<Node>> conjunctsObtainedForNodes = initNodeMap();
-        Map<Conjunct, Set<Node>> conjunctsObtainedForNodesOnPreviousIteration = initNodeMap();
+        Map<Conjunct, Set<GraphStackNode>> conjunctsObtainedForNodes = initNodeMap();
+        Map<Conjunct, Set<GraphStackNode>> conjunctsObtainedForNodesOnPreviousIteration = initNodeMap();
 
         boolean setOfConjunctsHasStabilized;
         for (; ; ) {
@@ -217,9 +227,9 @@ public class BooleanLRParser extends AbstractInterpreter implements ILRParser<Gr
             }
             int newConjunctsAdded = 0;
 
-            Set<Node> topLayer = stack.getTop();
-            for (Node topNode : topLayer) {
-                BGState state = topNode.getState();
+            Set<GraphStackNode> topLayer = stack.getTop();
+            for (GraphStackNode topNode : topLayer) {
+                BGTableState state = topNode.getState();
 
                 List<ReduceAction> reduceActionList = getReduceActions(state, token);
                 if (reduceActionList == null) {
@@ -252,10 +262,10 @@ public class BooleanLRParser extends AbstractInterpreter implements ILRParser<Gr
             Collection<Arc> arcsValidated = new LinkedList<Arc>();
             List<Rule> allRules = table.getRules();
             for (Rule rule : allRules) {
-                Set<Node> nodesThatMatchRule = getNodesOfStackMatchingRule(rule, conjunctsObtainedForNodes);
+                Set<GraphStackNode> nodesThatMatchRule = getNodesOfStackMatchingRule(rule, conjunctsObtainedForNodes);
 
-                for (Node node : nodesThatMatchRule) {
-                    BGState state = node.getState();
+                for (GraphStackNode node : nodesThatMatchRule) {
+                    BGTableState state = node.getState();
                     Nonterminal nonterminal = rule.getLeftPart();
 
 
@@ -288,7 +298,7 @@ public class BooleanLRParser extends AbstractInterpreter implements ILRParser<Gr
      * @param token - current symbol in string
      * @return - list of reductions
      */
-    private List<ReduceAction> getReduceActions(final BGState state, final IAbstractSymbol token) {
+    private List<ReduceAction> getReduceActions(final BGTableState state, final IAbstractSymbol token) {
         if (token != Terminal.EOF) {
             return state.getReduceAction(token);
         } else {
@@ -319,16 +329,16 @@ public class BooleanLRParser extends AbstractInterpreter implements ILRParser<Gr
      * @param conjunctsObtainedForNodes - map of conjuncts
      * @return true - if conjunctsObtainedForNodes has been modified, else false
      */
-    private boolean addStartNodesForReductionEdgeInMap(final Node topNode, final ReduceAction reduceAction, final Map<Conjunct, Set<Node>> conjunctsObtainedForNodes) {
+    private boolean addStartNodesForReductionEdgeInMap(final GraphStackNode topNode, final ReduceAction reduceAction, final Map<Conjunct, Set<GraphStackNode>> conjunctsObtainedForNodes) {
         Conjunct conjunct = reduceAction.getConjunct();
         // get all nodes where this
         // conjunct begins.
         int reductionLength = reduceAction.getLength();
         // get predecessors with k steps back
-        Set<Node> nodeWhereCurrentConjunctBegins = topNode.getAllPredecessorsWithGivenStepsBack(reductionLength);
+        Set<GraphStackNode> nodeWhereCurrentConjunctBegins = topNode.getAllPredecessorsWithGivenStepsBack(reductionLength);
 
         // add new nodes
-        Set<Node> conjunctForRule = conjunctsObtainedForNodes.get(conjunct);
+        Set<GraphStackNode> conjunctForRule = conjunctsObtainedForNodes.get(conjunct);
         return conjunctForRule.addAll(nodeWhereCurrentConjunctBegins);
     }
 
@@ -343,10 +353,10 @@ public class BooleanLRParser extends AbstractInterpreter implements ILRParser<Gr
      * @return true - if stack was modified, else false
      *         - if string is not valid
      */
-    private Collection<Arc> addNewNodeToTheFutureTopLayerByReduction(final GraphStack stack, final Node node, final GotoAction gotoAction, final Nonterminal nonterminal, final Collection<Arc> arcsValidated) {
-        Set<Node> top = stack.getTop();
-        BGState nextState = gotoAction.getNextState();
-        Node previouslyCreatedNextNode = stack.findNodeInTop(nextState.getIndex());
+    private Collection<Arc> addNewNodeToTheFutureTopLayerByReduction(final GraphStack stack, final GraphStackNode node, final GotoAction gotoAction, final Nonterminal nonterminal, final Collection<Arc> arcsValidated) {
+        Set<GraphStackNode> top = stack.getTop();
+        BGTableState nextState = gotoAction.getNextState();
+        GraphStackNode previouslyCreatedNextNode = stack.findNodeInTop(nextState.getIndex());
         if (previouslyCreatedNextNode != null && stack.isNodesConnected(node, previouslyCreatedNextNode)) {
             if (table.isBooleanGrammar()) {
                 Arc arc = new Arc(node, previouslyCreatedNextNode, nonterminal);
@@ -361,7 +371,7 @@ public class BooleanLRParser extends AbstractInterpreter implements ILRParser<Gr
             }
             secondRepeatFlag = true;
         } else {
-            Node newNode = new Node(nextState, pointer);
+            GraphStackNode newNode = new GraphStackNode(nextState, pointer);
             stack.connectNodes(node, newNode, nonterminal);
 
             top.add(newNode);
@@ -383,15 +393,15 @@ public class BooleanLRParser extends AbstractInterpreter implements ILRParser<Gr
      * @param conjunctsObtainedForNodes - map of nodes that matches conjuncts
      * @return nodes that matches rule
      */
-    private Set<Node> getNodesOfStackMatchingRule(final Rule rule, final Map<Conjunct, Set<Node>> conjunctsObtainedForNodes) {
+    private Set<GraphStackNode> getNodesOfStackMatchingRule(final Rule rule, final Map<Conjunct, Set<GraphStackNode>> conjunctsObtainedForNodes) {
         int conjunctAmount = rule.getConjunctAmount();
         Conjunct firstConjunct = rule.getConjunctByIndex(0);
-        Set<Node> nodes = conjunctsObtainedForNodes.get(firstConjunct);
-        Set<Node> resultForRule = new HashSet<Node>(nodes);
+        Set<GraphStackNode> nodes = conjunctsObtainedForNodes.get(firstConjunct);
+        Set<GraphStackNode> resultForRule = new HashSet<GraphStackNode>(nodes);
 
         for (int conjunctIndex = 1; conjunctIndex < conjunctAmount; conjunctIndex++) {
             Conjunct nextConjunct = rule.getConjunctByIndex(conjunctIndex);
-            Set<Node> next = conjunctsObtainedForNodes.get(nextConjunct);
+            Set<GraphStackNode> next = conjunctsObtainedForNodes.get(nextConjunct);
 
             if (nextConjunct.getSign() == Conjunct.NEGATION) {
                 resultForRule.removeAll(next);
@@ -402,39 +412,16 @@ public class BooleanLRParser extends AbstractInterpreter implements ILRParser<Gr
         return resultForRule;
     }
 
-    private boolean checkForValidStackStructure(GraphStack stack) {
-        if (!parsingGoesOn) {
-            System.out.println("false");
-            return false;
-        }
-
-        Set<Node> top = stack.getTop();
-        for (Node topLayerNode : top) {
-            if (topLayerNode.getState() == table.getAcceptingState()) {
-                List<Node> predecessors = topLayerNode.getPredecessors();
-
-                for (Node predecessor : predecessors) {
-                    if (predecessor.getState() == table.getStartState()) {
-                        System.out.println("accepted!!");
-                        return true;
-                    }
-                }
-            }
-        }
-        System.out.println("not accepted");
-        return false;
-    }
-
     private void makeInvalidation(GraphStack stack, Collection<Arc> arcsValidated) {
         boolean isArcsToInvalidate = false;
 
-        Set<Node> top = stack.getTop();
-        for (Node topNode : top) {
-            List<Node> predecessors = topNode.getPredecessors();
+        Set<GraphStackNode> top = stack.getTop();
+        for (GraphStackNode topNode : top) {
+            List<GraphStackNode> predecessors = topNode.getPredecessors();
 
-            Iterator<Node> iterator = predecessors.iterator();
+            Iterator<GraphStackNode> iterator = predecessors.iterator();
             while (iterator.hasNext()) {
-                Node predecessor = iterator.next();
+                GraphStackNode predecessor = iterator.next();
                 IAbstractSymbol grammarElement = predecessor.getGrammarElementBySuccessor(topNode);
 
                 if (grammarElement instanceof Terminal) {
@@ -454,7 +441,7 @@ public class BooleanLRParser extends AbstractInterpreter implements ILRParser<Gr
 
         if (isArcsToInvalidate) {
 
-            for (Node topNode : top) {
+            for (GraphStackNode topNode : top) {
                 if (topNode.getSuccessorsAmount() == 0 && topNode.getPredecessorsAmount() == 0) {
                     stack.addNodeToGarbageCollector(topNode);
                 } else {
@@ -472,17 +459,17 @@ public class BooleanLRParser extends AbstractInterpreter implements ILRParser<Gr
         }
     }
 
-    private Map<Conjunct, Set<Node>> initNodeMap() {
-        Map<Conjunct, Set<Node>> map = new HashMap<Conjunct, Set<Node>>();
+    private Map<Conjunct, Set<GraphStackNode>> initNodeMap() {
+        Map<Conjunct, Set<GraphStackNode>> map = new HashMap<Conjunct, Set<GraphStackNode>>();
         Collection<Conjunct> conjuncts = table.getConjuncts();
         for (Conjunct conjunct : conjuncts) {
-            map.put(conjunct, new HashSet<Node>());
+            map.put(conjunct, new HashSet<GraphStackNode>());
         }
         return map;
     }
 
-    private boolean isSetOfConjunctsStabilizedForBooleanGrammar(Map<Conjunct, Set<Node>> conjunctsObtainedForNodesOnPreviousIteration,
-                                                                Map<Conjunct, Set<Node>> conjunctsObtainedForNodes) {
+    private boolean isSetOfConjunctsStabilizedForBooleanGrammar(Map<Conjunct, Set<GraphStackNode>> conjunctsObtainedForNodesOnPreviousIteration,
+                                                                Map<Conjunct, Set<GraphStackNode>> conjunctsObtainedForNodes) {
         return conjunctsObtainedForNodes.equals(conjunctsObtainedForNodesOnPreviousIteration);
     }
 

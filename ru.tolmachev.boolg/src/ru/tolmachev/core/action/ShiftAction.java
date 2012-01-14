@@ -1,6 +1,6 @@
 package ru.tolmachev.core.action;
 
-import ru.tolmachev.core.BGState;
+import ru.tolmachev.core.BGTableState;
 
 import com.googlecode.alvor.lexer.alphabet.IAbstractInputItem;
 import com.googlecode.alvor.sqlparser.IParserStack;
@@ -14,13 +14,13 @@ import com.googlecode.alvor.sqlparser.IParserStack;
 
 public class ShiftAction extends AbstractAction {
 
-    private final BGState nextState;
+    private final BGTableState nextState;
 
-    public ShiftAction(BGState nextState) {
+    public ShiftAction(BGTableState nextState) {
         this.nextState = nextState;
     }
 
-    public BGState getNextState() {
+    public BGTableState getNextState() {
         return nextState;
     }
 

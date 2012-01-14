@@ -1,0 +1,4 @@
+%lex-token _a = "a"
+%lex-token _b = "b"
+%%
+q : _a;

@@ -2,23 +2,37 @@
 <project name="project" default="default">
 	<property name="lexerProject" value="../com.googlecode.alvor.sqllexer"></property>
 	<property name="parserProject" value="../com.googlecode.alvor.sqlparser"></property>
+	<property name="wcdir" value="/Users/abreslav/Desktop/eclipse 2/workspace/whalecalf-1.9.0/myexample"></property>
+	
+	<property name="data" value="simplest"></property>
+	<!--<property name="data" value="programming_language"></property>-->
+	
 	<taskdef classname="JFlex.anttask.JFlexTask" name="jflex" classpath="${lexerProject}/lib/JFlex.jar"/>
 
 	<target name="default" depends="generateLexer" description="description">
     </target>
 
     <target name="generateParser">
-        <echo message="${basedir}"/>
+    	<copyfile  src="resources/${data}/grammar.whc" dest="${wcdir}/grammar.whc" forceoverwrite="true"/>
+    	<delete>
+    		<fileset dir="${wcdir}" includes="*.o"></fileset>
+    		<fileset dir="${wcdir}" includes="table.txt"/>
+    		<fileset dir="${wcdir}" includes="test"/>
+    		<fileset dir="${wcdir}" includes="grammar.cpp"/>
+    	</delete>
+    	<exec executable="make" dir="${wcdir}"/>
+    	<exec executable="${wcdir}/test" dir="${wcdir}"/>
+    	<copyfile src="${wcdir}/table.txt" dest="resources/${data}/table.txt" forceoverwrite="true"/>
 		<!-- New GLR-parser -->
     	<java 
     		classpath="${parserProject}/bin" 
     		classname="com.googlecode.alvor.sqlparser.SpecGeneratorMain"
     	>
-    		<arg value="resources/programming_language/pl.bgtemplate"/>
-    		<arg value="generated/pl.bg"/>
-    		<arg value="resources/programming_language/pl.flextemplate"/>
-    		<arg value="generated/pl.flex"/>
-    		<arg value="generated/pl.keywords"/>
+    		<arg value="resources/${data}/lexer.bgtemplate"/>
+    		<arg value="generated/${data}.bg"/>
+    		<arg value="resources/lexer.flextemplate"/>
+    		<arg value="generated/${data}.flex"/>
+    		<arg value="generated/${data}.keywords"/>
     	</java>
 <!--
     	<arg value="- -language=Java"/>
@@ -28,27 +42,28 @@
 			<!--<arg value="- -xml=generated/pl.xml"/>
 			<arg value="- -report=state,lookahead,itemset"/>
 			<arg value="- -report-file=generated/pl.report"/>-->
-			<arg value="generated/pl.bg"/>
+			<arg value="generated/${data}.bg"/>
 		</exec>
-    	<delete file="pl.tab.bg"></delete>
+    	<delete file="${data}.tab.bg"></delete>
 	</target>
 	
     <target name="generateLexer" depends="generateParser">  
 		<!-- SQL lexer : SQL transducer is generated from it -->
 		<jflex
-			file="generated/pl.flex"
+			file="generated/${data}.flex"
     		destdir="generated" 
 			time="on"
     		nobak="on"
 			pack="off"
 		/>
 		<!-- Generate a class which will generate the data for a transducer -->
+    	<delete file="generated/lexer/BGLexerData.java"></delete>
     	<java classpath="${lexerProject}/bin" classname="Generator">
     		<arg file="generated/"/>
-    		<arg value="PLLexer"/>
+    		<arg value="BGLexer"/>
     		<arg file="generated/"/>
-    		<arg value="PLLexerGen"/>
-    		<arg value="generated/pl.keywords"/>
+    		<arg value="BGLexerGen"/>
+    		<arg value="generated/${data}.keywords"/>
     	</java>
 		<!-- Compile the generated class -->
     	<javac 
@@ -57,13 +72,13 @@
     		destdir="bin">
     	</javac>
 		<!-- Run the compiled class and store the results as a *.java file -->
-    	<mkdir dir="generated/pl/lexer"/>
+    	<mkdir dir="generated/lexer"/>
     	<java 
     		classpath="bin" 
-    		classname="PLLexerGen" 
-    		output="generated/pl/lexer/PLLexerData.java">
-    		<arg value="pl.lexer"/>
-    		<arg value="PLLexerData"/>
+    		classname="BGLexerGen" 
+    		output="generated/lexer/BGLexerData.java">
+    		<arg value="lexer"/>
+    		<arg value="BGLexerData"/>
     	</java>
 	</target>	
 

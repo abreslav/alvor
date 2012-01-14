@@ -2,11 +2,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import pl.lexer.PLLexerData;
-import ru.tolmachev.core.BGState;
+import lexer.BGLexerData;
 import ru.tolmachev.core.LRParserTable;
 import ru.tolmachev.parsing.bool.BooleanLRParser;
 import ru.tolmachev.parsing.conjunctive.stack.GraphStack;
+import ru.tolmachev.parsing.conjunctive.stack.GraphStackNode;
 import ru.tolmachev.table.builder.TableBuilder;
 import ru.tolmachev.table.builder.exceptions.WrongInputFileStructureException;
 
@@ -20,26 +20,26 @@ import com.googlecode.alvor.string.StringConstant;
 
 public class SimpleAbstractParsingTest {
 	public static void main(String[] args) throws WrongInputFileStructureException, IOException {
-		LRParserTable table = new TableBuilder(new File("resources/programming_language/table.txt")).buildTable();
+		LRParserTable table = new TableBuilder(new File("resources/simplest/table.txt")).buildTable();
 		ILRParser<GraphStack> parser = new BooleanLRParser(table);
 		IStackFactory<GraphStack> factory = new IStackFactory<GraphStack>() {
 			
 			@Override
 			public GraphStack newStack(IParserState state) {
-				return new GraphStack((BGState) state);
+				return new GraphStack((GraphStackNode) state);
 			}
 		};
-		LexerData lexerData = PLLexerData.DATA;
+		LexerData lexerData = BGLexerData.DATA;
 		ParserSimulator<GraphStack> simulator = new ParserSimulator<GraphStack>(parser, factory, lexerData );
-		String longExample = "main(arg)" +
-		"{" +
-		"var x, while;" +
-		"if(arg!=1) 1; else x=1;" +
-		"return 1;" +
-		"}";
-		List<String> errors = simulator.check(new StringConstant(
-				longExample
-				));
+		String example = 
+				"main(arg)" +
+				"{" +
+					"var x, while;" +
+					"if(arg!=1) 1; else x=1;" +
+					"return 1;" +
+				"}";
+		example = "a";
+		List<String> errors = simulator.check(new StringConstant(example));
 		for (String error : errors) {
 			System.out.println(error);
 		}

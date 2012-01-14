@@ -97,7 +97,7 @@ public class ShortestCounterExampleAbstractInterpreter<S> implements IAbstractIn
 	}	
 	
 	public IError interpret(State inputInitalState, List<IAbstractInputItem> counterExample) {
-		PredicateState initialPredicateState = new PredicateState(predicate.getInitialState(), inputInitalState, null, null);
+		PredicateState initialPredicateState = new PredicateState(predicate.getInitialStack(), inputInitalState, null, null);
 		getPredicateStates(inputInitalState).put(initialPredicateState.data, initialPredicateState);
 		
 		Queue<PredicateState> queue = new LinkedList<PredicateState>();

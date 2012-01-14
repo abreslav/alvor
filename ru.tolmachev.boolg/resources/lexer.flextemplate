@@ -1,0 +1,19 @@
+@SuppressWarnings("unused")
+
+%%
+
+%class BGLexer
+%public
+%unicode
+%ignorecase
+%table
+
+/*%debug*/
+
+%%%helpers%%%
+
+%% 
+
+<YYINITIAL> {
+%%%tokens%%%  
+}
