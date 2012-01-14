@@ -7,7 +7,7 @@ import com.googlecode.alvor.sqlparser.ILRParser;
 import com.googlecode.alvor.sqlparser.IParserStackLike;
 import com.googlecode.alvor.sqlparser.IStackFactory;
 
-public class LRParser<S extends IParserStackLike> implements IAbstractablePredicate<S, IAbstractInputItem>{
+public class LRParserPredicate<S extends IParserStackLike> implements IAbstractablePredicate<S, IAbstractInputItem>{
 
 	public static final class UnexpectedTokenError implements IError {
 
@@ -40,7 +40,7 @@ public class LRParser<S extends IParserStackLike> implements IAbstractablePredic
 		
 		@Override
 		public String toString() {
-			return "Syntax error. Most probably, unfinished query.";
+			return "Syntax error. Most probably, unfinished sentence.";
 		}
 		
 	};
@@ -49,7 +49,7 @@ public class LRParser<S extends IParserStackLike> implements IAbstractablePredic
 	private final IStackFactory<S> stackFactory;
 	private final IAlphabetConverter alphabetConverter;
 
-	public LRParser(ILRParser<S> lrParser, IStackFactory<S> stackFactory,
+	public LRParserPredicate(ILRParser<S> lrParser, IStackFactory<S> stackFactory,
 			IAlphabetConverter alphabetConverter) {
 		this.lrParser = lrParser;
 		this.stackFactory = stackFactory;
@@ -57,16 +57,16 @@ public class LRParser<S extends IParserStackLike> implements IAbstractablePredic
 	}
 
 	@Override
-	public S getInitialState() {
+	public S getInitialStack() {
 		return stackFactory.newStack(lrParser.getInitialState());
 	}
 
 	@Override
-	public IError getError(S state) {
-		if (!state.hasErrorOnTop()) {
+	public IError getError(S stack) {
+		if (!stack.hasErrorOnTop()) {
 			return IError.NO_ERROR;
 		}
-		ErrorState error = (ErrorState) state.getErrorOnTop();
+		ErrorState error = (ErrorState) stack.getErrorOnTop();
 		IAbstractInputItem unexpectedItem = error.getUnexpectedItem();
 		if (unexpectedItem == null) {
 			return OVERABSTRACTION_ERROR;
@@ -78,9 +78,9 @@ public class LRParser<S extends IParserStackLike> implements IAbstractablePredic
 	}
 
 	@Override
-	public S transition(S state, IAbstractInputItem character) {
+	public S transition(S stack, IAbstractInputItem character) {
 		int tokenIndex = alphabetConverter.convert(character.getCode());
-		return lrParser.processToken(character, tokenIndex, state);
+		return lrParser.processToken(character, tokenIndex, stack);
 	}
 	
 }

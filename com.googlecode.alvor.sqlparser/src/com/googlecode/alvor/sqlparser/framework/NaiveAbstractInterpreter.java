@@ -86,7 +86,7 @@ public class NaiveAbstractInterpreter<S> implements IAbstractInterpreter<S> {
 	}	
 	
 	public IError interpret(State inputInitalState, List<IAbstractInputItem> counterExample) {
-		getPredicateStates(inputInitalState).add(new PredicateState(predicate.getInitialState(), null, null));
+		getPredicateStates(inputInitalState).add(new PredicateState(predicate.getInitialStack(), null, null));
 		Queue<State> queue = new LinkedList<State>();
 		Set<State> inQueue = new HashSet<State>();
 

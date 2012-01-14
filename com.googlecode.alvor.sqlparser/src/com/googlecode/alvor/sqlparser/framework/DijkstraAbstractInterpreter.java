@@ -141,7 +141,7 @@ public class DijkstraAbstractInterpreter<S> implements IAbstractInterpreter<S> {
 	}	
 	
 	public IError interpret(State inputInitalState, List<IAbstractInputItem> counterExample) {
-		PredicateState initialPredicateState = new PredicateState(predicate.getInitialState(), inputInitalState, null, null);
+		PredicateState initialPredicateState = new PredicateState(predicate.getInitialStack(), inputInitalState, null, null);
 		getPredicateStates(inputInitalState).put(initialPredicateState.data, initialPredicateState);
 		
 		IPriorityQueue<PredicateState> queue = new BinaryHeap<PredicateState>();

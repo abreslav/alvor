@@ -13,7 +13,7 @@ import ru.tolmachev.core.Conjunct;
 import ru.tolmachev.core.IAbstractSymbol;
 import ru.tolmachev.core.LRParserTable;
 import ru.tolmachev.core.Rule;
-import ru.tolmachev.core.BGState;
+import ru.tolmachev.core.BGTableState;
 import ru.tolmachev.core.action.GotoAction;
 import ru.tolmachev.core.action.ReduceAction;
 import ru.tolmachev.core.action.ShiftAction;
@@ -124,6 +124,7 @@ public class TableBuilder {
             grammarElementsCounter++;
             line = scanner.nextLine();
         }
+        namesToTokenNumbers.put(Terminal.EOF.getValue(), Terminal.EOF.getCode());
 
         if (terminalList.isEmpty()) {
             throw new WrongInputFileStructureException("no terminals in table description");
@@ -244,26 +245,26 @@ public class TableBuilder {
 
         line = scanner.nextLine();
         while (!LR_TABLE_STOP_TAG.equals(line)) {
-            BGState state = getLRTableState(scanner, line);
+            BGTableState state = getLRTableState(scanner, line);
             table.addState(state);
             line = scanner.nextLine();
         }
 
-        BGState acceptingState = table.calculateAcceptingState();
+        BGTableState acceptingState = table.calculateAcceptingState();
         table.setAcceptingState(acceptingState);
         return table;
     }
 
-    private BGState getLRTableState(final Scanner scanner, String line) throws WrongInputFileStructureException {
+    private BGTableState getLRTableState(final Scanner scanner, String line) throws WrongInputFileStructureException {
         int stateNumber;
         if (line.startsWith(LR_TABLE_STATE_START_TAG)) {
             stateNumber = getStateNumber(line);
         } else {
             throw new WrongInputFileStructureException("no LR table state block start tag");
         }
-        BGState state = table.getState(stateNumber);
+        BGTableState state = table.getState(stateNumber);
         if (state == null) {
-            state = new BGState(stateNumber);
+            state = new BGTableState(stateNumber);
             table.addState(state);
         }
 
@@ -296,9 +297,9 @@ public class TableBuilder {
         }
 
         int nextStateIndex = Integer.valueOf(m[2]);
-        BGState nextState = table.getState(nextStateIndex);
+        BGTableState nextState = table.getState(nextStateIndex);
         if (nextState == null) {
-            nextState = new BGState(nextStateIndex);
+            nextState = new BGTableState(nextStateIndex);
             table.addState(nextState);
         }
 
@@ -331,9 +332,9 @@ public class TableBuilder {
         }
 
         int nextStateIndex = Integer.valueOf(m[2]);
-        BGState nextState = table.getState(nextStateIndex);
+        BGTableState nextState = table.getState(nextStateIndex);
         if (nextState == null) {
-            nextState = new BGState(nextStateIndex);
+            nextState = new BGTableState(nextStateIndex);
             table.addState(nextState);
         }
 

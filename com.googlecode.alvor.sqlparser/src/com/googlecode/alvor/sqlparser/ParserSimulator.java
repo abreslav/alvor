@@ -16,7 +16,7 @@ import com.googlecode.alvor.lexer.automata.Transition;
 import com.googlecode.alvor.lexer.sql.SQLLexer;
 import com.googlecode.alvor.sqllexer.GenericSQLLexerData;
 import com.googlecode.alvor.sqlparser.framework.IError;
-import com.googlecode.alvor.sqlparser.framework.LRParser;
+import com.googlecode.alvor.sqlparser.framework.LRParserPredicate;
 import com.googlecode.alvor.sqlparser.framework.NaiveAbstractInterpreter;
 import com.googlecode.alvor.sqlparser.framework.ShortestCounterExampleAbstractInterpreter;
 import com.googlecode.alvor.string.IAbstractString;
@@ -93,7 +93,7 @@ public class ParserSimulator<S extends IParserStackLike> {
 			@Override
 			public void other(List<? extends IAbstractInputItem> counterExample) {
 				if (errors.isEmpty()) {
-					errors.add("SQL syntax error. Most likely unfinished query");
+					errors.add("Syntax error. Most likely unfinished query");
 				}
 			}
 			
@@ -135,7 +135,7 @@ public class ParserSimulator<S extends IParserStackLike> {
 					return eofTokenIndex;
 				}
 				String tokenName = sqlLexer.getTokenName(c);
-				if (Character.isLetter(tokenName.charAt(0))) {
+				if (Character.isJavaIdentifierStart(tokenName.charAt(0))) {
 					return parser.getNamesToTokenNumbers().get(tokenName);
 				}
 				Integer tokenNumber = parser.getNamesToTokenNumbers().get("'" + tokenName + "'");
@@ -148,19 +148,19 @@ public class ParserSimulator<S extends IParserStackLike> {
 				return tokenNumber;
 			}
 		};
-		LRParser<S> lrParser = new LRParser<S>(parser, stackFactory, converter);
+		LRParserPredicate<S> lrParser = new LRParserPredicate<S>(parser, stackFactory, converter);
 		
 		List<IAbstractInputItem> counterExample = new ArrayList<IAbstractInputItem>();
 //		IError result = new NaiveAbstractInterpreter<S>(lrParser).interpret(transduction, counterExample);
 		IError result = new ShortestCounterExampleAbstractInterpreter<S>(lrParser).interpret(transduction, counterExample);
 //		IError result = new DijkstraAbstractInterpreter<S>(lrParser).interpret(transduction, counterExample);
 		if (result != IError.NO_ERROR) {
-			if (result == LRParser.OTHER_ERROR) {
+			if (result == LRParserPredicate.OTHER_ERROR) {
 				errorHandler.other(counterExample);
-			} else if (result == LRParser.OVERABSTRACTION_ERROR) {
+			} else if (result == LRParserPredicate.OVERABSTRACTION_ERROR) {
 				errorHandler.overabstraction(counterExample);
-			} else if (result instanceof LRParser.UnexpectedTokenError) {
-				errorHandler.unexpectedItem(((LRParser.UnexpectedTokenError) result).getUnexpectedItem(), counterExample);
+			} else if (result instanceof LRParserPredicate.UnexpectedTokenError) {
+				errorHandler.unexpectedItem(((LRParserPredicate.UnexpectedTokenError) result).getUnexpectedItem(), counterExample);
 			} else {
 				throw new IllegalArgumentException("Unknown error type: " + result.getClass().getCanonicalName());
 			}
@@ -175,7 +175,7 @@ public class ParserSimulator<S extends IParserStackLike> {
 	 * Used for testing.
 	 */
 	public boolean parseAutomaton(State initial, IAlphabetConverter alphabetConverter) {
-		com.googlecode.alvor.sqlparser.framework.LRParser<S> lrParser = new com.googlecode.alvor.sqlparser.framework.LRParser<S>(parser, stackFactory, alphabetConverter);
+		com.googlecode.alvor.sqlparser.framework.LRParserPredicate<S> lrParser = new com.googlecode.alvor.sqlparser.framework.LRParserPredicate<S>(parser, stackFactory, alphabetConverter);
 		List<IAbstractInputItem> cex = new ArrayList<IAbstractInputItem>();
 		IError result = new NaiveAbstractInterpreter<S>(lrParser).interpret(initial, cex);
 		if (result != IError.NO_ERROR) {

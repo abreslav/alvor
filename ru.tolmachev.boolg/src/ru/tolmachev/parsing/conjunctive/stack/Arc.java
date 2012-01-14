@@ -12,23 +12,23 @@ import ru.tolmachev.core.IAbstractSymbol;
 
 public class Arc {
 
-    private final Node from;
+    private final GraphStackNode from;
 
-    private final Node to;
+    private final GraphStackNode to;
 
     private final IAbstractSymbol symbol;
 
-    public Arc(Node from, Node to, IAbstractSymbol symbol) {
+    public Arc(GraphStackNode from, GraphStackNode to, IAbstractSymbol symbol) {
         this.from = from;
         this.to = to;
         this.symbol = symbol;
     }
 
-    public Node getFrom() {
+    public GraphStackNode getFrom() {
         return from;
     }
 
-    public Node getTo() {
+    public GraphStackNode getTo() {
         return to;
     }
 

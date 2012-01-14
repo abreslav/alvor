@@ -9,8 +9,9 @@ import java.util.List;
 import java.util.Set;
 
 import ru.tolmachev.core.IAbstractSymbol;
-import ru.tolmachev.core.BGState;
+import ru.tolmachev.core.BGTableState;
 
+import com.googlecode.alvor.sqlparser.IAction;
 import com.googlecode.alvor.sqlparser.IParserStack;
 import com.googlecode.alvor.sqlparser.IParserStackLike;
 import com.googlecode.alvor.sqlparser.IParserState;
@@ -23,47 +24,47 @@ import com.googlecode.alvor.sqlparser.IParserState;
  */
 public class GraphStack implements IParserStackLike {
 
-    private Set<Node> top;
+	private Set<GraphStackNode> top;
 
-    private Set<Node> nextTop;
+    private Set<GraphStackNode> nextTop;
 
-    private final List<Node> stack;
+    private final List<GraphStackNode> stack;
 
-    private final Node startNode;
+    private final GraphStackNode startNode;
 
-    private Set<Node> garbageCollection;
+    private Set<GraphStackNode> garbageCollection;
 
-    public GraphStack(BGState start) {
-        startNode = new Node(start, 0);
-        stack = new LinkedList<Node>(Collections.singleton(startNode));
-        top = new HashSet<Node>(Collections.singleton(startNode));
-        nextTop = new HashSet<Node>();
-        garbageCollection = new HashSet<Node>();
-    }
+    public GraphStack(GraphStackNode node) {
+        startNode = node;
+        stack = new LinkedList<GraphStackNode>(Collections.singleton(startNode));
+        top = new HashSet<GraphStackNode>(Collections.singleton(startNode));
+        nextTop = new HashSet<GraphStackNode>();
+        garbageCollection = new HashSet<GraphStackNode>();
+	}
 
-    public Set<Node> getTop() {
+	public Set<GraphStackNode> getTop() {
         return top;
     }
 
-    public void addNode(Node node) {
+    public void addNode(GraphStackNode node) {
         stack.add(node);
     }
 
-    public void addNodeToNextTopLayer(Node node) {
+    public void addNodeToNextTopLayer(GraphStackNode node) {
         nextTop.add(node);
     }
 
-    public Node findNodeInTop(int stateIndex) {
+    public GraphStackNode findNodeInTop(int stateIndex) {
         return findNodeByStateId(top, stateIndex);
     }
 
-    public Node findNodeInNextTop(int stateIndex) {
+    public GraphStackNode findNodeInNextTop(int stateIndex) {
         return findNodeByStateId(nextTop, stateIndex);
     }
 
-    public Node findNodeByStateId(Set<Node> set, int stateIndex) {
-        for (Node node : set) {
-            BGState state = node.getState();
+    public GraphStackNode findNodeByStateId(Set<GraphStackNode> set, int stateIndex) {
+        for (GraphStackNode node : set) {
+            BGTableState state = node.getState();
             if (state.getIndex() == stateIndex) {
                 return node;
             }
@@ -71,7 +72,7 @@ public class GraphStack implements IParserStackLike {
         return null;
     }
 
-    public void addNodeToGarbageCollector(Node node) {
+    public void addNodeToGarbageCollector(GraphStackNode node) {
         garbageCollection.add(node);
     }
 
@@ -81,27 +82,27 @@ public class GraphStack implements IParserStackLike {
 
     public void updateTop() {
         top = nextTop;
-        nextTop = new HashSet<Node>();
+        nextTop = new HashSet<GraphStackNode>();
     }
 
-    public void connectNodes(Node prev, Node next, IAbstractSymbol grammarElement) {
+    public void connectNodes(GraphStackNode prev, GraphStackNode next, IAbstractSymbol grammarElement) {
         prev.addSuccessor(grammarElement, next);
         next.addPredecessor(prev);
     }
 
-    public void disconnectNodes(Node prev, Node next, Iterator<Node> iter) {
+    public void disconnectNodes(GraphStackNode prev, GraphStackNode next, Iterator<GraphStackNode> iter) {
         prev.removeSuccessor(next);
         iter.remove();
     }
 
 
     public void clearGarbageCollector() {
-        Set<Node> nodesWithoutSuccessors = getNodesWithoutSuccessors(garbageCollection);
+        Set<GraphStackNode> nodesWithoutSuccessors = getNodesWithoutSuccessors(garbageCollection);
 
         while (nodesWithoutSuccessors.size() > 0) {
-            Iterator<Node> iter = nodesWithoutSuccessors.iterator();
+            Iterator<GraphStackNode> iter = nodesWithoutSuccessors.iterator();
             while (iter.hasNext()) {
-                Node node = iter.next();
+                GraphStackNode node = iter.next();
                 if (cutBranch(node)) {
                     iter.remove();
                     stack.remove(node);
@@ -109,12 +110,12 @@ public class GraphStack implements IParserStackLike {
                 }
             }
         }
-        garbageCollection = new HashSet<Node>();
+        garbageCollection = new HashSet<GraphStackNode>();
     }
 
-    private Set<Node> getNodesWithoutSuccessors(Set<Node> setOfNodesToDelete) {
-        Set<Node> nodesWithoutSuccessors = new HashSet<Node>();
-        for (Node node : setOfNodesToDelete) {
+    private Set<GraphStackNode> getNodesWithoutSuccessors(Set<GraphStackNode> setOfNodesToDelete) {
+        Set<GraphStackNode> nodesWithoutSuccessors = new HashSet<GraphStackNode>();
+        for (GraphStackNode node : setOfNodesToDelete) {
             if (node.getSuccessorsAmount() == 0) {
                 nodesWithoutSuccessors.add(node);
             }
@@ -122,15 +123,15 @@ public class GraphStack implements IParserStackLike {
         return nodesWithoutSuccessors;
     }
 
-    private boolean cutBranch(Node node) {
+    private boolean cutBranch(GraphStackNode node) {
         if (node.getSuccessorsAmount() != 0) {
             return false;
         }
 
-        List<Node> predecessors = node.getPredecessors();
-        Iterator<Node> iter = predecessors.iterator();
+        List<GraphStackNode> predecessors = node.getPredecessors();
+        Iterator<GraphStackNode> iter = predecessors.iterator();
         while (iter.hasNext()) {
-            Node predecessor = iter.next();
+            GraphStackNode predecessor = iter.next();
             predecessor.removeSuccessor(node);
             cutBranch(predecessor);
             iter.remove();
@@ -140,9 +141,9 @@ public class GraphStack implements IParserStackLike {
         return true;
     }
 
-    public boolean isNodesConnected(Node n1, Node n2) {
-        List<Node> predecessors = n2.getPredecessors();
-        for (Node predecessor : predecessors) {
+    public boolean isNodesConnected(GraphStackNode n1, GraphStackNode n2) {
+        List<GraphStackNode> predecessors = n2.getPredecessors();
+        for (GraphStackNode predecessor : predecessors) {
             if (predecessor.equals(n1)) {
                 return true;
             }
@@ -152,30 +153,50 @@ public class GraphStack implements IParserStackLike {
 
     public Collection<IParserState> top() {
         Collection<IParserState> top = new HashSet<IParserState>();
-        for (Node node : this.top) {
+        for (GraphStackNode node : this.top) {
             top.add(node);
         }
 
         return top;
     }
 
-    public IParserStack push(IParserState state) {
-        throw new UnsupportedOperationException();
-    }
-
-    public IParserStack pop(int count) {
-        throw new UnsupportedOperationException();
-    }
-
     public boolean hasErrorOnTop() {
-        return false;
+        return getTop().isEmpty();
     }
 
     public IParserState getErrorOnTop() {
-        return null;
+        return new IParserState() {
+			
+			@Override
+			public boolean isTerminating() {
+				return true;
+			}
+			
+			@Override
+			public boolean isError() {
+				return true;
+			}
+			
+			@Override
+			public Collection<IAction> getActions(int symbolNumber) {
+				return Collections.emptyList();
+			}
+		};
     }
 
     public boolean topAccepts() {
+        Set<GraphStackNode> top = getTop();
+        for (GraphStackNode topLayerNode : top) {
+            if (topLayerNode.getState().isAccepting()) {
+                List<GraphStackNode> predecessors = topLayerNode.getPredecessors();
+
+                for (GraphStackNode predecessor : predecessors) {
+                    if (predecessor.getState().isStarting()) {
+                        return true;
+                    }
+                }
+            }
+        }
         return false;
     }
 }
