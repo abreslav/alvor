@@ -81,9 +81,12 @@ public class BooleanLRParser extends AbstractInterpreter implements ILRParser<Gr
 
     @Override
     public GraphStack processToken(IAbstractInputItem token, int tokenIndex, GraphStack stack) {
+//    	System.out.println("processToken: token = " + token + " tokenIndex=" + tokenIndex + " top size=" + stack.getTop().size());
         if (token.getCode() == IAbstractInputItem.EOF.getCode()) {
+//        	System.out.println("Processing EOF");
             return processEndOfStringToken(Terminal.EOF, tokenIndex, stack);
         } else {
+//        	System.out.println("Processing normal");
         	Terminal terminal = new Terminal("For: " + token.toString() + "[" + token.getCode() + "]", tokenIndex);
             boolean reduceActionResult = makeReduceActions(terminal, stack);
             if (!reduceActionResult) {
@@ -113,10 +116,10 @@ public class BooleanLRParser extends AbstractInterpreter implements ILRParser<Gr
 
     private GraphStack processEndOfStringToken(IAbstractSymbol token, int tokenIndex, GraphStack stack) {
         boolean reduceActionResult = makeReduceActions(token, stack);
-        if (!reduceActionResult) {
-            return null;
+        if (!reduceActionResult || !stack.topAccepts()) {
+            return createErrorStack(null, IAbstractInputItem.EOF);
         }
-
+        
         return stack;
     }
 

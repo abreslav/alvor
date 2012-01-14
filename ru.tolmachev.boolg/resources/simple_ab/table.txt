@@ -1,0 +1,25 @@
+terminals
+_epsilon
+_a
+_b
+terminals_end
+non_terminals
+S
+non_terminals_end
+grammar_rules
+S -> _a _b
+grammar_rules_end
+LR_table
+state: 0
+shift _a 1
+goto S 3
+state_end
+state: 1
+shift _b 2
+state_end
+state: 2
+reduction _epsilon S -> _a _b
+state_end
+state: 3
+state_end
+LR_table_end

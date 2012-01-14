@@ -59,10 +59,10 @@ public final class BoundedStack implements IParserStack {
 		return getErrorOnTop() != null;
 	}
 	
-	@Override
-	public boolean topAccepts() {
-		return top() == IParserState.ACCEPT;
-	}
+//	@Override
+//	public boolean topAccepts() {
+//		return top() == IParserState.ACCEPT;
+//	}
 	
 	@Override
 	public IParserStack pop(int count) {
