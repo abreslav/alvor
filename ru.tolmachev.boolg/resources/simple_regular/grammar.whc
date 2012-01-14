@@ -1,0 +1,5 @@
+algorithm=LR;
+
+terminal _a;
+
+S -> _a S | e;

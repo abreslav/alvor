@@ -1,0 +1,318 @@
+terminals
+_epsilon
+_a
+_b
+_c
+terminals_end
+non_terminals
+S
+C
+D
+A
+B
+E
+non_terminals_end
+grammar_rules
+S -> C & D
+C -> _a C _a
+C -> _a C _b
+C -> _b C _a
+C -> _b C _b
+C -> _c
+D -> _a A & _a D
+D -> _b B & _b D
+D -> _c E
+A -> _a A _a
+A -> _a A _b
+A -> _b A _a
+A -> _b A _b
+A -> _c E _a
+B -> _a B _a
+B -> _a B _b
+B -> _b B _a
+B -> _b B _b
+B -> _c E _b
+E -> _a E
+E -> _b E
+E -> _epsilon
+grammar_rules_end
+LR_table
+state: 0
+shift _a 1
+shift _b 2
+shift _c 3
+goto S 47
+goto C 4
+goto D 5
+state_end
+state: 1
+shift _a 6
+shift _b 7
+shift _c 8
+goto C 9
+goto D 10
+goto A 11
+state_end
+state: 2
+shift _a 12
+shift _b 13
+shift _c 14
+goto C 15
+goto D 16
+goto B 17
+state_end
+state: 3
+shift _a 18
+shift _b 19
+goto E 20
+reduction _epsilon C -> _c
+reduction _epsilon E -> _epsilon
+reduction _a C -> _c
+reduction _a E -> _epsilon
+reduction _b C -> _c
+reduction _b E -> _epsilon
+state_end
+state: 4
+reduction _epsilon S -> C
+state_end
+state: 5
+reduction _epsilon S -> D
+state_end
+state: 6
+shift _a 6
+shift _b 7
+shift _c 8
+goto C 9
+goto D 10
+goto A 21
+state_end
+state: 7
+shift _a 22
+shift _b 23
+shift _c 24
+goto C 15
+goto D 16
+goto A 25
+goto B 17
+state_end
+state: 8
+shift _a 18
+shift _b 19
+goto E 26
+reduction _epsilon C -> _c
+reduction _epsilon E -> _epsilon
+reduction _a C -> _c
+reduction _a E -> _epsilon
+reduction _b C -> _c
+reduction _b E -> _epsilon
+state_end
+state: 9
+shift _a 27
+shift _b 28
+state_end
+state: 10
+reduction _epsilon D -> _a D
+state_end
+state: 11
+reduction _epsilon D -> _a A
+state_end
+state: 12
+shift _a 22
+shift _b 23
+shift _c 24
+goto C 9
+goto D 10
+goto A 11
+goto B 29
+state_end
+state: 13
+shift _a 12
+shift _b 13
+shift _c 14
+goto C 15
+goto D 16
+goto B 30
+state_end
+state: 14
+shift _a 18
+shift _b 19
+goto E 31
+reduction _epsilon C -> _c
+reduction _epsilon E -> _epsilon
+reduction _a C -> _c
+reduction _a E -> _epsilon
+reduction _b C -> _c
+reduction _b E -> _epsilon
+state_end
+state: 15
+shift _a 32
+shift _b 33
+state_end
+state: 16
+reduction _epsilon D -> _b D
+state_end
+state: 17
+reduction _epsilon D -> _b B
+state_end
+state: 18
+shift _a 18
+shift _b 19
+goto E 34
+reduction _epsilon E -> _epsilon
+reduction _a E -> _epsilon
+reduction _b E -> _epsilon
+state_end
+state: 19
+shift _a 18
+shift _b 19
+goto E 35
+reduction _epsilon E -> _epsilon
+reduction _a E -> _epsilon
+reduction _b E -> _epsilon
+state_end
+state: 20
+reduction _epsilon D -> _c E
+state_end
+state: 21
+shift _a 36
+shift _b 37
+reduction _epsilon D -> _a A
+state_end
+state: 22
+shift _a 22
+shift _b 23
+shift _c 24
+goto C 9
+goto D 10
+goto A 21
+goto B 29
+state_end
+state: 23
+shift _a 22
+shift _b 23
+shift _c 24
+goto C 15
+goto D 16
+goto A 25
+goto B 30
+state_end
+state: 24
+shift _a 18
+shift _b 19
+goto E 38
+reduction _epsilon C -> _c
+reduction _epsilon E -> _epsilon
+reduction _a C -> _c
+reduction _a E -> _epsilon
+reduction _b C -> _c
+reduction _b E -> _epsilon
+state_end
+state: 25
+shift _a 39
+shift _b 40
+state_end
+state: 26
+shift _a 41
+reduction _epsilon D -> _c E
+state_end
+state: 27
+reduction _epsilon C -> _a C _a
+reduction _a C -> _a C _a
+reduction _b C -> _a C _a
+state_end
+state: 28
+reduction _epsilon C -> _a C _b
+reduction _a C -> _a C _b
+reduction _b C -> _a C _b
+state_end
+state: 29
+shift _a 42
+shift _b 43
+state_end
+state: 30
+shift _a 44
+shift _b 45
+reduction _epsilon D -> _b B
+state_end
+state: 31
+shift _b 46
+reduction _epsilon D -> _c E
+state_end
+state: 32
+reduction _epsilon C -> _b C _a
+reduction _a C -> _b C _a
+reduction _b C -> _b C _a
+state_end
+state: 33
+reduction _epsilon C -> _b C _b
+reduction _a C -> _b C _b
+reduction _b C -> _b C _b
+state_end
+state: 34
+reduction _epsilon E -> _a E
+reduction _a E -> _a E
+reduction _b E -> _a E
+state_end
+state: 35
+reduction _epsilon E -> _b E
+reduction _a E -> _b E
+reduction _b E -> _b E
+state_end
+state: 36
+reduction _epsilon A -> _a A _a
+reduction _a A -> _a A _a
+reduction _b A -> _a A _a
+state_end
+state: 37
+reduction _epsilon A -> _a A _b
+reduction _a A -> _a A _b
+reduction _b A -> _a A _b
+state_end
+state: 38
+shift _a 41
+shift _b 46
+reduction _epsilon D -> _c E
+state_end
+state: 39
+reduction _epsilon A -> _b A _a
+reduction _a A -> _b A _a
+reduction _b A -> _b A _a
+state_end
+state: 40
+reduction _epsilon A -> _b A _b
+reduction _a A -> _b A _b
+reduction _b A -> _b A _b
+state_end
+state: 41
+reduction _epsilon A -> _c E _a
+reduction _a A -> _c E _a
+reduction _b A -> _c E _a
+state_end
+state: 42
+reduction _epsilon B -> _a B _a
+reduction _a B -> _a B _a
+reduction _b B -> _a B _a
+state_end
+state: 43
+reduction _epsilon B -> _a B _b
+reduction _a B -> _a B _b
+reduction _b B -> _a B _b
+state_end
+state: 44
+reduction _epsilon B -> _b B _a
+reduction _a B -> _b B _a
+reduction _b B -> _b B _a
+state_end
+state: 45
+reduction _epsilon B -> _b B _b
+reduction _a B -> _b B _b
+reduction _b B -> _b B _b
+state_end
+state: 46
+reduction _epsilon B -> _c E _b
+reduction _a B -> _c E _b
+reduction _b B -> _c E _b
+state_end
+state: 47
+state_end
+LR_table_end

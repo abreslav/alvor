@@ -1,0 +1,10 @@
+algorithm=LR;
+
+terminal _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _plus, _minus, _star, _slash, _leftpar, _rightpar;
+
+Exp -> Exp _plus Term | Exp _minus Term | Term;
+Term -> Term _star Factor | Term _slash Factor | Factor;
+Factor -> Number | _leftpar Exp _rightpar | _minus Factor;
+Number -> Number Digit | Digit;
+Digit -> _0 | _1 | _2 | _3 | _4 | _5 | _6 | _7 | _8 | _9;
+                   

@@ -1,0 +1,65 @@
+terminals
+_epsilon
+_0
+_1
+_star
+_plus
+terminals_end
+non_terminals
+E
+B
+non_terminals_end
+grammar_rules
+E -> E _star B
+E -> E _plus B
+E -> B
+B -> _0
+B -> _1
+grammar_rules_end
+LR_table
+state: 0
+shift _0 1
+shift _1 2
+goto E 3
+goto B 4
+state_end
+state: 1
+reduction _epsilon B -> _0
+reduction _star B -> _0
+reduction _plus B -> _0
+state_end
+state: 2
+reduction _epsilon B -> _1
+reduction _star B -> _1
+reduction _plus B -> _1
+state_end
+state: 3
+shift _star 5
+shift _plus 6
+state_end
+state: 4
+reduction _epsilon E -> B
+reduction _star E -> B
+reduction _plus E -> B
+state_end
+state: 5
+shift _0 1
+shift _1 2
+goto B 7
+state_end
+state: 6
+shift _0 1
+shift _1 2
+goto B 8
+state_end
+state: 7
+reduction _epsilon E -> E _star B
+reduction _star E -> E _star B
+reduction _plus E -> E _star B
+state_end
+state: 8
+reduction _epsilon E -> E _plus B
+reduction _star E -> E _plus B
+reduction _plus E -> E _plus B
+state_end
+LR_table_end
