@@ -2,8 +2,6 @@ package ru.tolmachev.parsing.conjunctive.stack;
 
 import ru.tolmachev.core.IAbstractSymbol;
 
-import com.googlecode.alvor.lexer.alphabet.IAbstractInputItem;
-
 
 /**
  * Created by IntelliJ IDEA.

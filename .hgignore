@@ -3,7 +3,7 @@ syntax: glob
 *.class
 bin
 .metadata
-
+ru.tolmachev.boolg/generated/*
 
 syntax: regexp
 ^com\.googlecode\.alvor\.updatesite/features$

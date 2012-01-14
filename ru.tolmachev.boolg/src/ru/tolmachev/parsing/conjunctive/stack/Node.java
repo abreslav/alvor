@@ -11,7 +11,6 @@ import java.util.Set;
 import ru.tolmachev.core.IAbstractSymbol;
 import ru.tolmachev.core.State;
 
-import com.googlecode.alvor.lexer.alphabet.IAbstractInputItem;
 import com.googlecode.alvor.sqlparser.IAction;
 import com.googlecode.alvor.sqlparser.IParserState;
 

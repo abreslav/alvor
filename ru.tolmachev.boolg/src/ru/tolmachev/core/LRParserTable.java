@@ -12,8 +12,6 @@ import ru.tolmachev.core.action.GotoAction;
 import ru.tolmachev.core.grammar_elems.Nonterminal;
 import ru.tolmachev.table.builder.exceptions.UndefinedTerminalException;
 
-import com.googlecode.alvor.lexer.alphabet.IAbstractInputItem;
-
 /**
  * Created by IntelliJ IDEA.
  * User: Дмитрий

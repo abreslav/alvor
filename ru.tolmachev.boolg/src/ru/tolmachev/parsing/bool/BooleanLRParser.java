@@ -1,7 +1,5 @@
 package ru.tolmachev.parsing.bool;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,10 +23,8 @@ import ru.tolmachev.parsing.AbstractInterpreter;
 import ru.tolmachev.parsing.conjunctive.stack.Arc;
 import ru.tolmachev.parsing.conjunctive.stack.GraphStack;
 import ru.tolmachev.parsing.conjunctive.stack.Node;
-import ru.tolmachev.table.builder.TableBuilder;
 import ru.tolmachev.table.builder.enums.Punctuation;
 import ru.tolmachev.table.builder.exceptions.UndefinedTerminalException;
-import ru.tolmachev.table.builder.exceptions.WrongInputFileStructureException;
 
 import com.googlecode.alvor.lexer.alphabet.IAbstractInputItem;
 import com.googlecode.alvor.sqlparser.ILRParser;

@@ -1,6 +1,5 @@
 package ru.tolmachev.core.grammar_elems;
 
-import com.googlecode.alvor.lexer.alphabet.IAbstractInputItem;
 
 /**
  * Created by IntelliJ IDEA.
