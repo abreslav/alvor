@@ -28,10 +28,10 @@ public class SpecGenerator {
 	private static final String LEX_TOKEN = "%lex-token";
 	private static final String LEX_LITERAL = "%lex-literal";
 	private static final String LEX_WHITESPACE = "%lex-whitespace";
-	private static final Pattern PATTERN_TOKEN_NAME = Pattern.compile(LEX_TOKEN + "\\s*([a-zA-Z_]+)");
-	private static final Pattern PATTERN_TOKEN_VALUE = Pattern.compile(LEX_TOKEN + "\\s*[a-zA-Z_]+\\s*=\\s*(.*?)$");
-	private static final Pattern PATTERN_HELPER_NAME = Pattern.compile(LEX_HELPER + "\\s*([a-zA-Z_]+)");
-	private static final Pattern PATTERN_HELPER_VALUE = Pattern.compile(LEX_HELPER + "\\s*[a-zA-Z_]+\\s*=\\s*(.*?)$");
+	private static final Pattern PATTERN_TOKEN_NAME = Pattern.compile(LEX_TOKEN + "\\s*([a-zA-Z_][a-zA-Z_0-9]+)");
+	private static final Pattern PATTERN_TOKEN_VALUE = Pattern.compile(LEX_TOKEN + "\\s*[a-zA-Z_][a-zA-Z_0-9]+\\s*=\\s*(.*?)$");
+	private static final Pattern PATTERN_HELPER_NAME = Pattern.compile(LEX_HELPER + "\\s*([a-zA-Z_][a-zA-Z_0-9]+)");
+	private static final Pattern PATTERN_HELPER_VALUE = Pattern.compile(LEX_HELPER + "\\s*[a-zA-Z_][a-zA-Z_0-9]+\\s*=\\s*(.*?)$");
 	private static final Pattern PATTERN_WHITESPACE_VALUE = Pattern.compile(LEX_WHITESPACE + "\\s*(.*?)$");
 	private static final Pattern PATTERN_LITERAL = Pattern.compile(LEX_LITERAL + "\\s*\"([^\"]*)\"");
 	private static final Pattern PATTERN_KEYWORD = Pattern.compile(LEX_KEYWORD + "\\s*([a-zA-Z_]+)");
@@ -126,7 +126,7 @@ public class SpecGenerator {
 	private String getFirstGroupMatch(String line, Pattern pattern) {
 		Matcher matcher = pattern.matcher(line);
 		if (!matcher.find()) {
-			throw new FormatException();
+			throw new FormatException(line + " does not match " + pattern.toString());
 		}
 		return matcher.group(1);
 	}
