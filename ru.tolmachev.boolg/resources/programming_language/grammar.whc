@@ -1,0 +1,325 @@
+algorithm=LR;
+
+terminal _space;
+terminal _a, _b, _c, _d, _e, _f, _g, _h, _i, _j,
+    _k, _l, _m, _n, _o, _p, _q, _r, _s, _t,
+    _u, _v, _w, _x, _y, _z;
+terminal _0, _1, _2, _3, _4, _5, _6, _7, _8, _9;
+terminal _leftpar, _rightpar, _leftbrace,
+    _rightbrace, _comma, _semicolon;
+terminal _plus, _minus, _star, _slash, _percent,
+    _and, _or, _excl, _eq, _lt, _gt;
+
+S -> WS Functions &
+    WS all_functions_defined &
+    WS has_main_function &
+    ~WS duplicate_functions;
+
+WS -> WS _space | e;
+anyletter -> _a | _b | _c | _d | _e | _f | _g | _h |
+    _i | _j | _k | _l | _m | _n | _o | _p | _q |
+    _r | _s | _t | _u | _v | _w | _x | _y | _z;
+anydigit -> _0 | _1 | _2 | _3 | _4 | _5 | _6 | _7 |
+    _8 | _9;
+anyletterdigit -> anyletter | anydigit;
+anypunctuator -> _leftpar | _rightpar | _leftbrace |
+    _rightbrace | _comma | _semicolon | _plus |
+    _minus | _star | _slash | _and | _or | _excl |
+    _eq | _lt | _gt | _percent;
+anypunctuatorexceptrightpar -> _leftpar |
+    _leftbrace | _rightbrace | _comma | _semicolon |
+    _plus | _minus | _star | _slash | _and | _or |
+    _excl | _eq | _lt | _gt | _percent;
+anypunctuatorexceptbraces -> _leftpar | _rightpar |
+    _comma | _semicolon | _plus | _minus | _star |
+    _slash | _and | _or | _excl | _eq | _lt | _gt |
+    _percent;
+anychar -> _space | anyletter | anydigit |
+    anypunctuator;
+anystring -> anystring anychar | e;
+anyletterdigits -> anyletterdigits anyletterdigit |
+    e;
+anystringwithoutbraces ->
+    anystringwithoutbraces _space |
+    anystringwithoutbraces anyletter |
+    anystringwithoutbraces anydigit |
+    anystringwithoutbraces
+        anypunctuatorexceptbraces |
+    e;
+
+tVar -> _v _a _r WS;
+tIf -> _i _f WS;
+tElse -> _e _l _s _e WS;
+tWhile -> _w _h _i _l _e WS;
+tReturn -> _r _e _t _u _r _n WS;
+Keyword -> tVar | tIf | tElse | tWhile | tReturn;
+
+tId -> tId_aux WS & ~Keyword;
+tId_aux -> anyletter | tId_aux anyletter |
+    tId_aux anydigit;
+tNum -> tNum_aux WS;
+tNum_aux -> tNum_aux anydigit | anydigit;
+
+ListOfIds -> ListOfIds tComma tId | tId;
+
+tPlus -> _plus WS;
+tMinus -> _minus WS;
+tStar -> _star WS;
+tSlash -> _slash WS;
+tMod -> _percent WS;
+tAnd -> _and WS;
+tOr -> _or WS;
+tLessThan -> _lt WS;
+tGreaterThan -> _gt WS;
+tLessEqual -> _lt _eq WS;
+tGreaterEqual -> _gt _eq WS;
+tEqual -> _eq _eq WS;
+tNotEqual -> _excl _eq WS;
+BinaryOp -> tPlus | tMinus | tStar | tSlash | tMod |
+    tAnd | tOr | tLessThan | tGreaterThan |
+    tLessEqual | tGreaterEqual | tEqual | tNotEqual;
+
+tNot -> _excl WS;
+UnaryOp -> tMinus | tNot;
+
+tLeftPar -> _leftpar WS;
+tRightPar -> _rightpar WS;
+tLeftBrace -> _leftbrace WS;
+tRightBrace -> _rightbrace WS;
+tAssign -> _eq WS;
+tSemicolon -> _semicolon WS;
+tComma -> _comma WS;
+
+Expr -> tId;
+Expr -> tNum;
+Expr -> tLeftPar Expr tRightPar;
+Expr -> ExprFunctionCall;
+Expr -> Expr BinaryOp Expr;
+Expr -> UnaryOp Expr;
+Expr -> tId tAssign Expr;
+
+ExprFunctionCall ->
+    tId tLeftPar ListOfExpr tRightPar;
+ListOfExpr -> ListOfExpr1;
+ListOfExpr -> e;
+ListOfExpr1 -> ListOfExpr1 tComma Expr | Expr;
+
+Statement -> ExprSt | CompoundSt | VarSt | CondSt |
+    IterationSt | ReturnSt;
+ExprSt -> Expr tSemicolon;
+CompoundSt -> tLeftBrace Statements tRightBrace;
+Statements -> Statements Statement | e;
+VarSt -> tVar _space ListOfIds tSemicolon;
+CondSt -> tIf tLeftPar Expr tRightPar Statement |
+    tIf tLeftPar Expr tRightPar Statement
+        tElse Statement;
+IterationSt -> tWhile tLeftPar Expr tRightPar
+        Statement;
+ReturnSt -> tReturn Expr tSemicolon;
+
+Function -> FunctionHeader CompoundSt &
+    tId tLeftPar all_variables_defined &
+    FunctionHeader returns_a_value;
+FunctionHeader -> tId FunctionArguments;
+FunctionArguments -> tLeftPar ListOfIds tRightPar |
+    tLeftPar tRightPar;
+
+Functions -> Functions Function | e;
+
+safeendingstring -> anystring anypunctuator |
+    anystring _space | e;
+
+C -> Clen & Citerate | C WS;
+Clen -> anyletterdigit Clen anyletterdigit |
+    anyletterdigit Cmid anyletterdigit;
+C_a -> anyletterdigit C_a anyletterdigit |
+    _a anyletterdigits Cmid;
+C_b -> anyletterdigit C_b anyletterdigit |
+    _b anyletterdigits Cmid;
+C_c -> anyletterdigit C_c anyletterdigit |
+    _c anyletterdigits Cmid;
+C_d -> anyletterdigit C_d anyletterdigit |
+    _d anyletterdigits Cmid;
+C_e -> anyletterdigit C_e anyletterdigit |
+    _e anyletterdigits Cmid;
+C_f -> anyletterdigit C_f anyletterdigit |
+    _f anyletterdigits Cmid;
+C_g -> anyletterdigit C_g anyletterdigit |
+    _g anyletterdigits Cmid;
+C_h -> anyletterdigit C_h anyletterdigit |
+    _h anyletterdigits Cmid;
+C_i -> anyletterdigit C_i anyletterdigit |
+    _i anyletterdigits Cmid;
+C_j -> anyletterdigit C_j anyletterdigit |
+    _j anyletterdigits Cmid;
+C_k -> anyletterdigit C_k anyletterdigit |
+    _k anyletterdigits Cmid;
+C_l -> anyletterdigit C_l anyletterdigit |
+    _l anyletterdigits Cmid;
+C_m -> anyletterdigit C_m anyletterdigit |
+    _m anyletterdigits Cmid;
+C_n -> anyletterdigit C_n anyletterdigit |
+    _n anyletterdigits Cmid;
+C_o -> anyletterdigit C_o anyletterdigit |
+    _o anyletterdigits Cmid;
+C_p -> anyletterdigit C_p anyletterdigit |
+    _p anyletterdigits Cmid;
+C_q -> anyletterdigit C_q anyletterdigit |
+    _q anyletterdigits Cmid;
+C_r -> anyletterdigit C_r anyletterdigit |
+    _r anyletterdigits Cmid;
+C_s -> anyletterdigit C_s anyletterdigit |
+    _s anyletterdigits Cmid;
+C_t -> anyletterdigit C_t anyletterdigit |
+    _t anyletterdigits Cmid;
+C_u -> anyletterdigit C_u anyletterdigit |
+    _u anyletterdigits Cmid;
+C_v -> anyletterdigit C_v anyletterdigit |
+    _v anyletterdigits Cmid;
+C_w -> anyletterdigit C_w anyletterdigit |
+    _w anyletterdigits Cmid;
+C_x -> anyletterdigit C_x anyletterdigit |
+    _x anyletterdigits Cmid;
+C_y -> anyletterdigit C_y anyletterdigit |
+    _y anyletterdigits Cmid;
+C_z -> anyletterdigit C_z anyletterdigit |
+    _z anyletterdigits Cmid;
+C_0 -> anyletterdigit C_0 anyletterdigit |
+    _0 anyletterdigits Cmid;
+C_1 -> anyletterdigit C_1 anyletterdigit |
+    _1 anyletterdigits Cmid;
+C_2 -> anyletterdigit C_2 anyletterdigit |
+    _2 anyletterdigits Cmid;
+C_3 -> anyletterdigit C_3 anyletterdigit |
+    _3 anyletterdigits Cmid;
+C_4 -> anyletterdigit C_4 anyletterdigit |
+    _4 anyletterdigits Cmid;
+C_5 -> anyletterdigit C_5 anyletterdigit |
+    _5 anyletterdigits Cmid;
+C_6 -> anyletterdigit C_6 anyletterdigit |
+    _6 anyletterdigits Cmid;
+C_7 -> anyletterdigit C_7 anyletterdigit |
+    _7 anyletterdigits Cmid;
+C_8 -> anyletterdigit C_8 anyletterdigit |
+    _8 anyletterdigits Cmid;
+C_9 -> anyletterdigit C_9 anyletterdigit |
+    _9 anyletterdigits Cmid;
+Citerate ->
+    C_a _a & Citerate _a | C_b _b & Citerate _b |
+    C_c _c & Citerate _c | C_d _d & Citerate _d |
+    C_e _e & Citerate _e | C_f _f & Citerate _f |
+    C_g _g & Citerate _g | C_h _h & Citerate _h |
+    C_i _i & Citerate _i | C_j _j & Citerate _j |
+    C_k _k & Citerate _k | C_l _l & Citerate _l |
+    C_m _m & Citerate _m | C_n _n & Citerate _n |
+    C_o _o & Citerate _o | C_p _p & Citerate _p |
+    C_q _q & Citerate _q | C_r _r & Citerate _r |
+    C_s _s & Citerate _s | C_t _t & Citerate _t |
+    C_u _u & Citerate _u | C_v _v & Citerate _v |
+    C_w _w & Citerate _w | C_x _x & Citerate _x |
+    C_y _y & Citerate _y | C_z _z & Citerate _z;
+Citerate ->
+    C_0 _0 & Citerate _0 | C_1 _1 & Citerate _1 |
+    C_2 _2 & Citerate _2 | C_3 _3 & Citerate _3 |
+    C_4 _4 & Citerate _4 | C_5 _5 & Citerate _5 |
+    C_6 _6 & Citerate _6 | C_7 _7 & Citerate _7 |
+    C_8 _8 & Citerate _8 | C_9 _9 & Citerate _9;
+Citerate -> anyletterdigits Cmid;
+Cmid -> anypunctuator anystring anypunctuator |
+    _space anystring anypunctuator |
+    anypunctuator anystring _space |
+    _space anystring _space | anypunctuator |
+    _space;
+    
+duplicate_functions ->
+    Functions duplicate_functions_here Functions;
+duplicate_functions_here ->
+    C FunctionArguments CompoundSt;
+
+all_functions_defined -> all_functions_defined
+        anypunctuatorexceptrightpar |
+    all_functions_defined _space |
+    all_functions_defined_skip Keyword |
+    all_functions_defined_skip tId |
+    all_functions_defined_skip tNum |
+    check_function_call &
+        all_functions_defined tRightPar |
+    e;
+all_functions_defined_skip ->
+    all_functions_defined & safeendingstring;
+
+check_function_call -> Functions FunctionHeader |
+    anystring & ~safeendingstring ExprFunctionCall |
+    Functions check_function_call_here;
+
+check_function_call_here ->
+    check_name & check_number_of_arguments;
+check_name -> C tLeftPar ListOfExpr tRightPar;
+check_number_of_arguments ->
+    tId tLeftPar n_of_arg_match tRightPar;
+n_of_arg_match -> tId n_of_arg_match Expr |
+    tComma n_of_arg_match tComma |
+    tRightPar anystring tLeftPar;
+
+all_variables_defined ->
+    all_variables_defined _space |
+    all_variables_defined anypunctuator &
+        ~safeendingstring VarSt |
+    all_variables_defined_skip tId tLeftPar |
+    all_variables_defined_skip tNum |
+    all_variables_defined_skip Keyword |
+    these_variables_not_defined tSemicolon &
+        all_variables_defined_skip VarSt |
+    this_variable_defined &
+        all_variables_defined_skip tId |
+    these_variables_not_defined tRightPar;
+all_variables_defined_skip ->
+    all_variables_defined & safeendingstring;
+
+this_variable_defined -> C |
+    tId tComma this_variable_defined |
+    tId tRightPar tLeftBrace this_variable_defined2;
+this_variable_defined2 ->
+    Statement this_variable_defined2 |
+    tLeftBrace this_variable_defined2 |
+    tIf tLeftPar Expr tRightPar tLeftBrace
+        this_variable_defined2 |
+    tIf tLeftPar Expr tRightPar Statement
+        tElse tLeftBrace this_variable_defined2 |
+    tWhile tLeftPar Expr tRightPar tLeftBrace
+        this_variable_defined2 |
+    tVar _space this_variable_defined3 |
+    tIf tLeftPar Expr tRightPar
+        tVar _space this_variable_defined4 |
+    tIf tLeftPar Expr tRightPar Statement
+        tElse tVar _space this_variable_defined4 |
+    tWhile tLeftPar Expr tRightPar
+        tVar _space this_variable_defined4;
+this_variable_defined3 ->
+    tId tComma this_variable_defined3 |
+    C & anystringwithoutbraces
+        this_variable_defined3_afterskip;
+this_variable_defined3_afterskip ->
+    Statement this_variable_defined3_afterskip |
+    tLeftBrace this_variable_defined3_afterskip |
+    anystringwithoutbraces;
+this_variable_defined4 ->
+    tId tComma this_variable_defined4 |
+    C & ListOfIds;
+
+these_variables_not_defined ->
+    these_variables_not_defined tComma tId &
+        ~this_variable_defined |
+    safeendingstring tVar _space tId &
+        ~this_variable_defined |
+    tId | e;
+
+has_main_function -> Functions _m _a _i _n
+        tLeftPar tId tRightPar CompoundSt Functions;
+
+returns_a_value ->
+    tLeftBrace Statements
+        returns_a_value tRightBrace |
+    tIf tLeftPar Expr tRightPar returns_a_value
+        tElse returns_a_value |
+    ReturnSt;

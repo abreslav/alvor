@@ -1,0 +1,7 @@
+algorithm=LR;
+
+terminal _0, _1, _star, _plus;
+
+E -> E _star B | E _plus B | B;
+B -> _0 | _1;
+ 

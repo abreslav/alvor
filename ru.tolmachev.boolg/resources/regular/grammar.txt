@@ -1,0 +1,93 @@
+terminals
+_epsilon
+_0
+_1
+terminals_end
+non_terminals
+A
+B
+C
+non_terminals_end
+grammar_rules
+A -> _1 A
+A -> _0 B
+B -> _1 A
+B -> _0 C
+C -> _0 C
+C -> _1 C
+C -> e
+grammar_rules_end
+LR_table
+state: 0
+shift _0 1
+shift _1 2
+goto A 13
+acessing symbol 0
+state_end
+state: 1
+shift _0 3
+shift _1 4
+goto B 5
+acessing symbol 1
+state_end
+state: 2
+shift _0 1
+shift _1 2
+goto A 6
+acessing symbol 2
+state_end
+state: 3
+shift _0 7
+shift _1 8
+goto C 9
+reduction _epsilon C -> e
+acessing symbol 1
+state_end
+state: 4
+shift _0 1
+shift _1 2
+goto A 10
+acessing symbol 2
+state_end
+state: 5
+reduction _epsilon A -> _0 B
+acessing symbol -2
+state_end
+state: 6
+reduction _epsilon A -> _1 A
+acessing symbol -1
+state_end
+state: 7
+shift _0 7
+shift _1 8
+goto C 11
+reduction _epsilon C -> e
+acessing symbol 1
+state_end
+state: 8
+shift _0 7
+shift _1 8
+goto C 12
+reduction _epsilon C -> e
+acessing symbol 2
+state_end
+state: 9
+reduction _epsilon B -> _0 C
+acessing symbol -3
+state_end
+state: 10
+reduction _epsilon B -> _1 A
+acessing symbol -1
+state_end
+state: 11
+reduction _epsilon C -> _0 C
+acessing symbol -3
+state_end
+state: 12
+reduction _epsilon C -> _1 C
+acessing symbol -3
+state_end
+state: 13
+acessing symbol -1
+state_end
+LR_table_end

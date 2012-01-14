@@ -1,0 +1,11 @@
+
+algorithm=LR;
+
+terminal _a, _b, _c;
+
+S -> C & D;
+C -> _a C _a | _a C _b | _b C _a | _b C _b | _c;
+D -> _a A & _a D | _b B & _b D | _c E;
+A -> _a A _a | _a A _b | _b A _a | _b A _b | _c E _a;
+B -> _a B _a | _a B _b | _b B _a | _b B _b | _c E _b;
+E -> _a E | _b E | e;

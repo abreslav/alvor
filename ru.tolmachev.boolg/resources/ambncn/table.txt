@@ -1,0 +1,99 @@
+terminals
+_epsilon
+_a
+_b
+_c
+terminals_end
+non_terminals
+S
+A
+B
+C
+D
+non_terminals_end
+grammar_rules
+S -> A B & ~D C
+A -> _a A
+A -> _epsilon
+B -> _b B _c
+B -> _epsilon
+C -> _c C
+C -> _epsilon
+D -> _a D _b
+D -> _epsilon
+grammar_rules_end
+LR_table
+state: 0
+shift _a 1
+goto S 14
+goto A 2
+goto D 3
+reduction _epsilon A -> _epsilon
+reduction _epsilon D -> _epsilon
+reduction _b A -> _epsilon
+reduction _b D -> _epsilon
+reduction _c D -> _epsilon
+state_end
+state: 1
+shift _a 1
+goto A 4
+goto D 5
+reduction _epsilon A -> _epsilon
+reduction _epsilon D -> _epsilon
+reduction _b A -> _epsilon
+reduction _b D -> _epsilon
+reduction _c D -> _epsilon
+state_end
+state: 2
+shift _b 6
+goto B 7
+reduction _epsilon B -> _epsilon
+reduction _c B -> _epsilon
+state_end
+state: 3
+shift _c 8
+goto C 9
+reduction _epsilon C -> _epsilon
+state_end
+state: 4
+reduction _epsilon A -> _a A
+reduction _b A -> _a A
+state_end
+state: 5
+shift _b 10
+state_end
+state: 6
+shift _b 6
+goto B 11
+reduction _epsilon B -> _epsilon
+reduction _c B -> _epsilon
+state_end
+state: 7
+reduction _epsilon S -> A B
+state_end
+state: 8
+shift _c 8
+goto C 12
+reduction _epsilon C -> _epsilon
+state_end
+state: 9
+reduction _epsilon S -> D C
+state_end
+state: 10
+reduction _epsilon D -> _a D _b
+reduction _b D -> _a D _b
+reduction _c D -> _a D _b
+state_end
+state: 11
+shift _c 13
+state_end
+state: 12
+reduction _epsilon C -> _c C
+state_end
+state: 13
+reduction _epsilon B -> _b B _c
+reduction _c B -> _b B _c
+state_end
+state: 14
+state_end
+LR_table_end

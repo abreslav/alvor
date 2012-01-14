@@ -1,0 +1,484 @@
+terminals
+_epsilon
+_0
+_1
+_2
+_3
+_4
+_5
+_6
+_7
+_8
+_9
+_plus
+_minus
+_star
+_slash
+_leftpar
+_rightpar
+terminals_end
+non_terminals
+Exp
+Term
+Factor
+Number
+Digit
+non_terminals_end
+grammar_rules
+Exp -> Exp _plus Term
+Exp -> Exp _minus Term
+Exp -> Term
+Term -> Term _star Factor
+Term -> Term _slash Factor
+Term -> Factor
+Factor -> Number
+Factor -> _leftpar Exp _rightpar
+Factor -> _minus Factor
+Number -> Number Digit
+Number -> Digit
+Digit -> _0
+Digit -> _1
+Digit -> _2
+Digit -> _3
+Digit -> _4
+Digit -> _5
+Digit -> _6
+Digit -> _7
+Digit -> _8
+Digit -> _9
+grammar_rules_end
+LR_table
+state: 0
+shift _0 1
+shift _1 2
+shift _2 3
+shift _3 4
+shift _4 5
+shift _5 6
+shift _6 7
+shift _7 8
+shift _8 9
+shift _9 10
+shift _minus 11
+shift _leftpar 12
+goto Exp 13
+goto Term 14
+goto Factor 15
+goto Number 16
+goto Digit 17
+state_end
+state: 1
+reduction _epsilon Digit -> _0
+reduction _0 Digit -> _0
+reduction _1 Digit -> _0
+reduction _2 Digit -> _0
+reduction _3 Digit -> _0
+reduction _4 Digit -> _0
+reduction _5 Digit -> _0
+reduction _6 Digit -> _0
+reduction _7 Digit -> _0
+reduction _8 Digit -> _0
+reduction _9 Digit -> _0
+reduction _plus Digit -> _0
+reduction _minus Digit -> _0
+reduction _star Digit -> _0
+reduction _slash Digit -> _0
+reduction _rightpar Digit -> _0
+state_end
+state: 2
+reduction _epsilon Digit -> _1
+reduction _0 Digit -> _1
+reduction _1 Digit -> _1
+reduction _2 Digit -> _1
+reduction _3 Digit -> _1
+reduction _4 Digit -> _1
+reduction _5 Digit -> _1
+reduction _6 Digit -> _1
+reduction _7 Digit -> _1
+reduction _8 Digit -> _1
+reduction _9 Digit -> _1
+reduction _plus Digit -> _1
+reduction _minus Digit -> _1
+reduction _star Digit -> _1
+reduction _slash Digit -> _1
+reduction _rightpar Digit -> _1
+state_end
+state: 3
+reduction _epsilon Digit -> _2
+reduction _0 Digit -> _2
+reduction _1 Digit -> _2
+reduction _2 Digit -> _2
+reduction _3 Digit -> _2
+reduction _4 Digit -> _2
+reduction _5 Digit -> _2
+reduction _6 Digit -> _2
+reduction _7 Digit -> _2
+reduction _8 Digit -> _2
+reduction _9 Digit -> _2
+reduction _plus Digit -> _2
+reduction _minus Digit -> _2
+reduction _star Digit -> _2
+reduction _slash Digit -> _2
+reduction _rightpar Digit -> _2
+state_end
+state: 4
+reduction _epsilon Digit -> _3
+reduction _0 Digit -> _3
+reduction _1 Digit -> _3
+reduction _2 Digit -> _3
+reduction _3 Digit -> _3
+reduction _4 Digit -> _3
+reduction _5 Digit -> _3
+reduction _6 Digit -> _3
+reduction _7 Digit -> _3
+reduction _8 Digit -> _3
+reduction _9 Digit -> _3
+reduction _plus Digit -> _3
+reduction _minus Digit -> _3
+reduction _star Digit -> _3
+reduction _slash Digit -> _3
+reduction _rightpar Digit -> _3
+state_end
+state: 5
+reduction _epsilon Digit -> _4
+reduction _0 Digit -> _4
+reduction _1 Digit -> _4
+reduction _2 Digit -> _4
+reduction _3 Digit -> _4
+reduction _4 Digit -> _4
+reduction _5 Digit -> _4
+reduction _6 Digit -> _4
+reduction _7 Digit -> _4
+reduction _8 Digit -> _4
+reduction _9 Digit -> _4
+reduction _plus Digit -> _4
+reduction _minus Digit -> _4
+reduction _star Digit -> _4
+reduction _slash Digit -> _4
+reduction _rightpar Digit -> _4
+state_end
+state: 6
+reduction _epsilon Digit -> _5
+reduction _0 Digit -> _5
+reduction _1 Digit -> _5
+reduction _2 Digit -> _5
+reduction _3 Digit -> _5
+reduction _4 Digit -> _5
+reduction _5 Digit -> _5
+reduction _6 Digit -> _5
+reduction _7 Digit -> _5
+reduction _8 Digit -> _5
+reduction _9 Digit -> _5
+reduction _plus Digit -> _5
+reduction _minus Digit -> _5
+reduction _star Digit -> _5
+reduction _slash Digit -> _5
+reduction _rightpar Digit -> _5
+state_end
+state: 7
+reduction _epsilon Digit -> _6
+reduction _0 Digit -> _6
+reduction _1 Digit -> _6
+reduction _2 Digit -> _6
+reduction _3 Digit -> _6
+reduction _4 Digit -> _6
+reduction _5 Digit -> _6
+reduction _6 Digit -> _6
+reduction _7 Digit -> _6
+reduction _8 Digit -> _6
+reduction _9 Digit -> _6
+reduction _plus Digit -> _6
+reduction _minus Digit -> _6
+reduction _star Digit -> _6
+reduction _slash Digit -> _6
+reduction _rightpar Digit -> _6
+state_end
+state: 8
+reduction _epsilon Digit -> _7
+reduction _0 Digit -> _7
+reduction _1 Digit -> _7
+reduction _2 Digit -> _7
+reduction _3 Digit -> _7
+reduction _4 Digit -> _7
+reduction _5 Digit -> _7
+reduction _6 Digit -> _7
+reduction _7 Digit -> _7
+reduction _8 Digit -> _7
+reduction _9 Digit -> _7
+reduction _plus Digit -> _7
+reduction _minus Digit -> _7
+reduction _star Digit -> _7
+reduction _slash Digit -> _7
+reduction _rightpar Digit -> _7
+state_end
+state: 9
+reduction _epsilon Digit -> _8
+reduction _0 Digit -> _8
+reduction _1 Digit -> _8
+reduction _2 Digit -> _8
+reduction _3 Digit -> _8
+reduction _4 Digit -> _8
+reduction _5 Digit -> _8
+reduction _6 Digit -> _8
+reduction _7 Digit -> _8
+reduction _8 Digit -> _8
+reduction _9 Digit -> _8
+reduction _plus Digit -> _8
+reduction _minus Digit -> _8
+reduction _star Digit -> _8
+reduction _slash Digit -> _8
+reduction _rightpar Digit -> _8
+state_end
+state: 10
+reduction _epsilon Digit -> _9
+reduction _0 Digit -> _9
+reduction _1 Digit -> _9
+reduction _2 Digit -> _9
+reduction _3 Digit -> _9
+reduction _4 Digit -> _9
+reduction _5 Digit -> _9
+reduction _6 Digit -> _9
+reduction _7 Digit -> _9
+reduction _8 Digit -> _9
+reduction _9 Digit -> _9
+reduction _plus Digit -> _9
+reduction _minus Digit -> _9
+reduction _star Digit -> _9
+reduction _slash Digit -> _9
+reduction _rightpar Digit -> _9
+state_end
+state: 11
+shift _0 1
+shift _1 2
+shift _2 3
+shift _3 4
+shift _4 5
+shift _5 6
+shift _6 7
+shift _7 8
+shift _8 9
+shift _9 10
+shift _minus 11
+shift _leftpar 12
+goto Factor 18
+goto Number 16
+goto Digit 17
+state_end
+state: 12
+shift _0 1
+shift _1 2
+shift _2 3
+shift _3 4
+shift _4 5
+shift _5 6
+shift _6 7
+shift _7 8
+shift _8 9
+shift _9 10
+shift _minus 11
+shift _leftpar 12
+goto Exp 19
+goto Term 14
+goto Factor 15
+goto Number 16
+goto Digit 17
+state_end
+state: 13
+shift _plus 20
+shift _minus 21
+state_end
+state: 14
+shift _star 22
+shift _slash 23
+reduction _epsilon Exp -> Term
+reduction _plus Exp -> Term
+reduction _minus Exp -> Term
+reduction _rightpar Exp -> Term
+state_end
+state: 15
+reduction _epsilon Term -> Factor
+reduction _plus Term -> Factor
+reduction _minus Term -> Factor
+reduction _star Term -> Factor
+reduction _slash Term -> Factor
+reduction _rightpar Term -> Factor
+state_end
+state: 16
+shift _0 1
+shift _1 2
+shift _2 3
+shift _3 4
+shift _4 5
+shift _5 6
+shift _6 7
+shift _7 8
+shift _8 9
+shift _9 10
+goto Digit 24
+reduction _epsilon Factor -> Number
+reduction _plus Factor -> Number
+reduction _minus Factor -> Number
+reduction _star Factor -> Number
+reduction _slash Factor -> Number
+reduction _rightpar Factor -> Number
+state_end
+state: 17
+reduction _epsilon Number -> Digit
+reduction _0 Number -> Digit
+reduction _1 Number -> Digit
+reduction _2 Number -> Digit
+reduction _3 Number -> Digit
+reduction _4 Number -> Digit
+reduction _5 Number -> Digit
+reduction _6 Number -> Digit
+reduction _7 Number -> Digit
+reduction _8 Number -> Digit
+reduction _9 Number -> Digit
+reduction _plus Number -> Digit
+reduction _minus Number -> Digit
+reduction _star Number -> Digit
+reduction _slash Number -> Digit
+reduction _rightpar Number -> Digit
+state_end
+state: 18
+reduction _epsilon Factor -> _minus Factor
+reduction _plus Factor -> _minus Factor
+reduction _minus Factor -> _minus Factor
+reduction _star Factor -> _minus Factor
+reduction _slash Factor -> _minus Factor
+reduction _rightpar Factor -> _minus Factor
+state_end
+state: 19
+shift _plus 20
+shift _minus 21
+shift _rightpar 25
+state_end
+state: 20
+shift _0 1
+shift _1 2
+shift _2 3
+shift _3 4
+shift _4 5
+shift _5 6
+shift _6 7
+shift _7 8
+shift _8 9
+shift _9 10
+shift _minus 11
+shift _leftpar 12
+goto Term 26
+goto Factor 15
+goto Number 16
+goto Digit 17
+state_end
+state: 21
+shift _0 1
+shift _1 2
+shift _2 3
+shift _3 4
+shift _4 5
+shift _5 6
+shift _6 7
+shift _7 8
+shift _8 9
+shift _9 10
+shift _minus 11
+shift _leftpar 12
+goto Term 27
+goto Factor 15
+goto Number 16
+goto Digit 17
+state_end
+state: 22
+shift _0 1
+shift _1 2
+shift _2 3
+shift _3 4
+shift _4 5
+shift _5 6
+shift _6 7
+shift _7 8
+shift _8 9
+shift _9 10
+shift _minus 11
+shift _leftpar 12
+goto Factor 28
+goto Number 16
+goto Digit 17
+state_end
+state: 23
+shift _0 1
+shift _1 2
+shift _2 3
+shift _3 4
+shift _4 5
+shift _5 6
+shift _6 7
+shift _7 8
+shift _8 9
+shift _9 10
+shift _minus 11
+shift _leftpar 12
+goto Factor 29
+goto Number 16
+goto Digit 17
+state_end
+state: 24
+reduction _epsilon Number -> Number Digit
+reduction _0 Number -> Number Digit
+reduction _1 Number -> Number Digit
+reduction _2 Number -> Number Digit
+reduction _3 Number -> Number Digit
+reduction _4 Number -> Number Digit
+reduction _5 Number -> Number Digit
+reduction _6 Number -> Number Digit
+reduction _7 Number -> Number Digit
+reduction _8 Number -> Number Digit
+reduction _9 Number -> Number Digit
+reduction _plus Number -> Number Digit
+reduction _minus Number -> Number Digit
+reduction _star Number -> Number Digit
+reduction _slash Number -> Number Digit
+reduction _rightpar Number -> Number Digit
+state_end
+state: 25
+reduction _epsilon Factor -> _leftpar Exp _rightpar
+reduction _plus Factor -> _leftpar Exp _rightpar
+reduction _minus Factor -> _leftpar Exp _rightpar
+reduction _star Factor -> _leftpar Exp _rightpar
+reduction _slash Factor -> _leftpar Exp _rightpar
+reduction _rightpar Factor -> _leftpar Exp _rightpar
+state_end
+state: 26
+shift _star 22
+shift _slash 23
+reduction _epsilon Exp -> Exp _plus Term
+reduction _plus Exp -> Exp _plus Term
+reduction _minus Exp -> Exp _plus Term
+reduction _rightpar Exp -> Exp _plus Term
+state_end
+state: 27
+shift _star 22
+shift _slash 23
+reduction _epsilon Exp -> Exp _minus Term
+reduction _plus Exp -> Exp _minus Term
+reduction _minus Exp -> Exp _minus Term
+reduction _rightpar Exp -> Exp _minus Term
+state_end
+state: 28
+reduction _epsilon Term -> Term _star Factor
+reduction _plus Term -> Term _star Factor
+reduction _minus Term -> Term _star Factor
+reduction _star Term -> Term _star Factor
+reduction _slash Term -> Term _star Factor
+reduction _rightpar Term -> Term _star Factor
+state_end
+state: 29
+reduction _epsilon Term -> Term _slash Factor
+reduction _plus Term -> Term _slash Factor
+reduction _minus Term -> Term _slash Factor
+reduction _star Term -> Term _slash Factor
+reduction _slash Term -> Term _slash Factor
+reduction _rightpar Term -> Term _slash Factor
+state_end
+LR_table_end

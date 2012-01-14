@@ -1,0 +1,9 @@
+
+algorithm=LR;
+
+terminal _a, _b;
+
+S -> A B & O | _a | _b;
+A -> _a S _a | e;
+B -> _b S _b | e;
+O -> O O O | _a | _b;

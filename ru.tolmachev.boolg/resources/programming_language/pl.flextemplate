@@ -1,0 +1,19 @@
+@SuppressWarnings("unused")
+
+%%
+
+%class PLLexer
+%public
+%unicode
+%ignorecase
+%table
+
+/*%debug*/
+
+%%%helpers%%%
+
+%% 
+
+<YYINITIAL> {
+%%%tokens%%%  
+}

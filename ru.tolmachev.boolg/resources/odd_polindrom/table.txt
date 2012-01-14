@@ -1,0 +1,130 @@
+terminals
+_epsilon
+_a
+_b
+terminals_end
+non_terminals
+S
+A
+B
+O
+non_terminals_end
+grammar_rules
+S -> A B & O
+S -> _a
+S -> _b
+A -> _a S _a
+A -> _epsilon
+B -> _b S _b
+B -> _epsilon
+O -> O O O
+O -> _a
+O -> _b
+grammar_rules_end
+LR_table
+state: 0
+shift _a 1
+shift _b 2
+goto S 15
+goto A 3
+goto O 4
+reduction _epsilon A -> _epsilon
+reduction _a A -> _epsilon
+reduction _b A -> _epsilon
+state_end
+state: 1
+shift _a 1
+shift _b 2
+goto S 5
+goto A 3
+goto O 4
+reduction _epsilon S -> _a
+reduction _epsilon A -> _epsilon
+reduction _epsilon O -> _a
+reduction _a S -> _a
+reduction _a A -> _epsilon
+reduction _a O -> _a
+reduction _b S -> _a
+reduction _b A -> _epsilon
+reduction _b O -> _a
+state_end
+state: 2
+reduction _epsilon S -> _b
+reduction _epsilon O -> _b
+reduction _a S -> _b
+reduction _a O -> _b
+reduction _b S -> _b
+reduction _b O -> _b
+state_end
+state: 3
+shift _b 6
+goto B 7
+reduction _epsilon B -> _epsilon
+reduction _a B -> _epsilon
+reduction _b B -> _epsilon
+state_end
+state: 4
+shift _a 8
+shift _b 9
+goto O 10
+reduction _epsilon S -> O
+reduction _a S -> O
+reduction _b S -> O
+state_end
+state: 5
+shift _a 11
+state_end
+state: 6
+shift _a 1
+shift _b 2
+goto S 12
+goto A 3
+goto O 4
+reduction _epsilon A -> _epsilon
+reduction _a A -> _epsilon
+reduction _b A -> _epsilon
+state_end
+state: 7
+reduction _epsilon S -> A B
+reduction _a S -> A B
+reduction _b S -> A B
+state_end
+state: 8
+reduction _epsilon O -> _a
+reduction _a O -> _a
+reduction _b O -> _a
+state_end
+state: 9
+reduction _epsilon O -> _b
+reduction _a O -> _b
+reduction _b O -> _b
+state_end
+state: 10
+shift _a 8
+shift _b 9
+goto O 13
+state_end
+state: 11
+reduction _epsilon A -> _a S _a
+reduction _a A -> _a S _a
+reduction _b A -> _a S _a
+state_end
+state: 12
+shift _b 14
+state_end
+state: 13
+shift _a 8
+shift _b 9
+goto O 13
+reduction _epsilon O -> O O O
+reduction _a O -> O O O
+reduction _b O -> O O O
+state_end
+state: 14
+reduction _epsilon B -> _b S _b
+reduction _a B -> _b S _b
+reduction _b B -> _b S _b
+state_end
+state: 15
+state_end
+LR_table_end
