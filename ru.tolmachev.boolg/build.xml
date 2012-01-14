@@ -4,7 +4,7 @@
 	<property name="parserProject" value="../com.googlecode.alvor.sqlparser"></property>
 	<property name="wcdir" value="/Users/abreslav/Desktop/eclipse 2/workspace/whalecalf-1.9.0/myexample"></property>
 	
-	<property name="data" value="simplest"></property>
+	<property name="data" value="simple_ab"></property>
 	<!--<property name="data" value="programming_language"></property>-->
 	
 	<taskdef classname="JFlex.anttask.JFlexTask" name="jflex" classpath="${lexerProject}/lib/JFlex.jar"/>

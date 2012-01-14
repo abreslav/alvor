@@ -26,7 +26,6 @@ public class BGTableState {
     private List<Collection<IAction>> actionBySymbol = null;
 
     private boolean isAccepting;
-    private boolean isStarting;
 
     public BGTableState(int index) {
         this.index = index;
@@ -161,6 +160,7 @@ public class BGTableState {
     }
 
 	public boolean isStarting() {
-		return isStarting;
+		return index == 0;
 	}
+	
 }

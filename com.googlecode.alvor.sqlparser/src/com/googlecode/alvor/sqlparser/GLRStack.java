@@ -61,15 +61,15 @@ public class GLRStack implements IParserStackLike {
 		return errorOnTop;
 	}
 
-	@Override
-	public boolean topAccepts() {
-		for (IParserStack stack : variants) {
-			if (!stack.topAccepts()) {
-				return false;
-			}
-		}
-		return !variants.isEmpty();
-	}
+//	@Override
+//	public boolean topAccepts() {
+//		for (IParserStack stack : variants) {
+//			if (!stack.topAccepts()) {
+//				return false;
+//			}
+//		}
+//		return !variants.isEmpty();
+//	}
 
 	@Override
 	public boolean hasErrorOnTop() {

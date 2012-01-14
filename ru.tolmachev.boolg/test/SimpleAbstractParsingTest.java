@@ -20,7 +20,25 @@ import com.googlecode.alvor.string.StringConstant;
 
 public class SimpleAbstractParsingTest {
 	public static void main(String[] args) throws WrongInputFileStructureException, IOException {
-		LRParserTable table = new TableBuilder(new File("resources/simplest/table.txt")).buildTable();
+		String example = 
+				"main(arg)" +
+				"{" +
+					"var x, while;" +
+					"if(arg!=1) 1; else x=1;" +
+					"return 1;" +
+				"}";
+		boolean ok = true;
+		ok &= test("a", false);
+		ok &= test("ab", true);
+		ok &= test("b", false);
+		ok &= test("aba", false);
+		ok &= test("aa", false);
+		System.out.println("===");
+		System.out.println(ok ? "OK" : "FAIL");
+	}
+
+	private static boolean test(String example, boolean correct) throws WrongInputFileStructureException, IOException {
+		LRParserTable table = new TableBuilder(new File("resources/simple_ab/table.txt")).buildTable();
 		ILRParser<GraphStack> parser = new BooleanLRParser(table);
 		IStackFactory<GraphStack> factory = new IStackFactory<GraphStack>() {
 			
@@ -30,19 +48,15 @@ public class SimpleAbstractParsingTest {
 			}
 		};
 		LexerData lexerData = BGLexerData.DATA;
-		ParserSimulator<GraphStack> simulator = new ParserSimulator<GraphStack>(parser, factory, lexerData );
-		String example = 
-				"main(arg)" +
-				"{" +
-					"var x, while;" +
-					"if(arg!=1) 1; else x=1;" +
-					"return 1;" +
-				"}";
-		example = "a";
+		ParserSimulator<GraphStack> simulator = new ParserSimulator<GraphStack>(parser, factory, lexerData);
+		System.out.println("Testing: " + example);
 		List<String> errors = simulator.check(new StringConstant(example));
 		for (String error : errors) {
 			System.out.println(error);
 		}
-		System.out.println("Done");
+		System.out.println("Errors found: " + errors.size());
+		boolean result = correct == errors.isEmpty();
+		System.out.println(result ? "OK" : "Fail");
+		return result;
 	}
 }

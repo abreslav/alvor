@@ -20,8 +20,8 @@ public interface IParserStackLike {
 	 */
 	boolean hasErrorOnTop();
 	
-	/**
-	 * @return true iff the top state is accepting
-	 */
-	boolean topAccepts();
+//	/**
+//	 * @return true iff the top state is accepting
+//	 */
+//	boolean topAccepts();
 }
