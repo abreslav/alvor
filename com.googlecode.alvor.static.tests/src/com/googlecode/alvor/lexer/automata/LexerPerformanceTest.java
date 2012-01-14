@@ -18,7 +18,6 @@ import org.junit.Test;
 import com.googlecode.alvor.checkers.sqlstatic.SyntacticalSQLChecker;
 import com.googlecode.alvor.lexer.alphabet.IAbstractInputItem;
 import com.googlecode.alvor.lexer.alphabet.Token;
-import com.googlecode.alvor.lexer.sql.SQLLexer;
 import com.googlecode.alvor.sqllexer.GenericSQLLexerData;
 import com.googlecode.alvor.string.IAbstractString;
 import com.googlecode.alvor.string.IAbstractStringVisitor;
@@ -41,7 +40,7 @@ public class LexerPerformanceTest {
 		
 		Map<String, IInputToString> expectedMap = new LinkedHashMap<String, IInputToString>();
 		
-		final SQLLexer lexer = new SQLLexer(GenericSQLLexerData.DATA);
+		final AbstractLexer lexer = new AbstractLexer(GenericSQLLexerData.DATA);
 		AutomataTransduction automataTransduction = new AutomataTransduction(lexer);
 		
 		expectedMap.put("data/sqls.expected", new AbstractCharacterMapper() {
@@ -61,11 +60,11 @@ public class LexerPerformanceTest {
 		
 		Map<String, Set<String>> generatedMap = new LinkedHashMap<String, Set<String>>();
 
-		State sqlTransducer = lexer.SQL_TRANSDUCER;
+		State sqlTransducer = lexer.transducer;
 		for (IAbstractString string : strings) {
 			string = optimize(string);
 			State initial = StringToAutomatonConverter.INSTANCE.convert(string);
-			State transduction = automataTransduction.getTransduction(sqlTransducer, initial, lexer.SQL_ALPHABET_CONVERTER);
+			State transduction = automataTransduction.getTransduction(sqlTransducer, initial, lexer.alphabetConverter);
 			transduction = EmptyTransitionEliminator.INSTANCE.eliminateEmptySetTransitions(transduction);
 //			transduction = AutomataDeterminator.determinate(transduction);
 

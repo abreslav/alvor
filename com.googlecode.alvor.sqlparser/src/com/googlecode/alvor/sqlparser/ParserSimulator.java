@@ -8,12 +8,12 @@ import com.googlecode.alvor.lexer.alphabet.Token;
 import com.googlecode.alvor.lexer.automata.AutomataTransduction;
 import com.googlecode.alvor.lexer.automata.EmptyTransitionEliminator;
 import com.googlecode.alvor.lexer.automata.EmptyTransitionEliminator.IEmptinessExpert;
+import com.googlecode.alvor.lexer.automata.AbstractLexer;
 import com.googlecode.alvor.lexer.automata.IAlphabetConverter;
 import com.googlecode.alvor.lexer.automata.LexerData;
 import com.googlecode.alvor.lexer.automata.State;
 import com.googlecode.alvor.lexer.automata.StringToAutomatonConverter;
 import com.googlecode.alvor.lexer.automata.Transition;
-import com.googlecode.alvor.lexer.sql.SQLLexer;
 import com.googlecode.alvor.sqllexer.GenericSQLLexerData;
 import com.googlecode.alvor.sqlparser.framework.IError;
 import com.googlecode.alvor.sqlparser.framework.LRParserPredicate;
@@ -58,13 +58,13 @@ public class ParserSimulator<S extends IParserStackLike> {
 	private final ILRParser<S> parser;
 	// For debugging purposes only
 	public long allTime;
-	private final SQLLexer sqlLexer;
+	private final AbstractLexer sqlLexer;
 	private final AutomataTransduction automataTransduction;
 
 	public ParserSimulator(ILRParser<S> parser, IStackFactory<S> factory, LexerData lexerData) {
 		this.stackFactory = factory;
 		this.parser = parser;
-		this.sqlLexer = new SQLLexer(lexerData);
+		this.sqlLexer = new AbstractLexer(lexerData);
 		this.automataTransduction = new AutomataTransduction(sqlLexer);
 	}
 
@@ -115,8 +115,8 @@ public class ParserSimulator<S extends IParserStackLike> {
 	}
 
 	private void checkAutomaton(final ILRParser<S> parser, State asAut, IStackFactory<S> stackFactory, IParseErrorHandler errorHandler) {
-		State sqlTransducer = sqlLexer.SQL_TRANSDUCER;
-		State transduction = this.automataTransduction.getTransduction(sqlTransducer, asAut, sqlLexer.SQL_ALPHABET_CONVERTER);
+		State sqlTransducer = sqlLexer.transducer;
+		State transduction = this.automataTransduction.getTransduction(sqlTransducer, asAut, sqlLexer.alphabetConverter);
 		long time = System.nanoTime();
 		transduction = EmptyTransitionEliminator.INSTANCE.eliminateEmptySetTransitions(transduction, new IEmptinessExpert() {
 			

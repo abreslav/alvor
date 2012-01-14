@@ -1,32 +1,32 @@
 package com.googlecode.alvor.lexer.automata;
 
 public class LexerData {
-	public final char[] CHAR_CLASSES;
-	public final int STATE_COUNT;
-	public final int CHAR_CLASS_COUNT;
-	public final int[][] TRANSITIONS;
+	public final char[] charClasses;
+	public final int stateCount;
+	public final int charClassCount;
+	public final int[][] transitions;
 
 	/** Attributes (state - attrs (oct)) */
-	public final int[] ATTRIBUTES;
+	public final int[] attributes;
 
 	/** Actions (state - action) */
-	public final int[] ACTIONS;
+	public final int[] actions;
 
-	public final String[] KEYWORDS;
+	public final String[] keywords;
 	
 	/** Tokens (action - name)*/
-	public final String[] TOKENS;
+	public final String[] tokens;
 	
 	public LexerData(String charClassesPacked, int stateCount, int charClassCount, int[][] transitions,
 			int[] attributes, int[] actions, String[] keywords, String[] tokens) {
-		this.CHAR_CLASSES = unpackCharClasses(charClassesPacked);
-		this.STATE_COUNT = stateCount;
-		this.CHAR_CLASS_COUNT = charClassCount;
-		this.TRANSITIONS = transitions;
-		this.ATTRIBUTES = attributes;
-		this.ACTIONS = actions;
-		this.KEYWORDS = keywords;
-		this.TOKENS = tokens;
+		this.charClasses = unpackCharClasses(charClassesPacked);
+		this.stateCount = stateCount;
+		this.charClassCount = charClassCount;
+		this.transitions = transitions;
+		this.attributes = attributes;
+		this.actions = actions;
+		this.keywords = keywords;
+		this.tokens = tokens;
 	}
 	
     private static char [] unpackCharClasses(String packed) {

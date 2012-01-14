@@ -9,11 +9,10 @@ import com.googlecode.alvor.lexer.alphabet.ISequence;
 import com.googlecode.alvor.lexer.alphabet.PushInput;
 import com.googlecode.alvor.lexer.alphabet.Token;
 import com.googlecode.alvor.lexer.alphabet.Yield;
-import com.googlecode.alvor.lexer.sql.SQLLexer;
 
 /**
  * This interpreter supports {@link PushInput} and {@link Yield}, and creates keyword tokens
- * based on the information in {@link SQLLexer} class (this information was initially got from 
+ * based on the information in {@link AbstractLexer} class (this information was initially got from 
  * "*.keywords" file, and integrated into {@link SQLLexerData} by the generator). 
  * @author abreslav
  *
@@ -21,9 +20,9 @@ import com.googlecode.alvor.lexer.sql.SQLLexer;
 public class PushYieldInterpreterWithKeywords implements IOutputItemInterpreter {
 
 	//public static PushYieldInterpreterWithKeywords INSTANCE = new PushYieldInterpreterWithKeywords();
-	private final SQLLexer lexer;
+	private final AbstractLexer lexer;
 	
-	public PushYieldInterpreterWithKeywords(SQLLexer lexer) {
+	public PushYieldInterpreterWithKeywords(AbstractLexer lexer) {
 		this.lexer = lexer; 
 	}
 	
