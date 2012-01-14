@@ -10,12 +10,12 @@ import java.util.List;
 import java.util.Set;
 
 import com.googlecode.alvor.lexer.automata.AbstractCharacterMapper;
+import com.googlecode.alvor.lexer.automata.AbstractLexer;
 import com.googlecode.alvor.lexer.automata.AutomataUtils;
 import com.googlecode.alvor.lexer.automata.ICharacterMapper;
 import com.googlecode.alvor.lexer.automata.IInputToString;
 import com.googlecode.alvor.lexer.automata.State;
 import com.googlecode.alvor.lexer.automata.AutomataUtils.IOutput;
-import com.googlecode.alvor.lexer.sql.SQLLexer;
 
 public class TestUtil {
 
@@ -31,7 +31,7 @@ public class TestUtil {
 		return result;
 	}
 
-	public static void checkGeneratedSQLStrings(State transduction, final SQLLexer lexer, String... expected) {
+	public static void checkGeneratedSQLStrings(State transduction, final AbstractLexer lexer, String... expected) {
 		checkGeneratedStrings(transduction, new AbstractCharacterMapper() {
 			@Override
 			public String map(int c) {

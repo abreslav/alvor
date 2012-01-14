@@ -13,7 +13,6 @@ import com.googlecode.alvor.lexer.alphabet.IAbstractInputItem;
 import com.googlecode.alvor.lexer.alphabet.IAbstractOutputItem;
 import com.googlecode.alvor.lexer.alphabet.ISequence;
 import com.googlecode.alvor.lexer.alphabet.SimpleCharacter;
-import com.googlecode.alvor.lexer.sql.SQLLexer;
 import com.googlecode.alvor.sqllexer.GenericSQLLexerData;
 import com.googlecode.alvor.string.IAbstractString;
 import com.googlecode.alvor.string.parser.AbstractStringParser;
@@ -26,7 +25,7 @@ public class AutomataInclusionTest {
 		String automaton1;
 		String automaton2;
 		
-		SQLLexer lexer = new SQLLexer(GenericSQLLexerData.DATA);
+		AbstractLexer lexer = new AbstractLexer(GenericSQLLexerData.DATA);
 		AutomataTransduction automataTransduction = new AutomataTransduction(lexer);
 
 		automaton1 = "!A - !A:x;";
@@ -142,7 +141,7 @@ public class AutomataInclusionTest {
 		String transducerStr;
 		String checkStr;
 		
-		SQLLexer lexer = new SQLLexer(GenericSQLLexerData.DATA);
+		AbstractLexer lexer = new AbstractLexer(GenericSQLLexerData.DATA);
 		AutomataTransduction automataTransduction = new AutomataTransduction(lexer);
 
 		automatonStr = 
@@ -214,7 +213,7 @@ public class AutomataInclusionTest {
 
 	@Test
 	public void testSQL() throws Exception {
-		SQLLexer lexer = new SQLLexer(GenericSQLLexerData.DATA);
+		AbstractLexer lexer = new AbstractLexer(GenericSQLLexerData.DATA);
 		
 		String[] strings = {
 				"SELECT cc.ColumnName FROM AD_Column c",
@@ -247,11 +246,11 @@ public class AutomataInclusionTest {
 	}
 
 
-	private void checkAutomatonTransduction(String[] expected, State init, SQLLexer lexer) {
-		State sqlTransducer = lexer.SQL_TRANSDUCER;
+	private void checkAutomatonTransduction(String[] expected, State init, AbstractLexer lexer) {
+		State sqlTransducer = lexer.transducer;
 		AutomataTransduction automataTransduction = new AutomataTransduction(lexer);
 		State transduction = automataTransduction.getTransduction(
-				sqlTransducer, init, lexer.SQL_ALPHABET_CONVERTER);
+				sqlTransducer, init, lexer.alphabetConverter);
 		transduction = EmptyTransitionEliminator.INSTANCE
 				.eliminateEmptySetTransitions(transduction);
 //		AutomataUtils.generate(transduction, AutomataUtils.SQL_TOKEN_TO_STRING, AutomataUtils.STANDARD_OUTPUT);
@@ -264,7 +263,7 @@ public class AutomataInclusionTest {
 	public void testLoops() throws Exception {
 //		fail("Loops are not supported");
 		
-		SQLLexer lexer = new SQLLexer(GenericSQLLexerData.DATA);
+		AbstractLexer lexer = new AbstractLexer(GenericSQLLexerData.DATA);
 		
 		String abstractString;
 		String[] expected;
@@ -343,7 +342,7 @@ public class AutomataInclusionTest {
 	}
 
 	private void checkAbstractStringTransduction(IAbstractString str,
-			String[] expected, SQLLexer lexer) {
+			String[] expected, AbstractLexer lexer) {
 		State init = StringToAutomatonConverter.INSTANCE.convert(str);
 //		init = AutomataDeterminator.determinate(init);
 

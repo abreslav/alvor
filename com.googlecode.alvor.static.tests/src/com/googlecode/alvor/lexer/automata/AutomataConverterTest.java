@@ -8,7 +8,6 @@ import org.junit.Test;
 
 import com.googlecode.alvor.lexer.alphabet.IAbstractOutputItem;
 import com.googlecode.alvor.lexer.alphabet.Yield;
-import com.googlecode.alvor.lexer.sql.SQLLexer;
 import com.googlecode.alvor.sqllexer.GenericSQLLexerData;
 
 
@@ -17,9 +16,9 @@ public class AutomataConverterTest {
 	@Test
 	public void test() throws Exception {
 		
-		SQLLexer lexer = new SQLLexer(GenericSQLLexerData.DATA);
+		AbstractLexer lexer = new AbstractLexer(GenericSQLLexerData.DATA);
 		
-		State initial = lexer.SQL_TRANSDUCER;
+		State initial = lexer.transducer;
 		
 		String input;
 		String expected;
@@ -73,7 +72,7 @@ public class AutomataConverterTest {
 		StringBuilder output = new StringBuilder();
 		for (int i = 0; i <= input.length(); i++) {
 			int inChar = (i < input.length()) ? input.charAt(i) : -1;
-			int c = inChar < 0 ? inChar : lexerData.CHAR_CLASSES[inChar];
+			int c = inChar < 0 ? inChar : lexerData.charClasses[inChar];
 //			if (c == 0) {
 //				throw new IllegalArgumentException("Illegal character: '" + ((char) inChar) + "'");
 //			}
@@ -89,7 +88,7 @@ public class AutomataConverterTest {
 							if (type == -1) {
 								output.append("EOF");
 							} else {
-								output.append(lexerData.TOKENS[type]);
+								output.append(lexerData.tokens[type]);
 							}
 							output.append(" ");
 						}

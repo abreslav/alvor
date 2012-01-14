@@ -13,7 +13,6 @@ import com.googlecode.alvor.lexer.alphabet.BranchingSequence;
 import com.googlecode.alvor.lexer.alphabet.IAbstractInputItem;
 import com.googlecode.alvor.lexer.alphabet.IAbstractOutputItem;
 import com.googlecode.alvor.lexer.alphabet.ISequence;
-import com.googlecode.alvor.lexer.sql.SQLLexer;
 
 /**
  * Performs inclusion checks and transductions
@@ -26,7 +25,7 @@ public class AutomataTransduction {
 //	public static final AutomataTransduction INSTANCE = new AutomataTransduction();
 	private final PushYieldInterpreterWithKeywords pushYieldInterpreter;
 	
-	public AutomataTransduction(SQLLexer lexer) {
+	public AutomataTransduction(AbstractLexer lexer) {
 		pushYieldInterpreter = new PushYieldInterpreterWithKeywords(lexer);
 	}
 	
