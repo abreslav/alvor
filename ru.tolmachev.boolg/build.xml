@@ -28,7 +28,7 @@
     		classpath="${parserProject}/bin" 
     		classname="com.googlecode.alvor.sqlparser.SpecGeneratorMain"
     	>
-    		<arg value="resources/${data}/lexer.bgtemplate"/>
+    		<arg value="resources/lexer.bgtemplate"/>
     		<arg value="generated/${data}.bg"/>
     		<arg value="resources/lexer.flextemplate"/>
     		<arg value="generated/${data}.flex"/>

@@ -93,7 +93,7 @@ public class ParserSimulator<S extends IParserStackLike> {
 			@Override
 			public void other(List<? extends IAbstractInputItem> counterExample) {
 				if (errors.isEmpty()) {
-					errors.add("Syntax error. Most likely unfinished query");
+					errors.add("Syntax error. Most likely unfinished sentence");
 				}
 			}
 			
