@@ -9,7 +9,6 @@ import ru.tolmachev.core.action.GotoAction;
 import ru.tolmachev.core.action.ReduceAction;
 import ru.tolmachev.core.action.ShiftAction;
 
-import com.googlecode.alvor.lexer.alphabet.IAbstractInputItem;
 import com.googlecode.alvor.sqlparser.IAction;
 
 /**

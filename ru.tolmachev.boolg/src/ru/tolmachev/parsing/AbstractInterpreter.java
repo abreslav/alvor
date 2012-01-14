@@ -6,8 +6,6 @@ import ru.tolmachev.core.grammar_elems.Terminal;
 import ru.tolmachev.table.builder.enums.container.TerminalSignContainer;
 import ru.tolmachev.table.builder.exceptions.UndefinedTerminalException;
 
-import com.googlecode.alvor.lexer.alphabet.IAbstractInputItem;
-
 /**
  * Created by IntelliJ IDEA.
  * User: �������

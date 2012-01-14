@@ -21,7 +21,6 @@ import ru.tolmachev.core.grammar_elems.Nonterminal;
 import ru.tolmachev.core.grammar_elems.Terminal;
 import ru.tolmachev.table.builder.exceptions.WrongInputFileStructureException;
 
-import com.googlecode.alvor.lexer.alphabet.IAbstractInputItem;
 import com.googlecode.alvor.sqlparser.IAction;
 
 /**

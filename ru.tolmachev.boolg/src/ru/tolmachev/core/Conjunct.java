@@ -5,8 +5,6 @@ import java.util.List;
 
 import ru.tolmachev.core.grammar_elems.Nonterminal;
 
-import com.googlecode.alvor.lexer.alphabet.IAbstractInputItem;
-
 /**
  * Created by IntelliJ IDEA.
  * User: �������

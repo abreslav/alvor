@@ -11,8 +11,8 @@ import java.util.Set;
 import ru.tolmachev.core.IAbstractSymbol;
 import ru.tolmachev.core.State;
 
-import com.googlecode.alvor.lexer.alphabet.IAbstractInputItem;
 import com.googlecode.alvor.sqlparser.IParserStack;
+import com.googlecode.alvor.sqlparser.IParserStackLike;
 import com.googlecode.alvor.sqlparser.IParserState;
 
 /**
@@ -21,7 +21,7 @@ import com.googlecode.alvor.sqlparser.IParserState;
  * Date: 04.12.11
  * Time: 19:21
  */
-public class GraphStack implements IParserStack {
+public class GraphStack implements IParserStackLike {
 
     private Set<Node> top;
 
