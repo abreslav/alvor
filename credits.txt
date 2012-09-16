@@ -1,0 +1,3 @@
+Alvor was developed in STACC (http://www.stacc.ee/, Estonian Software Technology and Applications Competence Centre) between 2009 and 2011 with support from Nortal (http://www.nortal.com).
+
+Any created software based on the source code must contain a reference to STACC, such reference shall be included in the source code by the Party who wrote the source code or otherwise introduced the source code to the project. In addition, for any software created as a result of the source code, STACC has the right to display information on its website stating that the software is created partly in cooperation with STACC.
